@@ -1,7 +1,12 @@
 package hipi.image.convert;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import hipi.image.FloatImage;
-import hipi.image.RawImage;
+import hipi.image.io.ImageDecoder;
+import hipi.image.io.ImageEncoder;
 
 public class ImageConverter {
 
@@ -14,10 +19,11 @@ public class ImageConverter {
 	 * 
 	 * @see JPEGImageConverter, PNGImageConverter, PPMImageConverter
 	 */
-	public static RawImage convert(RawImage image, 
-			RawImageConverter converterFrom, RawImageConverter converterTo) {
-		FloatImage float_image = converterFrom.DecodeToFloatImage(image);
+	public static void convert(
+			InputStream image_in, OutputStream image_out, 
+			ImageDecoder decoder_in, ImageEncoder encoder_out) throws IOException {
 		
-		return converterTo.EncodeFromFloatImage(float_image);
+		FloatImage float_image = decoder_in.decodeImage(image_in);
+		encoder_out.encodeImage(float_image, image_out);
 	}
 }

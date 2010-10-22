@@ -145,8 +145,7 @@ public abstract class AbstractImageBundle {
 		PipedOutputStream pipe_out = new PipedOutputStream();
 		PipedInputStream pipe_in = new PipedInputStream(pipe_out);
 		
-		encoder.encodeImageHeader(header, pipe_out);
-		encoder.encodeImage(image, pipe_out);
+		encoder.encodeImage(image, header, pipe_out);
 		
 		addImage(pipe_in, header.getImageType());
 	}
@@ -172,6 +171,7 @@ public abstract class AbstractImageBundle {
 			throw new IOException("Header already read");
 		}
 	}
+	//TODO: Add in a method to skip the next image
 	
 	public final FloatImage nextImage() throws IOException {
 		if (!_readHeader) {

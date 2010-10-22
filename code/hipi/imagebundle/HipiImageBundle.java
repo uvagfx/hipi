@@ -27,8 +27,10 @@ public class HipiImageBundle extends AbstractImageBundle {
 	/**
 	 * A set of records where the key is the length of each image and the value
 	 * is the image type.
+	 * 
+	 * TODO: Change from Map to Array of pairs or equiv
 	 */
-	private Map<Long, ImageHeader.ImageType> _image_information;
+	private Pair<Long, ImageHeader.ImageType> _image_information;
 	
 	private long _internal_counter = 0;
 	

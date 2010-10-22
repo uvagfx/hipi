@@ -23,12 +23,7 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 		return null;
 	}
 
-	public void encodeImageHeader(ImageHeader header, OutputStream os)
-			throws IOException {
-		
-	}
-
-	public void encodeImage(FloatImage image, OutputStream os)
+	public void encodeImage(FloatImage image, ImageHeader header, OutputStream os)
 			throws IOException {
 		
 	}

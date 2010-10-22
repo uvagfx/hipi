@@ -8,7 +8,6 @@ import java.io.OutputStream;
 
 public interface ImageEncoder {
 
-	public void encodeImageHeader(ImageHeader header, OutputStream os) throws IOException;
 	public ImageHeader createSimpleHeader(FloatImage image);
-	public void encodeImage(FloatImage image, OutputStream os) throws IOException;
+	public void encodeImage(FloatImage image, ImageHeader header, OutputStream os) throws IOException;
 }

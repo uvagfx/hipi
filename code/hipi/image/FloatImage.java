@@ -29,10 +29,11 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 	protected int _b;
 	protected float[] _pels;
 
-	protected FloatImage(int width, int height, int bands) {
+	public FloatImage(int width, int height, int bands, float[] pels) {
 		_w = width;
 		_h = height;
 		_b = bands;
+		_pels = pels;
 	}
 
 	/**
@@ -54,6 +55,22 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 
 	public float getPixel(int x, int y, int c) {
 		return _pels[c + (x + y * _w) * _b];
+	}
+
+	public int getWidth() {
+		return _w;
+	}
+
+	public int getHeight() {
+		return _h;
+	}
+
+	public int getBand() {
+		return _b;
+	}
+
+	public float[] getData() {
+		return _pels;
 	}
 
 	public void readFields(DataInput input) throws IOException {

@@ -3,6 +3,7 @@ package hipi.image;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +47,7 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 	 * it appears in the EXIF 2.2 specification and the value is the
 	 * corresponding information for that field.
 	 */
-	private Map<String, String> _exif_information;
+	private Map<String, String> _exif_information = new HashMap<String, String>();
 	/**
 	 * The image type of this image. Usually read from the image file's first
 	 * few bytes.

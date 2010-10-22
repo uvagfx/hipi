@@ -1,0 +1,96 @@
+/**
+ * 
+ */
+package hipi.unittest;
+
+import static org.junit.Assert.*;
+import static org.junit.Assume.*;
+import hipi.image.FloatImage;
+import hipi.image.ImageHeader;
+import hipi.image.io.ImageDecoder;
+import hipi.image.io.ImageEncoder;
+import hipi.image.io.JPEGImageUtil;
+import hipi.image.io.PPMImageUtil;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import org.junit.Test;
+
+/**
+ * @author liu
+ *
+ */
+public class JPEGImageUtilTestCase {
+
+	/**
+	 * Test method for {@link hipi.image.io.JPEGImageUtil#decodeImageHeader(java.io.InputStream)}.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDecodeImageHeader() throws IOException {
+		ImageDecoder decoder = JPEGImageUtil.getInstance();
+		FileInputStream fis;
+		ImageHeader header;
+		String[] fileName = {"canon-ixus", "fujifilm-dx10", "fujifilm-finepix40i", "fujifilm-mx1700", "kodak-dc210", "kodak-dc240", "nikon-e950", "olympus-c960", "ricoh-rdc5300", "sanyo-vpcg250", "sanyo-vpcsx550", "sony-cybershot", "sony-d700"};
+		String[] model = {"Canon DIGITAL IXUS", "DX-10", "FinePix40i", "MX-1700ZOOM", "DC210 Zoom (V05.00)", "KODAK DC240 ZOOM DIGITAL CAMERA", "E950", "C960Z,D460Z", "RDC-5300", "SR6", "SX113", "CYBERSHOT", "DSC-D700"};
+		for (int i = 0; i < fileName.length; i++)
+		{
+			fis = new FileInputStream("data/test/JPEGImageUtilTestCase/exif/" + fileName[i] + ".jpg");
+			header = decoder.decodeImageHeader(fis);
+			assertEquals("exif model not correct", model[i].trim(), header.getEXIFInformation("Model").trim());
+		}
+	}
+
+	/**
+	 * Test method for {@link hipi.image.io.JPEGImageUtil#decodeImage(java.io.InputStream)}.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDecodeImage() throws IOException {
+		ImageDecoder jpgDecoder, ppmDecoder;
+		jpgDecoder = JPEGImageUtil.getInstance();
+		ppmDecoder = PPMImageUtil.getInstance();
+		FileInputStream fis;
+		FloatImage ppmImage, jpgImage;
+		String[] fileName = {"canon-ixus", "cmyk-jpeg-format"};
+		for (int i = 0; i < fileName.length; i++)
+		{
+			fis = new FileInputStream("data/test/JPEGImageUtilTestCase/truth/" + fileName[i] + ".ppm");
+			ppmImage = ppmDecoder.decodeImage(fis);
+			assumeNotNull(ppmImage);
+			fis = new FileInputStream("data/test/JPEGImageUtilTestCase/decode/" + fileName[i] + ".jpg");
+			jpgImage = jpgDecoder.decodeImage(fis);
+			assumeNotNull(jpgImage);
+			assertArrayEquals(fileName[i] + " decoding fails", ppmImage.getData(), jpgImage.getData(), 1);
+		}
+	}
+
+	/**
+	 * Test method for {@link hipi.image.io.JPEGImageUtil#encodeImage(hipi.image.FloatImage, java.io.OutputStream)}.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testEncodeImage() throws IOException {
+		ImageDecoder decoder = PPMImageUtil.getInstance();
+		ImageEncoder encoder = JPEGImageUtil.getInstance();
+		FileInputStream pis, jis;
+		FloatImage image;
+		byte[] pb, jb;
+		String[] fileName = {"canon-ixus", "cmyk-jpeg-format"};
+		for (int i = 0; i < fileName.length; i++)
+		{
+			pis = new FileInputStream("data/test/JPEGImageUtilTestCase/truth/" + fileName[i] + ".ppm");
+			image = decoder.decodeImage(pis);
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			encoder.encodeImage(image, null, bos);
+			pb = bos.toByteArray();
+			jis = new FileInputStream("data/test/JPEGImageUtilTestCase/encode/" + fileName[i] + ".jpg");
+			jb = new byte[pb.length];
+			jis.read(jb);
+			assertArrayEquals(fileName[i] + " encoding fails", jb, pb);
+		}
+	}
+
+}

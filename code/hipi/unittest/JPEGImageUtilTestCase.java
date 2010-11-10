@@ -12,9 +12,14 @@ import hipi.image.io.ImageEncoder;
 import hipi.image.io.JPEGImageUtil;
 import hipi.image.io.PPMImageUtil;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Scanner;
 
 import org.junit.Test;
 
@@ -75,7 +80,8 @@ public class JPEGImageUtilTestCase {
 	public void testEncodeImage() throws IOException {
 		ImageDecoder decoder = PPMImageUtil.getInstance();
 		ImageEncoder encoder = JPEGImageUtil.getInstance();
-		FileInputStream pis, jis;
+		FileInputStream pis;
+		FileOutputStream jos;
 		FloatImage image;
 		byte[] pb, jb;
 		String[] fileName = {"canon-ixus", "cmyk-jpeg-format"};
@@ -83,13 +89,13 @@ public class JPEGImageUtilTestCase {
 		{
 			pis = new FileInputStream("data/test/JPEGImageUtilTestCase/truth/" + fileName[i] + ".ppm");
 			image = decoder.decodeImage(pis);
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			encoder.encodeImage(image, null, bos);
-			pb = bos.toByteArray();
-			jis = new FileInputStream("data/test/JPEGImageUtilTestCase/encode/" + fileName[i] + ".jpg");
-			jb = new byte[pb.length];
-			jis.read(jb);
-			assertArrayEquals(fileName[i] + " encoding fails", jb, pb);
+			jos = new FileOutputStream("/tmp/" + fileName[i] + ".jpg");
+			encoder.encodeImage(image, null, jos);
+			Runtime rt = Runtime.getRuntime();
+			Process pr = rt.exec("compare -metric PSNR data/test/JPEGImageUtilTestCase/truth/" + fileName[i] + ".ppm /tmp/" + fileName[i] + ".jpg /tmp/psnr.png");
+			Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));
+			float psnr = scanner.hasNextFloat() ? scanner.nextFloat() : 0;
+			assertTrue(fileName[i] + " PSNR is too low : " + psnr, psnr > 30);
 		}
 	}
 

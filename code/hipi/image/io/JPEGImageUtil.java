@@ -3,23 +3,20 @@ package hipi.image.io;
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
 
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
-
-import javax.imageio.ImageIO;
 
 import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGDecodeParam;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
@@ -34,7 +31,8 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 
 	public ImageHeader decodeImageHeader(InputStream is) throws IOException {
 		try {
-			Metadata metadata = JpegMetadataReader.readMetadata(is);
+			MetadataReader reader = new MetadataReader(is);
+			Metadata metadata = reader.extract();
 			ImageHeader header = new ImageHeader();
 			Iterator directories = metadata.getDirectoryIterator();
 			while (directories.hasNext()) {

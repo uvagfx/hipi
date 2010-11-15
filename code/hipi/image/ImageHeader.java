@@ -13,6 +13,10 @@ import org.apache.hadoop.io.Writable;
 
 public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 
+	public int image_width;
+	public int image_height;
+	public int image_bit_depth;
+	
 	public enum ImageType {
 		UNSUPPORTED_IMAGE(0x0),
 		JPEG_IMAGE(0x1), 

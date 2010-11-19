@@ -6,11 +6,10 @@ import hipi.image.ImageHeader.ImageType;
 import hipi.image.io.ImageEncoder;
 import hipi.image.io.JPEGImageUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,12 +43,10 @@ public abstract class AbstractImageBundle {
 	protected Configuration _conf;
 
 	private boolean _readHeader;
-	private boolean _readImage;
+	private FloatImage _readImage;
 
 	public AbstractImageBundle(Configuration conf) {
 		_conf = conf;
-		_readHeader = false;
-		_readImage = false;
 	}
 
 	public final void open(Path file_path, int mode) throws IOException {
@@ -85,7 +82,7 @@ public abstract class AbstractImageBundle {
 			}
 			_fileMode = FILE_MODE_WRITE;
 			openForWrite(file_path);
-		} else if (_fileMode == -1 && mode == FILE_MODE_WRITE) {
+		} else if (_fileMode == -1 && mode == FILE_MODE_READ) {
 			LOG.info("Attempting to open file " + file_path.getName()
 					+ " for reading");
 			_fileMode = FILE_MODE_READ;
@@ -94,6 +91,8 @@ public abstract class AbstractImageBundle {
 			throw new IOException("File " + file_path.getName()
 					+ " already opened for reading/writing");
 		}
+		_readHeader = false;
+		_readImage = null;
 	}
 
 	/**
@@ -142,12 +141,11 @@ public abstract class AbstractImageBundle {
 	}
 	
 	public final void addImage(FloatImage image, ImageEncoder encoder, ImageHeader header) throws IOException {
-		PipedOutputStream pipe_out = new PipedOutputStream();
-		PipedInputStream pipe_in = new PipedInputStream(pipe_out);
-		
-		encoder.encodeImage(image, header, pipe_out);
-		
-		addImage(pipe_in, header.getImageType());
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		encoder.encodeImage(image, header, baos);
+
+		addImage(new ByteArrayInputStream(baos.toByteArray()), header.getImageType());
 	}
 	
 	public abstract void addImage(InputStream image_stream, ImageType type) throws IOException;
@@ -162,29 +160,23 @@ public abstract class AbstractImageBundle {
 	protected abstract ImageHeader readNextHeader() throws IOException;
 	protected abstract FloatImage readNextImage() throws IOException;
 
-	public final ImageHeader nextHeader() throws IOException {
-		if (!_readHeader) {
+	public final ImageHeader next() throws IOException {
+		_readImage = null;
+		if (hasNext()) {
 			_readHeader = true;
-			_readImage = false;
 			return readNextHeader();
 		} else {
-			throw new IOException("Header already read");
+			_readHeader = false;
+			return null;
 		}
 	}
 	//TODO: Add in a method to skip the next image
 	
-	public final FloatImage nextImage() throws IOException {
-		if (!_readHeader) {
-			nextHeader();
+	public final FloatImage getCurrentImage() throws IOException {
+		if (_readImage == null && _readHeader) {
+			_readImage = readNextImage();
 		}
-		
-		if (!_readImage) {
-			_readImage = true;
-			_readHeader = false;
-			return readNextImage();
-		} else {
-			throw new IOException("Image already read");
-		}
+		return _readImage;
 	}
 
 	/**

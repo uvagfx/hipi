@@ -12,9 +12,6 @@ import hipi.image.io.ImageEncoder;
 import hipi.image.io.JPEGImageUtil;
 import hipi.image.io.PPMImageUtil;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -83,7 +80,6 @@ public class JPEGImageUtilTestCase {
 		FileInputStream pis;
 		FileOutputStream jos;
 		FloatImage image;
-		byte[] pb, jb;
 		String[] fileName = {"canon-ixus", "cmyk-jpeg-format"};
 		for (int i = 0; i < fileName.length; i++)
 		{

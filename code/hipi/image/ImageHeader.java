@@ -100,6 +100,16 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 			return value;
 		}
 	}
+	
+	public ImageHeader(ImageType type)
+	{
+		_image_type = type;
+	}
+	
+	public ImageHeader()
+	{
+		_image_type = ImageType.getDefault();
+	}
 
 	/**
 	 * Get the image type.

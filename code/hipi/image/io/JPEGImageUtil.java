@@ -2,17 +2,16 @@ package hipi.image.io;
 
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
+import hipi.image.ImageHeader.ImageType;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 
-import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
@@ -29,11 +28,12 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 		return static_object;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public ImageHeader decodeImageHeader(InputStream is) throws IOException {
 		try {
 			MetadataReader reader = new MetadataReader(is);
 			Metadata metadata = reader.extract();
-			ImageHeader header = new ImageHeader();
+			ImageHeader header = new ImageHeader(ImageType.JPEG_IMAGE);
 			Iterator directories = metadata.getDirectoryIterator();
 			while (directories.hasNext()) {
 				Directory directory = (Directory)directories.next();
@@ -112,7 +112,7 @@ public void encodeImage(FloatImage image, ImageHeader header, OutputStream os)
 	}
 
 	public ImageHeader createSimpleHeader(FloatImage image) {
-		return new ImageHeader();
+		return new ImageHeader(ImageType.JPEG_IMAGE);
 	}
 
 }

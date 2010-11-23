@@ -1,12 +1,9 @@
 package hipi.imagebundle.mapred;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import hipi.excluder.ImageExcluder;
 import hipi.image.FloatImage;
-import hipi.image.ImageHeader;
-import hipi.image.convert.ImageConverter;
 
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.RecordReader;

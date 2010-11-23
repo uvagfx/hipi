@@ -132,7 +132,6 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 			throw new IOException("That image is too wide or tall.");
 		int width = (int) widthLong;
 		int height = (int) heightLong;
-		int bitsPerPixel = (int) chunks.getBitsPerPixel();
 		float[] pels = new float[width * height * 3];
 		byte[] image_bytes = chunks.getImageData();
 
@@ -486,49 +485,6 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 	public ImageHeader createSimpleHeader(FloatImage image) {
 		return null;
 	}
-
-	private byte read(InputStream is) throws IOException {
-		byte b = (byte)is.read();
-		System.out.print((char)b);
-		return(b);
-	}
-
-	private int readInt(InputStream is) throws IOException {
-		byte b[] = read(is, 4);
-		return(((b[0]&0xff)<<24) +
-				((b[1]&0xff)<<16) +
-				((b[2]&0xff)<<8) +
-				((b[3]&0xff)));
-	}
-
-	private byte[] read(InputStream is, int count) throws IOException {
-		byte[] result = new byte[count];
-		for(int i = 0; i < count; i++) {
-			result[i] = read(is);
-		}
-		return(result);
-	}
-
-	private boolean compare(byte[] b1, byte[] b2) {
-		if(b1.length != b2.length) {
-			return(false);
-		}
-		for(int i = 0; i < b1.length; i++) {
-			if(b1[i] != b2[i]) {
-				return(false);
-			}
-		}
-		return(true);
-	}
-
-	private void checkEquality(byte[] b1, byte[] b2) {
-		if(!compare(b1, b2)) {
-			//	System.out.println(new String(b1));
-			//	System.out.println(new String(b2));
-			throw(new RuntimeException("Format error"));
-		}
-	}
-
 
 	private void write(OutputStream os, int i) throws IOException {
 		byte b[]={(byte)((i>>24)&0xff),(byte)((i>>16)&0xff),(byte)((i>>8)&0xff),(byte)(i&0xff)};

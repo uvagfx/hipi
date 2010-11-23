@@ -9,8 +9,6 @@ import hipi.image.io.ImageEncoder;
 import hipi.image.io.PNGImageUtil;
 import hipi.image.io.PPMImageUtil;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,7 +17,7 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
-public class PNGImageUtilTest {
+public class PNGImageUtilTestCase {
 
 
 	/**
@@ -83,7 +81,6 @@ public class PNGImageUtilTest {
 		FileInputStream pis;
 		FileOutputStream pos;
 		FloatImage image;
-		byte[] pb, jb;
 		String[] fileName = {"canon-ixus", "cmyk-jpeg-format"};
 		for (int i = 0; i < fileName.length; i++)
 		{
@@ -92,7 +89,7 @@ public class PNGImageUtilTest {
 			pos = new FileOutputStream("/tmp/" + fileName[i] + ".png");
 			encoder.encodeImage(image, null, pos);
 			Runtime rt = Runtime.getRuntime();
-			Process pr = rt.exec("/opt/local/bin/compare -metric MSE data/test/PNGImageUtilTestCase/truth/" + fileName[i] + ".ppm /tmp/" + fileName[i] + ".png /tmp/psnr.png");
+			Process pr = rt.exec("compare -metric MSE data/test/PNGImageUtilTestCase/truth/" + fileName[i] + ".ppm /tmp/" + fileName[i] + ".png /tmp/psnr.png");
 			Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));
 			float mse = scanner.hasNextFloat() ? scanner.nextFloat() : -1;
 			assertTrue(fileName[i] + " MSE is too high : " + mse, mse == 0);

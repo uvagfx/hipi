@@ -8,6 +8,7 @@ import org.junit.runners.Suite;
 	JPEGImageUtilTestCase.class,
 	PNGImageUtilTestCase.class,
 	HipiImageBundleTestCase.class,
+	SeqImageBundleTestCase.class,
 })
 
 public class AllTests {

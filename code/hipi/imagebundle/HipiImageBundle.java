@@ -104,41 +104,37 @@ public class HipiImageBundle extends AbstractImageBundle {
 
 	@Override
 	public long getImageCount() {
-		return 0;
+		return -1;
 	}
 
 	@Override
-	protected ImageHeader readNextHeader() throws IOException {
-		while (_cacheLength > 0) {
-			long skipped = _buffered_input_stream.skip((long) _cacheLength);
-			if (skipped == 0)
-				break;
-			_cacheLength -= skipped;
+	protected ImageHeader readHeader() throws IOException {
+		if (_cacheLength > 0) {
+			ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
+			if (decoder == null)
+				return null;
+			ImageHeader header = decoder.decodeImageHeader(_buffered_input_stream);
+			_buffered_input_stream.reset();
+			return header;
 		}
-		_buffered_input_stream.read(_sig);
-		_cacheLength = ((_sig[0] & 0xff) << 24) | ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8) | (_sig[3] & 0xff);
-		_cacheType = ((_sig[4] & 0xff) << 24) | ((_sig[5] & 0xff) << 16) | ((_sig[6] & 0xff) << 8) | (_sig[7] & 0xff);
-		ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
-		if (decoder == null)
-			return null;
-		_buffered_input_stream.mark(_cacheLength);
-		ImageHeader header = decoder.decodeImageHeader(_buffered_input_stream);
-		_buffered_input_stream.reset();
-		return header;
+		return null;
 	}
 
 	@Override
-	protected FloatImage readNextImage() throws IOException {
-		ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
-		if (decoder == null)
-			return null;
-		FloatImage image = decoder.decodeImage(_buffered_input_stream);
-		_cacheLength = _cacheType = 0;
-		return image;
+	protected FloatImage readImage() throws IOException {
+		if (_cacheLength > 0) {
+			ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
+			if (decoder == null)
+				return null;
+			FloatImage image = decoder.decodeImage(_buffered_input_stream);
+			_buffered_input_stream.reset();
+			return image;
+		}
+		return null;
 	}
 
 	@Override
-	public boolean hasNext() {
+	protected boolean prepareNext() {
 		try {
 			while (_cacheLength > 0) {
 				long skipped = _buffered_input_stream.skip((long) _cacheLength);
@@ -146,16 +142,23 @@ public class HipiImageBundle extends AbstractImageBundle {
 					break;
 				_cacheLength -= skipped;
 			}
-			_buffered_input_stream.mark(8);
 			_buffered_input_stream.read(_sig);
-			_buffered_input_stream.reset();
-			_cacheLength = _cacheType = 0;
-			return (_sig[0] != 0 || _sig[1] != 0 || _sig[2] != 0 || _sig[3] != 0 ||
-					_sig[4] != 0 || _sig[5] != 0 || _sig[6] != 0 || _sig[7] != 0);
+			if (_sig[0] != 0 || _sig[1] != 0 || _sig[2] != 0 || _sig[3] != 0 || _sig[4] != 0 || _sig[5] != 0 || _sig[6] != 0 || _sig[7] != 0) {
+				_cacheLength = ((_sig[0] & 0xff) << 24) | ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8) | (_sig[3] & 0xff);
+				_cacheType = ((_sig[4] & 0xff) << 24) | ((_sig[5] & 0xff) << 16) | ((_sig[6] & 0xff) << 8) | (_sig[7] & 0xff);
+				_buffered_input_stream.mark(_cacheLength);
+				return true;
+			}
+			return false;
 		} catch (IOException e) {
 			LOG.info("reach the end of the file");
 			return false;
 		}
+	}
+	
+	@Override
+	public void merge(AbstractImageBundle[] bundles) {
+		
 	}
 
 	@Override

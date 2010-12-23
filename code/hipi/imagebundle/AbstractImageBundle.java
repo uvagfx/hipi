@@ -42,6 +42,8 @@ public abstract class AbstractImageBundle {
 
 	protected Configuration _conf;
 
+	private boolean _hasNext;
+	private boolean _prepared;
 	private boolean _readHeader;
 	private FloatImage _readImage;
 
@@ -91,6 +93,7 @@ public abstract class AbstractImageBundle {
 			throw new IOException("File " + file_path.getName()
 					+ " already opened for reading/writing");
 		}
+		_prepared = false;
 		_readHeader = false;
 		_readImage = null;
 	}
@@ -156,25 +159,43 @@ public abstract class AbstractImageBundle {
 	 * @return
 	 */
 	public abstract long getImageCount();
-	
-	protected abstract ImageHeader readNextHeader() throws IOException;
-	protected abstract FloatImage readNextImage() throws IOException;
+
+	/**
+	 * put all needed information for next into some cached place
+	 * @return denote if has next or not
+	 */
+	protected abstract boolean prepareNext();
+	/**
+	 * pull header out of cached place, can read multi-times, but for the same header
+	 * @return
+	 * @throws IOException
+	 */
+	protected abstract ImageHeader readHeader() throws IOException;
+	/**
+	 * pull image out of cached place, can read multi-times, but for the same image
+	 * @return
+	 * @throws IOException
+	 */
+	protected abstract FloatImage readImage() throws IOException;
 
 	public final ImageHeader next() throws IOException {
+		if (!_prepared)
+			_hasNext = prepareNext();
+		_prepared = false;
 		_readImage = null;
-		if (hasNext()) {
+		if (_hasNext) {
 			_readHeader = true;
-			return readNextHeader();
+			return readHeader();
 		} else {
 			_readHeader = false;
 			return null;
 		}
 	}
 	//TODO: Add in a method to skip the next image
-	
+
 	public final FloatImage getCurrentImage() throws IOException {
 		if (_readImage == null && _readHeader) {
-			_readImage = readNextImage();
+			_readImage = readImage();
 		}
 		return _readImage;
 	}
@@ -185,7 +206,15 @@ public abstract class AbstractImageBundle {
 	 * 
 	 * @return
 	 */
-	public abstract boolean hasNext();
+	public boolean hasNext() {
+		if (!_prepared) {
+			_hasNext = prepareNext();
+			_prepared = true;
+		}
+		return _hasNext;
+	}
+
+	public abstract void merge(AbstractImageBundle[] bundles);
 
 	/**
 	 * Closes the underlying stream for this bundle. In some implementations, no

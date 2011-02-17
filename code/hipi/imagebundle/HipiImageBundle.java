@@ -11,23 +11,131 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 public class HipiImageBundle extends AbstractImageBundle {
 
-	private static final Log LOG = LogFactory.getLog(HipiImageBundle.class
-			.getName());
+	private static final Log LOG = LogFactory.getLog(HipiImageBundle.class.getName());
 
-	protected DataInputStream _index_input_stream = null;
-	protected DataOutputStream _index_output_stream = null;
-	protected DataInputStream _data_input_stream = null;
-	protected DataOutputStream _data_output_stream = null;
-	protected BufferedInputStream _buffered_data_input_stream = null;
+	public static class FileReader {
+
+		private DataInputStream _data_input_stream = null;
+		private BufferedInputStream _buffered_data_input_stream = null;
+
+		private byte _sig[] = new byte[8];
+		private int _cacheLength = 0;
+		private int _cacheType = 0;
+		private long _countingOffset = 0;
+		private long _start = 0;
+		private long _end = 0;
+		private ImageHeader _header;
+		private FloatImage _image;
+
+		public float getProgress() {
+			return (_end - _start) > 0 ? (float)(_countingOffset - _start) / (_end - _start) : 0;
+		}
+
+		public FileReader(FileSystem fs, Path path, Configuration conf,
+				long start, long end) throws IOException {
+			_data_input_stream = new DataInputStream(fs.open(path));
+			_buffered_data_input_stream = new BufferedInputStream(
+					_data_input_stream);
+			_countingOffset = _start = start;
+			while (_countingOffset > 0) {
+				long skipped = _buffered_data_input_stream
+						.skip((long) _countingOffset);
+				if (skipped <= 0)
+					break;
+				_countingOffset -= skipped;
+			}
+			_countingOffset = _start;
+			_end = end;
+		}
+		
+		public void close() throws IOException {
+			if (_data_input_stream != null)
+				_data_input_stream.close();
+			if (_buffered_data_input_stream != null)
+				_buffered_data_input_stream.close();
+		}
+
+		public boolean nextKeyValue() {
+			try {
+				LOG.info("try to fetch the nex key-value pair at " + _countingOffset);
+				_countingOffset += _cacheLength;
+				if (_end > 0 && _countingOffset > _end) {
+					_cacheLength = _cacheType = 0;
+					return false;
+				}
+				while (_cacheLength > 0) {
+					long skipped = _buffered_data_input_stream
+							.skip((long) _cacheLength);
+					if (skipped <= 0)
+						break;
+					_cacheLength -= skipped;
+				}
+				int byteRead = _buffered_data_input_stream.read(_sig);
+				if (byteRead <= 0)
+					return false;
+				_cacheLength = ((_sig[0] & 0xff) << 24)
+						| ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8)
+						| (_sig[3] & 0xff);
+				_cacheType = ((_sig[4] & 0xff) << 24)
+						| ((_sig[5] & 0xff) << 16) | ((_sig[6] & 0xff) << 8)
+						| (_sig[7] & 0xff);
+				_image = null;
+				_header = null;
+				_buffered_data_input_stream.mark(_cacheLength);
+				return true;
+			} catch (IOException e) {
+				return false;
+			}
+		}
+
+		public ImageHeader getCurrentKey() throws IOException {
+			if (_header != null)
+				return _header;
+			if (_cacheLength > 0) {
+				ImageDecoder decoder = CodecManager.getDecoder(ImageType
+						.fromValue(_cacheType));
+				if (decoder == null)
+					return null;
+				_header = decoder.decodeImageHeader(_buffered_data_input_stream);
+				_buffered_data_input_stream.reset();
+				return _header;
+			}
+			return null;
+		}
+
+		public FloatImage getCurrentValue() throws IOException {
+			if (_image != null)
+				return _image;
+			if (_cacheLength > 0) {
+				ImageDecoder decoder = CodecManager.getDecoder(ImageType
+						.fromValue(_cacheType));
+				if (decoder == null)
+					return null;
+				_image = decoder.decodeImage(_buffered_data_input_stream);
+				_buffered_data_input_stream.reset();
+				return _image;
+			}
+			return null;
+		}
+
+	}
+
+	private DataInputStream _index_input_stream = null;
+	private DataOutputStream _index_output_stream = null;
+	private DataOutputStream _data_output_stream = null;
+	private FileReader _reader = null;
 
 	/**
 	 * A set of records where the key is the length of each image and the value
@@ -56,7 +164,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 		// 16-byte of reserved field
 		// 4-byte points to how much to skip in order to reach the start of
 		// offsets (default 0)
-		// 8-byte of offsets starts from here until EOF
+		// 8-byte of offsets (of the end position) starts from here until EOF
 		_index_output_stream.writeInt(0x81911b18);
 		String data_name = _data_file.getName();
 		// write out filename in UTF-8 encoding
@@ -76,7 +184,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 	@Override
 	protected void openForWrite(Path output_file) throws IOException {
 		// Check if the instance is already in some read/write states
-		if (_data_output_stream != null || _data_input_stream != null
+		if (_data_output_stream != null || _reader != null
 				|| _index_output_stream != null || _index_input_stream != null) {
 			throw new IOException("File " + output_file.getName()
 					+ " already opened for reading/writing");
@@ -123,9 +231,29 @@ public class HipiImageBundle extends AbstractImageBundle {
 		_cacheLength = _cacheType = 0;
 	}
 
+	public List<Long> getOffsets() {
+		return getOffsets(0);
+	}
+	
+	public FileStatus getDataFile() throws IOException {
+		return FileSystem.get(_conf).getFileStatus(_data_file);
+	}
+
+	public List<Long> getOffsets(int maximumNumber) {
+		ArrayList<Long> offsets = new ArrayList<Long>(maximumNumber);
+		for (int i = 0; i < maximumNumber || maximumNumber == 0; i++) {
+			try {
+				offsets.add(_index_input_stream.readLong());
+			} catch (IOException e) {
+				break;
+			}
+		}
+		return offsets;
+	}
+
 	@Override
 	protected void openForRead(Path input_file) throws IOException {
-		if (_data_output_stream != null || _data_input_stream != null
+		if (_data_output_stream != null || _reader != null
 				|| _index_output_stream != null || _index_input_stream != null) {
 			throw new IOException("File " + input_file.getName()
 					+ " already opened for reading/writing");
@@ -136,11 +264,8 @@ public class HipiImageBundle extends AbstractImageBundle {
 				_index_file));
 
 		readBundleHeader();
-
-		_data_input_stream = new DataInputStream(FileSystem.get(_conf).open(
-				_data_file));
-		_buffered_data_input_stream = new BufferedInputStream(
-				_data_input_stream);
+		
+		_reader = new FileReader(FileSystem.get(_conf), _data_file, _conf, 0, 0);
 	}
 
 	@Override
@@ -160,8 +285,8 @@ public class HipiImageBundle extends AbstractImageBundle {
 		_sig[7] = (byte) (_cacheType & 0xff);
 		_data_output_stream.write(_sig);
 		_data_output_stream.write(data);
-		_index_output_stream.writeLong(_countingOffset);
 		_countingOffset += 8 + data.length;
+		_index_output_stream.writeLong(_countingOffset);
 	}
 
 	@Override
@@ -171,56 +296,17 @@ public class HipiImageBundle extends AbstractImageBundle {
 
 	@Override
 	protected ImageHeader readHeader() throws IOException {
-		if (_cacheLength > 0) {
-			ImageDecoder decoder = CodecManager.getDecoder(ImageType
-					.fromValue(_cacheType));
-			if (decoder == null)
-				return null;
-			ImageHeader header = decoder
-					.decodeImageHeader(_buffered_data_input_stream);
-			_buffered_data_input_stream.reset();
-			return header;
-		}
-		return null;
+		return _reader.getCurrentKey();
 	}
 
 	@Override
 	protected FloatImage readImage() throws IOException {
-		if (_cacheLength > 0) {
-			ImageDecoder decoder = CodecManager.getDecoder(ImageType
-					.fromValue(_cacheType));
-			if (decoder == null)
-				return null;
-			FloatImage image = decoder.decodeImage(_buffered_data_input_stream);
-			_buffered_data_input_stream.reset();
-			return image;
-		}
-		return null;
+		return _reader.getCurrentValue();
 	}
 
 	@Override
 	protected boolean prepareNext() {
-		try {
-			while (_cacheLength > 0) {
-				long skipped = _buffered_data_input_stream
-						.skip((long) _cacheLength);
-				if (skipped <= 0)
-					break;
-				_cacheLength -= skipped;
-			}
-			int byteRead = _buffered_data_input_stream.read(_sig);
-			if (byteRead <= 0)
-				return false;
-			_cacheLength = ((_sig[0] & 0xff) << 24) | ((_sig[1] & 0xff) << 16)
-					| ((_sig[2] & 0xff) << 8) | (_sig[3] & 0xff);
-			_cacheType = ((_sig[4] & 0xff) << 24) | ((_sig[5] & 0xff) << 16)
-					| ((_sig[6] & 0xff) << 8) | (_sig[7] & 0xff);
-			_buffered_data_input_stream.mark(_cacheLength);
-			return true;
-		} catch (IOException e) {
-			LOG.info("reach the end of the file");
-			return false;
-		}
+		return _reader.nextKeyValue();
 	}
 
 	@Override
@@ -230,12 +316,9 @@ public class HipiImageBundle extends AbstractImageBundle {
 
 	@Override
 	public void close() throws IOException {
-		if (_buffered_data_input_stream != null) {
-			_buffered_data_input_stream.close();
-		}
 
-		if (_data_input_stream != null) {
-			_data_input_stream.close();
+		if (_reader != null) {
+			_reader.close();
 		}
 
 		if (_index_input_stream != null) {

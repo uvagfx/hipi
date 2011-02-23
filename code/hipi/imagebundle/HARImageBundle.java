@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -24,8 +22,6 @@ import org.apache.hadoop.fs.HarFileSystem;
 import org.apache.hadoop.fs.Path;
 
 public class HARImageBundle extends AbstractImageBundle {
-	private static final Log LOG = LogFactory.getLog(HARImageBundle.class
-			.getName());
 	private HarFileSystem _harfs = null;
 	private FileStatus[] _filesInHar;
 	private int _current_image;

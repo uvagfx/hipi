@@ -1,0 +1,38 @@
+<project basedir="." default="all">
+	<property name="files" value="ImageBundleJob.java"/>
+	<property name="jarfilename" value="ImageBundleJob.jar"/>
+	<property name="mainclass" value="ImageBundleJob"/>
+
+	<target name="setnew">
+		<property name="HADOOP_HOME" value="/opt/hadoop"/>
+		<property name="HADOOP_VERSION" value="0.20.1+152"/>
+	</target>
+
+	<target name="compile">
+		<mkdir dir="bin"/>
+		<javac target="1.6" srcdir="./:../" includes="${files}" destdir="./bin" debug="true" deprecation="true">
+			<classpath>
+				<fileset dir="${HADOOP_HOME}">
+					<include name="hadoop-${HADOOP_VERSION}-core.jar" />
+				</fileset>
+				<fileset dir="../3rdparty">
+					<include name="metadata-extractor-2.3.1.jar" />
+				</fileset>
+				<fileset dir="${HADOOP_HOME}/lib">
+					<include name="commons-logging-1.0.4.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		<jar destfile="${jarfilename}" basedir="./bin">
+			<zipfileset src="../3rdparty/metadata-extractor-2.3.1.jar" />
+			<manifest>
+				<attribute name="Main-Class" value="${mainclass}"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="all" depends="setnew,compile"/>
+	<target name="clean">
+		<delete dir="bin"/>
+	</target>
+</project>

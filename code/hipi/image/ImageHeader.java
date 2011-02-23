@@ -4,11 +4,15 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.BinaryComparable;
 import org.apache.hadoop.io.RawComparator;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
 public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
@@ -131,13 +135,28 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 		return 0;
 	}
 
-	public void readFields(DataInput arg0) throws IOException {
-		// TODO Auto-generated method stub
-
+	public void readFields(DataInput in) throws IOException {
+		image_bit_depth = in.readInt();
+		image_height = in.readInt();
+		image_width = in.readInt();
+		int size = in.readInt();
+		for (int i = 0; i < size; i++) {
+			String key = Text.readString(in);
+			String value = Text.readString(in);
+			_exif_information.put(key, value);
+		}
 	}
 
-	public void write(DataOutput arg0) throws IOException {
-		// TODO Auto-generated method stub
-
+	public void write(DataOutput out) throws IOException {
+		out.writeInt(image_bit_depth);
+		out.writeInt(image_height);
+		out.writeInt(image_width);
+		out.writeInt(_exif_information.size());
+		Iterator<Entry<String, String>> it = _exif_information.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<String, String> entry = it.next();
+			Text.writeString(out, entry.getKey());
+			Text.writeString(out, entry.getValue());
+		}
 	}
 }

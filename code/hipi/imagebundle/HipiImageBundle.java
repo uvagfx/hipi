@@ -6,7 +6,7 @@ import hipi.image.ImageHeader.ImageType;
 import hipi.image.io.CodecManager;
 import hipi.image.io.ImageDecoder;
 
-import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,8 +14,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -23,12 +21,9 @@ import org.apache.hadoop.fs.Path;
 
 public class HipiImageBundle extends AbstractImageBundle {
 
-	private static final Log LOG = LogFactory.getLog(HipiImageBundle.class.getName());
-
 	public static class FileReader {
 
 		private DataInputStream _data_input_stream = null;
-		private BufferedInputStream _buffered_data_input_stream = null;
 
 		private byte _sig[] = new byte[8];
 		private int _cacheLength = 0;
@@ -38,6 +33,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 		private long _end = 0;
 		private ImageHeader _header;
 		private FloatImage _image;
+		private byte[] _byte_array_data;
 
 		public float getProgress() {
 			return (_end - _start) > 0 ? (float)(_countingOffset - _start) / (_end - _start) : 0;
@@ -46,11 +42,9 @@ public class HipiImageBundle extends AbstractImageBundle {
 		public FileReader(FileSystem fs, Path path, Configuration conf,
 				long start, long end) throws IOException {
 			_data_input_stream = new DataInputStream(fs.open(path));
-			_buffered_data_input_stream = new BufferedInputStream(
-					_data_input_stream);
 			_countingOffset = _start = start;
 			while (_countingOffset > 0) {
-				long skipped = _buffered_data_input_stream
+				long skipped = _data_input_stream
 						.skip((long) _countingOffset);
 				if (skipped <= 0)
 					break;
@@ -63,26 +57,17 @@ public class HipiImageBundle extends AbstractImageBundle {
 		public void close() throws IOException {
 			if (_data_input_stream != null)
 				_data_input_stream.close();
-			if (_buffered_data_input_stream != null)
-				_buffered_data_input_stream.close();
 		}
 
 		public boolean nextKeyValue() {
 			try {
-				LOG.info("try to fetch the nex key-value pair at " + _countingOffset);
-				_countingOffset += _cacheLength;
+				// the total skip is cache length plus 8 (4 for cache length, 4 for cache type)
+				_countingOffset += _cacheLength + 8;
 				if (_end > 0 && _countingOffset > _end) {
 					_cacheLength = _cacheType = 0;
 					return false;
 				}
-				while (_cacheLength > 0) {
-					long skipped = _buffered_data_input_stream
-							.skip((long) _cacheLength);
-					if (skipped <= 0)
-						break;
-					_cacheLength -= skipped;
-				}
-				int byteRead = _buffered_data_input_stream.read(_sig);
+				int byteRead = _data_input_stream.read(_sig);
 				if (byteRead <= 0)
 					return false;
 				_cacheLength = ((_sig[0] & 0xff) << 24)
@@ -93,7 +78,8 @@ public class HipiImageBundle extends AbstractImageBundle {
 						| (_sig[7] & 0xff);
 				_image = null;
 				_header = null;
-				_buffered_data_input_stream.mark(_cacheLength);
+				_byte_array_data = new byte[_cacheLength];
+				_data_input_stream.read(_byte_array_data);
 				return true;
 			} catch (IOException e) {
 				return false;
@@ -108,8 +94,9 @@ public class HipiImageBundle extends AbstractImageBundle {
 						.fromValue(_cacheType));
 				if (decoder == null)
 					return null;
-				_header = decoder.decodeImageHeader(_buffered_data_input_stream);
-				_buffered_data_input_stream.reset();
+				ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
+				_header = decoder.decodeImageHeader(_byte_array_input_stream);
+				_byte_array_input_stream.close();
 				return _header;
 			}
 			return null;
@@ -123,8 +110,9 @@ public class HipiImageBundle extends AbstractImageBundle {
 						.fromValue(_cacheType));
 				if (decoder == null)
 					return null;
-				_image = decoder.decodeImage(_buffered_data_input_stream);
-				_buffered_data_input_stream.reset();
+				ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
+				_image = decoder.decodeImage(_byte_array_input_stream);
+				_byte_array_input_stream.close();
 				return _image;
 			}
 			return null;

@@ -66,9 +66,9 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 					int m = (int)Math.min(Math.max(Y - 0.34414 * (Cb - 128) - 0.71414 * (Cr - 128), 0), 255);
 					int y = (int)Math.min(Math.max(Y + 1.402 * (Cr - 128), 0), 255);
 					int k = dataBuffer.getElem(i * w * 4 + j * 4 + 3);
-					pels[i* w * 3 + j * 3] = k - (c * k >> 8);
-					pels[i* w * 3 + j * 3 + 1] = k - (m * k >> 8);
-					pels[i* w * 3 + j * 3 + 2] = k - (y * k >> 8);
+					pels[i* w * 3 + j * 3] = (float) ((k - (c * k >> 8)) / 255.0);
+					pels[i* w * 3 + j * 3 + 1] = (float) ((k - (m * k >> 8)) / 255.0);
+					pels[i* w * 3 + j * 3 + 2] = (float) ((k - (y * k >> 8)) / 255.0);
 				}
 		} else if (raster.getNumBands() == 3) {
 			for (int i = 0; i < h; i++)
@@ -76,17 +76,17 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 					int Y = dataBuffer.getElem(i * w * 3 + j * 3);
 					int Cr = dataBuffer.getElem(i * w * 3 + j * 3 + 1);
 					int Cb = dataBuffer.getElem(i * w * 3 + j * 3 + 2);
-					pels[i* w * 3 + j * 3] = Math.min(Math.max(Y + 1.772f * (Cb - 128), 0), 255);
-					pels[i* w * 3 + j * 3 + 1] = Math.min(Math.max(Y - 0.34414f * (Cb - 128) - 0.71414f * (Cr - 128), 0), 255);
-					pels[i* w * 3 + j * 3 + 2] = Math.min(Math.max(Y + 1.402f * (Cr - 128), 0), 255);
+					pels[i* w * 3 + j * 3] = (float) ((Math.min(Math.max(Y + 1.772f * (Cb - 128), 0), 255)) / 255.0);
+					pels[i* w * 3 + j * 3 + 1] = (float) ((Math.min(Math.max(Y - 0.34414f * (Cb - 128) - 0.71414f * (Cr - 128), 0), 255)) / 255.0);
+					pels[i* w * 3 + j * 3 + 2] = (float) ((Math.min(Math.max(Y + 1.402f * (Cr - 128), 0), 255)) / 255.0);
 				}
 		} else if (raster.getNumBands() == 1) {
 			for (int i = 0; i < h; i++)
 				for (int j = 0; j < w; j++) {
 					int Y = dataBuffer.getElem(i * w + j);
-					pels[i* w * 3 + j * 3] = Y;
-					pels[i* w * 3 + j * 3 + 1] = Y;
-					pels[i* w * 3 + j * 3 + 2] = Y;
+					pels[i* w * 3 + j * 3] = (float) (Y / 255.0);
+					pels[i* w * 3 + j * 3 + 1] = (float) (Y / 255.0);
+					pels[i* w * 3 + j * 3 + 2] = (float) (Y / 255.0);
 				}
 		}
 		FloatImage image = new FloatImage(w, h, 3, pels);
@@ -101,9 +101,9 @@ public void encodeImage(FloatImage image, ImageHeader header, OutputStream os)
 		int[] rgb = new int[image.getWidth() * image.getHeight()];
 		for (int i = 0; i < image.getWidth() * image.getHeight(); i++)
 		{
-			int r = Math.min(Math.max((int)data[i * 3], 0), 255);
-			int g = Math.min(Math.max((int)data[i * 3 + 1], 0), 255);
-			int b = Math.min(Math.max((int)data[i * 3 + 2], 0), 255);
+			int r = Math.min(Math.max((int)(data[i * 3] * 255), 0), 255);
+			int g = Math.min(Math.max((int)(data[i * 3 + 1] * 255), 0), 255);
+			int b = Math.min(Math.max((int)(data[i * 3 + 2] * 255), 0), 255);
 			rgb[i] = r << 16 | g << 8 | b;
 		}
 		bufferedImage.setRGB(0, 0, image.getWidth(), image.getHeight(), rgb, 0, image.getWidth());

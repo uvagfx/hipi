@@ -63,7 +63,7 @@ public class ImageBundleInputFormat extends
 					for (int k = 0; k < blkHosts.length; k++)
 						hosts.add(blkHosts[k]);
 				}
-				splits.add(new FileSplit(hib.getDataFile().getPath(), lastOffset, currentOffset, hosts.toArray(new String[hosts.size()])));
+				splits.add(new FileSplit(hib.getDataFile().getPath(), lastOffset, currentOffset - lastOffset, hosts.toArray(new String[hosts.size()])));
 				lastOffset = currentOffset;
 				i += next + 1;
 				taskRemaining--;

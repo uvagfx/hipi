@@ -6,8 +6,6 @@ import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
 import hipi.imagebundle.HipiImageBundle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -35,8 +33,6 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 public class ImageBundleRecordReader extends
 		RecordReader<ImageHeader, FloatImage> {
 
-	private static final Log LOG = LogFactory.getLog(ImageBundleRecordReader.class.getName());
-
 	protected Configuration conf;
 	private HipiImageBundle.FileReader reader;
 
@@ -49,7 +45,7 @@ public class ImageBundleRecordReader extends
 		FileSystem fs = path.getFileSystem(conf);
 		// reader specifies start and end, for which start + length would be the beginning of a new file,
 		// which is undesirable to reader, -1 must be applied.
-		LOG.info("record start from " + bundleSplit.getStart() + " end at " + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
+		System.out.println("record start from " + bundleSplit.getStart() + " end at " + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
 		reader = new HipiImageBundle.FileReader(fs, path, conf,
 				bundleSplit.getStart(), bundleSplit.getStart() + bundleSplit.getLength() - 1);
 	}

@@ -29,6 +29,8 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 	protected int _b;
 	protected float[] _pels;
 
+	public FloatImage() {}
+	
 	public FloatImage(int width, int height, int bands, float[] pels) {
 		_w = width;
 		_h = height;
@@ -36,6 +38,14 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 		_pels = pels;
 	}
 
+	public FloatImage crop(int x, int y, int width, int height) {
+		float[] pels = new float[width * height * _b];
+		for (int i = y; i < y + height; i++)
+			for (int j = x * _b; j < (x + width) * _b; j++)
+				pels[(i - y) * width * _b + j - x * _b] = _pels[i * _w * _b + j];
+		return new FloatImage(width, height, _b, pels);
+	}
+	
 	/**
 	 * Get a pixel from this image and check the bounds while doing it
 	 * 
@@ -89,6 +99,21 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 		output.write(ByteUtils.FloatArraytoByteArray(_pels));
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		result.append(_w);
+		result.append(" ");
+		result.append(_h);
+		result.append(" ");
+		result.append(_b);
+		for (int i = 0; i < _w * _h * _b; i++) {
+			result.append(" ");
+			result.append(_pels[i]);
+		}
+		return result.toString();
+	}
+	
 	/**
 	 * This method comes from the RawComparator class and allows sorting to
 	 * happen much faster than in the normal Comparable interface. For a

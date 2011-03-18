@@ -32,7 +32,7 @@ public class PPMImageUtil implements ImageDecoder, ImageEncoder {
 		float[] pels = image.getData();
 		byte[] raw = new byte[image.getWidth() * image.getHeight() * 3];
 		for (int i = 0; i < image.getWidth() * image.getHeight() * 3; i++)
-			raw[i] = (byte)pels[i];
+			raw[i] = (byte)((int)(pels[i] * 255));
 		os.write(raw);
 	}
 
@@ -64,9 +64,9 @@ public class PPMImageUtil implements ImageDecoder, ImageEncoder {
 		is.read(rest);
 		float[] pels = new float[w * h * 3];
 		for (int i = 0; i < 255 - off; i++)
-			pels[i] = (float)(header[i + off] & 0xff);
+			pels[i] = (float)((header[i + off] & 0xff) / 255.0);
 		for (int i = 0; i < w * h * 3 - (255 - off); i++)
-			pels[i + 255 - off] = (float)(rest[i] & 0xff);
+			pels[i + 255 - off] = (float)((rest[i] & 0xff) / 255.0);
 		FloatImage image = new FloatImage(w, h, 3, pels);
 		return image;
 	}

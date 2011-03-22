@@ -7,6 +7,7 @@ import hipi.image.io.CodecManager;
 import hipi.image.io.ImageDecoder;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -259,8 +260,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 	@Override
 	public void addImage(InputStream image_stream, ImageType type)
 			throws IOException {
-		byte data[] = new byte[image_stream.available()];
-		image_stream.read(data);
+		byte data[] = readBytes(image_stream);
 		_cacheLength = data.length;
 		_cacheType = type.toValue();
 		_sig[0] = (byte) (_cacheLength >> 24);
@@ -277,6 +277,33 @@ public class HipiImageBundle extends AbstractImageBundle {
 		_index_output_stream.writeLong(_countingOffset);
 	}
 
+	private byte[] readBytes(InputStream stream) throws IOException {
+	      if (stream == null) return new byte[] {};
+	      byte[] buffer = new byte[1024];
+	      ByteArrayOutputStream output = new ByteArrayOutputStream();
+	      boolean error = false;
+	      try {
+	          int numRead = 0;
+	          while ((numRead = stream.read(buffer)) > -1) {
+	              output.write(buffer, 0, numRead);
+	          }
+	      } catch (IOException e) {
+	          error = true; // this error should be thrown, even if there is an error closing stream
+	          throw e;
+	      } catch (RuntimeException e) {
+	          error = true; // this error should be thrown, even if there is an error closing stream
+	          throw e;
+	      } finally {
+	          try {
+	              stream.close();
+	          } catch (IOException e) {
+	              if (!error) throw e;
+	          }
+	      }
+	      output.flush();
+	      return output.toByteArray();
+	  }
+	
 	@Override
 	public long getImageCount() {
 		return _imageCount;

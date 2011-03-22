@@ -2,6 +2,7 @@ package hipi.image.io;
 
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
+import hipi.image.ImageHeader.ImageType;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -63,6 +64,10 @@ import java.util.zip.InflaterInputStream;
  *
  */
 
+/**
+ * Currently, images can only be encoded and decoded with RGB encoding. That is, black and white, and grayscale
+ * encoded images can be used.
+ */
 public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 
 
@@ -77,7 +82,14 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 	public static PNGImageUtil getInstance() {
 		return static_object;
 	}
-
+	
+	/**
+	 * Decodes the image header from an input stream that contains the PNG image. PNG images are broken up into "chunks"
+	 * (see documentation), and the PNG header could be located anywhere in the image
+	 * 
+	 * @param is The {@link InputStream} that contains the PNG image
+	 * @return The {@link ImageHeader} found in the input stream
+	 */
 	public ImageHeader decodeImageHeader(InputStream is) throws IOException {
 		ImageHeader header = new ImageHeader();
 		DataInputStream in = new DataInputStream(is);
@@ -120,7 +132,14 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 		}
 		return header;
 	}
-
+	
+	/**
+	 * Decodes a PNG image from an input stream. This method only creates a {@link FloatImage} and will not
+	 * create a {@link ImageHeader}. {@link #decodeImageHeader(InputStream)} must be called in order to acquire an {@link ImageHeader}
+	 * 
+	 * @param is The {@link InputStream} that contains the PNG image
+	 * @return The {@link FloatImage} from the input stream
+	 */
 	public FloatImage decodeImage(InputStream is) throws IOException {		
 		DataInputStream dataIn = new DataInputStream(is);
 		readSignature(dataIn);
@@ -136,7 +155,7 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 		byte[] image_bytes = chunks.getImageData();
 
 		for(int i = 0; i < image_bytes.length; i++)
-			pels[i] = image_bytes[i]&0xff;
+			pels[i] = (float) ((image_bytes[i]&0xff)/255.0);
 		FloatImage image = new FloatImage(width, height, 3, pels); //hard code 3
 
 		return image;
@@ -186,12 +205,8 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 		long calculated = crc32.getValue();
 		return (calculated == crc);
 	}
-	/*
-	public ImageHeader createSimpleHeader(FloatImage image) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	 */
+
+
 	class PNGData {
 		private int mNumberOfChunks;
 
@@ -371,11 +386,17 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 		}
 	}
 
-	public void encodeImageHeader(ImageHeader header, OutputStream os)
-	throws IOException {
-
+	public ImageHeader createSimpleHeader(FloatImage image) {
+		return new ImageHeader(ImageType.PNG_IMAGE);
 	}
-
+	
+	/**
+	 * Encodes an image into a PNG image
+	 * 
+	 * @param image The {@link FloatImage} that contains the PNG image
+	 * @param header The {@link ImageHeader} for the image
+	 * @param os The {@link OutputStream} that the encoded image will write to
+	 */
 	public void encodeImage(FloatImage image, ImageHeader header,
 			OutputStream os) throws IOException {
 		crc = new CRC32();
@@ -458,9 +479,9 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 			for (int y=0;y<height;y++) {
 				bos.write(0);
 				for (int x=0;x<width;x++) {
-					int r = Math.min(Math.max((int)image.getPixel(x, y, 0), 0), 255);
-					int g = Math.min(Math.max((int)image.getPixel(x, y, 1), 0), 255);
-					int b = Math.min(Math.max((int)image.getPixel(x, y, 2), 0), 255);
+					int r = Math.min(Math.max((int)(image.getPixel(x, y, 0)*255), 0), 255);
+					int g = Math.min(Math.max((int)(image.getPixel(x, y, 1)*255), 0), 255);
+					int b = Math.min(Math.max((int)(image.getPixel(x, y, 2)*255), 0), 255);
 					bos.write((byte)r);
 					bos.write((byte)g);
 					bos.write((byte)b);
@@ -480,11 +501,6 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 		write(os, (int) crc.getValue()); 
 		os.close();
 	}		
-
-
-	public ImageHeader createSimpleHeader(FloatImage image) {
-		return null;
-	}
 
 	private void write(OutputStream os, int i) throws IOException {
 		byte b[]={(byte)((i>>24)&0xff),(byte)((i>>16)&0xff),(byte)((i>>8)&0xff),(byte)(i&0xff)};

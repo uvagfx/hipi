@@ -16,12 +16,10 @@ public class PPMImageUtil implements ImageDecoder, ImageEncoder {
 		return static_object;
 	}
 
-	@Override
 	public ImageHeader createSimpleHeader(FloatImage image) {
 		return new ImageHeader();
 	}
 
-	@Override
 	public void encodeImage(FloatImage image, ImageHeader header, OutputStream os)
 			throws IOException {
 		PrintWriter writer = new PrintWriter(os);
@@ -36,12 +34,10 @@ public class PPMImageUtil implements ImageDecoder, ImageEncoder {
 		os.write(raw);
 	}
 
-	@Override
 	public ImageHeader decodeImageHeader(InputStream is) throws IOException {
 		return new ImageHeader();
 	}
 
-	@Override
 	public FloatImage decodeImage(InputStream is) throws IOException {
 		byte[] header = new byte[255];
 		is.read(header);

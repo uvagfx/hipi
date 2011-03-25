@@ -326,7 +326,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 
 	@Override
 	public void merge(AbstractImageBundle[] bundles) {
-
+		
 	}
 
 	@Override

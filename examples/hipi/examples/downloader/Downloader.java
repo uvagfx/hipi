@@ -43,9 +43,8 @@ public class Downloader extends Configured implements Tool{
 			Configuration conf = jc.getConfiguration(); 
 			maxAlpha = conf.getInt("strontium.downloader.max", 0);
 			numRecords = conf.getInt("strontium.downloader.numRecords", 1000);
-			hib = new HipiImageBundle(jc.getConfiguration());
-			hib.open(new Path("/virginia/uvagfx/cms2vp/bigbundle.hib"), 
-					AbstractImageBundle.FILE_MODE_WRITE, true);
+			hib = new HipiImageBundle(new Path("/virginia/uvagfx/cms2vp/bigbundle.hib"), jc.getConfiguration());
+			hib.open(AbstractImageBundle.FILE_MODE_WRITE, true);
 		}
 
 		public void map(LongWritable key, LongWritable value, Context context) 

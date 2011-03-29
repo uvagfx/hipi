@@ -39,8 +39,8 @@ public class ImageBundleInputFormat extends
 		for (FileStatus file : listStatus(job)) {
 			Path path = file.getPath();
 			FileSystem fs = path.getFileSystem(conf);
-			HipiImageBundle hib = new HipiImageBundle(conf);
-			hib.open(path, AbstractImageBundle.FILE_MODE_READ);
+			HipiImageBundle hib = new HipiImageBundle(path, conf);
+			hib.open(AbstractImageBundle.FILE_MODE_READ);
 			// offset should be guaranteed to be in order
 			List<Long> offsets = hib.getOffsets();
 			BlockLocation[] blkLocations = fs.getFileBlockLocations(hib.getDataFile(), 0, offsets.get(offsets.size() - 1));

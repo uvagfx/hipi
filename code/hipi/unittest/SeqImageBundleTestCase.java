@@ -13,8 +13,8 @@ public class SeqImageBundleTestCase extends AbstractImageBundleTestCase {
 	@Override
 	public AbstractImageBundle createImageBundleAndOpen(int mode) throws IOException {
 		Configuration conf = new Configuration();
-		SeqImageBundle sib = new SeqImageBundle(conf);
-		sib.open(new Path("/tmp/bundle.sib"), mode, true);
+		SeqImageBundle sib = new SeqImageBundle(new Path("/tmp/bundle.sib"), conf);
+		sib.open(mode, true);
 		return sib;
 	}
 

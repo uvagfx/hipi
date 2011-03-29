@@ -46,20 +46,22 @@ public abstract class AbstractImageBundle {
 	private boolean _prepared;
 	private boolean _readHeader;
 	private FloatImage _readImage;
+	protected Path _file_path;
 
-	public AbstractImageBundle(Configuration conf) {
+	public AbstractImageBundle(Path file_path, Configuration conf) {
+		_file_path = file_path;
 		_conf = conf;
 	}
 
-	public final void open(Path file_path, int mode) throws IOException {
-		open(file_path, mode, false);
+	public final void open(int mode) throws IOException {
+		open(mode, false);
 	}
 
 	/**
 	 * Opens a file for either reading or writing. This method will return an
 	 * IOException if an open call has already happened.
 	 * 
-	 * @param file_path
+	 * @param _file_path
 	 *            the file that will be used for reading/writing
 	 * @param mode
 	 *            determines whether the file will be read from or written to
@@ -69,28 +71,28 @@ public abstract class AbstractImageBundle {
 	 *            an error
 	 * @throws IOException
 	 */
-	public final void open(Path file_path, int mode, boolean overwrite)
+	public final void open(int mode, boolean overwrite)
 			throws IOException {
-		LOG.info("Attempting to access file " + file_path.getName()
+		LOG.info("Attempting to access file " + _file_path.getName()
 				+ " with mode " + mode);
 
 		if (_fileMode == -1 && mode == FILE_MODE_WRITE) {
-			LOG.info("Attempting to open file " + file_path.getName()
+			LOG.info("Attempting to open file " + _file_path.getName()
 					+ " for writing (overwrite: " + overwrite + ")");
 			// Check to see whether the file exists
-			if (FileSystem.get(_conf).exists(file_path) && !overwrite) {
-				throw new IOException("File " + file_path.getName()
+			if (FileSystem.get(_conf).exists(_file_path) && !overwrite) {
+				throw new IOException("File " + _file_path.getName()
 						+ " already exists");
 			}
 			_fileMode = FILE_MODE_WRITE;
-			openForWrite(file_path);
+			openForWrite();
 		} else if (_fileMode == -1 && mode == FILE_MODE_READ) {
-			LOG.info("Attempting to open file " + file_path.getName()
+			LOG.info("Attempting to open file " + _file_path.getName()
 					+ " for reading");
 			_fileMode = FILE_MODE_READ;
-			openForRead(file_path);
+			openForRead();
 		} else {
-			throw new IOException("File " + file_path.getName()
+			throw new IOException("File " + _file_path.getName()
 					+ " already opened for reading/writing");
 		}
 		_prepared = false;
@@ -114,7 +116,7 @@ public abstract class AbstractImageBundle {
 	 * might have specific ways of actually opening the files (maybe the HAR for
 	 * example). We need to follow-up on this.
 	 */
-	protected abstract void openForWrite(Path output_file) throws IOException;
+	protected abstract void openForWrite() throws IOException;
 
 	/**
 	 * Method for opening a file for the purposes of reading. The function
@@ -125,7 +127,7 @@ public abstract class AbstractImageBundle {
 	 *            the stream that will be read from
 	 * @throws IOException
 	 */
-	protected abstract void openForRead(Path input_file) throws IOException;
+	protected abstract void openForRead() throws IOException;
 
 	/**
 	 * Add an image to this bundle. Some implementations may not actually write

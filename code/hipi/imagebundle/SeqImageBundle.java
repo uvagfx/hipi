@@ -19,8 +19,8 @@ import org.apache.hadoop.io.SequenceFile;
 
 public class SeqImageBundle extends AbstractImageBundle {
 
-	public SeqImageBundle(Configuration conf) {
-		super(conf);
+	public SeqImageBundle(Path file_path, Configuration conf) {
+		super(file_path, conf);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -31,14 +31,14 @@ public class SeqImageBundle extends AbstractImageBundle {
 	private int _cacheType;
 
 	@Override
-	protected void openForWrite(Path output_file) throws IOException {
-		_writer = SequenceFile.createWriter(FileSystem.get(_conf), _conf, output_file, LongWritable.class, BytesWritable.class);
+	protected void openForWrite() throws IOException {
+		_writer = SequenceFile.createWriter(FileSystem.get(_conf), _conf, _file_path, LongWritable.class, BytesWritable.class);
 		_total = 1;
 	}
 
 	@Override
-	protected void openForRead(Path input_file) throws IOException {
-		_reader = new SequenceFile.Reader(FileSystem.get(_conf), input_file, _conf);
+	protected void openForRead() throws IOException {
+		_reader = new SequenceFile.Reader(FileSystem.get(_conf), _file_path, _conf);
 		_cacheData = null;
 		_cacheType = 0;
 	}

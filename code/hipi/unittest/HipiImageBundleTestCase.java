@@ -19,8 +19,8 @@ public class HipiImageBundleTestCase extends AbstractImageBundleTestCase {
 	@Override
 	public AbstractImageBundle createImageBundleAndOpen(int mode) throws IOException {
 		Configuration conf = new Configuration();
-		HipiImageBundle hib = new HipiImageBundle(conf);
-		hib.open(new Path("/tmp/bundle.hib"), mode, true);
+		HipiImageBundle hib = new HipiImageBundle(new Path("/tmp/bundle.hib"), conf);
+		hib.open(mode, true);
 		return hib;
 	}
 	
@@ -34,20 +34,33 @@ public class HipiImageBundleTestCase extends AbstractImageBundleTestCase {
 	
 	@Test
 	public void testMerge() throws IOException {
-		AbstractImageBundle aib1 = createImageBundleAndOpen(AbstractImageBundle.FILE_MODE_WRITE);
+		//create image bundles
+		Configuration conf = new Configuration();
+		HipiImageBundle aib1 = new HipiImageBundle(new Path("/tmp/bundle1.hib"), conf);
+		aib1.open(AbstractImageBundle.FILE_MODE_WRITE, true);		
 		aib1.addImage(new FileInputStream("data/test/ImageBundleTestCase/read/0.jpg"), ImageType.JPEG_IMAGE);
 		aib1.addImage(new FileInputStream("data/test/ImageBundleTestCase/read/1.jpg"), ImageType.JPEG_IMAGE);
 		aib1.close();
-		
-		AbstractImageBundle aib2 = createImageBundleAndOpen(AbstractImageBundle.FILE_MODE_WRITE);
+
+		HipiImageBundle aib2 = new HipiImageBundle(new Path("/tmp/bundle2.hib"), conf);
+		aib2.open(AbstractImageBundle.FILE_MODE_WRITE, true);
 		aib2.addImage(new FileInputStream("data/test/ImageBundleTestCase/read/2.jpg"), ImageType.JPEG_IMAGE);
 		aib2.addImage(new FileInputStream("data/test/ImageBundleTestCase/read/3.jpg"), ImageType.JPEG_IMAGE);
 		aib2.close();
 		
-		AbstractImageBundle merged_hib = createImageBundleAndOpen(AbstractImageBundle.FILE_MODE_WRITE);
-		AbstractImageBundle bundles[] = {aib1, aib2};
-		merged_hib.merge(bundles);
+		HipiImageBundle aib1_in = new HipiImageBundle(new Path("/tmp/bundle1.hib"), conf);
+		aib1_in.open(AbstractImageBundle.FILE_MODE_READ, true);
+		System.out.println("pics in bundle 1: + " + aib1_in.getImageCount());
+		HipiImageBundle aib2_in = new HipiImageBundle(new Path("/tmp/bundle2.hib"), conf);
+		aib2_in.open(AbstractImageBundle.FILE_MODE_READ, true);
+		System.out.println("pics in bundle 1: + " + aib1_in.getImageCount());
+
+		HipiImageBundle bundles[] = {aib1_in, aib2_in};
+		HipiImageBundle merged_hib = HipiImageBundle.merge(new Path("/tmp/bundle.hib"), conf, bundles);
+		merged_hib.close();
 		
+		merged_hib.open(AbstractImageBundle.FILE_MODE_READ, true);		
+				
 		setUp();
 		testIterator();
 		testGetCurrentImage();

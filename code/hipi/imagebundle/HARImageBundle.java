@@ -34,22 +34,26 @@ public class HARImageBundle extends AbstractImageBundle {
 	
 	private byte _cacheData[];
 	private int _cacheType;
-	private Path _outputPath;
+	private Path _file_path;
 	private ArrayList<HARIndexContainer> indexHash;
 	
-	public HARImageBundle(Configuration conf) {
-		super(conf);
+	public HARImageBundle(Path file_path, Configuration conf) {
+
+		super(file_path, conf);
+		System.out.println("1: "+file_path.toString());
+
+		System.out.println("2: "+_file_path.toString());
+
 	}
 
 	@Override
-	protected void openForWrite(Path output_file) throws IOException {
-		_outputPath = output_file;
+	protected void openForWrite() throws IOException {
 		_imageCount = 0;	
 		
 		indexHash = new ArrayList<HARIndexContainer>();
-		
-		Path tmpOutputDir = new Path(_outputPath.toUri().getPath());
-		String partname = "part-0"; //temp solution... need to figure how to have multiple splits
+		System.out.println("3: "+_file_path.toString());
+		Path tmpOutputDir = new Path(_file_path.toUri().getPath());
+		String partname = "part-0"; //TODO: temp solution... need to figure how to have multiple splits
 		Path tmpOutput = new Path(tmpOutputDir, partname);
 		try {
 			//try to create har file parts
@@ -66,12 +70,12 @@ public class HARImageBundle extends AbstractImageBundle {
 	}
 
 	@Override
-	protected void openForRead(Path input_file) throws IOException {
+	protected void openForRead() throws IOException {
 	    _harfs = new HarFileSystem(FileSystem.get(_conf));
 	    
 	    //Path qualifiedPath = new Path("har://", input_file.toUri() +
 	    //	      Path.SEPARATOR + input_file.getParent().toUri().getPath());
-	    Path qualifiedPath = new Path("har://", input_file.toUri().getPath());
+	    Path qualifiedPath = new Path("har://", _file_path.toUri().getPath());
 	    	      //Path.SEPARATOR + input_file.getParent().toUri().getPath());
 	    _harfs.initialize(qualifiedPath.toUri(), _conf);
 	    	    
@@ -189,8 +193,8 @@ public class HARImageBundle extends AbstractImageBundle {
 		
 		
 		// try to create index files
-		Path masterIndex = new Path(_outputPath, "_masterindex");
-		Path index = new Path(_outputPath, "_index");
+		Path masterIndex = new Path(_file_path, "_masterindex");
+		Path index = new Path(_file_path, "_index");
 		FileSystem fs = masterIndex.getFileSystem(_conf);
 		if (fs.exists(masterIndex)) {
 			fs.delete(masterIndex, false);

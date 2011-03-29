@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -140,8 +141,8 @@ public class HipiImageBundle extends AbstractImageBundle {
 	private Path _data_file = null;
 	private long _imageCount = -1;
 
-	public HipiImageBundle(Configuration conf) {
-		super(conf);
+	public HipiImageBundle(Path file_path, Configuration conf) {
+		super(file_path, conf);
 	}
 
 	private void writeBundleHeader() throws IOException {
@@ -171,11 +172,11 @@ public class HipiImageBundle extends AbstractImageBundle {
 	}
 
 	@Override
-	protected void openForWrite(Path output_file) throws IOException {
+	protected void openForWrite() throws IOException {
 		// Check if the instance is already in some read/write states
 		if (_data_output_stream != null || _reader != null
 				|| _index_output_stream != null || _index_input_stream != null) {
-			throw new IOException("File " + output_file.getName()
+			throw new IOException("File " + _file_path.getName()
 					+ " already opened for reading/writing");
 		}
 
@@ -183,10 +184,10 @@ public class HipiImageBundle extends AbstractImageBundle {
 		// by default, the Path of output_file is the Path of index file, and
 		// data
 		// file will simply append .dat suffix
-		_index_file = output_file;
+		_index_file = _file_path;
 		_index_output_stream = new DataOutputStream(FileSystem.get(_conf)
 				.create(_index_file));
-		_data_file = output_file.suffix(".dat");
+		_data_file = _file_path.suffix(".dat");
 		_data_output_stream = new DataOutputStream(FileSystem.get(_conf)
 				.create(_data_file));
 		_countingOffset = 0;
@@ -241,14 +242,14 @@ public class HipiImageBundle extends AbstractImageBundle {
 	}
 
 	@Override
-	protected void openForRead(Path input_file) throws IOException {
+	protected void openForRead() throws IOException {
 		if (_data_output_stream != null || _reader != null
 				|| _index_output_stream != null || _index_input_stream != null) {
-			throw new IOException("File " + input_file.getName()
+			throw new IOException("File " + _file_path.getName()
 					+ " already opened for reading/writing");
 		}
 
-		_index_file = input_file;
+		_index_file = _file_path;
 		_index_input_stream = new DataInputStream(FileSystem.get(_conf).open(
 				_index_file));
 
@@ -324,11 +325,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 		return _reader.nextKeyValue();
 	}
 
-	@Override
-	public void merge(AbstractImageBundle[] bundles) {
-		
-	}
-
+	
 	@Override
 	public void close() throws IOException {
 
@@ -348,5 +345,41 @@ public class HipiImageBundle extends AbstractImageBundle {
 			_index_output_stream.close();
 		}
 	}
+
+	/* Assumes that openForWrite has been called
+	 */
+	public static HipiImageBundle merge(Path new_bundle, Configuration conf, HipiImageBundle[] bundles) {
+		HipiImageBundle merged_hib = new HipiImageBundle(new_bundle, conf);
+		long last_offset = 0;
+		for(int i = 0; i < bundles.length; i++){
+			HipiImageBundle hib_temp = (HipiImageBundle)bundles[i];
+			try {
+				FileStatus data_file = hib_temp.getDataFile();
+				List<Long> offsets = hib_temp.getOffsets();
+				
+				//concatenate data file
+				InputStream data_input = new FileInputStream(data_file.getPath().toString());
+				byte[] data = merged_hib.readBytes(data_input);
+				merged_hib._data_output_stream.write(data);
+				
+				//write offsets in index file
+				for(int j = 0; j < offsets.size(); j++){
+					long img_offset = (long)(offsets.get(j)) + last_offset;
+					merged_hib._index_output_stream.writeLong(img_offset);
+				}
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return merged_hib;
+	}
+
+	@Override
+	public void merge(AbstractImageBundle[] bundles) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

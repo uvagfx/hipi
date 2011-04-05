@@ -37,6 +37,10 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 		_b = bands;
 		_pels = pels;
 	}
+	
+	public FloatImage(int width, int height, int bands) {
+		this(width, height, bands, new float[width * height * bands]);
+	}
 
 	public FloatImage crop(int x, int y, int width, int height) {
 		float[] pels = new float[width * height * _b];
@@ -44,6 +48,41 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 			for (int j = x * _b; j < (x + width) * _b; j++)
 				pels[(i - y) * width * _b + j - x * _b] = _pels[i * _w * _b + j];
 		return new FloatImage(width, height, _b, pels);
+	}
+	
+	public static final int RGB2GRAY = 0x01;
+
+	public FloatImage cvtColor(int type) {
+		switch (type) {
+		case RGB2GRAY:
+			float[] pels = new float[_w * _h];
+			for (int i = 0; i < _w * _h; i++)
+				pels[i] = _pels[i * _b] * 0.30f + _pels[i * _b + 1] * 0.59f + _pels[i * _b + 2] * 0.11f;
+			return new FloatImage(_w, _h, 1, pels);
+		}
+		return null;
+	}
+
+	public void add(FloatImage image) {
+		float[] pels = image.getData();
+		for (int i = 0; i < _w * _h * _b; i++)
+			_pels[i] += pels[i];
+	}
+	
+	public void add(float number) {
+		for (int i = 0; i < _w * _h * _b; i++)
+			_pels[i] += number;
+	}
+	
+	public void scale(FloatImage image) {
+		float[] pels = image.getData();
+		for (int i = 0; i < _w * _h * _b; i++)
+			_pels[i] *= pels[i];
+	}
+	
+	public void scale(float number) {
+		for (int i = 0; i < _w * _h * _b; i++)
+			_pels[i] *= number;
 	}
 	
 	/**
@@ -102,14 +141,14 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		result.append(_w);
-		result.append(" ");
-		result.append(_h);
-		result.append(" ");
-		result.append(_b);
-		for (int i = 0; i < _w * _h * _b; i++) {
-			result.append(" ");
-			result.append(_pels[i]);
+		result.append(_w + " " + _h + " " + _b + "\n");
+		for (int i = 0; i < _h; i++) {
+			for (int j = 0; j < _w * _b; j++) {
+				result.append(_pels[i * _w * _b + j]);
+				if (j < _w * _b - 1)
+					result.append(" ");
+			}
+			result.append("\n");
 		}
 		return result.toString();
 	}

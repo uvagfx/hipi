@@ -1,7 +1,7 @@
 <project basedir="." default="all">
-	<property name="files" value="ImageBundleJob.java"/>
-	<property name="jarfilename" value="ImageBundleJob.jar"/>
-	<property name="mainclass" value="ImageBundleJob"/>
+	<property name="files" value="Covariance.java"/>
+	<property name="jarfilename" value="Covariance.jar"/>
+	<property name="mainclass" value="Covariance"/>
 
 	<target name="setnew">
 		<property name="HADOOP_HOME" value="/opt/hadoop"/>

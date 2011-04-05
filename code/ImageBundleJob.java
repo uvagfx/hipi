@@ -19,7 +19,8 @@ public class ImageBundleJob extends Configured implements Tool {
 		
 		public void map(ImageHeader key, FloatImage value, Context context)
 				throws IOException, InterruptedException {
-			context.write(new Text(key.getEXIFInformation("Model").trim()), new IntWritable(value.getWidth()));
+			if (value != null)
+				context.write(new Text("image"), new IntWritable(value.getWidth()));
 		}
 	}
 

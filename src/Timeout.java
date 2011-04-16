@@ -1,11 +1,22 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.BlockLocation;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
@@ -34,10 +45,18 @@ public class Timeout extends Configured implements Tool {
 
 		public void run(Context context) throws IOException,
 				InterruptedException {
-			long elapsed_time = (new Date()).getTime();
-			elapsed_time = (new Date()).getTime() - elapsed_time;
-			context.write(new Text("elapsed_time"), new LongWritable(
-					elapsed_time));
+			setup(context);
+			long expectedTime = context.getCurrentValue().get();
+			long currentTime = (new Date()).getTime();
+			System.out.println("expectedTime: " + expectedTime + ", currentTime: " + currentTime);
+			while (currentTime < expectedTime) {
+				currentTime = (new Date()).getTime();
+			}
+			URL ping = new URL("http://liuliu.me/hipi/ping.php");
+			URLConnection pc = ping.openConnection();
+	        BufferedReader in = new BufferedReader(new InputStreamReader(pc.getInputStream()));
+	        String serverTime = in.readLine();
+			context.write(new Text("serverTime"), new LongWritable(Long.valueOf(serverTime)));
 		}
 	}
 
@@ -46,39 +65,38 @@ public class Timeout extends Configured implements Tool {
 
 		@Override
 		public void close() throws IOException {
-			// TODO Auto-generated method stub
-			
+			// DO NOTHING
 		}
 
 		@Override
 		public Text getCurrentKey() throws IOException, InterruptedException {
-			// TODO Auto-generated method stub
-			return null;
+			return key;
 		}
 
 		@Override
 		public LongWritable getCurrentValue() throws IOException,
 				InterruptedException {
-			// TODO Auto-generated method stub
-			return null;
+			return value;
 		}
 
 		@Override
 		public float getProgress() throws IOException, InterruptedException {
-			// TODO Auto-generated method stub
-			return 0;
+			return 1;
 		}
 
+		private static final Text key = new Text("expectedTime");
+		private LongWritable value;
+		
 		@Override
-		public void initialize(InputSplit arg0, TaskAttemptContext arg1)
+		public void initialize(InputSplit split, TaskAttemptContext context)
 				throws IOException, InterruptedException {
-			// TODO Auto-generated method stub
-			
+			FileSplit fileSplit = (FileSplit) split;
+			value = new LongWritable(fileSplit.getStart());
+			System.out.println("record expected time " + fileSplit.getStart());
 		}
 
 		@Override
 		public boolean nextKeyValue() throws IOException, InterruptedException {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
@@ -91,16 +109,48 @@ public class Timeout extends Configured implements Tool {
 		public RecordReader<Text, LongWritable> createRecordReader(
 				InputSplit arg0, TaskAttemptContext arg1) throws IOException,
 				InterruptedException {
-			return null;
+			return new IdleRecordReader();
 		}
+
+		private static final PathFilter hiddenFileFilter = new PathFilter(){
+			public boolean accept(Path p){
+				String name = p.getName(); 
+				return !name.startsWith("_") && !name.startsWith(".");
+			}
+		};
 
 		@Override
 		public List<InputSplit> getSplits(JobContext job) throws IOException {
-			List<InputSplit> splits = new ArrayList<InputSplit>();
 			Configuration conf = job.getConfiguration();
 			int numMapTasks = conf.getInt("hipi.map.tasks", 1);
-			Path emptyPath = new Path("");
-			splits.add(new FileSplit(emptyPath, lastOffset, 0, hosts.toArray(new String[hosts.size()])));
+			Path emptyPath = new Path("/");
+			Set<String> hostSet = new HashSet<String>();
+			List<InputSplit> splits = new ArrayList<InputSplit>();
+
+			FileSystem fileSystem = FileSystem.get(conf);
+			Path dir = new Path("/virginia/shared/flickr/0/0/0/0/0/0");
+			FileStatus[] matches = fileSystem.listStatus(FileUtil.stat2Paths(fileSystem.globStatus(dir, hiddenFileFilter)), hiddenFileFilter);
+
+			for (FileStatus match: matches)
+			{
+				long length = match.getLen();
+				Path file = fileSystem.makeQualified(match.getPath());
+				BlockLocation[] blocks = fileSystem.getFileBlockLocations(fileSystem.getFileStatus(file), 0, length);
+
+				if (!hostSet.contains(blocks[0].getHosts()[0]))
+					hostSet.add(blocks[0].getHosts()[0]);
+
+				if (hostSet.size() == numMapTasks)
+					break;
+			}
+			String[] hosts = (String[]) hostSet.toArray(new String[hostSet.size()]);
+			System.out.println("Tried to initiate " + numMapTasks + " mapper, got " + hosts.length);
+			long currentTime = (new Date()).getTime();
+			for (int i = 0; i < hosts.length; i++) {
+				String[] localHosts = new String[1];
+				localHosts[0] = hosts[i];
+				splits.add(new FileSplit(emptyPath, currentTime + 120 * 1000, 0, localHosts));
+			}
 			return splits;
 		}
 	}
@@ -130,15 +180,20 @@ public class Timeout extends Configured implements Tool {
 
 		job.setOutputFormatClass(TextOutputFormat.class);
 
-		FileInputFormat.setInputPaths(job, new Path(args[0]));
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		FileOutputFormat.setOutputPath(job, new Path(args[0]));
+
+		URL ping = new URL("http://liuliu.me/hipi/ping.php");
+		URLConnection pc = ping.openConnection();
+        BufferedReader in = new BufferedReader(new InputStreamReader(pc.getInputStream()));
+        String serverTime = in.readLine();
+        System.out.println(Long.valueOf(serverTime));
 
 		boolean success = job.waitForCompletion(true);
 		return success ? 0 : 1;
 	}
 
 	public static void main(String[] args) throws Exception {
-		int ret = ToolRunner.run(new Benchmark(), args);
+		int ret = ToolRunner.run(new Timeout(), args);
 		System.exit(ret);
 	}
 

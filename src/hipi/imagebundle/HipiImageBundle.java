@@ -10,7 +10,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -348,31 +347,34 @@ public class HipiImageBundle extends AbstractImageBundle {
 
 	/* Assumes that openForWrite has been called
 	 */
-	public static HipiImageBundle merge(Path new_bundle, Configuration conf, HipiImageBundle[] bundles) {
-		HipiImageBundle merged_hib = new HipiImageBundle(new_bundle, conf);
-		long last_offset = 0;
-		for(int i = 0; i < bundles.length; i++){
-			HipiImageBundle hib_temp = (HipiImageBundle)bundles[i];
+	public void append(HipiImageBundle bundle) {
 			try {
-				FileStatus data_file = hib_temp.getDataFile();
-				List<Long> offsets = hib_temp.getOffsets();
+				bundle.open(FILE_MODE_READ, true);
+				FileStatus data_file = bundle.getDataFile();
+				List<Long> offsets = bundle.getOffsets();
 				
 				//concatenate data file
-				InputStream data_input = new FileInputStream(data_file.getPath().toString());
-				byte[] data = merged_hib.readBytes(data_input);
-				merged_hib._data_output_stream.write(data);
+				FileSystem fs = FileSystem.get(_conf);
+				DataInputStream data_input = new DataInputStream(fs.open(data_file.getPath()));
+				int numRead = 0;
+				byte[] data = new byte[1024*1024];
+				while ((numRead = data_input.read(data)) > -1) {
+		              _data_output_stream.write(data, 0, numRead);
+		          }
 				
 				//write offsets in index file
 				for(int j = 0; j < offsets.size(); j++){
-					long img_offset = (long)(offsets.get(j)) + last_offset;
-					merged_hib._index_output_stream.writeLong(img_offset);
+					long img_offset = (long)(offsets.get(j)) + _countingOffset;
+					_index_output_stream.writeLong(img_offset);
 				}
 				
+				_data_output_stream.flush();
+				_index_output_stream.flush();
+				bundle.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-		return merged_hib;
+
 	}
 
 	@Override

@@ -1,3 +1,4 @@
+package hipi.examples.covariance;
 
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;

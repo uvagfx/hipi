@@ -1,0 +1,8 @@
+hipi.container
+hipi.image
+hipi.image.convert
+hipi.image.io
+hipi.imagebundle
+hipi.imagebundle.mapreduce
+hipi.unittest
+hipi.util

@@ -163,6 +163,15 @@ public abstract class AbstractImageBundle {
 	public abstract long getImageCount();
 
 	/**
+	 * Return the path to the index file
+	 * 
+	 * @return Path path to index file
+	 */
+	public Path getPath(){
+		return _file_path;
+	}
+	
+	/**
 	 * put all needed information for next into some cached place
 	 * @return denote if has next or not
 	 */

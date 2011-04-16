@@ -1,26 +1,22 @@
 package hipi.examples.downloader;
 
 import hipi.image.ImageHeader.ImageType;
-import hipi.imagebundle.AbstractImageBundle;
 import hipi.imagebundle.HipiImageBundle;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Iterator;
+import java.io.StringReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 
 import org.apache.hadoop.io.BooleanWritable;
 
@@ -30,155 +26,101 @@ import java.net.URLConnection;
 
 public class Downloader extends Configured implements Tool{
 
-	public static class DownloaderMapper extends Mapper<LongWritable, LongWritable, BooleanWritable, LongWritable>
+	
+	public static class DownloaderMapper extends Mapper<IntWritable, Text, BooleanWritable, Text>
 	{
-		private static int numRecords;
-		private static int pause = 0;
-		private static AbstractImageBundle hib;
-		private int maxAlpha;
-
+		private static Configuration conf;
 		// This method is called on every node
 		public void setup(Context jc) throws IOException
 		{
-			Configuration conf = jc.getConfiguration(); 
-			maxAlpha = conf.getInt("strontium.downloader.max", 0);
-			numRecords = conf.getInt("strontium.downloader.numRecords", 1000);
-			hib = new HipiImageBundle(new Path("/virginia/uvagfx/cms2vp/bigbundle.hib"), jc.getConfiguration());
-			hib.open(AbstractImageBundle.FILE_MODE_WRITE, true);
+			conf = jc.getConfiguration(); 
 		}
 
-		public void map(LongWritable key, LongWritable value, Context context) 
+		public void map(IntWritable key, Text value, Context context) 
 		throws IOException, InterruptedException
 		{
-			Connection con; 
-
-			int start = (int) key.get();
-			int length = (int) value.get();
-
-			System.out.println("maxalpha = " + maxAlpha);
-			System.out.println("Getting records [" + start + ", " + (start+length) + ")");
-			context.setStatus("Getting records [" + start + ", " + (start+length) + ")");
+			String temp_path = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
+			System.out.println("Temp path: " + temp_path);
 			
-			try 
-			{	    
-				//Register the JDBC driver for MySQL.
-				Class.forName("com.mysql.jdbc.Driver");
-				String url = "jdbc:mysql://galicia.cs.virginia.edu/strontium";
-				con = DriverManager.getConnection(url,"sean", "l33tgfx");
+			HipiImageBundle hib = new HipiImageBundle(new Path(temp_path), conf);
+			hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 
-				//Display URL and connection information
-				System.out.println("URL: " + url);
-				System.out.println("Connection: " + con);
+			String word = value.toString();
 
-				//Get a Statement object	    
-			} catch(Exception e)
+			BufferedReader reader = new BufferedReader(new StringReader(word));
+			String uri;
+			int i = key.get();
+			int iprev = i;
+			while((uri = reader.readLine()) != null)			
 			{
-				e.printStackTrace();
-				context.write(new BooleanWritable(false), new LongWritable(-1));
-				return;
-			}
+				if(i >= iprev+100){
+					hib.close();
+					context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
+					temp_path = conf.get("downloader.outpath") + i + ".hib.tmp";
+					hib = new HipiImageBundle(new Path(temp_path), conf);
+					hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
+					iprev = i;
+				}
+				long startT=0;
+				long stopT=0;	   
+				startT = System.currentTimeMillis();	    	    
 
-			for (int alpha = start; alpha < (int) Math.min(maxAlpha,start+length); alpha++)
-			{
-				context.setStatus("Downloading record #" + alpha);
-				System.out.println("Downloading record #" + alpha);
-				String sql = 	"SELECT url ";
-				sql +=		"FROM download_images ";
-				sql +=		"WHERE id > " + alpha*numRecords + " AND id <= " + ((alpha+1)*numRecords);
+				try {
+					String type = "";
+					URLConnection conn;
+					// Attempt to download
+					context.progress();
 
-				System.out.println("Beginning of alpha");
-				try
-				{
-					long startT=0;
-					long stopT=0;	   
-					startT = System.currentTimeMillis();
-
-					Statement stmt;
-					ResultSet rs;
-
-					stmt = con.createStatement();
-					// Execute statment
-					rs = stmt.executeQuery(sql); /** @throws SQLException */	    	    
-
-					while(rs.next())
-					{						
-						try {
-							String uri = rs.getString("url"); /** @throws SQLException */
-							String type = "";
-							URLConnection conn;
-							// Attempt to download
-							context.progress();
-
-							try {
-								URL link = new URL(uri);
-								conn = link.openConnection();
-								conn.connect();
-								type = conn.getContentType();
-								//System.out.println(type + ":" + fpath);
-							} catch (Exception e)
-							{
-								System.err.println("Connection error to flickr image : " + uri);
-								continue;
-							}
-
-							if (type == null)
-								continue;
-
-							if (type.compareTo("image/gif") == 0)
-								continue;
-
-							if (type != null)
-							{										
-								if (type.compareTo("image/jpeg") == 0)
-									hib.addImage(conn.getInputStream(), ImageType.JPEG_IMAGE);
-							}		
-						} catch(Exception e)
-						{
-							e.printStackTrace();
-							System.err.println("Error... probably cluster downtime");
-							try
-							{
-								Thread.sleep(1000);			    
-							} catch (InterruptedException e1)
-							{
-								e1.printStackTrace();
-							}
-							rs.previous();			    
-						}
+					try {
+						URL link = new URL(uri);
+						conn = link.openConnection();
+						conn.connect();
+						type = conn.getContentType();
+						//System.out.println(type + ":" + fpath);
+					} catch (Exception e)
+					{
+						System.err.println("Connection error to image : " + uri);
+						continue;
 					}
 
-					// Emit success
-					stopT = System.currentTimeMillis();
-					float el = (float)(stopT-startT)/1000.0f;
-					System.out.println("Took " + el + " seconds");
-					System.out.println("-----------------------\n");
-					context.write(new BooleanWritable(true), new LongWritable(alpha));
-					try
-					{
-						Thread.sleep(pause);
-						context.progress();
-					} catch (InterruptedException e1)
-					{
-						e1.printStackTrace();
-					}
+					if (type == null)
+						continue;
+
+					if (type.compareTo("image/gif") == 0)
+						continue;
+
+					if (type != null)
+					{										
+						if (type.compareTo("image/jpeg") == 0)
+							hib.addImage(conn.getInputStream(), ImageType.JPEG_IMAGE);
+					}		
 				} catch(Exception e)
 				{
 					e.printStackTrace();
+					System.err.println("Error... probably cluster downtime");
 					try
 					{
-						Thread.sleep(300 * 1000);
-						context.progress();
+						Thread.sleep(1000);			    
 					} catch (InterruptedException e1)
 					{
 						e1.printStackTrace();
 					}
-					alpha--;
 				}
+
+				i++;
+				
+				// Emit success
+				stopT = System.currentTimeMillis();
+				float el = (float)(stopT-startT)/1000.0f;
+				System.out.println("Took " + el + " seconds");
+				System.out.println("-----------------------\n");
 			}
+
 
 			try
 			{
-				con.close();
+				context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
+				reader.close();
 				hib.close();
 			} catch (Exception e)
 			{
@@ -188,87 +130,65 @@ public class Downloader extends Configured implements Tool{
 		}
 	}
 
-	public static class DownloaderReducer extends Reducer<BooleanWritable, LongWritable, BooleanWritable, LongWritable> {
-		// Just the basic indentity reducer... no extra functionality needed at this time
-		public void reduce(BooleanWritable key, Iterator<LongWritable> values, Context context) 
+	public static class DownloaderReducer extends Reducer<BooleanWritable, Text, BooleanWritable, Text> {
+
+		private static Configuration conf;		
+		public void setup(Context jc) throws IOException
+		{
+			conf = jc.getConfiguration();
+		}
+
+		public void reduce(BooleanWritable key, Iterable<Text> values, Context context) 
 		throws IOException, InterruptedException
 		{
-			if (key.get())
-			{
-				System.out.println("REDUCING");
-				while(values.hasNext())
-				{	    
-					context.write(key, values.next());
+			if(key.get()){
+				FileSystem fileSystem = FileSystem.get(conf);
+				HipiImageBundle hib = new HipiImageBundle(new Path(conf.get("downloader.outfile")), conf);
+				hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
+				for (Text temp_string : values) {
+					Path temp_path = new Path(temp_string.toString());
+					HipiImageBundle input_bundle = new HipiImageBundle(temp_path, conf);
+					hib.append(input_bundle);
+					
+					Path index_path = input_bundle.getPath();
+					Path data_path = new Path(index_path.toString() + ".dat");
+					System.out.println("Deleting: " + data_path.toString());
+					fileSystem.delete(index_path, false);
+					fileSystem.delete(data_path, false);
+					
+					context.write(new BooleanWritable(true), new Text(input_bundle.getPath().toString()));
+					context.progress();
 				}
 			}
 		}
 	}
 
 
-	public static int numRecords = 1000;
-
 	public int run(String[] args) throws Exception
 	{	
 
 		// Read in the configuration file
-		if (args.length < 4)
+		if (args.length < 3)
 		{
-			System.out.println("Usage: downloader <config file> <start> <end> <nodes>");
+			System.out.println("Usage: downloader <input file> <output file> <nodes>");
 			System.exit(0);
 		}
 
-		String configFile = args[0];
-		int start = Integer.parseInt(args[1]);
-		int end = Integer.parseInt(args[2]);
-		int nodes = Integer.parseInt(args[3]);
-
 		// Setup configuration
 		Configuration conf = new Configuration();
+
+		String inputFile = args[0];
+		String outputFile = args[1];
+		int nodes = Integer.parseInt(args[2]);
+
+		String outputPath = outputFile.substring(0, outputFile.lastIndexOf('/')+1);
+		System.out.println("Output HIB: " + outputPath);
 		
-
-		Statement stmt;
-		ResultSet rs;
-		Connection con;    
-		int maxAlpha;
-
-		try 
-		{	    
-			//Register the JDBC driver for MySQL.
-			Class.forName("com.mysql.jdbc.Driver");
-			String url = "jdbc:mysql://galicia.cs.virginia.edu/strontium";
-			con = DriverManager.getConnection(url,"sean", "l33tgfx");
-
-			//Display URL and connection information
-			System.out.println("URL: " + url);
-			System.out.println("Connection: " + con);
-
-			//Get a Statement object
-			stmt = con.createStatement();
-			String sql = 	"SELECT COUNT(id) AS max ";
-			sql +=		"FROM download_images ";
-
-			// Execute statment
-			rs = stmt.executeQuery(sql); /** @throws SQLException */	   
-			rs.next();
-
-			maxAlpha = (int) Math.ceil( (float) rs.getInt("max") / (float) numRecords); /** @throws SQLException */		
-
-		} catch(Exception e)
-		{
-			e.printStackTrace();
-			return 0;
-		}    
 		
-		con.close();
-		
-		conf.setInt("strontium.downloader.start", start);
-		conf.setInt("strontium.downloader.max", (int) Math.min(end, maxAlpha));
-		conf.setInt("strontium.downloader.numRecords", numRecords);
-		conf.setInt("strontium.downloader.nodes", nodes);
+		conf.setInt("downloader.nodes", nodes);
+		conf.setStrings("downloader.outfile", outputFile);
+		conf.setStrings("downloader.outpath", outputPath);
 
-		// Add custom XML document with dimensions
-		conf.addResource(new Path(configFile));
-		
 		Job job = new Job(conf, "downloader");
 		job.setJarByClass(Downloader.class);
 		job.setMapperClass(DownloaderMapper.class);
@@ -276,18 +196,18 @@ public class Downloader extends Configured implements Tool{
 
 		// Set formats
 		job.setOutputKeyClass(BooleanWritable.class);
-		job.setOutputValueClass(LongWritable.class);       
+		job.setOutputValueClass(Text.class);       
 		job.setInputFormatClass(DownloaderInputFormat.class);
 
 		//*************** IMPORTANT ****************\\
 		job.setMapOutputKeyClass(BooleanWritable.class);
-		job.setMapOutputValueClass(LongWritable.class);
-
+		//job.setMapOutputValueClass(AbstractImageBundle.class);
+		job.setMapOutputValueClass(Text.class);
 		// Set out/in paths
-		removeDir("/virginia/uvagfx/out", conf);
-		FileOutputFormat.setOutputPath(job, new Path("/virginia/uvagfx/out"));
-		DownloaderInputFormat.setInputPaths(job, new Path(configFile));	
+		//createDir(outputPath, conf);
+		FileOutputFormat.setOutputPath(job, new Path(outputFile + "_output"));
 
+		DownloaderInputFormat.setInputPaths(job, new Path(inputFile));
 
 		//conf.set("mapred.job.tracker", "local");
 		job.setNumReduceTasks(1);
@@ -295,13 +215,13 @@ public class Downloader extends Configured implements Tool{
 		return 0;
 	}
 
-	public static void removeDir(String path, Configuration conf) throws IOException {
+	public static void createDir(String path, Configuration conf) throws IOException {
 		Path output_path = new Path(path);
 
 		FileSystem fs = FileSystem.get(conf);
 
-		if (fs.exists(output_path)) {
-			fs.delete(output_path, true);
+		if (!fs.exists(output_path)) {
+			fs.mkdirs(output_path);
 		}
 	}
 

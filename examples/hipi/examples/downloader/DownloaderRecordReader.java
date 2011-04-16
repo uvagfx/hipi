@@ -1,7 +1,12 @@
 package hipi.examples.downloader;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
@@ -9,20 +14,36 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 /**
  * Treats keys as index into training array and value as the training vector. 
  */
-public class DownloaderRecordReader extends RecordReader<LongWritable, LongWritable> 
+public class DownloaderRecordReader extends RecordReader<IntWritable, Text> 
 {
 	private boolean singletonEmit;
-	private long start;
-	private long length;
-
-	public void initialize(InputSplit split, TaskAttemptContext arg1)
+	private String urls;
+	private long start_line;
+	
+	public void initialize(InputSplit split, TaskAttemptContext context)
 	throws IOException, InterruptedException {
 		FileSplit f = (FileSplit) split;
+		Path path = f.getPath();
+		Configuration conf = context.getConfiguration();
+		FileSystem fs = path.getFileSystem(conf);
 
-		start = f.getStart();
-		length = f.getLength();
+		start_line = f.getStart();
+		long num_lines = f.getLength();
 
 		singletonEmit = false;
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(path)));
+		int i = 0;
+		while(i < start_line && reader.readLine() != null){
+			i++;
+		}
+		
+		urls = "";
+		String line;
+		for(i = 0; i < num_lines && (line = reader.readLine()) != null; i++){
+			urls += line + '\n';
+		}
+		reader.close();
 	}
 
 
@@ -38,22 +59,21 @@ public class DownloaderRecordReader extends RecordReader<LongWritable, LongWrita
 		}
 	}
 
-	public synchronized void close() throws IOException 
+	public void close() throws IOException 
 	{
 		return;
 	}
 
 	@Override
-	public LongWritable getCurrentKey() throws IOException,
+	public IntWritable getCurrentKey() throws IOException,
 	InterruptedException {
-		return new LongWritable(start);
+		return new IntWritable((int)start_line);
 	}
 
 	@Override
-	public LongWritable getCurrentValue() throws IOException,
+	public Text getCurrentValue() throws IOException,
 	InterruptedException {
-		return new LongWritable(length);
-
+		return new Text(urls);
 	}
 
 	@Override

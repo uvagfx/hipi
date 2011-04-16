@@ -1,16 +1,18 @@
 package hipi.examples.downloader;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.fs.BlockLocation;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.PathFilter;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
@@ -19,9 +21,9 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.conf.Configuration;
 
-public class DownloaderInputFormat extends FileInputFormat<LongWritable, LongWritable> 
+public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> 
 {
-	
+
 	protected class QuickFile
 	{
 		public String host;
@@ -32,57 +34,51 @@ public class DownloaderInputFormat extends FileInputFormat<LongWritable, LongWri
 	 * Returns an object that can be used to read records of type ImageInputFormat
 	 */
 	@Override
-	public RecordReader<LongWritable, LongWritable> createRecordReader(InputSplit genericSplit, TaskAttemptContext context) 
+	public RecordReader<IntWritable, Text> createRecordReader(InputSplit genericSplit, TaskAttemptContext context) 
 	throws IOException, InterruptedException {
 		return new DownloaderRecordReader();
 	}
 
 
-	private static final PathFilter hiddenFileFilter = new PathFilter(){
-		public boolean accept(Path p){
-			String name = p.getName(); 
-			return !name.startsWith("_") && !name.startsWith(".");
-		}
-	};
-
 	@Override
 	public List<InputSplit> getSplits(JobContext job) throws IOException 
 	{
 		Configuration conf = job.getConfiguration();
+		int nodes = conf.getInt("downloader.nodes", 10);
 
-		int maxAlpha = conf.getInt("strontium.downloader.max", 0);
-		int start = conf.getInt("strontium.downloader.start", 0);
-		int nodes = conf.getInt("strontium.downloader.nodes", 10);
-		System.out.println("(start, maxAlpha) = (" + start + ", " + maxAlpha + ")");
-		// Get DataNodes
-		/*
-	  FSNamesystem fsn = FSNamesystem.getFSNamesystem();
-	  ArrayList<DatanodeDescriptor> live = new ArrayList<DatanodeDescriptor>();
-	  ArrayList<DatanodeDescriptor> dead = new ArrayList<DatanodeDescriptor>();
-
-	  fsn.DFSNodesStatus(live, dead);
-
-		 */
 
 		ArrayList<QuickFile> hosts = new ArrayList<QuickFile>(0);
 		List<InputSplit> splits = new ArrayList<InputSplit>();
 
 		FileSystem fileSystem = FileSystem.get(conf);
-		Path dir = new Path("/virginia/shared/flickr/0/0/0/0/0/0");
-		FileStatus[] matches = fileSystem.listStatus(FileUtil.stat2Paths(fileSystem.globStatus(dir, hiddenFileFilter)), hiddenFileFilter);
-
-		for (FileStatus match: matches)
+		String tempOutputPath = conf.get("downloader.outpath") + "_tmp";
+		Path tempOutputDir = new Path(tempOutputPath);
+		
+		if (fileSystem.exists(tempOutputDir)) {
+			fileSystem.delete(tempOutputDir, true);
+		}
+		fileSystem.mkdirs(tempOutputDir);
+		
+		int i = 0;
+		while( hosts.size() < nodes && i < 2*nodes)
 		{
+			String tempFileString = tempOutputPath + "/" + i;
+			Path tempFile = new Path(tempFileString);
+			FSDataOutputStream os = fileSystem.create(tempFile);
+			os.write(i);
+			os.close();
+
+			FileStatus match = fileSystem.getFileStatus(tempFile);
 			long length = match.getLen();
-			Path file = fileSystem.makeQualified(match.getPath());
-			BlockLocation[] blocks = fileSystem.getFileBlockLocations(fileSystem.getFileStatus(file), 0, length);
+			BlockLocation[] blocks = fileSystem.getFileBlockLocations(match, 0, length);
 
 			boolean save = true;
-			for (int i = 0; i < hosts.size(); i++)
+			for (int j = 0; j < hosts.size(); j++)
 			{
-				if (blocks[0].getHosts()[0].compareTo(hosts.get(i).host) == 0)
+				if (blocks[0].getHosts()[0].compareTo(hosts.get(j).host) == 0)
 				{
 					save = false;
+					System.out.println("Repeated host: " + i);
 					break;
 				}
 			}
@@ -91,33 +87,43 @@ public class DownloaderInputFormat extends FileInputFormat<LongWritable, LongWri
 			{
 				QuickFile Q = new QuickFile();
 				Q.host = blocks[0].getHosts()[0];
-				Q.file = file;
+				Q.file = tempFile;
 				hosts.add(Q);
+				System.out.println("Found host successfully: " + i);
 			}
-
-			if (hosts.size() == nodes)
-				break;
+			i++;
 		}
 
 		System.out.println("Tried to get " + nodes + " nodes, got " + hosts.size());
 
-		int per = (int) Math.ceil(((float) (maxAlpha - start)) / ((float) hosts.size()));
 
-		System.out.println("Each node responsible for " + per + " download sets");
+		FileStatus file = listStatus(job).get(0);
+		Path path = file.getPath();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(path)));
+		int num_lines = 0;
+		while(reader.readLine() != null){
+			num_lines++;
+		}
+		reader.close();
+		
+		int per = (int) Math.ceil(((float) (num_lines)) / ((float) hosts.size()));
+
+		System.out.println("Each node responsible for " + per + " image downloads");
 
 		int index = 0;
 		FileSplit[] f = new FileSplit[hosts.size()];
-		for (int i = 0; i < f.length; i++)
+		for (i = 0; i < f.length; i++)
 		{
 			String[] host = new String[1];
 			host[0] = hosts.get(index++).host;
 			if (index >= hosts.size())
 				index = 0;
 
-			splits.add( new FileSplit(hosts.get(index).file , (start+i*per) , per, host));
+			splits.add( new FileSplit(path , (i*per) , per, host));
 		}
-
+		if (fileSystem.exists(tempOutputDir)) {
+			fileSystem.delete(tempOutputDir, true);
+		}
 		return splits;    
 	}
-
 }

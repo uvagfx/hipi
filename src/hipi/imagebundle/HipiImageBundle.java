@@ -96,7 +96,11 @@ public class HipiImageBundle extends AbstractImageBundle {
 				if (decoder == null)
 					return null;
 				ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
-				_header = decoder.decodeImageHeader(_byte_array_input_stream);
+				try {
+					_header = decoder.decodeImageHeader(_byte_array_input_stream);
+				} catch (IOException e) {
+					_header = null;
+				}
 				_byte_array_input_stream.close();
 				return _header;
 			}
@@ -112,7 +116,11 @@ public class HipiImageBundle extends AbstractImageBundle {
 				if (decoder == null)
 					return null;
 				ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
-				_image = decoder.decodeImage(_byte_array_input_stream);
+				try {
+					_image = decoder.decodeImage(_byte_array_input_stream);
+				} catch (IOException e) {
+					_image = null;
+				}
 				_byte_array_input_stream.close();
 				return _image;
 			}

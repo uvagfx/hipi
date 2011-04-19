@@ -31,14 +31,24 @@ public class JpegFromHib extends Configured implements Tool{
 		public FileSystem fileSystem;
 		public void setup(Context jc) throws IOException
 		{
-			fileSystem = FileSystem.get(jc.getConfiguration());
-			path = new Path("/virginia/uvagfx/cms2vp/jpegfromhib");
+			Configuration conf = jc.getConfiguration();
+			fileSystem = FileSystem.get(conf);
+			path = new Path( conf.get("jpegfromhib.outdir"));
 			fileSystem.mkdirs(path);
 		}
 		public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException{
+			if( key == null && value == null)
+				return;
+			
 			ImageEncoder encoder = JPEGImageUtil.getInstance();
-			FSDataOutputStream os = fileSystem.create(new Path(path + "/" + value.hashCode() + ".jpg"));
+			Path outpath = new Path(path + "/" + value.hashCode() + ".jpg");
+			while(fileSystem.exists(outpath)){
+				String temp = outpath.toString();
+				outpath = new Path(temp.substring(0,temp.lastIndexOf('.')) + "1.jpg"); 
+			}
+			FSDataOutputStream os = fileSystem.create(outpath);
 			encoder.encodeImage(value, key, os);
+			os.close();
 			context.write(new BooleanWritable(true), new LongWritable(value.hashCode()));
 		}
 	}
@@ -62,10 +72,11 @@ public class JpegFromHib extends Configured implements Tool{
 	public int run(String[] args) throws Exception
 	{	
 
-		// Read in the configuration file
-		if (args.length < 1)
+		// Read in the configurations
+		if (args.length < 2)
 		{
-			System.out.println("Usage: jpegfromhib <hibfile>");
+			System.out.println("args: " + args.length);
+			System.out.println("Usage: jpegfromhib <hibfile> <outputdir> <numnodes>");
 			System.exit(0);
 		}
 
@@ -73,6 +84,13 @@ public class JpegFromHib extends Configured implements Tool{
 		// Setup configuration
 		Configuration conf = new Configuration();
 		
+		// set the dir to output the jpegs to
+		String outputPath = args[1];
+		conf.setStrings("jpegfromhib.outdir", outputPath);
+		
+		if(args.length >= 3){
+			conf.setInt("hipi.map.tasks", Integer.parseInt(args[2]));
+		}
 		Job job = new Job(conf, "jpegfromhib");
 		job.setJarByClass(JpegFromHib.class);
 		job.setMapperClass(MyMapper.class);
@@ -87,6 +105,7 @@ public class JpegFromHib extends Configured implements Tool{
 		removeDir("/virginia/uvagfx/cms2vp/out", conf);
 		FileOutputFormat.setOutputPath(job, new Path("/virginia/uvagfx/cms2vp/out"));
 		ImageBundleInputFormat.setInputPaths(job, new Path(args[0]));	
+
 
 
 		//conf.set("mapred.job.tracker", "local");

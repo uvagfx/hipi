@@ -2,7 +2,7 @@
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
 import hipi.imagebundle.mapreduce.CullMapper;
-import hipi.imagebundle.mapreduce.HipiJob;
+import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 
 import java.io.IOException;
 import java.util.Date;
@@ -48,8 +48,9 @@ public class Benchmark extends Configured implements Tool {
 	}
 
 	public int run(String[] args) throws Exception {
-		HipiJob job = new HipiJob(getConf(), "Benchmark");
-		job.setDefault(Benchmark.class);
+		Job job = new Job(getConf(), "Benchmark");
+		job.setJarByClass(Benchmark.class);
+		job.setInputFormatClass(ImageBundleInputFormat.class);
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(LongWritable.class);

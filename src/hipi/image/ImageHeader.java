@@ -17,9 +17,9 @@ import org.apache.hadoop.io.Writable;
 
 public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 
-	public int image_width;
-	public int image_height;
-	public int image_bit_depth;
+	public int width;
+	public int height;
+	public int bitDepth;
 	
 	public enum ImageType {
 		UNSUPPORTED_IMAGE(0x0),
@@ -136,9 +136,9 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 	}
 
 	public void readFields(DataInput in) throws IOException {
-		image_bit_depth = in.readInt();
-		image_height = in.readInt();
-		image_width = in.readInt();
+		bitDepth = in.readInt();
+		height = in.readInt();
+		width = in.readInt();
 		int size = in.readInt();
 		for (int i = 0; i < size; i++) {
 			String key = Text.readString(in);
@@ -148,9 +148,9 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 	}
 
 	public void write(DataOutput out) throws IOException {
-		out.writeInt(image_bit_depth);
-		out.writeInt(image_height);
-		out.writeInt(image_width);
+		out.writeInt(bitDepth);
+		out.writeInt(height);
+		out.writeInt(width);
 		out.writeInt(_exif_information.size());
 		Iterator<Entry<String, String>> it = _exif_information.entrySet().iterator();
 		while (it.hasNext()) {

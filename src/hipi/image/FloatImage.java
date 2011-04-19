@@ -52,7 +52,7 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 	
 	public static final int RGB2GRAY = 0x01;
 
-	public FloatImage cvtColor(int type) {
+	public FloatImage convert(int type) {
 		switch (type) {
 		case RGB2GRAY:
 			float[] pels = new float[_w * _h];
@@ -83,23 +83,6 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 	public void scale(float number) {
 		for (int i = 0; i < _w * _h * _b; i++)
 			_pels[i] *= number;
-	}
-	
-	/**
-	 * Get a pixel from this image and check the bounds while doing it
-	 * 
-	 * @param x
-	 * @param y
-	 * @param c
-	 * @return Either the requested pixel value or -Float.MAX_VALUE if the pixel
-	 *         is out of bounds
-	 */
-	public float getPixelCheckBounds(int x, int y, int c) {
-		if (x >= 0 && x < _w && y >= 0 && y < _h && c >= 0 && c < _b) {
-			return _pels[c + (x + y * _w) * _b];
-		} else {
-			return -Float.MAX_VALUE;
-		}
 	}
 
 	public float getPixel(int x, int y, int c) {

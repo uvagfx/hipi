@@ -38,9 +38,9 @@ public class PNGImageUtilTestCase {
 		{
 			fis = new FileInputStream("data/test/PNGImageUtilTestCase/exif/" + fileName[i] + ".png");
 			header = decoder.decodeImageHeader(fis);
-			assertEquals("width not correct", width[i], header.image_width);
-			assertEquals("height not correct", height[i], header.image_height);
-			assertEquals("bit depth not correct", bit_depth[i], header.image_bit_depth);
+			assertEquals("width not correct", width[i], header.width);
+			assertEquals("height not correct", height[i], header.height);
+			assertEquals("bit depth not correct", bit_depth[i], header.bitDepth);
 		}
 	}
 

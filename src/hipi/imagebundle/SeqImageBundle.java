@@ -105,11 +105,6 @@ public class SeqImageBundle extends AbstractImageBundle {
 	}
 
 	@Override
-	public void merge(AbstractImageBundle[] bundles) {
-		
-	}
-
-	@Override
 	public void close() throws IOException {
 		if (_reader != null) {
 			_reader.close();

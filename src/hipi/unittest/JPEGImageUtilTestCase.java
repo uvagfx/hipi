@@ -37,11 +37,17 @@ public class JPEGImageUtilTestCase {
 		ImageHeader header;
 		String[] fileName = {"canon-ixus", "fujifilm-dx10", "fujifilm-finepix40i", "fujifilm-mx1700", "kodak-dc210", "kodak-dc240", "nikon-e950", "olympus-c960", "ricoh-rdc5300", "sanyo-vpcg250", "sanyo-vpcsx550", "sony-cybershot", "sony-d700"};
 		String[] model = {"Canon DIGITAL IXUS", "DX-10", "FinePix40i", "MX-1700ZOOM", "DC210 Zoom (V05.00)", "KODAK DC240 ZOOM DIGITAL CAMERA", "E950", "C960Z,D460Z", "RDC-5300", "SR6", "SX113", "CYBERSHOT", "DSC-D700"};
+		int[] width = {640, 1024, 600, 640, 640, 640, 800, 640, 896, 640, 640, 640, 672};
+		int[] height = {480, 768, 450, 480, 480, 480, 600, 480, 600, 480, 480, 480, 512};
+		int[] bit_depth = {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8};
 		for (int i = 0; i < fileName.length; i++)
 		{
 			fis = new FileInputStream("data/test/JPEGImageUtilTestCase/exif/" + fileName[i] + ".jpg");
 			header = decoder.decodeImageHeader(fis);
 			assertEquals("exif model not correct", model[i].trim(), header.getEXIFInformation("Model").trim());
+			assertEquals("width not correct", width[i], header.width);
+			assertEquals("height not correct", height[i], header.height);
+			assertEquals("bit depth not correct", bit_depth[i], header.bitDepth);
 		}
 	}
 

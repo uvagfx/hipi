@@ -2,7 +2,7 @@
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
 import hipi.imagebundle.mapreduce.CullMapper;
-import hipi.imagebundle.mapreduce.HipiJob;
+import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 
 import java.io.IOException;
 import org.apache.hadoop.fs.Path;
@@ -18,14 +18,14 @@ public class ImageBundleJob extends Configured implements Tool {
 	public static class Map extends
 			CullMapper<ImageHeader, FloatImage, Text, IntWritable> {		
 		
-		public boolean cull(ImageHeader key) {
+		/*public boolean cull(ImageHeader key) {
 			return (key != null && key.getEXIFInformation("Model") != null && key.getEXIFInformation("Model").toLowerCase().indexOf("canon") >= 0);
-		}
+		}*/
 		
 		public void map(ImageHeader key, FloatImage value, Context context)
 				throws IOException, InterruptedException {
 			if (value != null)
-				context.write(new Text(key.getEXIFInformation("Model")), new IntWritable(value.getWidth()));
+				context.write(new Text("0"), new IntWritable(value.getWidth()));
 		}
 	}
 
@@ -40,8 +40,9 @@ public class ImageBundleJob extends Configured implements Tool {
 	}
 
 	public int run(String[] args) throws Exception {
-		HipiJob job = new HipiJob(getConf(), "ImageBundleJob");
-		job.setDefault(ImageBundleJob.class);
+		Job job = new Job(getConf(), "ImageBundleJob");
+		job.setJarByClass(ImageBundleJob.class);
+		job.setInputFormatClass(ImageBundleInputFormat.class);
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);

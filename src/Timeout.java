@@ -56,7 +56,7 @@ public class Timeout extends Configured implements Tool {
 			URLConnection pc = ping.openConnection();
 	        BufferedReader in = new BufferedReader(new InputStreamReader(pc.getInputStream()));
 	        String serverTime = in.readLine();
-			context.write(new Text("serverTime"), new LongWritable(Long.valueOf(serverTime)));
+			context.write(context.getCurrentKey(), new LongWritable(Long.valueOf(serverTime)));
 		}
 	}
 
@@ -84,13 +84,14 @@ public class Timeout extends Configured implements Tool {
 			return 1;
 		}
 
-		private static final Text key = new Text("expectedTime");
+		private Text key;
 		private LongWritable value;
 		
 		@Override
 		public void initialize(InputSplit split, TaskAttemptContext context)
 				throws IOException, InterruptedException {
 			FileSplit fileSplit = (FileSplit) split;
+			key = new Text(fileSplit.getPath().toString());
 			value = new LongWritable(fileSplit.getStart());
 			System.out.println("record expected time " + fileSplit.getStart());
 		}
@@ -123,7 +124,6 @@ public class Timeout extends Configured implements Tool {
 		public List<InputSplit> getSplits(JobContext job) throws IOException {
 			Configuration conf = job.getConfiguration();
 			int numMapTasks = conf.getInt("hipi.map.tasks", 1);
-			Path emptyPath = new Path("/");
 			Set<String> hostSet = new HashSet<String>();
 			List<InputSplit> splits = new ArrayList<InputSplit>();
 
@@ -149,7 +149,7 @@ public class Timeout extends Configured implements Tool {
 			for (int i = 0; i < hosts.length; i++) {
 				String[] localHosts = new String[1];
 				localHosts[0] = hosts[i];
-				splits.add(new FileSplit(emptyPath, currentTime + 120 * 1000, 0, localHosts));
+				splits.add(new FileSplit(new Path("/" + hosts[i]), currentTime + 120 * 1000, 0, localHosts));
 			}
 			return splits;
 		}

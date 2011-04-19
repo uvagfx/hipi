@@ -103,7 +103,6 @@ public class HipiImageBundle extends AbstractImageBundle {
 				} catch (IOException e) {
 					_header = null;
 				}
-				_byte_array_input_stream.close();
 				return _header;
 			}
 			return null;
@@ -386,12 +385,5 @@ public class HipiImageBundle extends AbstractImageBundle {
 			}
 
 	}
-
-	@Override
-	public void merge(AbstractImageBundle[] bundles) {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 }

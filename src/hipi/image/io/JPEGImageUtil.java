@@ -7,6 +7,8 @@ import hipi.image.ImageHeader.ImageType;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,10 +32,40 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 
 	@SuppressWarnings("rawtypes")
 	public ImageHeader decodeImageHeader(InputStream is) throws IOException {
+		ImageHeader header = new ImageHeader(ImageType.JPEG_IMAGE);
 		try {
-			MetadataReader reader = new MetadataReader(is);
+			DataInputStream dis = new DataInputStream(new BufferedInputStream(is));
+			dis.mark(Integer.MAX_VALUE);
+			short magic = dis.readShort();
+			if (magic != -40)
+				return null;
+			byte[] data = new byte[6];
+			// read in each block to find width / height / bitDepth
+			for (;;) {
+				dis.read(data, 0, 4);
+				if ((data[0] & 0xff) != 0xff)
+					return null;
+				if ((data[1] & 0xff) == 0x01 || ((data[1] & 0xff) >= 0xd0 && (data[1] & 0xff) <= 0xd7))
+					continue;
+				long length = (((data[2] & 0xff) << 8) | (data[3] & 0xff)) - 2;
+				if ((data[1] & 0xff) != 0xc0) {
+					while (length > 0) {
+						long skipped = dis.skip(length);
+						if (skipped == 0)
+							break;
+						length -= skipped;
+					}
+				} else {
+					dis.read(data);
+					header.height = ((data[1] & 0xff) << 8) | (data[2] & 0xff);
+					header.width = ((data[3] & 0xff) << 8) | (data[4] & 0xff);
+					header.bitDepth = data[0] & 0xff;
+					break;
+				}
+			}
+			dis.reset();
+			MetadataReader reader = new MetadataReader(dis);
 			Metadata metadata = reader.extract();
-			ImageHeader header = new ImageHeader(ImageType.JPEG_IMAGE);
 			Iterator directories = metadata.getDirectoryIterator();
 			while (directories.hasNext()) {
 				Directory directory = (Directory)directories.next();
@@ -43,10 +75,9 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 					header.addEXIFInformation(tag.getTagName(), tag.getDescription());
 				}
 			}
-			return header;
 		} catch (Exception e) {
-			return null;
 		}
+		return header;
 	}
 
 	public FloatImage decodeImage(InputStream is) throws IOException {

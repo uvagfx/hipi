@@ -117,9 +117,9 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 						throw new IOException("That file appears to be corrupted.");
 
 					PNGChunk chunk = static_object.new PNGChunk(typeBytes, data);
-					header.image_width      = (int) chunk.getUnsignedInt(0);
-					header.image_height     = (int) chunk.getUnsignedInt(4);
-					header.image_bit_depth  = chunk.getUnsignedByte(8);
+					header.width      = (int) chunk.getUnsignedInt(0);
+					header.height     = (int) chunk.getUnsignedInt(4);
+					header.bitDepth  = chunk.getUnsignedByte(8);
 					break;
 				}
 				else {
@@ -257,40 +257,6 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 			return getChunk("IHDR").getUnsignedByte(12);
 		}
 
-
-		// keep these methods commented out, in case we need to modify them for later use
-		/*
-	public ColorModel getColorModel() {
-		short colorType = getColorType();
-		int bitsPerPixel = getBitsPerPixel();
-
-		if (colorType == 3) {
-			byte[] paletteData = getChunk("PLTE").getData();
-			int paletteLength = paletteData.length / 3;
-			return new IndexColorModel(bitsPerPixel, paletteLength,
-					paletteData, 0, false);
-		}
-		System.out.println("Unsupported color type: " + colorType);
-		return null;
-	}
-
-	public WritableRaster getRaster() {
-		int width = (int) getWidth();
-		int height = (int) getHeight();
-		int bitsPerPixel = getBitsPerPixel();
-		short colorType = getColorType();
-
-		if (colorType == 3) {
-			byte[] imageData = getImageData();
-			DataBuffer db = new DataBufferByte(imageData, imageData.length);
-			WritableRaster raster = Raster.createPackedRaster(db, width,
-					height, bitsPerPixel, null);
-			return raster;
-		} else
-			System.out.println("Unsupported color type!");
-		return null;
-	}
-		 */
 		public byte[] getImageData() {
 			try {
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -421,60 +387,7 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 		write(os, (int)crc.getValue());
 		ByteArrayOutputStream compressed = new ByteArrayOutputStream(65536);
 		BufferedOutputStream bos = new BufferedOutputStream( new DeflaterOutputStream(compressed, new Deflater(9)));
-		/*
-		int pixel;
-		int color;
-		int colorset;
-		 */
 		switch (mode) {
-		/*
-		case BW_MODE: 
-			int rest=width%8;
-			int bytes=width/8;
-			for (int y=0;y<height;y++) {
-				bos.write(0);
-				for (int x=0;x<bytes;x++) {
-					colorset=0;
-					for (int sh=0; sh<8; sh++) {
-						pixel=image.getRGB(x*8+sh,y);
-						color=((pixel >> 16) & 0xff);
-						color+=((pixel >> 8) & 0xff);
-						color+=(pixel & 0xff);
-						colorset<<=1;
-						if (color>=3*128)
-							colorset|=1;
-					}
-					bos.write((byte)colorset);
-				}
-				if (rest>0) {
-					colorset=0;
-					for (int sh=0; sh<width%8; sh++) {
-						pixel=image.getRGB(bytes*8+sh,y);
-						color=((pixel >> 16) & 0xff);
-						color+=((pixel >> 8) & 0xff);
-						color+=(pixel & 0xff);
-						colorset<<=1;
-						if (color>=3*128)
-							colorset|=1;
-					}
-					colorset<<=8-rest;
-					bos.write((byte)colorset);
-				}
-			}
-			break;
-		case GREYSCALE_MODE: 
-			for (int y=0;y<height;y++) {
-				bos.write(0);
-				for (int x=0;x<width;x++) {
-					pixel=image.getRGB(x,y);
-					color=((pixel >> 16) & 0xff);
-					color+=((pixel >> 8) & 0xff);
-					color+=(pixel & 0xff);
-					bos.write((byte)(color/3));
-				}
-			}
-			break;
-		 */
 		case COLOR_MODE:
 			for (int y=0;y<height;y++) {
 				bos.write(0);

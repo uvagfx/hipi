@@ -225,8 +225,6 @@ public abstract class AbstractImageBundle {
 		return _hasNext;
 	}
 
-	public abstract void merge(AbstractImageBundle[] bundles);
-
 	/**
 	 * Closes the underlying stream for this bundle. In some implementations, no
 	 * data is written to the output stream unless this function is called.

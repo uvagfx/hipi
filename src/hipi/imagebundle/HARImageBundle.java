@@ -163,12 +163,6 @@ public class HARImageBundle extends AbstractImageBundle {
 	}
 
 	@Override
-	public void merge(AbstractImageBundle[] bundles) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	public void close() throws IOException {
 		if (_reader != null) {
 			_reader.close();

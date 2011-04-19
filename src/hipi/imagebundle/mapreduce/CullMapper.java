@@ -14,7 +14,7 @@ public class CullMapper <KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN,
 	public void run(Context context) throws IOException, InterruptedException {
 		setup(context);
 		while (context.nextKeyValue()) {
-			if (cull(context.getCurrentKey()))
+			if (context.getCurrentKey() != null && cull(context.getCurrentKey()))
 				map(context.getCurrentKey(), context.getCurrentValue(), context);
 		}
 		cleanup(context);

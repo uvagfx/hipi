@@ -64,6 +64,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 			try {
 				// the total skip is cache length plus 8 (4 for cache length, 4 for cache type)
 				_countingOffset += _cacheLength + 8;
+								
 				if (_end > 0 && _countingOffset > _end) {
 					_cacheLength = _cacheType = 0;
 					return false;
@@ -77,6 +78,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 				_cacheType = ((_sig[4] & 0xff) << 24)
 						| ((_sig[5] & 0xff) << 16) | ((_sig[6] & 0xff) << 8)
 						| (_sig[7] & 0xff);
+
 				_image = null;
 				_header = null;
 				_byte_array_data = new byte[_cacheLength];
@@ -371,11 +373,11 @@ public class HipiImageBundle extends AbstractImageBundle {
 		          }
 				
 				//write offsets in index file
+				long last_offset = _countingOffset;
 				for(int j = 0; j < offsets.size(); j++){
-					long img_offset = (long)(offsets.get(j)) + _countingOffset;
-					_index_output_stream.writeLong(img_offset);
+					_countingOffset = (long)(offsets.get(j)) + last_offset;
+					_index_output_stream.writeLong(_countingOffset);
 				}
-				
 				_data_output_stream.flush();
 				_index_output_stream.flush();
 				bundle.close();

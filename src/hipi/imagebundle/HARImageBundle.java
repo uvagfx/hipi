@@ -34,7 +34,6 @@ public class HARImageBundle extends AbstractImageBundle {
 	
 	private byte _cacheData[];
 	private int _cacheType;
-	private Path _file_path;
 	private ArrayList<HARIndexContainer> indexHash;
 	
 	public HARImageBundle(Path file_path, Configuration conf) {

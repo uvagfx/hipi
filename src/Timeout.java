@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -56,7 +57,8 @@ public class Timeout extends Configured implements Tool {
 			URLConnection pc = ping.openConnection();
 	        BufferedReader in = new BufferedReader(new InputStreamReader(pc.getInputStream()));
 	        String serverTime = in.readLine();
-			context.write(context.getCurrentKey(), new LongWritable(Long.valueOf(serverTime)));
+			InetAddress ia = InetAddress.getLocalHost();
+			context.write(new Text(ia.getHostName()), new LongWritable(Long.valueOf(serverTime)));
 		}
 	}
 

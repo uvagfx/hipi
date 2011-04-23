@@ -43,13 +43,13 @@ public class HipiImageBundle extends AbstractImageBundle {
 		public FileReader(FileSystem fs, Path path, Configuration conf,
 				long start, long end) throws IOException {
 			_data_input_stream = new DataInputStream(fs.open(path));
-			_countingOffset = _start = start;
-			while (_countingOffset > 0) {
+			_start = start;
+			while (start > 0) {
 				long skipped = _data_input_stream
-						.skip((long) _countingOffset);
+						.skip((long) start);
 				if (skipped <= 0)
 					break;
-				_countingOffset -= skipped;
+				start -= skipped;
 			}
 			_countingOffset = _start;
 			_end = end;
@@ -62,16 +62,24 @@ public class HipiImageBundle extends AbstractImageBundle {
 
 		public boolean nextKeyValue() {
 			try {
-				// the total skip is cache length plus 8 (4 for cache length, 4 for cache type)
-				_countingOffset += _cacheLength + 8;
-								
 				if (_end > 0 && _countingOffset > _end) {
 					_cacheLength = _cacheType = 0;
 					return false;
 				}
+
+				int readOff = 0;
 				int byteRead = _data_input_stream.read(_sig);
-				if (byteRead <= 0)
+				// even only 8-byte, it requires to retry
+				while (byteRead < 8 - readOff && byteRead > 0) {
+					readOff += byteRead;
+					byteRead = _data_input_stream.read(_sig, readOff, 8 - readOff);
+				}
+				if (byteRead <= 0) {
+					_cacheLength = _cacheType = 0;
 					return false;
+				}
+				if (byteRead < 8)
+					System.out.println("lacking of " + byteRead);
 				_cacheLength = ((_sig[0] & 0xff) << 24)
 						| ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8)
 						| (_sig[3] & 0xff);
@@ -81,8 +89,26 @@ public class HipiImageBundle extends AbstractImageBundle {
 
 				_image = null;
 				_header = null;
+				if (_cacheLength < 0)
+				{
+					System.out.println("corrupted HipiImageBundle at offset: " + _countingOffset + ", exiting ...");
+					_cacheLength = _cacheType = 0;
+					return false;
+				}
 				_byte_array_data = new byte[_cacheLength];
-				_data_input_stream.read(_byte_array_data);
+				readOff = 0;
+				// it may requires several round-trip in order for this to work
+				byteRead = _data_input_stream.read(_byte_array_data);
+				while (byteRead < _byte_array_data.length - readOff && byteRead > 0) {
+					readOff += byteRead;
+					byteRead = _data_input_stream.read(_byte_array_data, readOff, _byte_array_data.length - readOff);
+				}
+				if (byteRead <= 0) {
+					_cacheLength = _cacheType = 0;
+					return false;
+				}
+				// the total skip is cache length plus 8 (4 for cache length, 4 for cache type)
+				_countingOffset += _cacheLength + 8;
 				return true;
 			} catch (IOException e) {
 				return false;
@@ -100,7 +126,8 @@ public class HipiImageBundle extends AbstractImageBundle {
 				ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
 				try {
 					_header = decoder.decodeImageHeader(_byte_array_input_stream);
-				} catch (IOException e) {
+				} catch (Exception e) {
+					e.printStackTrace();
 					_header = null;
 				}
 				return _header;
@@ -119,10 +146,10 @@ public class HipiImageBundle extends AbstractImageBundle {
 				ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
 				try {
 					_image = decoder.decodeImage(_byte_array_input_stream);
-				} catch (IOException e) {
+				} catch (Exception e) {
+					e.printStackTrace();
 					_image = null;
 				}
-				_byte_array_input_stream.close();
 				return _image;
 			}
 			return null;

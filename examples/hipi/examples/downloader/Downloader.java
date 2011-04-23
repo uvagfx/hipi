@@ -118,9 +118,9 @@ public class Downloader extends Configured implements Tool{
 
 			try
 			{
-				context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
 				reader.close();
 				hib.close();
+				context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
 			} catch (Exception e)
 			{
 				e.printStackTrace();
@@ -158,6 +158,7 @@ public class Downloader extends Configured implements Tool{
 					context.write(new BooleanWritable(true), new Text(input_bundle.getPath().toString()));
 					context.progress();
 				}
+				hib.close();
 			}
 		}
 	}

@@ -5,6 +5,8 @@ import hipi.util.ByteUtils;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.apache.hadoop.io.BinaryComparable;
 import org.apache.hadoop.io.RawComparator;
@@ -103,6 +105,21 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 
 	public float[] getData() {
 		return _pels;
+	}
+	
+	public String hex() {
+		try {
+			MessageDigest sha1;
+			sha1 = MessageDigest.getInstance("SHA-1");
+			byte[] bytes = sha1.digest(ByteUtils.FloatArraytoByteArray(_pels));
+			StringBuilder hex = new StringBuilder(bytes.length * 2);
+			for (int i = 0; i < bytes.length; i++)
+				hex.append(Integer.toHexString(0xFF & bytes[i]));
+			return hex.toString();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public void readFields(DataInput input) throws IOException {

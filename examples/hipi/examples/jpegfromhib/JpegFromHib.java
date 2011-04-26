@@ -5,8 +5,10 @@ import hipi.image.ImageHeader;
 import hipi.image.io.ImageEncoder;
 import hipi.image.io.JPEGImageUtil;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
+import hipi.util.ByteUtils;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.util.Iterator;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -37,15 +39,10 @@ public class JpegFromHib extends Configured implements Tool{
 			fileSystem.mkdirs(path);
 		}
 		public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException{
-			if( key == null && value == null)
+			if(value == null)
 				return;
-			
 			ImageEncoder encoder = JPEGImageUtil.getInstance();
-			Path outpath = new Path(path + "/" + value.hashCode() + ".jpg");
-			while(fileSystem.exists(outpath)){
-				String temp = outpath.toString();
-				outpath = new Path(temp.substring(0,temp.lastIndexOf('.')) + "1.jpg"); 
-			}
+			Path outpath = new Path(path + "/" + value.hex() + ".jpg");
 			FSDataOutputStream os = fileSystem.create(outpath);
 			encoder.encodeImage(value, key, os);
 			os.close();

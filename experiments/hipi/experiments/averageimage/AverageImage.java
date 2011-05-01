@@ -4,16 +4,13 @@ import hipi.experiments.mapreduce.JPEGFileInputFormat;
 import hipi.experiments.mapreduce.JPEGSequenceFileInputFormat;
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
-import hipi.image.io.ImageEncoder;
-import hipi.image.io.JPEGImageUtil;
 import hipi.imagebundle.mapreduce.CullMapper;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
-import hipi.util.ByteUtils;
+import hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
 
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -53,7 +50,9 @@ public class AverageImage extends Configured implements Tool{
 				mean.add(val);
 				num_pics++;
 			}
-			mean.scale(1/num_pics);
+			float scale = 1.0f/num_pics;
+			mean.scale(scale);
+			System.out.println("Scale: " + scale);
 			
 			context.write(new IntWritable(0), mean);
 		}
@@ -76,7 +75,6 @@ public class AverageImage extends Configured implements Tool{
 		// set the dir to output the jpegs to
 		String outputPath = args[1];
 		String input_file_type = args[2];
-		conf.setStrings("averageimage.outdir", outputPath);
 		conf.setStrings("averageimage.filetype", input_file_type);
 
 		Job job = new Job(conf, "averageimage");
@@ -87,12 +85,13 @@ public class AverageImage extends Configured implements Tool{
 		// Set formats
 		job.setOutputKeyClass(IntWritable.class);
 		job.setOutputValueClass(FloatImage.class);       
+		job.setOutputFormatClass(BinaryOutputFormat.class);
 		job.setMapOutputKeyClass(NullWritable.class);
 		job.setMapOutputValueClass(FloatImage.class);
 
 		// Set out/in paths
-		removeDir("/virginia/uvagfx/cms2vp/out", conf);
-		FileOutputFormat.setOutputPath(job, new Path("/virginia/uvagfx/cms2vp/out"));
+		removeDir(outputPath, conf);
+		FileOutputFormat.setOutputPath(job, new Path(outputPath));
 
 		JPEGFileInputFormat.addInputPath(job, new Path(args[0]));
 

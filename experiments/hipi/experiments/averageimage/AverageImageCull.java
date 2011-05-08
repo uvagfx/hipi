@@ -21,7 +21,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class AverageImage extends Configured implements Tool{
+public class AverageImageCull extends Configured implements Tool{
 
 	public static class MyMapper extends CullMapper<ImageHeader, FloatImage, NullWritable, FloatImage>
 	{		
@@ -77,8 +77,8 @@ public class AverageImage extends Configured implements Tool{
 		String input_file_type = args[2];
 		conf.setStrings("averageimage.filetype", input_file_type);
 
-		Job job = new Job(conf, "averageimage");
-		job.setJarByClass(AverageImage.class);
+		Job job = new Job(conf, "averageimage cull");
+		job.setJarByClass(AverageImageCull.class);
 		job.setMapperClass(MyMapper.class);
 		job.setReducerClass(MyReducer.class);
 
@@ -122,7 +122,7 @@ public class AverageImage extends Configured implements Tool{
 		}
 	}
 	public static void main(String[] args) throws Exception {
-		int res = ToolRunner.run(new AverageImage(), args);
+		int res = ToolRunner.run(new AverageImageCull(), args);
 		System.exit(res);
 	}
 }

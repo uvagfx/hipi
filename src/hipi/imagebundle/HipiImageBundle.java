@@ -20,8 +20,26 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
+/**
+ * HipiImageBundle is HIPI's main way of storing collections of images. It takes advantage of the fact that
+ * Hadoop's MapReduce works best with data locality and large files as opposed to small files. This class provides
+ * methods for easily writing and reading to/from a HipiImageBundle. HipiImageBundles are broken up into an index file
+ * containing image offsets and a data file.
+ * The full implementation can be found at HIPI's main website.
+ * 
+ * @see <a href="http://hipi.cs.virginia.edu/">HIPI Project Homepage</a>
+ *
+ */
 public class HipiImageBundle extends AbstractImageBundle {
 
+	/**
+
+	 * The reader class provides a simple interface for reading images from a {@link hipi.imagebundle.HipiImageBundle} so that
+	 * the HipiImageBundle can be split into multiple sections and be read in parallel. This 
+	 * It is used heavily by {@link hipi.imagebundle.mapreduce.ImageBundleInputFormat} 
+	 * and {@link hipi.imagebundle.mapreduce.ImageBundleRecordReader} for MapReduce jobs because of this parallelism.
+	 *
+	 */
 	public static class FileReader {
 
 		private DataInputStream _data_input_stream = null;
@@ -36,10 +54,23 @@ public class HipiImageBundle extends AbstractImageBundle {
 		private FloatImage _image;
 		private byte[] _byte_array_data;
 
+		/**
+		 * 
+		 * @return The progress of reading through the HipiImageBundle according to the start and end specified in the constructor
+		 */
 		public float getProgress() {
 			return (_end - _start) > 0 ? (float)(_countingOffset - _start) / (_end - _start) : 0;
 		}
 
+		/**
+		 * 
+		 * @param fs The {@link FileSystem} where the HipiImageBundle resides
+		 * @param path The {@link Path} to the HipiImageBundle
+		 * @param conf {@link Configuration} for the HipiImageBundle
+		 * @param start The offset position to start reading the HipiImageBundle
+		 * @param end The offset position to stop reading the HipiImageBundle
+		 * @throws IOException
+		 */
 		public FileReader(FileSystem fs, Path path, Configuration conf,
 				long start, long end) throws IOException {
 			_data_input_stream = new DataInputStream(fs.open(path));
@@ -60,6 +91,14 @@ public class HipiImageBundle extends AbstractImageBundle {
 				_data_input_stream.close();
 		}
 
+		/**
+		 * Reads the next image in the HipiImageBundle into a cache. Images are not decoded in this method. To get
+		 * the corresponding {@link FloatImage} and {@link ImageHeader} you must call {@link #getCurrentValue()} and
+		 * {@link #getCurrentKey()} respectively.
+		 * 
+		 * @return True if the reader could get the next image from the HipiImageBundle. False if there are no more images
+		 * or an error occurred.
+		 */
 		public boolean nextKeyValue() {
 			try {
 				if (_end > 0 && _countingOffset > _end) {
@@ -115,6 +154,13 @@ public class HipiImageBundle extends AbstractImageBundle {
 			}
 		}
 
+		/**
+		 * 
+		 * @return Raw byte array containing the image as stored in the HipiImageBundle. The image will not be decoded
+		 * into an {@link FloatImage}.
+		 * 
+		 * @throws IOException
+		 */
 		public byte[] getRawBytes() throws IOException {
 			if (_cacheLength > 0) {
 				return _byte_array_data;
@@ -122,6 +168,11 @@ public class HipiImageBundle extends AbstractImageBundle {
 			return null;
 		}
 
+		/**
+		 * 
+		 * @return ImageHeader of the current image, as retrieved by {@link #nextKeyValue()}
+		 * @throws IOException
+		 */
 		public ImageHeader getCurrentKey() throws IOException {
 			if (_header != null)
 				return _header;
@@ -142,6 +193,11 @@ public class HipiImageBundle extends AbstractImageBundle {
 			return null;
 		}
 
+		/**
+		 * 
+		 * @return Decoded image as a {@link FloatImage}, as retrieved by {@link #nextKeyValue()}
+		 * @throws IOException
+		 */
 		public FloatImage getCurrentValue() throws IOException {
 			if (_image != null)
 				return _image;
@@ -183,6 +239,11 @@ public class HipiImageBundle extends AbstractImageBundle {
 	private Path _data_file = null;
 	private long _imageCount = -1;
 
+	/**
+	 * 
+	 * @param file_path The {@link Path} indicating where the image bundle is (or should be written to)
+	 * @param conf {@link Configuration} that determines the {@link FileSystem} for the image bundle
+	 */
 	public HipiImageBundle(Path file_path, Configuration conf) {
 		super(file_path, conf);
 	}
@@ -213,6 +274,9 @@ public class HipiImageBundle extends AbstractImageBundle {
 		_index_output_stream.writeInt(0);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void openForWrite() throws IOException {
 		// Check if the instance is already in some read/write states
@@ -263,14 +327,24 @@ public class HipiImageBundle extends AbstractImageBundle {
 		_cacheLength = _cacheType = 0;
 	}
 
+	/**
+	 * 
+	 * @return a {@link List} of image offsets
+	 */
 	public List<Long> getOffsets() {
 		return getOffsets(0);
 	}
 
+	/**
+	 * 
+	 * @return The data file for the HipiImageBundle
+	 * @throws IOException
+	 */
 	public FileStatus getDataFile() throws IOException {
 		return FileSystem.get(_conf).getFileStatus(_data_file);
 	}
 
+	
 	public List<Long> getOffsets(int maximumNumber) {
 		ArrayList<Long> offsets = new ArrayList<Long>(maximumNumber);
 		for (int i = 0; i < maximumNumber || maximumNumber == 0; i++) {
@@ -282,6 +356,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 		}
 		return offsets;
 	}
+
 
 	@Override
 	protected void openForRead() throws IOException {
@@ -300,6 +375,10 @@ public class HipiImageBundle extends AbstractImageBundle {
 		_reader = new FileReader(FileSystem.get(_conf), _data_file, _conf, 0, 0);
 	}
 
+	/**
+	 * Adds the image to the HipiImageBundle. This involves appending the image to the data file, and adding
+	 * the image offset to the index file.
+	 */
 	@Override
 	public void addImage(InputStream image_stream, ImageType type)
 	throws IOException {
@@ -352,16 +431,25 @@ public class HipiImageBundle extends AbstractImageBundle {
 		return _imageCount;
 	}
 
+	/**
+	 * Implemented with {@link HipiImageBundle.FileReader#getCurrentKey()}
+	 */
 	@Override
 	protected ImageHeader readHeader() throws IOException {
 		return _reader.getCurrentKey();
 	}
 
+	/**
+	 * Implemented with {@link HipiImageBundle.FileReader#getCurrentValue()}
+	 */
 	@Override
 	protected FloatImage readImage() throws IOException {
 		return _reader.getCurrentValue();
 	}
 
+	/**
+	 * Implemented with {@link HipiImageBundle.FileReader#nextKeyValue()}
+	 */
 	@Override
 	protected boolean prepareNext() {
 		return _reader.nextKeyValue();
@@ -388,6 +476,10 @@ public class HipiImageBundle extends AbstractImageBundle {
 		}
 	}
 
+	/**
+	 * Appends a HipiImageBundle. This involves concatenating data files as well appending offsets to the index file.
+	 * @param bundle HipiImageBundle to be appended
+	 */
 	/* Assumes that openForWrite has been called
 	 */
 	public void append(HipiImageBundle bundle) {

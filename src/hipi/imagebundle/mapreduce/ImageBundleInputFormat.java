@@ -23,9 +23,18 @@ import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
+/**
+ * With one or many HipiImageBundles as an input, ImageBundleInputFormat will generate InputSplits for the MapReduce
+ * tasks and create the corresponding RecordReaders.  
+ *
+ */
+
 public class ImageBundleInputFormat extends
 		FileInputFormat<ImageHeader, FloatImage> {
 
+	/**
+	 * Creates an {@link ImageBundleRecordReader}
+	 */
 	@Override
 	public RecordReader<ImageHeader, FloatImage> createRecordReader(
 			InputSplit split, TaskAttemptContext context) throws IOException,
@@ -33,6 +42,12 @@ public class ImageBundleInputFormat extends
 		return new ImageBundleRecordReader();
 	}
 
+	/**
+	 * Splits the input to Map tasks to maximize data locality when the Mappers are being run. As such, 
+	 * {@link InputSplit}s are created such that one Map Node is created for each data chunk to ensure locality.
+	 * Multiple images may be on one data chunk. This method is very sensitive to Hadoop's setup for the size of 
+	 * data chunks (smaller data chunks yield more map tasks).
+	 */
 	@Override
 	public List<InputSplit> getSplits(JobContext job) throws IOException {
 		Configuration conf = job.getConfiguration();

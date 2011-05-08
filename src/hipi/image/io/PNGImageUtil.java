@@ -66,7 +66,7 @@ import java.util.zip.InflaterInputStream;
 
 /**
  * Currently, images can only be encoded and decoded with RGB encoding. That is, black and white, and grayscale
- * encoded images can be used.
+ * encoded images cannot be used.
  */
 public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 
@@ -85,7 +85,7 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 	
 	/**
 	 * Decodes the image header from an input stream that contains the PNG image. PNG images are broken up into "chunks"
-	 * (see documentation), and the PNG header could be located anywhere in the image
+	 * (see PNG documentation), and the PNG header could be located anywhere in the image
 	 * 
 	 * @param is The {@link InputStream} that contains the PNG image
 	 * @return The {@link ImageHeader} found in the input stream

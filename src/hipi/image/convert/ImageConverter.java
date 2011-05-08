@@ -12,18 +12,23 @@ import hipi.image.io.ImageEncoder;
 public class ImageConverter {
 
 	/**
-	 * Converts between two raw image representations (JPEG, PNG, etc)
-	 * @param image the image to convert
-	 * @param converterFrom the representation that image is currently in
-	 * @param converterTo the representation that image gets converted to
-	 * @return a RawImage that is encoded with converterTo
+	 * Convert between two different image types
 	 * 
-	 * @see JPEGImageConverter, PNGImageConverter, PPMImageConverter
+	 * @param image_in an InputStream containing the image to convert
+	 * @param image_out an OutputStream where the converted image will be written
+	 * @param decoder_in the decoder for decoding the image_in
+	 * @param encoder_out the encoder for encoding image_out
+	 * 
+	 * @throws IOException
+	 * 
+	 * @see hipi.image.io.JPEGImageUtil
+	 * @see hipi.image.io.PNGImageUtil
+	 * @see hipi.image.io.PPMImageUtil
 	 */
 	public static void convert(
 			InputStream image_in, OutputStream image_out, 
 			ImageDecoder decoder_in, ImageEncoder encoder_out) throws IOException {
-		
+
 		ImageHeader header = decoder_in.decodeImageHeader(image_in);
 		FloatImage float_image = decoder_in.decodeImage(image_in);
 		encoder_out.encodeImage(float_image, header, image_out);

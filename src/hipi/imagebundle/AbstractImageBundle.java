@@ -27,8 +27,6 @@ import org.apache.hadoop.fs.Path;
  * opened the file you cannot read anything from the file until you have closed
  * it.
  * 
- * @author seanarietta
- * 
  */
 public abstract class AbstractImageBundle {
 
@@ -48,6 +46,11 @@ public abstract class AbstractImageBundle {
 	private FloatImage _readImage;
 	protected Path _file_path;
 
+	/**
+	 * 
+	 * @param file_path The {@link Path} indicating where the image bundle is (or should be written to)
+	 * @param conf {@link Configuration} that determines the {@link FileSystem} for the image bundle
+	 */
 	public AbstractImageBundle(Path file_path, Configuration conf) {
 		_file_path = file_path;
 		_conf = conf;
@@ -61,8 +64,6 @@ public abstract class AbstractImageBundle {
 	 * Opens a file for either reading or writing. This method will return an
 	 * IOException if an open call has already happened.
 	 * 
-	 * @param _file_path
-	 *            the file that will be used for reading/writing
 	 * @param mode
 	 *            determines whether the file will be read from or written to
 	 * @param overwrite
@@ -102,29 +103,18 @@ public abstract class AbstractImageBundle {
 
 	/**
 	 * Method for opening a file for the purposes of writing. The function
-	 * {@link AbstractImageBundle#open(OutputStream)} contains the necessary
+	 * {@link #open(int)} contains the necessary
 	 * checks to determine whether a file can be opened for writing.
 	 * 
-	 * @param output_stream
-	 *            the stream that will be written to
 	 * @throws IOException
-	 */
-	/**
-	 * TODO: Decide whether the subclasses should receive Paths or
-	 * DataOutputStreams. In the former case, the subclass has to bother with
-	 * actually opening the file. The issue here is that some implementations
-	 * might have specific ways of actually opening the files (maybe the HAR for
-	 * example). We need to follow-up on this.
 	 */
 	protected abstract void openForWrite() throws IOException;
 
 	/**
 	 * Method for opening a file for the purposes of reading. The function
-	 * {@link AbstractImageBundle#open(InputStream)} contains the necessary
+	 * {@link #open(int)} contains the necessary
 	 * checks to determine whether a file can be opened for reading.
 	 * 
-	 * @param input_stream
-	 *            the stream that will be read from
 	 * @throws IOException
 	 */
 	protected abstract void openForRead() throws IOException;
@@ -133,8 +123,6 @@ public abstract class AbstractImageBundle {
 	 * Add an image to this bundle. Some implementations may not actually write
 	 * the data to the file system until after close has been called.
 	 * 
-	 * @param image
-	 *            the image to add to this bundle
 	 * @throws IOException
 	 */
 	public final void addImage(FloatImage image) throws IOException {
@@ -157,8 +145,6 @@ public abstract class AbstractImageBundle {
 
 	/**
 	 * Get the number of images contained in this bundle
-	 * 
-	 * @return
 	 */
 	public abstract long getImageCount();
 
@@ -172,23 +158,31 @@ public abstract class AbstractImageBundle {
 	}
 	
 	/**
-	 * put all needed information for next into some cached place
+	 * Reads the next image and stores it in a cache. Does not decode the image from the image bundle
 	 * @return denote if has next or not
 	 */
 	protected abstract boolean prepareNext();
+	
 	/**
-	 * pull header out of cached place, can read multi-times, but for the same header
-	 * @return
+	 * @return the decoded ImageHeader from the cache that has been prepared. Will not advance the 
+	 * bundle to the next image upon return
 	 * @throws IOException
 	 */
 	protected abstract ImageHeader readHeader() throws IOException;
+	
 	/**
-	 * pull image out of cached place, can read multi-times, but for the same image
-	 * @return
+	 * @return the decoded FloatImage from the cache that has been prepared. Will not advance the 
+	 * bundle to the next image upon return
+	 * 
 	 * @throws IOException
 	 */
 	protected abstract FloatImage readImage() throws IOException;
 
+	/**
+	 * Advances the image bundle to the next image
+	 * @return ImageHeader of the next image
+	 * @throws IOException
+	 */
 	public final ImageHeader next() throws IOException {
 		if (!_prepared)
 			_hasNext = prepareNext();
@@ -202,8 +196,12 @@ public abstract class AbstractImageBundle {
 			return null;
 		}
 	}
-	//TODO: Add in a method to skip the next image
 
+	/**
+	 * 
+	 * @return the FloatImage of the image at the current position in the image bundle
+	 * @throws IOException
+	 */
 	public final FloatImage getCurrentImage() throws IOException {
 		if (_readImage == null && _readHeader) {
 			_readImage = readImage();
@@ -212,10 +210,8 @@ public abstract class AbstractImageBundle {
 	}
 
 	/**
-	 * Returns a boolean indicating whether there are more images left to read
+	 * @return a boolean indicating whether there are more images left to read
 	 * from this bundle.
-	 * 
-	 * @return
 	 */
 	public boolean hasNext() {
 		if (!_prepared) {

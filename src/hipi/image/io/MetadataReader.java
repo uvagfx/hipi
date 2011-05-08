@@ -8,6 +8,9 @@ import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.imaging.jpeg.JpegProcessingException;
 import com.drew.metadata.Metadata;
 
+/**
+ * Helper class for extracting JPEG EXIF data. 
+ */
 public class MetadataReader {
 
 	private class UnclosableBufferedInputStream extends BufferedInputStream {

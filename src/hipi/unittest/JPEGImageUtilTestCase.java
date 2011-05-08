@@ -76,7 +76,7 @@ public class JPEGImageUtilTestCase {
 	}
 
 	/**
-	 * Test method for {@link hipi.image.io.JPEGImageUtil#encodeImage(hipi.image.FloatImage, java.io.OutputStream)}.
+	 * Test method for {@link hipi.image.io.JPEGImageUtil#encodeImage(hipi.image.FloatImage, hipi.image.ImageHeader, java.io.OutputStream)}.
 	 * @throws IOException 
 	 */
 	@Test

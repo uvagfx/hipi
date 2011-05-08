@@ -10,7 +10,6 @@ public class ByteUtils {
 	/**
 	 * Convert from an array of floats to an array of bytes
 	 * @param floatArray
-	 * @return
 	 */
 	public static byte[] FloatArraytoByteArray(float floatArray[]) { 
 		byte byteArray[] = new byte[floatArray.length*4];
@@ -27,7 +26,6 @@ public class ByteUtils {
 	/**
 	 * Convert from an array of bytes to an array of floats
 	 * @param byteArray
-	 * @return
 	 */
 	public static float[] ByteArraytoFloatArray(byte byteArray[]) { 
 		float floatArray[] = new float[byteArray.length/4]; 
@@ -44,7 +42,6 @@ public class ByteUtils {
 	/**
 	 * Convert from a byte array to one int
 	 * @param byteArray
-	 * @return
 	 */
 	public static final int ByteArrayToInt(byte[] byteArray) {
 		return ByteArrayToInt(byteArray, 0);
@@ -54,7 +51,6 @@ public class ByteUtils {
 	 * Convert from a byte array at an offset to one int
 	 * @param byteArray
 	 * @param offset the offset in the byteArray that is the first byte of the int
-	 * @return
 	 * 
 	 * TODO: Test that this will work for leading-zero bytes
 	 */
@@ -68,12 +64,16 @@ public class ByteUtils {
 	/**
 	 * Convert from one int to a byte array
 	 * @param i the integer
-	 * @return
 	 */
 	public static final byte[] IntToByteArray(int i) {
 		return new byte[] { (byte)(i>>24), (byte)(i>>16), (byte)(i>>8), (byte)i };
 	}
 	
+	/**
+	 * 
+	 * @param vals
+	 * @return A hex string of the input according to SHA-1 standards
+	 */
 	public static String asHex(byte[] vals) {
 		try {
 			MessageDigest sha1;

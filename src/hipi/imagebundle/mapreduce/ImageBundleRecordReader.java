@@ -15,20 +15,11 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 /**
- * Provides the basic functionality of an ImageBundle record reader's
- * constructor. The constructor is able to read ImageBundleFileSplits and setup
- * the necessary fields to allow the subclass the ability to actually read off
- * FloatImages from the ImageBundle.
+ * Provides the basic functionality of an ImageBundle record reader. Utilizes 
+ * {@link hipi.imagebundle.HipiImageBundle.FileReader} to read the portion of the HipiImageBundle
+ * denoted by the InputSplit to get the ImageHeader and FloatImage
  * 
- * This class should be subclassed with a specific Writable object that will
- * serve as the key in the Map tasks.
- * 
- * @author seanarietta
- * 
- * @param <T>
- *            a Writable object that will serve as the key to the Map tasks.
- *            Typically this is either an empty object or the RawImageHeader
- *            object.
+ *
  */
 public class ImageBundleRecordReader extends
 		RecordReader<ImageHeader, FloatImage> {

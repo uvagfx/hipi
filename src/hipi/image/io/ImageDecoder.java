@@ -11,7 +11,6 @@ import hipi.image.ImageHeader;
  * InputStream. All subclasses must contain methods that know how to read the
  * image header.
  * 
- * @author seanarietta
  */
 public interface ImageDecoder {
 	

@@ -2,6 +2,10 @@ package hipi.image.io;
 
 import hipi.image.ImageHeader.ImageType;
 
+/**
+ * This class contains the decoder and encoder classes for converting between image types
+ *
+ */
 public final class CodecManager {
 	static public ImageDecoder getDecoder(ImageType type) {
 		ImageDecoder decoder = null;

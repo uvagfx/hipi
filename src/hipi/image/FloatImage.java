@@ -5,9 +5,6 @@ import hipi.util.ByteUtils;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import org.apache.hadoop.io.BinaryComparable;
 import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.Writable;
@@ -17,11 +14,9 @@ import org.apache.hadoop.io.Writable;
  * values along with information about the dimensions of the image that array
  * represents. The is the default image type that is used in HIPI.
  * 
- * You can convert to other image types using {@link ImageConverter}.
+ * You can convert to other image types using ImageConverter.
  * 
- * @see ImageConverter, UCharImage, GenericImage, DoubleImage
- * 
- * @author seanarietta
+ * @see hipi.image.convert.ImageConverter
  * 
  */
 public class FloatImage implements Writable, RawComparator<BinaryComparable> {
@@ -43,7 +38,13 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 	public FloatImage(int width, int height, int bands) {
 		this(width, height, bands, new float[width * height * bands]);
 	}
-
+	
+	
+	/**
+	 * Crops a float image according the the x,y location and the width, height passed in.
+	 * 
+	 * @return a {@link FloatImage} containing the cropped portion of the original image
+	 */
 	public FloatImage crop(int x, int y, int width, int height) {
 		float[] pels = new float[width * height * _b];
 		for (int i = y; i < y + height; i++)
@@ -54,6 +55,11 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 	
 	public static final int RGB2GRAY = 0x01;
 
+	/**
+	 * Convert between color types (black and white, grayscale, etc.). Currently only RGB2GRAY
+	 * 
+	 * @return A {@link FloatImage} of the converted image. Returns null if the image could not be converted
+	 */
 	public FloatImage convert(int type) {
 		switch (type) {
 		case RGB2GRAY:
@@ -65,17 +71,29 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 		return null;
 	}
 
+	/**
+	 * Adds a {@link FloatImage} to the current image
+	 * 
+	 * @param image
+	 */
 	public void add(FloatImage image) {
 		float[] pels = image.getData();
 		for (int i = 0; i < _w * _h * _b; i++)
 			_pels[i] += pels[i];
 	}
-	
+	/**
+	 * Adds a scalar to every pixel in the FloatImage
+	 * 
+	 * @param number
+	 */
 	public void add(float number) {
 		for (int i = 0; i < _w * _h * _b; i++)
 			_pels[i] += number;
 	}
-	
+	/**
+	 * 
+	 * @param image Each value is scaled by the corresponding value in image
+	 */
 	public void scale(FloatImage image) {
 		float[] pels = image.getData();
 		for (int i = 0; i < _w * _h * _b; i++)
@@ -170,12 +188,6 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 		return (size1 - size2);
 	}
 
-	/**
-	 * TODO: Ensure that this method is working appropriately. I'm not sure that
-	 * the getBytes() function returns the bytes that I think it does. Also, why
-	 * does this function even get called. Shouldn't the method above be the
-	 * only one that is called ever?
-	 */
 	public int compare(BinaryComparable o1, BinaryComparable o2) {
 		byte[] b1 = o1.getBytes();
 		byte[] b2 = o2.getBytes();

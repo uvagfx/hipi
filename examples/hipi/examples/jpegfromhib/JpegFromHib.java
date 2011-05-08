@@ -1,33 +1,31 @@
 package hipi.examples.jpegfromhib;
 
-import hipi.image.FloatImage;
-import hipi.image.ImageHeader;
-import hipi.image.io.ImageEncoder;
-import hipi.image.io.JPEGImageUtil;
+import hipi.image.ImageHeader.ImageType;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 import hipi.util.ByteUtils;
 
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.util.Iterator;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.BooleanWritable;
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import org.apache.hadoop.io.BooleanWritable;
-
 public class JpegFromHib extends Configured implements Tool{
 
-	public static class MyMapper extends Mapper<ImageHeader, FloatImage, BooleanWritable, LongWritable>
+	public static class MyMapper extends Mapper<NullWritable, BytesWritable, BooleanWritable, Text>
 	{
 		public Path path;
 		public FileSystem fileSystem;
@@ -38,31 +36,27 @@ public class JpegFromHib extends Configured implements Tool{
 			path = new Path( conf.get("jpegfromhib.outdir"));
 			fileSystem.mkdirs(path);
 		}
-		public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException{
+		public void map(NullWritable key, BytesWritable value, Context context) 
+		throws IOException, InterruptedException{
 			if(value == null)
 				return;
-			ImageEncoder encoder = JPEGImageUtil.getInstance();
-			Path outpath = new Path(path + "/" + value.hex() + ".jpg");
+			byte[] val = value.getBytes();
+			
+			String hashval = ByteUtils.asHex(val);
+		    
+			Path outpath = new Path(path + "/" + hashval + ".jpg");
 			FSDataOutputStream os = fileSystem.create(outpath);
-			encoder.encodeImage(value, key, os);
+			os.write(val);
+			os.flush();
 			os.close();
-			context.write(new BooleanWritable(true), new LongWritable(value.hashCode()));
-		}
-	}
-	
-	public static class MyReducer extends Reducer<BooleanWritable, LongWritable, BooleanWritable, LongWritable> {
-		// Just the basic indentity reducer... no extra functionality needed at this time
-		public void reduce(BooleanWritable key, Iterator<LongWritable> values, Context context) 
-		throws IOException, InterruptedException
-		{
-			if (key.get())
-			{
-				System.out.println("REDUCING");
-				while(values.hasNext())
-				{	    
-					context.write(key, values.next());
-				}
-			}
+			
+			long sig = 0<<2 | ImageType.JPEG_IMAGE.toValue();
+			
+			//if you want the images to be output as a sequence file, emit the line below
+			//and change the output key and values appropriately
+			//context.write(new LongWritable(sig), value);
+			
+			context.write(new BooleanWritable(true), new Text(hashval));
 		}
 	}
 
@@ -70,10 +64,10 @@ public class JpegFromHib extends Configured implements Tool{
 	{	
 
 		// Read in the configurations
-		if (args.length < 2)
+		if (args.length < 3)
 		{
 			System.out.println("args: " + args.length);
-			System.out.println("Usage: jpegfromhib <hibfile> <outputdir> <numnodes>");
+			System.out.println("Usage: jpegfromhib <hibfile> <small files output dir> <sequence file output>");
 			System.exit(0);
 		}
 
@@ -84,28 +78,24 @@ public class JpegFromHib extends Configured implements Tool{
 		// set the dir to output the jpegs to
 		String outputPath = args[1];
 		conf.setStrings("jpegfromhib.outdir", outputPath);
-		
-		if(args.length >= 3){
-			conf.setInt("hipi.map.tasks", Integer.parseInt(args[2]));
-		}
+
 		Job job = new Job(conf, "jpegfromhib");
 		job.setJarByClass(JpegFromHib.class);
 		job.setMapperClass(MyMapper.class);
-		job.setReducerClass(MyReducer.class);
+		job.setReducerClass(Reducer.class);
 
 		// Set formats
 		job.setOutputKeyClass(BooleanWritable.class);
-		job.setOutputValueClass(LongWritable.class);       
-		job.setInputFormatClass(ImageBundleInputFormat.class);
+		job.setOutputValueClass(Text.class);       
+		//job.setOutputFormatClass(SequenceFileOutputFormat.class);
+
+		job.setInputFormatClass(JpegFromHibInputFormat.class);
 
 		// Set out/in paths
-		removeDir("/virginia/uvagfx/cms2vp/out", conf);
-		FileOutputFormat.setOutputPath(job, new Path("/virginia/uvagfx/cms2vp/out"));
+		removeDir(args[2], conf);
+		FileOutputFormat.setOutputPath(job, new Path(args[2]));
 		ImageBundleInputFormat.setInputPaths(job, new Path(args[0]));	
 
-
-
-		//conf.set("mapred.job.tracker", "local");
 		job.setNumReduceTasks(1);
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
 		return 0;

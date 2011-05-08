@@ -46,7 +46,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 			_start = start;
 			while (start > 0) {
 				long skipped = _data_input_stream
-						.skip((long) start);
+				.skip((long) start);
 				if (skipped <= 0)
 					break;
 				start -= skipped;
@@ -54,7 +54,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 			_countingOffset = _start;
 			_end = end;
 		}
-		
+
 		public void close() throws IOException {
 			if (_data_input_stream != null)
 				_data_input_stream.close();
@@ -81,11 +81,11 @@ public class HipiImageBundle extends AbstractImageBundle {
 				if (byteRead < 8)
 					System.out.println("lacking of " + byteRead);
 				_cacheLength = ((_sig[0] & 0xff) << 24)
-						| ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8)
-						| (_sig[3] & 0xff);
+				| ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8)
+				| (_sig[3] & 0xff);
 				_cacheType = ((_sig[4] & 0xff) << 24)
-						| ((_sig[5] & 0xff) << 16) | ((_sig[6] & 0xff) << 8)
-						| (_sig[7] & 0xff);
+				| ((_sig[5] & 0xff) << 16) | ((_sig[6] & 0xff) << 8)
+				| (_sig[7] & 0xff);
 
 				_image = null;
 				_header = null;
@@ -113,6 +113,13 @@ public class HipiImageBundle extends AbstractImageBundle {
 			} catch (IOException e) {
 				return false;
 			}
+		}
+
+		public byte[] getRawBytes() throws IOException {
+			if (_cacheLength > 0) {
+				return _byte_array_data;
+			}
+			return null;
 		}
 
 		public ImageHeader getCurrentKey() throws IOException {
@@ -259,7 +266,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 	public List<Long> getOffsets() {
 		return getOffsets(0);
 	}
-	
+
 	public FileStatus getDataFile() throws IOException {
 		return FileSystem.get(_conf).getFileStatus(_data_file);
 	}
@@ -289,13 +296,13 @@ public class HipiImageBundle extends AbstractImageBundle {
 				_index_file));
 
 		readBundleHeader();
-		
+
 		_reader = new FileReader(FileSystem.get(_conf), _data_file, _conf, 0, 0);
 	}
 
 	@Override
 	public void addImage(InputStream image_stream, ImageType type)
-			throws IOException {
+	throws IOException {
 		byte data[] = readBytes(image_stream);
 		_cacheLength = data.length;
 		_cacheType = type.toValue();
@@ -314,32 +321,32 @@ public class HipiImageBundle extends AbstractImageBundle {
 	}
 
 	private byte[] readBytes(InputStream stream) throws IOException {
-	      if (stream == null) return new byte[] {};
-	      byte[] buffer = new byte[1024];
-	      ByteArrayOutputStream output = new ByteArrayOutputStream();
-	      boolean error = false;
-	      try {
-	          int numRead = 0;
-	          while ((numRead = stream.read(buffer)) > -1) {
-	              output.write(buffer, 0, numRead);
-	          }
-	      } catch (IOException e) {
-	          error = true; // this error should be thrown, even if there is an error closing stream
-	          throw e;
-	      } catch (RuntimeException e) {
-	          error = true; // this error should be thrown, even if there is an error closing stream
-	          throw e;
-	      } finally {
-	          try {
-	              stream.close();
-	          } catch (IOException e) {
-	              if (!error) throw e;
-	          }
-	      }
-	      output.flush();
-	      return output.toByteArray();
-	  }
-	
+		if (stream == null) return new byte[] {};
+		byte[] buffer = new byte[1024];
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		boolean error = false;
+		try {
+			int numRead = 0;
+			while ((numRead = stream.read(buffer)) > -1) {
+				output.write(buffer, 0, numRead);
+			}
+		} catch (IOException e) {
+			error = true; // this error should be thrown, even if there is an error closing stream
+			throw e;
+		} catch (RuntimeException e) {
+			error = true; // this error should be thrown, even if there is an error closing stream
+			throw e;
+		} finally {
+			try {
+				stream.close();
+			} catch (IOException e) {
+				if (!error) throw e;
+			}
+		}
+		output.flush();
+		return output.toByteArray();
+	}
+
 	@Override
 	public long getImageCount() {
 		return _imageCount;
@@ -360,7 +367,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 		return _reader.nextKeyValue();
 	}
 
-	
+
 	@Override
 	public void close() throws IOException {
 
@@ -384,32 +391,32 @@ public class HipiImageBundle extends AbstractImageBundle {
 	/* Assumes that openForWrite has been called
 	 */
 	public void append(HipiImageBundle bundle) {
-			try {
-				bundle.open(FILE_MODE_READ, true);
-				FileStatus data_file = bundle.getDataFile();
-				List<Long> offsets = bundle.getOffsets();
-				
-				//concatenate data file
-				FileSystem fs = FileSystem.get(_conf);
-				DataInputStream data_input = new DataInputStream(fs.open(data_file.getPath()));
-				int numRead = 0;
-				byte[] data = new byte[1024*1024];
-				while ((numRead = data_input.read(data)) > -1) {
-		              _data_output_stream.write(data, 0, numRead);
-		          }
-				
-				//write offsets in index file
-				long last_offset = _countingOffset;
-				for(int j = 0; j < offsets.size(); j++){
-					_countingOffset = (long)(offsets.get(j)) + last_offset;
-					_index_output_stream.writeLong(_countingOffset);
-				}
-				_data_output_stream.flush();
-				_index_output_stream.flush();
-				bundle.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+		try {
+			bundle.open(FILE_MODE_READ, true);
+			FileStatus data_file = bundle.getDataFile();
+			List<Long> offsets = bundle.getOffsets();
+
+			//concatenate data file
+			FileSystem fs = FileSystem.get(_conf);
+			DataInputStream data_input = new DataInputStream(fs.open(data_file.getPath()));
+			int numRead = 0;
+			byte[] data = new byte[1024*1024];
+			while ((numRead = data_input.read(data)) > -1) {
+				_data_output_stream.write(data, 0, numRead);
 			}
+			data_input.close();
+			//write offsets in index file
+			long last_offset = _countingOffset;
+			for(int j = 0; j < offsets.size(); j++){
+				_countingOffset = (long)(offsets.get(j)) + last_offset;
+				_index_output_stream.writeLong(_countingOffset);
+			}
+			_data_output_stream.flush();
+			_index_output_stream.flush();
+			bundle.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 

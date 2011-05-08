@@ -2,6 +2,8 @@ package hipi.util;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class ByteUtils {
 
@@ -70,5 +72,20 @@ public class ByteUtils {
 	 */
 	public static final byte[] IntToByteArray(int i) {
 		return new byte[] { (byte)(i>>24), (byte)(i>>16), (byte)(i>>8), (byte)i };
+	}
+	
+	public static String asHex(byte[] vals) {
+		try {
+			MessageDigest sha1;
+			sha1 = MessageDigest.getInstance("SHA-1");
+			byte[] bytes = sha1.digest(vals);
+			StringBuilder hex = new StringBuilder(bytes.length * 2);
+			for (int i = 0; i < bytes.length; i++)
+				hex.append(Integer.toHexString(0xFF & bytes[i]));
+			return hex.toString();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

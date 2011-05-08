@@ -108,18 +108,7 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 	}
 	
 	public String hex() {
-		try {
-			MessageDigest sha1;
-			sha1 = MessageDigest.getInstance("SHA-1");
-			byte[] bytes = sha1.digest(ByteUtils.FloatArraytoByteArray(_pels));
-			StringBuilder hex = new StringBuilder(bytes.length * 2);
-			for (int i = 0; i < bytes.length; i++)
-				hex.append(Integer.toHexString(0xFF & bytes[i]));
-			return hex.toString();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(_pels));
 	}
 
 	public void readFields(DataInput input) throws IOException {

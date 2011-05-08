@@ -33,56 +33,20 @@ FileInputFormat<ImageHeader, FloatImage> {
 
 	/** Splits files returned by {@link #listStatus(Configuration)} when
 	 * they're too big.*/
-/*
+
 	public List<InputSplit> getSplits(JobContext context
 	) throws IOException {
-		Configuration job = context.getConfiguration();
-		long minSize = Math.max(getFormatMinSplitSize(), getMinSplitSize(context));
-		long maxSize = getMaxSplitSize(context);
-
-	    Path[] dirs = getInputPaths(context);
-	    for(Path dir : dirs){
-	    	System.out.println("Input path: " + dir.toString());
-	    	System.out.println("FS: " + dir.getFileSystem(job).toString());
-	    	dir = dir.makeQualified(dir.getFileSystem(job));
-	    	System.out.println("Qualified dir: " + dir.toString());
-	    }
-		
-		// generate splits
-		List<InputSplit> splits = new ArrayList<InputSplit>();
-		for (FileStatus file: listStatus(context)) {
-			Path path = file.getPath();
-			System.out.println("Path: " + path.toString());
-			FileSystem fs = path.getFileSystem(context.getConfiguration());
-			long length = file.getLen();
-			BlockLocation[] blkLocations = fs.getFileBlockLocations(file, 0, length);
-			if ((length != 0) && isSplitable(context, path)) {
-				long blockSize = file.getBlockSize();
-				long splitSize = computeSplitSize(blockSize, minSize, maxSize);
-
-				long bytesRemaining = length;
-				while (((double) bytesRemaining)/splitSize > 1.1) {
-					int blkIndex = getBlockIndex(blkLocations, length-bytesRemaining);
-					splits.add(new FileSplit(path, length-bytesRemaining, splitSize,
-							blkLocations[blkIndex].getHosts()));
-					bytesRemaining -= splitSize;
-				}
-
-				if (bytesRemaining != 0) {
-					splits.add(new FileSplit(path, length-bytesRemaining, bytesRemaining,
-							blkLocations[blkLocations.length-1].getHosts()));
-				}
-			} else if (length != 0) {
-				splits.add(new FileSplit(path, 0, length, blkLocations[0].getHosts()));
-			} else {
-				//Create empty hosts array for zero length files
-				splits.add(new FileSplit(path, 0, length, new String[0]));
-			}
-		}
-		//LOG.debug("Total # of splits: " + splits.size());
+		long startT=0;
+		long stopT=0;	   
+		startT = System.currentTimeMillis();
+		List<InputSplit> splits = super.getSplits(context);
+		stopT = System.currentTimeMillis();
+		float el = (float)(stopT-startT)/1000.0f;
+		System.out.println("Total Time: " + el);
 		return splits;
+		
 	}	
-	*/
+	
 	/**
 	   * Add a {@link Path} to the list of inputs for the map-reduce job.
 	   *

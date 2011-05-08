@@ -18,6 +18,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
@@ -45,9 +46,9 @@ public class Im2Gray extends Configured implements Tool{
 				context.write(new BooleanWritable(true), new LongWritable(gray.hashCode()));
 				
 				//If we later decide we want to output the image
-				/*
-				ImageEncoder encoder = JPEGImageUtil.getInstance();
 				
+				ImageEncoder encoder = JPEGImageUtil.getInstance();
+				/*
 				//a neccessary step to avoid files with duplicate hash values
 				Path outpath = new Path(path + "/" + value.hashCode() + ".jpg");
 				while(fileSystem.exists(outpath)){

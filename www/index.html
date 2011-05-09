@@ -27,10 +27,11 @@
     <div class="content">
       <h2>Overview</h2>
       <div class="section">
-	HIPI is a library for Hadoop's MapReduce framework that
-	provides an API for performing image processing tasks in a
-	distributed computing environment. Here is an overview of our
-	system:
+	HIPI is a library for <a class="external_link"
+	href="http://hadoop.apache.org/mapreduce">Hadoop's
+	MapReduce</a> framework that provides an API for performing
+	image processing tasks in a distributed computing
+	environment. Here is an overview of our system:
 	
 	<img class="centered_image" src="images/hipi_pipeline.png" width="700" alt=""/>
 	
@@ -71,7 +72,7 @@
 	found on our <a href="documentation.html">documentation</a>
 	page.
 	
-	<h3>HIPIImageBundle (HIB)</h3> 
+	<h3>HIPI Image Bundle (HIB)</h3> 
 	
 	A HIPI Image Bundle (HIB) is a collection of images that are
 	stored together in one file, somewhat analagous to .tar files
@@ -95,29 +96,48 @@
 
 	You can create a HIPI Image Bundle from a set of files using
 	the operations listed above, or via some external source
-	(e.g. Flickr) via our <a
-	href="">DistributedDownloader</a>. Please see the <a
-	href="">HIB javadoc page</a> for more details on all of the
-	HIB operations, and the <a href="">Experiments</a> page for
-	information regarding the design of HIBs.
+	(e.g. Flickr) via
+	our <a href="">DistributedDownloader</a>. Please see
+	the <a href="">HIB javadoc page</a> for more details on all of
+	the HIB operations, and the <a href="">Experiments</a> page
+	for information regarding the design of HIBs.
 	
 	<h3>Float Image</h3>
 	
-	Researchers and students most often deal with floating point
-	images, and worrying about encoding or decoding various image
-	types can be a pain, so we implemented a FloatImage class that
-	handles this for the user. We even have added implementation to
-	allow variosu image types to be converted to one
-	another. FloatImage is stored like a tensor, so images can be
-	grayscale, RGB, or have any number of channels to it. We also
-	feature common image methods such as crop, and convolution.
-	<br /><br />
+	The primary input to Map tasks in HIPI is
+	the <a href="">FloatImage</a> class. It is a simple
+	representation of an image file as a set of pixels specified
+	with single floating-point precision. Several common
+	operations can be performed on a FloatImage:
+	<div class="todo">TODO: Show small code snippets for each of these</div>
+	<ul>
+	  <li>Get/set pixels values</li>
+	  <li>Convert to grayscale</li>
+	  <li>Scalar multiplication</li>
+	  <li>Addition</li>
+	  <li>Image cropping</li>
+	</ul>
 
-	Our FloatImage class is presented to users of HIPI in the Map
-	phase, where all images from the HIPI Image Bundles are
-	sent. This way, floating point images are presented to the user
-	without the user having to have any knowledge of the image type
-	or where it comes from.
+	A <a href="">FloatImage</a> is actually just a three-dimensional set of
+	floating-point values. Thus it can also be treated as a matrix
+	(or tensor) and used accordingly. The function
+	<a href="">FloatImage::getData</a> converts the FloatImage
+	into its array representation and can be used directly with
+	the popular BLAS/LAPACK Java implementation
+	<a class="external_link"
+	href="http://icl.cs.utk.edu/f2j/">f2j</a> to perform standard
+	matrix operations. Creating a FloatImage from an array of
+	pixels can be performed via a special form of
+	the <a href="">FloatImage constructor</a>. <br /><br />
+
+	As mentioned in the <a href="#overview">Overview</a> section,
+	HIPI takes as input a <a href="#hib">HIPI Image Bundle</a> and
+	sends records to user-specified Mapper functions with the key
+	being an object of type <a href="">ImageHeader</a> and the
+	value being an object of type <a href="">FloatImage</a>. For
+	each image contained in the HIB that passes the
+	optional <a href="#culling">culling step</a> a FloatImage will
+	be generated.
 	
 	<h3>Cull</h3>
 	

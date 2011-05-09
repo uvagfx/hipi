@@ -1,33 +1,163 @@
-<html>
-<body>
-<h1 align="center">HIPI: A Hadoop Image Processing Interface</h1>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="Description" content="HIPI - Hadoop Image Processing Interface is a Hadoop MapReduce library for performing image processing tasks in the Hadoop distributed computation framework." />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    
+    <link rel="stylesheet" type="text/css" href="include/main.css" />
+    <title>HIPI - Hadoop Image Processing Interface :: Introduction</title>
+  </head>
+  
+  <body>
+    <div class="header">
+      <h1>HIPI - Hadoop Image Processing Framework</h1>
+    </div>
+    <div class="navigation_menu">
+      <ul>
+	<li><a href="index.html">Introduction</a></li>
+	<li><a href="gettingstarted.html">Getting Started</a></li>
+	<li><a href="documentation.html">Documentation</a></li>
+	<li><a href="examples.html">Examples</a></li>
+	<li><a href="downloads.html">Downloads</a></li>
+	<li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+    
+    <!-- Begin Content -->
+    <div class="content">
+      <h2>Overview</h2>
+      <div class="section">
+	HIPI is a library for Hadoop's MapReduce framework that
+	provides an API for performing image processing tasks in a
+	distributed computing environment. Here is an overview of our
+	system:
+	
+	<img class="centered_image" src="images/hipi_pipeline.png" width="700" alt=""/>
+	
+	The input type used in HIPI is referred to as a <a
+	href="">HipiImageBundle</a> (HIB). A HIB is a set of images
+	combined into one large file along with some metadata
+	describing the layout of the images. A HIB can be created from
+	an already existing set of images or directly through some
+	other source (e.g. our <a href="">DistributedDownloader</a>). <br /><br />
 
-<p>HIPI is a library for Hadoop's MapReduce framework that provides an API for efficiently performing image-based tasks. Particularly, it focuses on image processing and computer vision.</p>
-<div align="center"><img src = "images/hipi_pipeline.png" width="700"></div>
-<p>In using HIPI, you specify a HIPI Image Bundle -- which contains a bundle of images -- as the input. You can then specify a culling criteria (if applicable) to filter the inputted set of images (e.g. only image > 10 megapixels). Then, HIPI will properly allocate map tasks to perform a high degree of parallelization. The user is presented with Float Images at each Map task. At this point, the Map and Reduce phases are the same as a normal MapReduce, though we provide the FloatImage classes to aid with image-processing applications. The final output of a HIPI MapReduce job can take many forms: a collection of images as a HIPI Image Bundle, a single image, or data results. In all, HIPI drastically improves the efficiency with which vision and image-processing applications can by made by abstracting the complex details of Hadoop's system away from the user and allowing the user to focus on the objects we bring to the forefront: images.
-</p>
-<hr>
-<h2 align="center">The Four Main Classes</h2>
-<p>While HIPI provides an extensive library, the classes most frequently used are the HipiImageBundle, the FloatImage, and the Cull classes. These classes provide much of the fundamentals for HIPI, and are described briefly below. The full API for HIPI can be found on our <a href="documentation.html">documentation</a> page.
-</p>
-<h3>HIPI Image Bundle</h3>
-<p>HIPI provides a data structure for collecting a set of images. Since Hadoop is a large-scale system, it is assumed that users often want access to many images at once. We introduce a HIPI Image Bundle data type, and an associated class, HipiImageBundle, for interacting with this data. Through this interface, you can create an image bundle, add images to it, merge an image bundle with another bundle, and read images from bundles that have already been created. Additionally, HIPI Image Bundles do not have to be read sequentially, so they can be split up for MapReduce tasks very quickly and efficiently.
-</p>
+	In order to improve the efficiency of some jobs, HIPI allows a
+	user to specify a culling function that discards images that
+	do not meet a specified set of criteria (e.g. the image must
+	be less than 10 megapixels). The user-specified <a
+	href="">CullMapper</a> class is then invoked on each image
+	that passes the culling test. Images are presented to this
+	class as a <a href="">FloatImage</a> and an associated <a
+	href="">ImageHeader</a>. Although HIPI does not directly
+	modify any of the default Hadoop MapReduce behavior once the
+	Mapper's take over, a user can modify execution parameters
+	specific to image processing tasks through the <a
+	href="">HipiJob</a> object during setup.  <br /><br />
 
-<p>You can create a HIPI Image Bundle from a set of files, or use our <a href="downloader/downloader.html">downloader</a> to download a set of images from the internet. Additionally, you can read more about HIPI Image bundles, including our motivation for creating it, the details of implementation, how HIPI Image Bundles compare to other storage formats (Hadoop Archives, Sequence Files, etc.), and why Hadoop prefers one large file as opposed to many small files at <a href="hipiimagebundle.html">this webpage</a></p>
-<h3>Float Image</h3>
-<p>Researchers and students most often deal with floating point images, and worrying about encoding or decoding various image types can be a pain, so we implemented a FloatImage class that handles this for the user. We even have added implementation to allow variosu image types to be converted to one another. FloatImage is stored like a tensor, so images can be grayscale, RGB, or have any number of channels to it. We also feature common image methods such as crop, and convolution.</p>
+	Great care has been taken to ensure that the implementations
+	of the necessary components of Hadoop MapReduce are efficient
+	and effective for image processing tasks. Please see our <a
+	href="experiments.html">Experiments</a> section for further
+	analysis of HIPI.
+      </div>
+      
+      <h2>The Four Main Classes</h2>
+      <div class="section">
+	The classes most frequently used by a practitioner are the <a
+	href="">HipiImageBundle</a>, the <a href="">FloatImage</a>,
+	and the <a href="">CullMapper</a> classes. These classes
+	provide most of the functionality an average user will need
+	and are described briefly below. The full API for HIPI can be
+	found on our <a href="documentation.html">documentation</a>
+	page.
+	
+	<h3>HIPIImageBundle (HIB)</h3> 
+	
+	A HIPI Image Bundle (HIB) is a collection of images that are
+	stored together in one file, somewhat analagous to .tar files
+	in UNIX. HIBs are implemented via the <a
+	href="">HipiImageBundle</a> class and can be used directly in
+	the Hadoop MapReduce framework. Several common operations can
+	be performed on HIBs, including:
+	<div class="todo">TODO: Show small code snippets for each of these</div>
+	<ul>
+	  <li>Create a HIB</li>
+	  <li>Add images to an already existing HIB</li>
+	  <li>Merge two HIBs</li>
+	  <li>Read the images from a HIB (random access is permitted)</li>
+	</ul>
+	<div class="important">Important Note:</div>
+	HIBs must be opened in either FILE_MODE_READ or
+	FILE_MODE_WRITE mode (see <a
+	href="">AbstractImageBundle::open</a>), and once they have
+	been opened in one mode, the mode cannot be switched.  <br
+	/><br />
 
-<p>Our FloatImage class is presented to users of HIPI in the Map phase, where all images from the HIPI Image Bundles are sent. This way, floating point images are presented to the user without the user having to have any knowledge of the image type or where it comes from.
-</p>
-<h3>Cull</h3>
-<p>Often when dealing with image sets, you want a way of filtering images so that only images with certain properties are consider. Applications such as <a href="http://graphics.cs.cmu.edu/projects/im2gps/">im2gps</a>, for instance, only need to consider images with proper GIS data in the image headers and exif data. HIPI provides a Cull class that provides an interface for filtering the data. This class is passed in through the HipiJob class (described below). In addition to saving runtime (images that do not pass the cull are not decoded into FloatImages), the culler also makes writing applications in the Map class much simpler since users can assume that images in the Mapper are only the images which pass the filter specified by the culler.</p>
-<h3>HIPI Job</h3>
-<hr>
-<h2 align="center">HIPI Platforms</h2>
-HIPI stands for Hadoop Image Processing Interface because it is meant to run on Apache Hadoop. Take a look at our <a href="gettingstarted.html"> Getting Started</a> page for details on how to install and set up Hadoop. Check out the <a href="http://hadoop.apache.org/">Apache Hadoop</a> website for more details on Hadoop.
-<hr>
-<h2 align="center">Examples</h2>
-Examples can be found on the <a href="examples.html">examples</a> page. We provide several examples, including trivial and non-trivial applications of HIPI being used on Hadoop's platform.
-</body>
+	You can create a HIPI Image Bundle from a set of files using
+	the operations listed above, or via some external source
+	(e.g. Flickr) via our <a
+	href="">DistributedDownloader</a>. Please see the <a
+	href="">HIB javadoc page</a> for more details on all of the
+	HIB operations, and the <a href="">Experiments</a> page for
+	information regarding the design of HIBs.
+	
+	<h3>Float Image</h3>
+	
+	Researchers and students most often deal with floating point
+	images, and worrying about encoding or decoding various image
+	types can be a pain, so we implemented a FloatImage class that
+	handles this for the user. We even have added implementation to
+	allow variosu image types to be converted to one
+	another. FloatImage is stored like a tensor, so images can be
+	grayscale, RGB, or have any number of channels to it. We also
+	feature common image methods such as crop, and convolution.
+	<br /><br />
+
+	Our FloatImage class is presented to users of HIPI in the Map
+	phase, where all images from the HIPI Image Bundles are
+	sent. This way, floating point images are presented to the user
+	without the user having to have any knowledge of the image type
+	or where it comes from.
+	
+	<h3>Cull</h3>
+	
+	Often when dealing with image sets, you want a way of filtering
+	images so that only images with certain properties are
+	consider. Applications such as <a
+	href="http://graphics.cs.cmu.edu/projects/im2gps/">im2gps</a>,
+	for instance, only need to consider images with proper GIS data
+	in the image headers and exif data. HIPI provides a Cull class
+	that provides an interface for filtering the data. This class is
+	passed in through the HipiJob class (described below). In
+	addition to saving runtime (images that do not pass the cull are
+	not decoded into FloatImages), the culler also makes writing
+	applications in the Map class much simpler since users can
+	assume that images in the Mapper are only the images which pass
+	the filter specified by the culler.
+	
+	<h3>HIPI Job</h3>
+	
+      </div>
+      
+      <h2>HIPI Platforms</h2>
+      <div class="section">
+	HIPI stands for Hadoop Image Processing Interface because it
+	is meant to run on Apache Hadoop. Take a look at our <a
+	href="gettingstarted.html"> Getting Started</a> page for
+	details on how to install and set up Hadoop. Check out the <a
+	href="http://hadoop.apache.org/">Apache Hadoop</a> website for
+	more details on Hadoop.
+      </div>
+      
+      <h2>Examples</h2>
+      <div class="section">
+	Examples can be found on the <a
+	href="examples.html">examples</a> page. We provide several
+	examples, including trivial and non-trivial applications of
+	HIPI being used on Hadoop's platform.
+      </div>
+
+    </div>
+    <!-- End Content -->
+  </body>
 </html>

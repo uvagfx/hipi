@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     
     <link rel="stylesheet" type="text/css" href="include/main.css" />
+    <link rel="stylesheet" type="text/css" href="include/javasyntax.css" />
     <title>HIPI - Hadoop Image Processing Interface :: Introduction</title>
   </head>
   
@@ -132,28 +133,58 @@
 
 	As mentioned in the <a href="#overview">Overview</a> section,
 	HIPI takes as input a <a href="#hib">HIPI Image Bundle</a> and
-	sends records to user-specified Mapper functions with the key
-	being an object of type <a href="">ImageHeader</a> and the
-	value being an object of type <a href="">FloatImage</a>. For
-	each image contained in the HIB that passes the
-	optional <a href="#culling">culling step</a> a FloatImage will
-	be generated.
+	sends records (key-value pairs) to user-specified Mapper
+	functions with the key being an object of
+	type <a href="">ImageHeader</a> and the value being an object
+	of type <a href="">FloatImage</a>. For each image contained in
+	the HIB that passes the optional <a href="#culling">culling
+	step</a> one such record will be generated.
 	
-	<h3>Cull</h3>
+	<h3>Cull Mapper</h3>
 	
-	Often when dealing with image sets, you want a way of filtering
-	images so that only images with certain properties are
-	consider. Applications such as <a
-	href="http://graphics.cs.cmu.edu/projects/im2gps/">im2gps</a>,
-	for instance, only need to consider images with proper GIS data
-	in the image headers and exif data. HIPI provides a Cull class
-	that provides an interface for filtering the data. This class is
-	passed in through the HipiJob class (described below). In
-	addition to saving runtime (images that do not pass the cull are
-	not decoded into FloatImages), the culler also makes writing
-	applications in the Map class much simpler since users can
-	assume that images in the Mapper are only the images which pass
-	the filter specified by the culler.
+	HIPI provides a way for users to discard, or cull, images that
+	do not meet a set of criteria. The CullMapper class defines a
+	special type of Hadoop Mapper that contains an extra function
+	CullMapper::cull that can be used to test an ImageHeader
+	associated with a FloatImage for arbitrary criteria. An
+	example of this can be found in our Experiments page under
+	Culling Test.<br /><br />
+
+	In the example below, the CullMapper is being used (which
+	inherits directly from Mapper). The function CullMapper::cull
+	returns a boolean indicating whether the image described by
+	ImageHeader should be processed (true) or should be discarded
+	(false). In this example, images must contain an EXIF tag
+	indicating they were taken with a Canon PowerShot S500 digital
+	camera and the images must have dimensions 2592 by 1944:
+
+	<pre id="Classes">
+    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyMapper <font id="Extends">extends</font> CullMapper&lt;ImageHeader, FloatImage, NullWritable, FloatImage&gt;
+    {       
+        <font id="Public">public</font> <font id="Boolean">boolean</font> cull(ImageHeader key) <font id="Throws">throws</font> IOException, InterruptedException {
+            <font id="If">if</font>(key.getEXIFInformation(<font id="StringLiteral">"Model"</font>).equals(<font id="StringLiteral">"Canon PowerShot S500"</font>) &amp;&amp; key.width == <font id="IntegerLiteral">2592</font> &amp;&amp; key.height == <font id="IntegerLiteral">1944</font>)
+                <font id="Return">return</font> <font id="True">true</font>;
+            <font id="Else">else</font>
+                <font id="Return">return</font> <font id="False">false</font>;
+        }
+        
+        <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
+	...
+	</pre>
+Often when
+	dealing with image sets, you want a way of filtering images so
+	that only images with certain properties are
+	consider. Applications such
+	as <a href="http://graphics.cs.cmu.edu/projects/im2gps/">im2gps</a>,
+	for instance, only need to consider images with proper GIS
+	data in the image headers and exif data. HIPI provides a Cull
+	class that provides an interface for filtering the data. This
+	class is passed in through the HipiJob class (described
+	below). In addition to saving runtime (images that do not pass
+	the cull are not decoded into FloatImages), the culler also
+	makes writing applications in the Map class much simpler since
+	users can assume that images in the Mapper are only the images
+	which pass the filter specified by the culler.
 	
 	<h3>HIPI Job</h3>
 	

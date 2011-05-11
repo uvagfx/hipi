@@ -21,7 +21,6 @@ public class SeqImageBundle extends AbstractImageBundle {
 
 	public SeqImageBundle(Path file_path, Configuration conf) {
 		super(file_path, conf);
-		// TODO Auto-generated constructor stub
 	}
 
 	private SequenceFile.Writer _writer;

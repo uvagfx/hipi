@@ -129,13 +129,11 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 	}
 
 	public int compare(BinaryComparable o1, BinaryComparable o2) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	public int compare(byte[] arg0, int arg1, int arg2, byte[] arg3, int arg4,
 			int arg5) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

@@ -376,7 +376,6 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 		write(os, height);
 		byte head[]=null;
 
-		//TODO: incorporate different modes of encoding
 		int mode = COLOR_MODE;
 		switch (mode) {
 		case BW_MODE: head=new byte[]{1, 0, 0, 0, 0}; break;

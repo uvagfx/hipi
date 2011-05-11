@@ -224,13 +224,6 @@ public class HipiImageBundle extends AbstractImageBundle {
 	private DataOutputStream _index_output_stream = null;
 	private DataOutputStream _data_output_stream = null;
 	private FileReader _reader = null;
-
-	/**
-	 * A set of records where the key is the length of each image and the value
-	 * is the image type.
-	 * 
-	 * TODO: Change from Map to Array of pairs or equiv
-	 */
 	private byte _sig[] = new byte[8];
 	private int _cacheLength = 0;
 	private int _cacheType = 0;

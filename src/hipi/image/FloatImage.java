@@ -189,6 +189,8 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 		int size1 = w1 * h1 * b1;
 		int size2 = w2 * h2 * b2;
 
+		System.out.println("here in the compare");
+		
 		return (size1 - size2);
 	}
 

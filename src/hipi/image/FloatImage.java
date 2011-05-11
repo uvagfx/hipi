@@ -108,6 +108,10 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 	public float getPixel(int x, int y, int c) {
 		return _pels[c + (x + y * _w) * _b];
 	}
+	
+	public void setPixel(int x, int y, int c, float val) {
+		_pels[c + (x + y * _w) * _b] = val;
+	}
 
 	public int getWidth() {
 		return _w;

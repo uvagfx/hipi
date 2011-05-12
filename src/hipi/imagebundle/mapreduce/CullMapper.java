@@ -22,19 +22,19 @@ public class CullMapper <KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN,
 	 * Determines which inputs should be presented to the map phase. Users should implement this method according to
 	 * how they would like to cull the input data.
 	 * @param key
-	 * @return Whether the key passes the cull test
+	 * @return True if the input should be culled. False if it should not.
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
 	protected boolean cull(KEYIN key) throws IOException, InterruptedException {
-		return true;
+		return false;
 	}
 	
 	@Override
 	public void run(Context context) throws IOException, InterruptedException {
 		setup(context);
 		while (context.nextKeyValue()) {
-			if (context.getCurrentKey() != null && cull(context.getCurrentKey()))
+			if (context.getCurrentKey() != null && !cull(context.getCurrentKey()))
 				map(context.getCurrentKey(), context.getCurrentValue(), context);
 		}
 		cleanup(context);

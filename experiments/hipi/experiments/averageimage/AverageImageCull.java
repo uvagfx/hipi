@@ -27,9 +27,9 @@ public class AverageImageCull extends Configured implements Tool{
 	{		
 		public boolean cull(ImageHeader key) throws IOException, InterruptedException {
 			if(key.getEXIFInformation("Model").equals("Canon PowerShot S500") && key.width == 2592 && key.height == 1944)
-				return true;
-			else
 				return false;
+			else
+				return true;
 		}
 		
 		public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException{

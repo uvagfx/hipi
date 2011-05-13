@@ -17,7 +17,6 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
@@ -73,7 +72,7 @@ public class InputTest extends Configured implements Tool{
 			removeDir("/virginia/uvagfx/cms2vp/out", conf);
 			FileOutputFormat.setOutputPath(job, new Path("/virginia/uvagfx/cms2vp/out"));
 			
-			FileInputFormat.addInputPath(job, new Path(args[0]));
+			JPEGFileInputFormat.addInputPath(job, new Path(args[0]));
 			
 			if(input_file_type.equals("hib"))
 				job.setInputFormatClass(ImageBundleInputFormat.class);

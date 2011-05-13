@@ -48,7 +48,6 @@ FileInputFormat<ImageHeader, FloatImage> {
 	   * @param path {@link Path} to be added to the list of inputs for
 	   *            the map-reduce job.
 	   */
-	
 	public static void addInputPath(Job job,
 	                                  Path path) throws IOException {
 		Configuration conf = job.getConfiguration();

@@ -50,10 +50,14 @@ extends RecordReader<ImageHeader, FloatImage> {
 			ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
 			if (decoder == null)
 				return null;
-			ByteArrayInputStream bis = new ByteArrayInputStream(_cacheData);
-			ImageHeader header = decoder.decodeImageHeader(bis);
-			bis.close();
-			return header;
+			try {
+				ByteArrayInputStream bis = new ByteArrayInputStream(_cacheData);
+				ImageHeader header = decoder.decodeImageHeader(bis);
+				bis.close();
+				return header;
+			} catch (Exception e) {
+				return null;
+			}
 		}
 		return null;
 	}
@@ -65,10 +69,14 @@ extends RecordReader<ImageHeader, FloatImage> {
 			ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
 			if (decoder == null)
 				return null;
-			ByteArrayInputStream bis = new ByteArrayInputStream(_cacheData);
-			FloatImage image = decoder.decodeImage(bis);
-			bis.close();
-			return image;
+			try {
+				ByteArrayInputStream bis = new ByteArrayInputStream(_cacheData);
+				FloatImage image = decoder.decodeImage(bis);
+				bis.close();
+				return image;
+			} catch (Exception e) {
+				return null;
+			}
 		}
 		return null;
 	}

@@ -39,8 +39,8 @@ public class HipiJob extends Job {
 	 * Turn speculative execution on or off for this job for map tasks.
 	 * @param speculativeExecution {@value true} if speculative execution should be turned on for map tasks, else {@value false}.
 	 */
-	public void setMapSpeculativeExecution(boolean speculativeExecution) {
-		this.conf.set("mapred.map.tasks.speculative.execution", Boolean.toString(speculativeExecution));
+	public void setMapSpeculativeExecution(boolean speculativeExecution) {		
+		this.conf.setBoolean("mapred.map.tasks.speculative.execution", speculativeExecution);		
 	}
 	
 	/**
@@ -48,7 +48,7 @@ public class HipiJob extends Job {
 	 * @param speculativeExecution {@value true} if speculative execution should be turned on for map tasks, else {@value false}.
 	 */
 	public void setReduceSpeculativeExecution(boolean speculativeExecution) {
-		conf.set("mapred.reduce.tasks.speculative.execution", Boolean.toString(speculativeExecution));
+		this.conf.setBoolean("mapred.reduce.tasks.speculative.execution", speculativeExecution);
 	}
 	
 	/**
@@ -56,7 +56,7 @@ public class HipiJob extends Job {
 	 * @param compressOutput {@value true} if compression should be enabled, else {@value false}.
 	 */
 	public void setCompressMapOutput(boolean compressOutput) {
-		this.conf.set("mapred.compress.map.output", Boolean.toString(compressOutput));
+		this.conf.setBoolean("mapred.compress.map.output", compressOutput);
 		this.conf.set("mapred.output.compression.type", "BLOCK");
 	}
 }

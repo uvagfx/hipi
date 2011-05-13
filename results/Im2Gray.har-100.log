@@ -1,0 +1,165 @@
+Inside add input path
+11/05/06 12:25:25 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+11/05/06 12:26:37 INFO input.FileInputFormat: Total input paths to process : 93
+11/05/06 12:28:31 INFO mapred.JobClient: Running job: job_201105051650_0045
+11/05/06 12:28:32 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/06 12:28:52 INFO mapred.JobClient:  map 92% reduce 0%
+11/05/06 12:28:53 INFO mapred.JobClient:  map 100% reduce 0%
+11/05/06 12:29:01 INFO mapred.JobClient:  map 100% reduce 18%
+11/05/06 12:29:19 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/06 12:29:27 INFO mapred.JobClient: Job complete: job_201105051650_0045
+11/05/06 12:29:27 INFO mapred.JobClient: Counters: 17
+11/05/06 12:29:27 INFO mapred.JobClient:   Job Counters 
+11/05/06 12:29:27 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/06 12:29:27 INFO mapred.JobClient:     Rack-local map tasks=93
+11/05/06 12:29:27 INFO mapred.JobClient:     Launched map tasks=93
+11/05/06 12:29:27 INFO mapred.JobClient:   FileSystemCounters
+11/05/06 12:29:27 INFO mapred.JobClient:     FILE_BYTES_READ=1029
+11/05/06 12:29:27 INFO mapred.JobClient:     HDFS_BYTES_READ=51166783
+11/05/06 12:29:27 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=5586
+11/05/06 12:29:27 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=1451
+11/05/06 12:29:27 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/06 12:29:27 INFO mapred.JobClient:     Reduce input groups=1
+11/05/06 12:29:27 INFO mapred.JobClient:     Combine output records=0
+11/05/06 12:29:27 INFO mapred.JobClient:     Map input records=93
+11/05/06 12:29:27 INFO mapred.JobClient:     Reduce shuffle bytes=1564
+11/05/06 12:29:27 INFO mapred.JobClient:     Reduce output records=93
+11/05/06 12:29:27 INFO mapred.JobClient:     Spilled Records=186
+11/05/06 12:29:27 INFO mapred.JobClient:     Map output bytes=837
+11/05/06 12:29:27 INFO mapred.JobClient:     Combine input records=0
+11/05/06 12:29:27 INFO mapred.JobClient:     Map output records=93
+11/05/06 12:29:27 INFO mapred.JobClient:     Reduce input records=93
+/opt/hadoop/bin/hadoop jar Im2Gray.jar  /virginia/uvagfx/lliu/out/har-$i har  4.50s user 0.49s system 2% cpu 4:03.23 total
+Inside add input path
+11/05/06 13:14:09 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+11/05/06 13:15:21 INFO input.FileInputFormat: Total input paths to process : 93
+11/05/06 13:17:10 INFO mapred.JobClient: Running job: job_201105051650_0048
+11/05/06 13:17:11 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/06 13:17:30 INFO mapred.JobClient:  map 68% reduce 0%
+11/05/06 13:17:31 INFO mapred.JobClient:  map 98% reduce 0%
+11/05/06 13:17:39 INFO mapred.JobClient:  map 98% reduce 21%
+11/05/06 13:17:40 INFO mapred.JobClient:  map 100% reduce 21%
+11/05/06 13:17:49 INFO mapred.JobClient:  map 100% reduce 32%
+11/05/06 13:18:06 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/06 13:18:14 INFO mapred.JobClient: Job complete: job_201105051650_0048
+11/05/06 13:18:14 INFO mapred.JobClient: Counters: 18
+11/05/06 13:18:14 INFO mapred.JobClient:   Job Counters 
+11/05/06 13:18:14 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/06 13:18:14 INFO mapred.JobClient:     Rack-local map tasks=92
+11/05/06 13:18:14 INFO mapred.JobClient:     Launched map tasks=93
+11/05/06 13:18:14 INFO mapred.JobClient:     Data-local map tasks=1
+11/05/06 13:18:14 INFO mapred.JobClient:   FileSystemCounters
+11/05/06 13:18:14 INFO mapred.JobClient:     FILE_BYTES_READ=1029
+11/05/06 13:18:14 INFO mapred.JobClient:     HDFS_BYTES_READ=51166783
+11/05/06 13:18:14 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=5586
+11/05/06 13:18:14 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=1449
+11/05/06 13:18:14 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/06 13:18:14 INFO mapred.JobClient:     Reduce input groups=1
+11/05/06 13:18:14 INFO mapred.JobClient:     Combine output records=0
+11/05/06 13:18:14 INFO mapred.JobClient:     Map input records=93
+11/05/06 13:18:14 INFO mapred.JobClient:     Reduce shuffle bytes=1564
+11/05/06 13:18:14 INFO mapred.JobClient:     Reduce output records=93
+11/05/06 13:18:14 INFO mapred.JobClient:     Spilled Records=186
+11/05/06 13:18:14 INFO mapred.JobClient:     Map output bytes=837
+11/05/06 13:18:14 INFO mapred.JobClient:     Combine input records=0
+11/05/06 13:18:14 INFO mapred.JobClient:     Map output records=93
+11/05/06 13:18:14 INFO mapred.JobClient:     Reduce input records=93
+/opt/hadoop/bin/hadoop jar Im2Gray.jar  /virginia/uvagfx/lliu/out/har-$i har  4.59s user 0.35s system 2% cpu 4:06.33 total
+Inside add input path
+11/05/06 14:02:14 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+11/05/06 14:03:26 INFO input.FileInputFormat: Total input paths to process : 93
+11/05/06 14:05:22 INFO mapred.JobClient: Running job: job_201105051650_0051
+11/05/06 14:05:23 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/06 14:05:43 INFO mapred.JobClient:  map 100% reduce 0%
+11/05/06 14:05:52 INFO mapred.JobClient:  map 100% reduce 21%
+11/05/06 14:06:11 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/06 14:06:19 INFO mapred.JobClient: Job complete: job_201105051650_0051
+11/05/06 14:06:19 INFO mapred.JobClient: Counters: 17
+11/05/06 14:06:19 INFO mapred.JobClient:   Job Counters 
+11/05/06 14:06:19 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/06 14:06:19 INFO mapred.JobClient:     Rack-local map tasks=93
+11/05/06 14:06:19 INFO mapred.JobClient:     Launched map tasks=93
+11/05/06 14:06:19 INFO mapred.JobClient:   FileSystemCounters
+11/05/06 14:06:19 INFO mapred.JobClient:     FILE_BYTES_READ=1029
+11/05/06 14:06:19 INFO mapred.JobClient:     HDFS_BYTES_READ=51166783
+11/05/06 14:06:19 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=5586
+11/05/06 14:06:19 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=1447
+11/05/06 14:06:19 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/06 14:06:19 INFO mapred.JobClient:     Reduce input groups=1
+11/05/06 14:06:19 INFO mapred.JobClient:     Combine output records=0
+11/05/06 14:06:19 INFO mapred.JobClient:     Map input records=93
+11/05/06 14:06:19 INFO mapred.JobClient:     Reduce shuffle bytes=1564
+11/05/06 14:06:19 INFO mapred.JobClient:     Reduce output records=93
+11/05/06 14:06:19 INFO mapred.JobClient:     Spilled Records=186
+11/05/06 14:06:19 INFO mapred.JobClient:     Map output bytes=837
+11/05/06 14:06:19 INFO mapred.JobClient:     Combine input records=0
+11/05/06 14:06:19 INFO mapred.JobClient:     Map output records=93
+11/05/06 14:06:19 INFO mapred.JobClient:     Reduce input records=93
+/opt/hadoop/bin/hadoop jar Im2Gray.jar  /virginia/uvagfx/lliu/out/har-$i har  4.48s user 0.53s system 2% cpu 4:06.46 total
+Inside add input path
+11/05/06 15:03:58 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+11/05/06 15:05:12 INFO input.FileInputFormat: Total input paths to process : 93
+11/05/06 15:07:08 INFO mapred.JobClient: Running job: job_201105051650_0061
+11/05/06 15:07:09 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/06 15:07:32 INFO mapred.JobClient:  map 46% reduce 0%
+11/05/06 15:07:33 INFO mapred.JobClient:  map 95% reduce 0%
+11/05/06 15:07:41 INFO mapred.JobClient:  map 96% reduce 2%
+11/05/06 15:07:42 INFO mapred.JobClient:  map 100% reduce 2%
+11/05/06 15:07:51 INFO mapred.JobClient:  map 100% reduce 32%
+11/05/06 15:08:08 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/06 15:08:16 INFO mapred.JobClient: Job complete: job_201105051650_0061
+11/05/06 15:08:17 INFO mapred.JobClient: Counters: 17
+11/05/06 15:08:17 INFO mapred.JobClient:   Job Counters 
+11/05/06 15:08:17 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/06 15:08:17 INFO mapred.JobClient:     Rack-local map tasks=93
+11/05/06 15:08:17 INFO mapred.JobClient:     Launched map tasks=93
+11/05/06 15:08:17 INFO mapred.JobClient:   FileSystemCounters
+11/05/06 15:08:17 INFO mapred.JobClient:     FILE_BYTES_READ=1029
+11/05/06 15:08:17 INFO mapred.JobClient:     HDFS_BYTES_READ=51166783
+11/05/06 15:08:17 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=5586
+11/05/06 15:08:17 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=1444
+11/05/06 15:08:17 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/06 15:08:17 INFO mapred.JobClient:     Reduce input groups=1
+11/05/06 15:08:17 INFO mapred.JobClient:     Combine output records=0
+11/05/06 15:08:17 INFO mapred.JobClient:     Map input records=93
+11/05/06 15:08:17 INFO mapred.JobClient:     Reduce shuffle bytes=1564
+11/05/06 15:08:17 INFO mapred.JobClient:     Reduce output records=93
+11/05/06 15:08:17 INFO mapred.JobClient:     Spilled Records=186
+11/05/06 15:08:17 INFO mapred.JobClient:     Map output bytes=837
+11/05/06 15:08:17 INFO mapred.JobClient:     Combine input records=0
+11/05/06 15:08:17 INFO mapred.JobClient:     Map output records=93
+11/05/06 15:08:17 INFO mapred.JobClient:     Reduce input records=93
+/opt/hadoop/bin/hadoop jar Im2Gray.jar  /virginia/uvagfx/lliu/out/har-$i har  4.53s user 0.45s system 1% cpu 4:20.56 total
+Inside add input path
+11/05/06 15:51:01 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+11/05/06 15:52:17 INFO input.FileInputFormat: Total input paths to process : 93
+11/05/06 15:54:06 INFO mapred.JobClient: Running job: job_201105051650_0066
+11/05/06 15:54:07 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/06 15:54:27 INFO mapred.JobClient:  map 41% reduce 0%
+11/05/06 15:54:28 INFO mapred.JobClient:  map 100% reduce 0%
+11/05/06 15:54:37 INFO mapred.JobClient:  map 100% reduce 15%
+11/05/06 15:54:55 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/06 15:55:03 INFO mapred.JobClient: Job complete: job_201105051650_0066
+11/05/06 15:55:03 INFO mapred.JobClient: Counters: 18
+11/05/06 15:55:03 INFO mapred.JobClient:   Job Counters 
+11/05/06 15:55:03 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/06 15:55:03 INFO mapred.JobClient:     Rack-local map tasks=92
+11/05/06 15:55:03 INFO mapred.JobClient:     Launched map tasks=93
+11/05/06 15:55:03 INFO mapred.JobClient:     Data-local map tasks=1
+11/05/06 15:55:03 INFO mapred.JobClient:   FileSystemCounters
+11/05/06 15:55:03 INFO mapred.JobClient:     FILE_BYTES_READ=1029
+11/05/06 15:55:03 INFO mapred.JobClient:     HDFS_BYTES_READ=51166783
+11/05/06 15:55:03 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=5586
+11/05/06 15:55:03 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=1444
+11/05/06 15:55:03 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/06 15:55:03 INFO mapred.JobClient:     Reduce input groups=1
+11/05/06 15:55:03 INFO mapred.JobClient:     Combine output records=0
+11/05/06 15:55:03 INFO mapred.JobClient:     Map input records=93
+11/05/06 15:55:03 INFO mapred.JobClient:     Reduce shuffle bytes=1564
+11/05/06 15:55:03 INFO mapred.JobClient:     Reduce output records=93
+11/05/06 15:55:03 INFO mapred.JobClient:     Spilled Records=186
+11/05/06 15:55:03 INFO mapred.JobClient:     Map output bytes=837
+11/05/06 15:55:03 INFO mapred.JobClient:     Combine input records=0
+11/05/06 15:55:03 INFO mapred.JobClient:     Map output records=93
+11/05/06 15:55:03 INFO mapred.JobClient:     Reduce input records=93
+/opt/hadoop/bin/hadoop jar Im2Gray.jar  /virginia/uvagfx/lliu/out/har-$i har  4.37s user 0.59s system 2% cpu 4:03.74 total

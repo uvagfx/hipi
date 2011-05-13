@@ -1,0 +1,11 @@
+11/05/01 15:18:14 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+Exception in thread "Thread-3" java.lang.NullPointerException
+	at org.apache.hadoop.hdfs.DFSClient$DFSOutputStream.closeThreads(DFSClient.java:3168)
+	at org.apache.hadoop.hdfs.DFSClient$DFSOutputStream.closeInternal(DFSClient.java:3211)
+	at org.apache.hadoop.hdfs.DFSClient$DFSOutputStream.close(DFSClient.java:3156)
+	at org.apache.hadoop.hdfs.DFSClient$LeaseChecker.close(DFSClient.java:1031)
+	at org.apache.hadoop.hdfs.DFSClient.close(DFSClient.java:232)
+	at org.apache.hadoop.hdfs.DistributedFileSystem.close(DistributedFileSystem.java:269)
+	at org.apache.hadoop.fs.FileSystem$Cache.closeAll(FileSystem.java:1503)
+	at org.apache.hadoop.fs.FileSystem$Cache$ClientFinalizer.run(FileSystem.java:1519)
+/opt/hadoop/bin/hadoop jar InputTest.jar  hib  1.06s user 0.08s system 32% cpu 3.557 total

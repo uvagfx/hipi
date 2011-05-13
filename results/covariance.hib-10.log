@@ -1,0 +1,420 @@
+11/04/30 12:27:29 INFO input.FileInputFormat: Total input paths to process : 1
+11/04/30 12:27:29 INFO imagebundle.AbstractImageBundle: Attempting to access file 10.hib with mode 1
+11/04/30 12:27:29 INFO imagebundle.AbstractImageBundle: Attempting to open file 10.hib for reading
+1 tasks spawned
+11/04/30 12:27:32 INFO mapred.JobClient: Running job: job_201104211619_3031
+11/04/30 12:27:33 INFO mapred.JobClient:  map 0% reduce 0%
+11/04/30 12:27:53 INFO mapred.JobClient:  map 100% reduce 0%
+11/04/30 12:28:20 INFO mapred.JobClient:  map 100% reduce 100%
+11/04/30 12:28:28 INFO mapred.JobClient: Job complete: job_201104211619_3031
+11/04/30 12:28:28 INFO mapred.JobClient: Counters: 17
+11/04/30 12:28:28 INFO mapred.JobClient:   Job Counters 
+11/04/30 12:28:28 INFO mapred.JobClient:     Launched reduce tasks=1
+11/04/30 12:28:28 INFO mapred.JobClient:     Rack-local map tasks=1
+11/04/30 12:28:28 INFO mapred.JobClient:     Launched map tasks=1
+11/04/30 12:28:28 INFO mapred.JobClient:   FileSystemCounters
+11/04/30 12:28:28 INFO mapred.JobClient:     FILE_BYTES_READ=7185
+11/04/30 12:28:28 INFO mapred.JobClient:     HDFS_BYTES_READ=4852692
+11/04/30 12:28:28 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=14394
+11/04/30 12:28:28 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=9232
+11/04/30 12:28:28 INFO mapred.JobClient:   Map-Reduce Framework
+11/04/30 12:28:28 INFO mapred.JobClient:     Reduce input groups=1
+11/04/30 12:28:28 INFO mapred.JobClient:     Combine output records=1
+11/04/30 12:28:28 INFO mapred.JobClient:     Map input records=9
+11/04/30 12:28:28 INFO mapred.JobClient:     Reduce shuffle bytes=0
+11/04/30 12:28:28 INFO mapred.JobClient:     Reduce output records=1
+11/04/30 12:28:28 INFO mapred.JobClient:     Spilled Records=2
+11/04/30 12:28:28 INFO mapred.JobClient:     Map output bytes=83088
+11/04/30 12:28:28 INFO mapred.JobClient:     Combine input records=9
+11/04/30 12:28:28 INFO mapred.JobClient:     Map output records=9
+11/04/30 12:28:28 INFO mapred.JobClient:     Reduce input records=1
+11/04/30 12:28:31 INFO input.FileInputFormat: Total input paths to process : 1
+11/04/30 12:28:31 INFO imagebundle.AbstractImageBundle: Attempting to access file 10.hib with mode 1
+11/04/30 12:28:31 INFO imagebundle.AbstractImageBundle: Attempting to open file 10.hib for reading
+1 tasks spawned
+11/04/30 12:28:34 INFO mapred.JobClient: Running job: job_201104211619_3032
+11/04/30 12:28:35 INFO mapred.JobClient:  map 0% reduce 0%
+11/04/30 12:29:13 INFO mapred.JobClient:  map 20% reduce 0%
+11/04/30 12:29:22 INFO mapred.JobClient:  map 34% reduce 0%
+11/04/30 12:29:32 INFO mapred.JobClient:  map 46% reduce 0%
+11/04/30 12:29:49 INFO mapred.JobClient:  map 52% reduce 0%
+11/04/30 12:30:08 INFO mapred.JobClient:  map 57% reduce 0%
+11/04/30 12:30:17 INFO mapred.JobClient:  map 81% reduce 0%
+11/04/30 12:30:25 INFO mapred.JobClient:  map 93% reduce 0%
+11/04/30 12:30:44 INFO mapred.JobClient:  map 100% reduce 0%
+11/04/30 12:30:53 INFO mapred.JobClient:  map 99% reduce 0%
+11/04/30 12:31:30 INFO mapred.JobClient:  map 99% reduce 100%
+11/04/30 12:31:39 INFO mapred.JobClient: Job complete: job_201104211619_3032
+11/04/30 12:31:39 INFO mapred.JobClient: Counters: 17
+11/04/30 12:31:39 INFO mapred.JobClient:   Job Counters 
+11/04/30 12:31:39 INFO mapred.JobClient:     Launched reduce tasks=1
+11/04/30 12:31:39 INFO mapred.JobClient:     Rack-local map tasks=1
+11/04/30 12:31:39 INFO mapred.JobClient:     Launched map tasks=1
+11/04/30 12:31:39 INFO mapred.JobClient:   FileSystemCounters
+11/04/30 12:31:39 INFO mapred.JobClient:     FILE_BYTES_READ=79237497
+11/04/30 12:31:39 INFO mapred.JobClient:     HDFS_BYTES_READ=4852692
+11/04/30 12:31:39 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=99022795
+11/04/30 12:31:39 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=21233680
+11/04/30 12:31:39 INFO mapred.JobClient:   Map-Reduce Framework
+11/04/30 12:31:39 INFO mapred.JobClient:     Reduce input groups=1
+11/04/30 12:31:39 INFO mapred.JobClient:     Combine output records=4
+11/04/30 12:31:39 INFO mapred.JobClient:     Map input records=9
+11/04/30 12:31:39 INFO mapred.JobClient:     Reduce shuffle bytes=0
+11/04/30 12:31:39 INFO mapred.JobClient:     Reduce output records=1
+11/04/30 12:31:39 INFO mapred.JobClient:     Spilled Records=5
+11/04/30 12:31:39 INFO mapred.JobClient:     Map output bytes=191103120
+11/04/30 12:31:39 INFO mapred.JobClient:     Combine input records=12
+11/04/30 12:31:39 INFO mapred.JobClient:     Map output records=9
+11/04/30 12:31:39 INFO mapred.JobClient:     Reduce input records=1
+/opt/hadoop/bin/hadoop jar covariance.jar   hib  1.75s user 0.19s system 0% cpu 4:13.52 total
+11/05/02 04:04:36 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/02 04:04:36 INFO imagebundle.AbstractImageBundle: Attempting to access file 10.hib with mode 1
+11/05/02 04:04:36 INFO imagebundle.AbstractImageBundle: Attempting to open file 10.hib for reading
+1 tasks spawned
+11/05/02 04:04:46 INFO mapred.JobClient: Running job: job_201104211619_3439
+11/05/02 04:04:47 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/02 04:05:06 INFO mapred.JobClient:  map 100% reduce 0%
+11/05/02 04:05:33 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/02 04:05:41 INFO mapred.JobClient: Job complete: job_201104211619_3439
+11/05/02 04:05:41 INFO mapred.JobClient: Counters: 17
+11/05/02 04:05:41 INFO mapred.JobClient:   Job Counters 
+11/05/02 04:05:41 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/02 04:05:41 INFO mapred.JobClient:     Rack-local map tasks=1
+11/05/02 04:05:41 INFO mapred.JobClient:     Launched map tasks=1
+11/05/02 04:05:41 INFO mapred.JobClient:   FileSystemCounters
+11/05/02 04:05:41 INFO mapred.JobClient:     FILE_BYTES_READ=7185
+11/05/02 04:05:41 INFO mapred.JobClient:     HDFS_BYTES_READ=4852692
+11/05/02 04:05:41 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=14394
+11/05/02 04:05:41 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=9232
+11/05/02 04:05:41 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/02 04:05:41 INFO mapred.JobClient:     Reduce input groups=1
+11/05/02 04:05:41 INFO mapred.JobClient:     Combine output records=1
+11/05/02 04:05:41 INFO mapred.JobClient:     Map input records=9
+11/05/02 04:05:41 INFO mapred.JobClient:     Reduce shuffle bytes=0
+11/05/02 04:05:41 INFO mapred.JobClient:     Reduce output records=1
+11/05/02 04:05:41 INFO mapred.JobClient:     Spilled Records=2
+11/05/02 04:05:41 INFO mapred.JobClient:     Map output bytes=83088
+11/05/02 04:05:41 INFO mapred.JobClient:     Combine input records=9
+11/05/02 04:05:41 INFO mapred.JobClient:     Map output records=9
+11/05/02 04:05:41 INFO mapred.JobClient:     Reduce input records=1
+11/05/02 04:05:51 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/02 04:05:51 INFO imagebundle.AbstractImageBundle: Attempting to access file 10.hib with mode 1
+11/05/02 04:05:51 INFO imagebundle.AbstractImageBundle: Attempting to open file 10.hib for reading
+1 tasks spawned
+11/05/02 04:05:58 INFO mapred.JobClient: Running job: job_201104211619_3440
+11/05/02 04:05:59 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/02 04:06:46 INFO mapred.JobClient:  map 20% reduce 0%
+11/05/02 04:06:55 INFO mapred.JobClient:  map 46% reduce 0%
+11/05/02 04:07:04 INFO mapred.JobClient:  map 52% reduce 0%
+11/05/02 04:07:31 INFO mapred.JobClient:  map 57% reduce 0%
+11/05/02 04:07:41 INFO mapred.JobClient:  map 81% reduce 0%
+11/05/02 04:07:49 INFO mapred.JobClient:  map 93% reduce 0%
+11/05/02 04:07:59 INFO mapred.JobClient:  map 100% reduce 0%
+11/05/02 04:08:17 INFO mapred.JobClient:  map 99% reduce 0%
+11/05/02 04:08:44 INFO mapred.JobClient:  map 99% reduce 100%
+11/05/02 04:08:52 INFO mapred.JobClient: Job complete: job_201104211619_3440
+11/05/02 04:08:52 INFO mapred.JobClient: Counters: 17
+11/05/02 04:08:52 INFO mapred.JobClient:   Job Counters 
+11/05/02 04:08:52 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/02 04:08:52 INFO mapred.JobClient:     Rack-local map tasks=1
+11/05/02 04:08:52 INFO mapred.JobClient:     Launched map tasks=1
+11/05/02 04:08:52 INFO mapred.JobClient:   FileSystemCounters
+11/05/02 04:08:52 INFO mapred.JobClient:     FILE_BYTES_READ=79237497
+11/05/02 04:08:52 INFO mapred.JobClient:     HDFS_BYTES_READ=4852692
+11/05/02 04:08:52 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=99022795
+11/05/02 04:08:52 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=21233680
+11/05/02 04:08:52 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/02 04:08:52 INFO mapred.JobClient:     Reduce input groups=1
+11/05/02 04:08:52 INFO mapred.JobClient:     Combine output records=4
+11/05/02 04:08:52 INFO mapred.JobClient:     Map input records=9
+11/05/02 04:08:52 INFO mapred.JobClient:     Reduce shuffle bytes=0
+11/05/02 04:08:52 INFO mapred.JobClient:     Reduce output records=1
+11/05/02 04:08:52 INFO mapred.JobClient:     Spilled Records=5
+11/05/02 04:08:52 INFO mapred.JobClient:     Map output bytes=191103120
+11/05/02 04:08:52 INFO mapred.JobClient:     Combine input records=12
+11/05/02 04:08:52 INFO mapred.JobClient:     Map output records=9
+11/05/02 04:08:52 INFO mapred.JobClient:     Reduce input records=1
+/opt/hadoop/bin/hadoop jar covariance.jar   hib  1.72s user 0.19s system 0% cpu 4:24.48 total
+11/05/03 15:33:15 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/03 15:33:15 INFO imagebundle.AbstractImageBundle: Attempting to access file 10.hib with mode 1
+11/05/03 15:33:15 INFO imagebundle.AbstractImageBundle: Attempting to open file 10.hib for reading
+1 tasks spawned
+11/05/03 15:33:18 INFO mapred.JobClient: Running job: job_201104211619_4153
+11/05/03 15:33:19 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/03 15:33:39 INFO mapred.JobClient:  map 100% reduce 0%
+11/05/03 15:34:06 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/03 15:34:15 INFO mapred.JobClient: Job complete: job_201104211619_4153
+11/05/03 15:34:15 INFO mapred.JobClient: Counters: 17
+11/05/03 15:34:15 INFO mapred.JobClient:   Job Counters 
+11/05/03 15:34:15 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/03 15:34:15 INFO mapred.JobClient:     Rack-local map tasks=1
+11/05/03 15:34:15 INFO mapred.JobClient:     Launched map tasks=1
+11/05/03 15:34:15 INFO mapred.JobClient:   FileSystemCounters
+11/05/03 15:34:15 INFO mapred.JobClient:     FILE_BYTES_READ=7185
+11/05/03 15:34:15 INFO mapred.JobClient:     HDFS_BYTES_READ=4852692
+11/05/03 15:34:15 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=14394
+11/05/03 15:34:15 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=9232
+11/05/03 15:34:15 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/03 15:34:15 INFO mapred.JobClient:     Reduce input groups=1
+11/05/03 15:34:15 INFO mapred.JobClient:     Combine output records=1
+11/05/03 15:34:15 INFO mapred.JobClient:     Map input records=9
+11/05/03 15:34:15 INFO mapred.JobClient:     Reduce shuffle bytes=0
+11/05/03 15:34:15 INFO mapred.JobClient:     Reduce output records=1
+11/05/03 15:34:15 INFO mapred.JobClient:     Spilled Records=2
+11/05/03 15:34:15 INFO mapred.JobClient:     Map output bytes=83088
+11/05/03 15:34:15 INFO mapred.JobClient:     Combine input records=9
+11/05/03 15:34:15 INFO mapred.JobClient:     Map output records=9
+11/05/03 15:34:15 INFO mapred.JobClient:     Reduce input records=1
+11/05/03 15:34:18 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/03 15:34:18 INFO imagebundle.AbstractImageBundle: Attempting to access file 10.hib with mode 1
+11/05/03 15:34:18 INFO imagebundle.AbstractImageBundle: Attempting to open file 10.hib for reading
+1 tasks spawned
+11/05/03 15:34:21 INFO mapred.JobClient: Running job: job_201104211619_4154
+11/05/03 15:34:22 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/03 15:35:00 INFO mapred.JobClient:  map 20% reduce 0%
+11/05/03 15:35:17 INFO mapred.JobClient:  map 46% reduce 0%
+11/05/03 15:35:36 INFO mapred.JobClient:  map 52% reduce 0%
+11/05/03 15:35:53 INFO mapred.JobClient:  map 57% reduce 0%
+11/05/03 15:36:12 INFO mapred.JobClient:  map 93% reduce 0%
+11/05/03 15:36:30 INFO mapred.JobClient:  map 100% reduce 0%
+11/05/03 15:36:39 INFO mapred.JobClient:  map 99% reduce 0%
+11/05/03 15:37:06 INFO mapred.JobClient:  map 99% reduce 100%
+11/05/03 15:37:15 INFO mapred.JobClient: Job complete: job_201104211619_4154
+11/05/03 15:37:15 INFO mapred.JobClient: Counters: 17
+11/05/03 15:37:15 INFO mapred.JobClient:   Job Counters 
+11/05/03 15:37:15 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/03 15:37:15 INFO mapred.JobClient:     Rack-local map tasks=1
+11/05/03 15:37:15 INFO mapred.JobClient:     Launched map tasks=1
+11/05/03 15:37:15 INFO mapred.JobClient:   FileSystemCounters
+11/05/03 15:37:15 INFO mapred.JobClient:     FILE_BYTES_READ=79237497
+11/05/03 15:37:15 INFO mapred.JobClient:     HDFS_BYTES_READ=4852692
+11/05/03 15:37:15 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=99022795
+11/05/03 15:37:15 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=21233680
+11/05/03 15:37:15 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/03 15:37:15 INFO mapred.JobClient:     Reduce input groups=1
+11/05/03 15:37:15 INFO mapred.JobClient:     Combine output records=4
+11/05/03 15:37:15 INFO mapred.JobClient:     Map input records=9
+11/05/03 15:37:15 INFO mapred.JobClient:     Reduce shuffle bytes=0
+11/05/03 15:37:15 INFO mapred.JobClient:     Reduce output records=1
+11/05/03 15:37:15 INFO mapred.JobClient:     Spilled Records=5
+11/05/03 15:37:15 INFO mapred.JobClient:     Map output bytes=191103120
+11/05/03 15:37:15 INFO mapred.JobClient:     Combine input records=12
+11/05/03 15:37:15 INFO mapred.JobClient:     Map output records=9
+11/05/03 15:37:15 INFO mapred.JobClient:     Reduce input records=1
+/opt/hadoop/bin/hadoop jar covariance.jar   hib  1.70s user 0.27s system 0% cpu 4:03.90 total
+11/05/04 01:15:06 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 0 time(s).
+11/05/04 01:15:07 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 1 time(s).
+11/05/04 01:15:08 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 2 time(s).
+11/05/04 01:15:09 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 3 time(s).
+11/05/04 01:15:10 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 4 time(s).
+11/05/04 01:15:11 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 5 time(s).
+11/05/04 01:15:12 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 6 time(s).
+11/05/04 01:15:13 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 7 time(s).
+11/05/04 01:15:14 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 8 time(s).
+11/05/04 01:15:15 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 9 time(s).
+Exception in thread "main" java.io.IOException: Call to /10.160.3.154:8021 failed on local exception: java.net.SocketException: Connection refused
+	at org.apache.hadoop.ipc.Client.wrapException(Client.java:774)
+	at org.apache.hadoop.ipc.Client.call(Client.java:742)
+	at org.apache.hadoop.ipc.RPC$Invoker.invoke(RPC.java:220)
+	at org.apache.hadoop.mapred.$Proxy0.getProtocolVersion(Unknown Source)
+	at org.apache.hadoop.ipc.RPC.getProxy(RPC.java:359)
+	at org.apache.hadoop.mapred.JobClient.createRPCProxy(JobClient.java:470)
+	at org.apache.hadoop.mapred.JobClient.init(JobClient.java:455)
+	at org.apache.hadoop.mapred.JobClient.<init>(JobClient.java:442)
+	at org.apache.hadoop.mapreduce.Job.<init>(Job.java:50)
+	at org.apache.hadoop.mapreduce.Job.<init>(Job.java:54)
+	at hipi.experiments.covariance.Covariance.runMeanCompute(Covariance.java:143)
+	at hipi.experiments.covariance.Covariance.run(Covariance.java:217)
+	at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:65)
+	at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:79)
+	at hipi.experiments.covariance.Covariance.main(Covariance.java:224)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at org.apache.hadoop.util.RunJar.main(RunJar.java:156)
+Caused by: java.net.SocketException: Connection refused
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:405)
+	at java.net.Socket.connect(Socket.java:529)
+	at org.apache.hadoop.net.NetUtils.connect(NetUtils.java:402)
+	at org.apache.hadoop.ipc.Client$Connection.setupIOstreams(Client.java:304)
+	at org.apache.hadoop.ipc.Client$Connection.access$1700(Client.java:176)
+	at org.apache.hadoop.ipc.Client.getConnection(Client.java:859)
+	at org.apache.hadoop.ipc.Client.call(Client.java:719)
+	... 18 more
+/opt/hadoop/bin/hadoop jar covariance.jar   hib  0.50s user 0.06s system 5% cpu 10.482 total
+11/05/04 01:16:29 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 0 time(s).
+11/05/04 01:16:30 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 1 time(s).
+11/05/04 01:16:31 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 2 time(s).
+11/05/04 01:16:32 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 3 time(s).
+11/05/04 01:16:33 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 4 time(s).
+11/05/04 01:16:34 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 5 time(s).
+11/05/04 01:16:35 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 6 time(s).
+11/05/04 01:16:36 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 7 time(s).
+11/05/04 01:16:37 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 8 time(s).
+11/05/04 01:16:38 INFO ipc.Client: Retrying connect to server: /10.160.3.154:8021. Already tried 9 time(s).
+Exception in thread "main" java.io.IOException: Call to /10.160.3.154:8021 failed on local exception: java.net.SocketException: Connection refused
+	at org.apache.hadoop.ipc.Client.wrapException(Client.java:774)
+	at org.apache.hadoop.ipc.Client.call(Client.java:742)
+	at org.apache.hadoop.ipc.RPC$Invoker.invoke(RPC.java:220)
+	at org.apache.hadoop.mapred.$Proxy0.getProtocolVersion(Unknown Source)
+	at org.apache.hadoop.ipc.RPC.getProxy(RPC.java:359)
+	at org.apache.hadoop.mapred.JobClient.createRPCProxy(JobClient.java:470)
+	at org.apache.hadoop.mapred.JobClient.init(JobClient.java:455)
+	at org.apache.hadoop.mapred.JobClient.<init>(JobClient.java:442)
+	at org.apache.hadoop.mapreduce.Job.<init>(Job.java:50)
+	at org.apache.hadoop.mapreduce.Job.<init>(Job.java:54)
+	at hipi.experiments.covariance.Covariance.runMeanCompute(Covariance.java:143)
+	at hipi.experiments.covariance.Covariance.run(Covariance.java:217)
+	at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:65)
+	at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:79)
+	at hipi.experiments.covariance.Covariance.main(Covariance.java:224)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at org.apache.hadoop.util.RunJar.main(RunJar.java:156)
+Caused by: java.net.SocketException: Connection refused
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:405)
+	at java.net.Socket.connect(Socket.java:529)
+	at org.apache.hadoop.net.NetUtils.connect(NetUtils.java:402)
+	at org.apache.hadoop.ipc.Client$Connection.setupIOstreams(Client.java:304)
+	at org.apache.hadoop.ipc.Client$Connection.access$1700(Client.java:176)
+	at org.apache.hadoop.ipc.Client.getConnection(Client.java:859)
+	at org.apache.hadoop.ipc.Client.call(Client.java:719)
+	... 18 more
+/opt/hadoop/bin/hadoop jar covariance.jar   hib  0.45s user 0.09s system 5% cpu 10.417 total
+11/05/04 13:26:16 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/04 13:26:16 INFO imagebundle.AbstractImageBundle: Attempting to access file 10.hib with mode 1
+11/05/04 13:26:16 INFO imagebundle.AbstractImageBundle: Attempting to open file 10.hib for reading
+1 tasks spawned
+11/05/04 13:26:19 INFO mapred.JobClient: Running job: job_201104211619_4723
+11/05/04 13:26:20 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/04 13:26:40 INFO mapred.JobClient:  map 100% reduce 0%
+11/05/04 13:27:07 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/04 13:27:16 INFO mapred.JobClient: Job complete: job_201104211619_4723
+11/05/04 13:27:16 INFO mapred.JobClient: Counters: 17
+11/05/04 13:27:16 INFO mapred.JobClient:   Job Counters 
+11/05/04 13:27:16 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/04 13:27:16 INFO mapred.JobClient:     Rack-local map tasks=1
+11/05/04 13:27:16 INFO mapred.JobClient:     Launched map tasks=1
+11/05/04 13:27:16 INFO mapred.JobClient:   FileSystemCounters
+11/05/04 13:27:16 INFO mapred.JobClient:     FILE_BYTES_READ=7185
+11/05/04 13:27:16 INFO mapred.JobClient:     HDFS_BYTES_READ=4852692
+11/05/04 13:27:16 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=14394
+11/05/04 13:27:16 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=9232
+11/05/04 13:27:16 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/04 13:27:16 INFO mapred.JobClient:     Reduce input groups=1
+11/05/04 13:27:16 INFO mapred.JobClient:     Combine output records=1
+11/05/04 13:27:16 INFO mapred.JobClient:     Map input records=9
+11/05/04 13:27:16 INFO mapred.JobClient:     Reduce shuffle bytes=0
+11/05/04 13:27:16 INFO mapred.JobClient:     Reduce output records=1
+11/05/04 13:27:16 INFO mapred.JobClient:     Spilled Records=2
+11/05/04 13:27:16 INFO mapred.JobClient:     Map output bytes=83088
+11/05/04 13:27:16 INFO mapred.JobClient:     Combine input records=9
+11/05/04 13:27:16 INFO mapred.JobClient:     Map output records=9
+11/05/04 13:27:16 INFO mapred.JobClient:     Reduce input records=1
+11/05/04 13:27:18 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/04 13:27:18 INFO imagebundle.AbstractImageBundle: Attempting to access file 10.hib with mode 1
+11/05/04 13:27:18 INFO imagebundle.AbstractImageBundle: Attempting to open file 10.hib for reading
+1 tasks spawned
+11/05/04 13:27:21 INFO mapred.JobClient: Running job: job_201104211619_4725
+11/05/04 13:27:22 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/04 13:28:08 INFO mapred.JobClient:  map 20% reduce 0%
+11/05/04 13:28:18 INFO mapred.JobClient:  map 46% reduce 0%
+11/05/04 13:28:26 INFO mapred.JobClient:  map 52% reduce 0%
+11/05/04 13:28:53 INFO mapred.JobClient:  map 81% reduce 0%
+11/05/04 13:29:12 INFO mapred.JobClient:  map 93% reduce 0%
+11/05/04 13:29:30 INFO mapred.JobClient:  map 100% reduce 0%
+11/05/04 13:29:39 INFO mapred.JobClient:  map 99% reduce 0%
+11/05/04 13:30:07 INFO mapred.JobClient:  map 99% reduce 100%
+11/05/04 13:30:15 INFO mapred.JobClient: Job complete: job_201104211619_4725
+11/05/04 13:30:15 INFO mapred.JobClient: Counters: 17
+11/05/04 13:30:15 INFO mapred.JobClient:   Job Counters 
+11/05/04 13:30:15 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/04 13:30:15 INFO mapred.JobClient:     Rack-local map tasks=1
+11/05/04 13:30:15 INFO mapred.JobClient:     Launched map tasks=1
+11/05/04 13:30:15 INFO mapred.JobClient:   FileSystemCounters
+11/05/04 13:30:15 INFO mapred.JobClient:     FILE_BYTES_READ=79237497
+11/05/04 13:30:15 INFO mapred.JobClient:     HDFS_BYTES_READ=4852692
+11/05/04 13:30:15 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=99022795
+11/05/04 13:30:15 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=21233680
+11/05/04 13:30:15 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/04 13:30:15 INFO mapred.JobClient:     Reduce input groups=1
+11/05/04 13:30:15 INFO mapred.JobClient:     Combine output records=4
+11/05/04 13:30:15 INFO mapred.JobClient:     Map input records=9
+11/05/04 13:30:15 INFO mapred.JobClient:     Reduce shuffle bytes=0
+11/05/04 13:30:15 INFO mapred.JobClient:     Reduce output records=1
+11/05/04 13:30:15 INFO mapred.JobClient:     Spilled Records=5
+11/05/04 13:30:15 INFO mapred.JobClient:     Map output bytes=191103120
+11/05/04 13:30:15 INFO mapred.JobClient:     Combine input records=12
+11/05/04 13:30:15 INFO mapred.JobClient:     Map output records=9
+11/05/04 13:30:15 INFO mapred.JobClient:     Reduce input records=1
+/opt/hadoop/bin/hadoop jar covariance.jar   hib  1.63s user 0.28s system 0% cpu 4:02.46 total
+11/05/04 19:16:43 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/04 19:16:43 INFO imagebundle.AbstractImageBundle: Attempting to access file 10.hib with mode 1
+11/05/04 19:16:43 INFO imagebundle.AbstractImageBundle: Attempting to open file 10.hib for reading
+1 tasks spawned
+11/05/04 19:16:46 INFO mapred.JobClient: Running job: job_201104211619_4755
+11/05/04 19:16:47 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/04 19:17:07 INFO mapred.JobClient:  map 100% reduce 0%
+11/05/04 19:17:35 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/04 19:17:42 INFO mapred.JobClient: Job complete: job_201104211619_4755
+11/05/04 19:17:42 INFO mapred.JobClient: Counters: 17
+11/05/04 19:17:42 INFO mapred.JobClient:   Job Counters 
+11/05/04 19:17:42 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/04 19:17:42 INFO mapred.JobClient:     Rack-local map tasks=1
+11/05/04 19:17:42 INFO mapred.JobClient:     Launched map tasks=1
+11/05/04 19:17:42 INFO mapred.JobClient:   FileSystemCounters
+11/05/04 19:17:42 INFO mapred.JobClient:     FILE_BYTES_READ=7185
+11/05/04 19:17:42 INFO mapred.JobClient:     HDFS_BYTES_READ=4852692
+11/05/04 19:17:42 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=14394
+11/05/04 19:17:42 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=9232
+11/05/04 19:17:42 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/04 19:17:42 INFO mapred.JobClient:     Reduce input groups=1
+11/05/04 19:17:42 INFO mapred.JobClient:     Combine output records=1
+11/05/04 19:17:42 INFO mapred.JobClient:     Map input records=9
+11/05/04 19:17:42 INFO mapred.JobClient:     Reduce shuffle bytes=0
+11/05/04 19:17:42 INFO mapred.JobClient:     Reduce output records=1
+11/05/04 19:17:42 INFO mapred.JobClient:     Spilled Records=2
+11/05/04 19:17:42 INFO mapred.JobClient:     Map output bytes=83088
+11/05/04 19:17:42 INFO mapred.JobClient:     Combine input records=9
+11/05/04 19:17:42 INFO mapred.JobClient:     Map output records=9
+11/05/04 19:17:42 INFO mapred.JobClient:     Reduce input records=1
+11/05/04 19:17:46 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/04 19:17:46 INFO imagebundle.AbstractImageBundle: Attempting to access file 10.hib with mode 1
+11/05/04 19:17:46 INFO imagebundle.AbstractImageBundle: Attempting to open file 10.hib for reading
+1 tasks spawned
+11/05/04 19:17:48 INFO mapred.JobClient: Running job: job_201104211619_4756
+11/05/04 19:17:49 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/04 19:18:27 INFO mapred.JobClient:  map 20% reduce 0%
+11/05/04 19:18:54 INFO mapred.JobClient:  map 52% reduce 0%
+11/05/04 19:19:13 INFO mapred.JobClient:  map 57% reduce 0%
+11/05/04 19:19:21 INFO mapred.JobClient:  map 81% reduce 0%
+11/05/04 19:19:40 INFO mapred.JobClient:  map 93% reduce 0%
+11/05/04 19:19:58 INFO mapred.JobClient:  map 100% reduce 0%
+11/05/04 19:20:07 INFO mapred.JobClient:  map 99% reduce 0%
+11/05/04 19:20:34 INFO mapred.JobClient:  map 99% reduce 100%
+11/05/04 19:20:42 INFO mapred.JobClient: Job complete: job_201104211619_4756
+11/05/04 19:20:42 INFO mapred.JobClient: Counters: 17
+11/05/04 19:20:42 INFO mapred.JobClient:   Job Counters 
+11/05/04 19:20:42 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/04 19:20:42 INFO mapred.JobClient:     Rack-local map tasks=1
+11/05/04 19:20:42 INFO mapred.JobClient:     Launched map tasks=1
+11/05/04 19:20:42 INFO mapred.JobClient:   FileSystemCounters
+11/05/04 19:20:42 INFO mapred.JobClient:     FILE_BYTES_READ=79237497
+11/05/04 19:20:42 INFO mapred.JobClient:     HDFS_BYTES_READ=4852692
+11/05/04 19:20:42 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=99022795
+11/05/04 19:20:42 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=21233680
+11/05/04 19:20:42 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/04 19:20:42 INFO mapred.JobClient:     Reduce input groups=1
+11/05/04 19:20:42 INFO mapred.JobClient:     Combine output records=4
+11/05/04 19:20:42 INFO mapred.JobClient:     Map input records=9
+11/05/04 19:20:42 INFO mapred.JobClient:     Reduce shuffle bytes=0
+11/05/04 19:20:42 INFO mapred.JobClient:     Reduce output records=1
+11/05/04 19:20:42 INFO mapred.JobClient:     Spilled Records=5
+11/05/04 19:20:42 INFO mapred.JobClient:     Map output bytes=191103120
+11/05/04 19:20:42 INFO mapred.JobClient:     Combine input records=12
+11/05/04 19:20:42 INFO mapred.JobClient:     Map output records=9
+11/05/04 19:20:42 INFO mapred.JobClient:     Reduce input records=1
+/opt/hadoop/bin/hadoop jar covariance.jar   hib  1.71s user 0.26s system 0% cpu 4:03.16 total

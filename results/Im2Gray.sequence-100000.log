@@ -1,0 +1,566 @@
+Inside add input path
+11/05/02 15:32:04 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+11/05/02 15:32:07 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/02 15:32:14 INFO mapred.JobClient: Running job: job_201104211619_3642
+11/05/02 15:32:15 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/02 15:32:47 INFO mapred.JobClient:  map 3% reduce 0%
+11/05/02 15:32:48 INFO mapred.JobClient:  map 4% reduce 0%
+11/05/02 15:32:51 INFO mapred.JobClient:  map 8% reduce 0%
+11/05/02 15:32:52 INFO mapred.JobClient:  map 9% reduce 0%
+11/05/02 15:32:55 INFO mapred.JobClient:  map 12% reduce 0%
+11/05/02 15:32:56 INFO mapred.JobClient:  map 14% reduce 0%
+11/05/02 15:32:57 INFO mapred.JobClient:  map 16% reduce 0%
+11/05/02 15:33:00 INFO mapred.JobClient:  map 17% reduce 0%
+11/05/02 15:33:01 INFO mapred.JobClient:  map 20% reduce 0%
+11/05/02 15:33:04 INFO mapred.JobClient:  map 23% reduce 0%
+11/05/02 15:33:05 INFO mapred.JobClient:  map 25% reduce 0%
+11/05/02 15:33:06 INFO mapred.JobClient:  map 27% reduce 0%
+11/05/02 15:33:07 INFO mapred.JobClient:  map 28% reduce 0%
+11/05/02 15:33:09 INFO mapred.JobClient:  map 29% reduce 0%
+11/05/02 15:33:11 INFO mapred.JobClient:  map 32% reduce 0%
+11/05/02 15:33:12 INFO mapred.JobClient:  map 33% reduce 0%
+11/05/02 15:33:12 INFO mapred.JobClient: Task Id : attempt_201104211619_3642_m_000434_0, Status : FAILED
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+11/05/02 15:33:12 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 15:33:12 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 15:33:13 INFO mapred.JobClient:  map 37% reduce 0%
+11/05/02 15:33:14 INFO mapred.JobClient:  map 39% reduce 0%
+11/05/02 15:33:15 INFO mapred.JobClient:  map 41% reduce 0%
+11/05/02 15:33:18 INFO mapred.JobClient:  map 44% reduce 0%
+11/05/02 15:33:19 INFO mapred.JobClient:  map 45% reduce 0%
+11/05/02 15:33:21 INFO mapred.JobClient:  map 46% reduce 0%
+11/05/02 15:33:22 INFO mapred.JobClient:  map 49% reduce 0%
+11/05/02 15:33:23 INFO mapred.JobClient:  map 51% reduce 0%
+11/05/02 15:33:24 INFO mapred.JobClient:  map 54% reduce 0%
+11/05/02 15:33:28 INFO mapred.JobClient:  map 57% reduce 0%
+11/05/02 15:33:29 INFO mapred.JobClient:  map 58% reduce 0%
+11/05/02 15:33:30 INFO mapred.JobClient:  map 59% reduce 0%
+11/05/02 15:33:31 INFO mapred.JobClient:  map 63% reduce 0%
+11/05/02 15:33:32 INFO mapred.JobClient:  map 64% reduce 0%
+11/05/02 15:33:33 INFO mapred.JobClient:  map 66% reduce 0%
+11/05/02 15:33:37 INFO mapred.JobClient:  map 69% reduce 0%
+11/05/02 15:33:38 INFO mapred.JobClient:  map 70% reduce 0%
+11/05/02 15:33:40 INFO mapred.JobClient:  map 73% reduce 0%
+11/05/02 15:33:41 INFO mapred.JobClient:  map 74% reduce 0%
+11/05/02 15:33:44 INFO mapred.JobClient:  map 75% reduce 0%
+11/05/02 15:33:46 INFO mapred.JobClient:  map 78% reduce 0%
+11/05/02 15:33:49 INFO mapred.JobClient:  map 80% reduce 9%
+11/05/02 15:33:50 INFO mapred.JobClient:  map 81% reduce 9%
+11/05/02 15:33:56 INFO mapred.JobClient:  map 83% reduce 9%
+11/05/02 15:33:58 INFO mapred.JobClient:  map 84% reduce 9%
+11/05/02 15:33:59 INFO mapred.JobClient:  map 85% reduce 17%
+11/05/02 15:34:04 INFO mapred.JobClient:  map 87% reduce 17%
+11/05/02 15:34:10 INFO mapred.JobClient:  map 88% reduce 22%
+11/05/02 15:34:13 INFO mapred.JobClient:  map 89% reduce 22%
+11/05/02 15:34:16 INFO mapred.JobClient:  map 90% reduce 22%
+11/05/02 15:34:22 INFO mapred.JobClient:  map 91% reduce 22%
+11/05/02 15:34:25 INFO mapred.JobClient:  map 91% reduce 24%
+11/05/02 15:34:32 INFO mapred.JobClient:  map 92% reduce 24%
+11/05/02 15:34:35 INFO mapred.JobClient:  map 92% reduce 27%
+11/05/02 15:34:44 INFO mapred.JobClient:  map 92% reduce 28%
+11/05/02 15:34:53 INFO mapred.JobClient:  map 92% reduce 30%
+11/05/02 15:35:03 INFO mapred.JobClient:  map 93% reduce 30%
+11/05/02 15:35:26 INFO mapred.JobClient:  map 94% reduce 30%
+11/05/02 15:35:54 INFO mapred.JobClient:  map 95% reduce 30%
+11/05/02 15:36:33 INFO mapred.JobClient:  map 96% reduce 30%
+11/05/02 15:37:10 INFO mapred.JobClient:  map 97% reduce 30%
+11/05/02 15:37:46 INFO mapred.JobClient:  map 98% reduce 30%
+11/05/02 15:38:22 INFO mapred.JobClient:  map 99% reduce 30%
+11/05/02 15:38:23 INFO mapred.JobClient:  map 99% reduce 31%
+11/05/02 15:38:50 INFO mapred.JobClient:  map 99% reduce 32%
+11/05/02 15:39:20 INFO mapred.JobClient:  map 100% reduce 32%
+11/05/02 15:39:27 INFO mapred.JobClient:  map 100% reduce 33%
+11/05/02 15:39:46 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/02 15:39:54 INFO mapred.JobClient: Job complete: job_201104211619_3642
+11/05/02 15:39:54 INFO mapred.JobClient: Counters: 18
+11/05/02 15:39:54 INFO mapred.JobClient:   Job Counters 
+11/05/02 15:39:54 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/02 15:39:54 INFO mapred.JobClient:     Rack-local map tasks=346
+11/05/02 15:39:54 INFO mapred.JobClient:     Launched map tasks=624
+11/05/02 15:39:54 INFO mapred.JobClient:     Data-local map tasks=278
+11/05/02 15:39:54 INFO mapred.JobClient:   FileSystemCounters
+11/05/02 15:39:54 INFO mapred.JobClient:     FILE_BYTES_READ=1043477
+11/05/02 15:39:54 INFO mapred.JobClient:     HDFS_BYTES_READ=72688538373
+11/05/02 15:39:54 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=2107392
+11/05/02 15:39:54 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=1470184
+11/05/02 15:39:54 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/02 15:39:54 INFO mapred.JobClient:     Reduce input groups=2
+11/05/02 15:39:54 INFO mapred.JobClient:     Combine output records=0
+11/05/02 15:39:54 INFO mapred.JobClient:     Map input records=94861
+11/05/02 15:39:54 INFO mapred.JobClient:     Reduce shuffle bytes=1043877
+11/05/02 15:39:54 INFO mapred.JobClient:     Reduce output records=94861
+11/05/02 15:39:54 INFO mapred.JobClient:     Spilled Records=189722
+11/05/02 15:39:54 INFO mapred.JobClient:     Map output bytes=853749
+11/05/02 15:39:54 INFO mapred.JobClient:     Combine input records=0
+11/05/02 15:39:54 INFO mapred.JobClient:     Map output records=94861
+11/05/02 15:39:54 INFO mapred.JobClient:     Reduce input records=94861
+/opt/hadoop/bin/hadoop jar Im2Gray.jar  /virginia/uvagfx/lliu/out/sib-100000   2.43s user 0.25s system 0% cpu 7:52.31 total
+Inside add input path
+11/05/02 15:39:56 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+11/05/02 15:40:00 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/02 15:40:07 INFO mapred.JobClient: Running job: job_201104211619_3648
+11/05/02 15:40:08 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/02 15:40:40 INFO mapred.JobClient:  map 4% reduce 0%
+11/05/02 15:40:40 INFO mapred.JobClient: Task Id : attempt_201104211619_3648_m_000267_0, Status : FAILED
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+11/05/02 15:40:40 WARN mapred.JobClient: Error reading task outputvm-10-160-218-46
+11/05/02 15:40:40 WARN mapred.JobClient: Error reading task outputvm-10-160-218-46
+11/05/02 15:40:41 INFO mapred.JobClient:  map 12% reduce 0%
+11/05/02 15:40:43 INFO mapred.JobClient:  map 13% reduce 0%
+11/05/02 15:40:44 INFO mapred.JobClient:  map 14% reduce 0%
+11/05/02 15:40:49 INFO mapred.JobClient:  map 19% reduce 0%
+11/05/02 15:40:50 INFO mapred.JobClient:  map 26% reduce 0%
+11/05/02 15:40:54 INFO mapred.JobClient:  map 28% reduce 0%
+11/05/02 15:40:58 INFO mapred.JobClient:  map 31% reduce 0%
+11/05/02 15:40:59 INFO mapred.JobClient:  map 39% reduce 0%
+11/05/02 15:41:03 INFO mapred.JobClient:  map 41% reduce 0%
+11/05/02 15:41:07 INFO mapred.JobClient:  map 44% reduce 0%
+11/05/02 15:41:08 INFO mapred.JobClient:  map 52% reduce 0%
+11/05/02 15:41:09 INFO mapred.JobClient:  map 53% reduce 0%
+11/05/02 15:41:12 INFO mapred.JobClient:  map 55% reduce 0%
+11/05/02 15:41:19 INFO mapred.JobClient:  map 65% reduce 0%
+11/05/02 15:41:20 INFO mapred.JobClient:  map 66% reduce 0%
+11/05/02 15:41:21 INFO mapred.JobClient:  map 67% reduce 0%
+11/05/02 15:41:27 INFO mapred.JobClient:  map 71% reduce 0%
+11/05/02 15:41:28 INFO mapred.JobClient:  map 73% reduce 0%
+11/05/02 15:41:29 INFO mapred.JobClient:  map 76% reduce 0%
+11/05/02 15:41:30 INFO mapred.JobClient:  map 77% reduce 0%
+11/05/02 15:41:30 INFO mapred.JobClient: Task Id : attempt_201104211619_3648_m_000498_0, Status : FAILED
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+11/05/02 15:41:30 WARN mapred.JobClient: Error reading task outputvm-10-160-218-46
+11/05/02 15:41:30 WARN mapred.JobClient: Error reading task outputvm-10-160-218-46
+11/05/02 15:41:31 INFO mapred.JobClient:  map 78% reduce 0%
+11/05/02 15:41:36 INFO mapred.JobClient:  map 79% reduce 0%
+11/05/02 15:41:38 INFO mapred.JobClient:  map 80% reduce 13%
+11/05/02 15:41:39 INFO mapred.JobClient:  map 81% reduce 13%
+11/05/02 15:41:40 INFO mapred.JobClient:  map 82% reduce 13%
+11/05/02 15:41:47 INFO mapred.JobClient:  map 83% reduce 21%
+11/05/02 15:41:49 INFO mapred.JobClient:  map 84% reduce 21%
+11/05/02 15:41:55 INFO mapred.JobClient:  map 85% reduce 21%
+11/05/02 15:41:58 INFO mapred.JobClient:  map 86% reduce 21%
+11/05/02 15:42:03 INFO mapred.JobClient:  map 87% reduce 21%
+11/05/02 15:42:04 INFO mapred.JobClient:  map 87% reduce 25%
+11/05/02 15:42:07 INFO mapred.JobClient:  map 88% reduce 25%
+11/05/02 15:42:12 INFO mapred.JobClient:  map 89% reduce 25%
+11/05/02 15:42:16 INFO mapred.JobClient:  map 90% reduce 25%
+11/05/02 15:42:23 INFO mapred.JobClient:  map 90% reduce 26%
+11/05/02 15:42:34 INFO mapred.JobClient:  map 91% reduce 26%
+11/05/02 15:42:41 INFO mapred.JobClient:  map 91% reduce 28%
+11/05/02 15:42:50 INFO mapred.JobClient:  map 91% reduce 29%
+11/05/02 15:43:03 INFO mapred.JobClient:  map 92% reduce 29%
+11/05/02 15:43:26 INFO mapred.JobClient:  map 93% reduce 29%
+11/05/02 15:43:44 INFO mapred.JobClient:  map 93% reduce 30%
+11/05/02 15:43:47 INFO mapred.JobClient:  map 94% reduce 30%
+11/05/02 15:44:20 INFO mapred.JobClient:  map 95% reduce 30%
+11/05/02 15:44:50 INFO mapred.JobClient:  map 96% reduce 30%
+11/05/02 15:45:22 INFO mapred.JobClient:  map 97% reduce 30%
+11/05/02 15:45:59 INFO mapred.JobClient:  map 98% reduce 30%
+11/05/02 15:46:29 INFO mapred.JobClient:  map 98% reduce 31%
+11/05/02 15:46:38 INFO mapred.JobClient:  map 99% reduce 31%
+11/05/02 15:46:56 INFO mapred.JobClient:  map 99% reduce 32%
+11/05/02 15:47:45 INFO mapred.JobClient:  map 100% reduce 32%
+11/05/02 15:48:08 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/02 15:48:16 INFO mapred.JobClient: Job complete: job_201104211619_3648
+11/05/02 15:48:17 INFO mapred.JobClient: Counters: 18
+11/05/02 15:48:17 INFO mapred.JobClient:   Job Counters 
+11/05/02 15:48:17 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/02 15:48:17 INFO mapred.JobClient:     Rack-local map tasks=346
+11/05/02 15:48:17 INFO mapred.JobClient:     Launched map tasks=626
+11/05/02 15:48:17 INFO mapred.JobClient:     Data-local map tasks=280
+11/05/02 15:48:17 INFO mapred.JobClient:   FileSystemCounters
+11/05/02 15:48:17 INFO mapred.JobClient:     FILE_BYTES_READ=1043477
+11/05/02 15:48:17 INFO mapred.JobClient:     HDFS_BYTES_READ=72688538373
+11/05/02 15:48:17 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=2107392
+11/05/02 15:48:17 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=1470077
+11/05/02 15:48:17 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/02 15:48:17 INFO mapred.JobClient:     Reduce input groups=2
+11/05/02 15:48:17 INFO mapred.JobClient:     Combine output records=0
+11/05/02 15:48:17 INFO mapred.JobClient:     Map input records=94861
+11/05/02 15:48:17 INFO mapred.JobClient:     Reduce shuffle bytes=1046699
+11/05/02 15:48:17 INFO mapred.JobClient:     Reduce output records=94861
+11/05/02 15:48:17 INFO mapred.JobClient:     Spilled Records=189722
+11/05/02 15:48:17 INFO mapred.JobClient:     Map output bytes=853749
+11/05/02 15:48:17 INFO mapred.JobClient:     Combine input records=0
+11/05/02 15:48:17 INFO mapred.JobClient:     Map output records=94861
+11/05/02 15:48:17 INFO mapred.JobClient:     Reduce input records=94861
+/opt/hadoop/bin/hadoop jar Im2Gray.jar  /virginia/uvagfx/lliu/out/sib-100000   2.42s user 0.22s system 0% cpu 8:22.04 total
+Inside add input path
+11/05/02 15:48:19 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+11/05/02 15:48:21 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/02 15:48:28 INFO mapred.JobClient: Running job: job_201104211619_3654
+11/05/02 15:48:29 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/02 15:49:00 INFO mapred.JobClient:  map 1% reduce 0%
+11/05/02 15:49:01 INFO mapred.JobClient:  map 2% reduce 0%
+11/05/02 15:49:02 INFO mapred.JobClient:  map 8% reduce 0%
+11/05/02 15:49:02 INFO mapred.JobClient: Task Id : attempt_201104211619_3654_m_000142_0, Status : FAILED
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+11/05/02 15:49:02 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 15:49:02 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 15:49:03 INFO mapred.JobClient:  map 9% reduce 0%
+11/05/02 15:49:04 INFO mapred.JobClient:  map 10% reduce 0%
+11/05/02 15:49:05 INFO mapred.JobClient:  map 14% reduce 0%
+11/05/02 15:49:08 INFO mapred.JobClient:  map 15% reduce 0%
+11/05/02 15:49:09 INFO mapred.JobClient:  map 16% reduce 0%
+11/05/02 15:49:10 INFO mapred.JobClient:  map 18% reduce 0%
+11/05/02 15:49:11 INFO mapred.JobClient:  map 21% reduce 0%
+11/05/02 15:49:12 INFO mapred.JobClient:  map 24% reduce 0%
+11/05/02 15:49:14 INFO mapred.JobClient:  map 28% reduce 0%
+11/05/02 15:49:15 INFO mapred.JobClient:  map 29% reduce 0%
+11/05/02 15:49:17 INFO mapred.JobClient:  map 30% reduce 0%
+11/05/02 15:49:19 INFO mapred.JobClient:  map 32% reduce 0%
+11/05/02 15:49:20 INFO mapred.JobClient:  map 33% reduce 0%
+11/05/02 15:49:21 INFO mapred.JobClient:  map 38% reduce 0%
+11/05/02 15:49:22 INFO mapred.JobClient:  map 39% reduce 0%
+11/05/02 15:49:23 INFO mapred.JobClient:  map 42% reduce 0%
+11/05/02 15:49:24 INFO mapred.JobClient:  map 43% reduce 0%
+11/05/02 15:49:26 INFO mapred.JobClient:  map 44% reduce 0%
+11/05/02 15:49:27 INFO mapred.JobClient:  map 46% reduce 0%
+11/05/02 15:49:28 INFO mapred.JobClient:  map 47% reduce 0%
+11/05/02 15:49:30 INFO mapred.JobClient:  map 52% reduce 0%
+11/05/02 15:49:31 INFO mapred.JobClient:  map 53% reduce 0%
+11/05/02 15:49:33 INFO mapred.JobClient:  map 57% reduce 0%
+11/05/02 15:49:34 INFO mapred.JobClient:  map 58% reduce 0%
+11/05/02 15:49:35 INFO mapred.JobClient:  map 59% reduce 0%
+11/05/02 15:49:36 INFO mapred.JobClient:  map 60% reduce 0%
+11/05/02 15:49:38 INFO mapred.JobClient:  map 61% reduce 0%
+11/05/02 15:49:39 INFO mapred.JobClient:  map 66% reduce 0%
+11/05/02 15:49:40 INFO mapred.JobClient:  map 67% reduce 0%
+11/05/02 15:49:40 INFO mapred.JobClient: Task Id : attempt_201104211619_3654_m_000508_0, Status : FAILED
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+11/05/02 15:49:40 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 15:49:40 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 15:49:41 INFO mapred.JobClient:  map 69% reduce 0%
+11/05/02 15:49:42 INFO mapred.JobClient:  map 71% reduce 0%
+11/05/02 15:49:44 INFO mapred.JobClient:  map 72% reduce 0%
+11/05/02 15:49:45 INFO mapred.JobClient:  map 73% reduce 0%
+11/05/02 15:49:47 INFO mapred.JobClient:  map 74% reduce 0%
+11/05/02 15:49:48 INFO mapred.JobClient:  map 77% reduce 0%
+11/05/02 15:49:50 INFO mapred.JobClient:  map 79% reduce 0%
+11/05/02 15:49:51 INFO mapred.JobClient:  map 80% reduce 0%
+11/05/02 15:49:53 INFO mapred.JobClient:  map 82% reduce 0%
+11/05/02 15:49:56 INFO mapred.JobClient:  map 82% reduce 1%
+11/05/02 15:49:57 INFO mapred.JobClient:  map 83% reduce 1%
+11/05/02 15:49:59 INFO mapred.JobClient:  map 84% reduce 1%
+11/05/02 15:50:02 INFO mapred.JobClient:  map 85% reduce 1%
+11/05/02 15:50:03 INFO mapred.JobClient:  map 86% reduce 1%
+11/05/02 15:50:04 INFO mapred.JobClient:  map 86% reduce 8%
+11/05/02 15:50:09 INFO mapred.JobClient:  map 87% reduce 8%
+11/05/02 15:50:11 INFO mapred.JobClient:  map 88% reduce 8%
+11/05/02 15:50:13 INFO mapred.JobClient:  map 88% reduce 23%
+11/05/02 15:50:15 INFO mapred.JobClient:  map 89% reduce 23%
+11/05/02 15:50:20 INFO mapred.JobClient:  map 90% reduce 23%
+11/05/02 15:50:29 INFO mapred.JobClient:  map 92% reduce 23%
+11/05/02 15:50:31 INFO mapred.JobClient:  map 92% reduce 27%
+11/05/02 15:50:39 INFO mapred.JobClient:  map 93% reduce 27%
+11/05/02 15:50:40 INFO mapred.JobClient:  map 93% reduce 28%
+11/05/02 15:50:49 INFO mapred.JobClient:  map 93% reduce 29%
+11/05/02 15:51:06 INFO mapred.JobClient:  map 94% reduce 29%
+11/05/02 15:51:08 INFO mapred.JobClient:  map 94% reduce 30%
+11/05/02 15:51:33 INFO mapred.JobClient:  map 95% reduce 30%
+11/05/02 15:51:58 INFO mapred.JobClient:  map 96% reduce 30%
+11/05/02 15:52:02 INFO mapred.JobClient:  map 96% reduce 31%
+11/05/02 15:52:28 INFO mapred.JobClient:  map 97% reduce 31%
+11/05/02 15:53:03 INFO mapred.JobClient:  map 98% reduce 31%
+11/05/02 15:53:40 INFO mapred.JobClient:  map 99% reduce 31%
+11/05/02 15:54:00 INFO mapred.JobClient:  map 99% reduce 32%
+11/05/02 15:54:45 INFO mapred.JobClient:  map 99% reduce 33%
+11/05/02 15:54:51 INFO mapred.JobClient:  map 100% reduce 33%
+11/05/02 15:55:12 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/02 15:55:20 INFO mapred.JobClient: Job complete: job_201104211619_3654
+11/05/02 15:55:20 INFO mapred.JobClient: Counters: 18
+11/05/02 15:55:20 INFO mapred.JobClient:   Job Counters 
+11/05/02 15:55:20 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/02 15:55:20 INFO mapred.JobClient:     Rack-local map tasks=329
+11/05/02 15:55:20 INFO mapred.JobClient:     Launched map tasks=612
+11/05/02 15:55:20 INFO mapred.JobClient:     Data-local map tasks=283
+11/05/02 15:55:20 INFO mapred.JobClient:   FileSystemCounters
+11/05/02 15:55:20 INFO mapred.JobClient:     FILE_BYTES_READ=1043477
+11/05/02 15:55:20 INFO mapred.JobClient:     HDFS_BYTES_READ=72688538373
+11/05/02 15:55:20 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=2107392
+11/05/02 15:55:20 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=1470296
+11/05/02 15:55:20 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/02 15:55:20 INFO mapred.JobClient:     Reduce input groups=2
+11/05/02 15:55:20 INFO mapred.JobClient:     Combine output records=0
+11/05/02 15:55:20 INFO mapred.JobClient:     Map input records=94861
+11/05/02 15:55:20 INFO mapred.JobClient:     Reduce shuffle bytes=1046699
+11/05/02 15:55:20 INFO mapred.JobClient:     Reduce output records=94861
+11/05/02 15:55:20 INFO mapred.JobClient:     Spilled Records=189722
+11/05/02 15:55:20 INFO mapred.JobClient:     Map output bytes=853749
+11/05/02 15:55:20 INFO mapred.JobClient:     Combine input records=0
+11/05/02 15:55:20 INFO mapred.JobClient:     Map output records=94861
+11/05/02 15:55:20 INFO mapred.JobClient:     Reduce input records=94861
+/opt/hadoop/bin/hadoop jar Im2Gray.jar  /virginia/uvagfx/lliu/out/sib-100000   2.39s user 0.24s system 0% cpu 7:03.18 total
+Inside add input path
+11/05/02 15:55:22 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+11/05/02 15:55:24 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/02 15:55:31 INFO mapred.JobClient: Running job: job_201104211619_3656
+11/05/02 15:55:32 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/02 15:56:04 INFO mapred.JobClient: Task Id : attempt_201104211619_3656_m_000267_0, Status : FAILED
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+11/05/02 15:56:04 WARN mapred.JobClient: Error reading task outputvm-10-160-218-46
+11/05/02 15:56:04 WARN mapred.JobClient: Error reading task outputvm-10-160-218-46
+11/05/02 15:56:05 INFO mapred.JobClient:  map 7% reduce 0%
+11/05/02 15:56:06 INFO mapred.JobClient:  map 11% reduce 0%
+11/05/02 15:56:07 INFO mapred.JobClient: Task Id : attempt_201104211619_3656_m_000476_0, Status : FAILED
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+11/05/02 15:56:07 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 15:56:07 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 15:56:08 INFO mapred.JobClient:  map 13% reduce 0%
+11/05/02 15:56:09 INFO mapred.JobClient:  map 14% reduce 0%
+11/05/02 15:56:12 INFO mapred.JobClient:  map 15% reduce 0%
+11/05/02 15:56:14 INFO mapred.JobClient:  map 19% reduce 0%
+11/05/02 15:56:15 INFO mapred.JobClient:  map 24% reduce 0%
+11/05/02 15:56:17 INFO mapred.JobClient:  map 25% reduce 0%
+11/05/02 15:56:18 INFO mapred.JobClient:  map 27% reduce 0%
+11/05/02 15:56:22 INFO mapred.JobClient:  map 31% reduce 0%
+11/05/02 15:56:24 INFO mapred.JobClient:  map 37% reduce 0%
+11/05/02 15:56:27 INFO mapred.JobClient:  map 40% reduce 0%
+11/05/02 15:56:30 INFO mapred.JobClient:  map 41% reduce 0%
+11/05/02 15:56:31 INFO mapred.JobClient:  map 44% reduce 0%
+11/05/02 15:56:32 INFO mapred.JobClient:  map 49% reduce 0%
+11/05/02 15:56:33 INFO mapred.JobClient:  map 51% reduce 0%
+11/05/02 15:56:36 INFO mapred.JobClient:  map 54% reduce 0%
+11/05/02 15:56:40 INFO mapred.JobClient:  map 56% reduce 0%
+11/05/02 15:56:41 INFO mapred.JobClient:  map 60% reduce 0%
+11/05/02 15:56:42 INFO mapred.JobClient:  map 64% reduce 0%
+11/05/02 15:56:44 INFO mapred.JobClient:  map 66% reduce 0%
+11/05/02 15:56:46 INFO mapred.JobClient:  map 67% reduce 0%
+11/05/02 15:56:49 INFO mapred.JobClient:  map 68% reduce 0%
+11/05/02 15:56:50 INFO mapred.JobClient:  map 71% reduce 2%
+11/05/02 15:56:51 INFO mapred.JobClient:  map 73% reduce 2%
+11/05/02 15:56:54 INFO mapred.JobClient:  map 76% reduce 2%
+11/05/02 15:56:58 INFO mapred.JobClient:  map 77% reduce 2%
+11/05/02 15:56:59 INFO mapred.JobClient:  map 78% reduce 10%
+11/05/02 15:57:01 INFO mapred.JobClient:  map 79% reduce 10%
+11/05/02 15:57:02 INFO mapred.JobClient: Task Id : attempt_201104211619_3656_m_000517_0, Status : FAILED
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+11/05/02 15:57:02 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 15:57:02 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 15:57:03 INFO mapred.JobClient:  map 81% reduce 10%
+11/05/02 15:57:09 INFO mapred.JobClient:  map 81% reduce 17%
+11/05/02 15:57:10 INFO mapred.JobClient:  map 82% reduce 17%
+11/05/02 15:57:12 INFO mapred.JobClient:  map 83% reduce 17%
+11/05/02 15:57:17 INFO mapred.JobClient:  map 84% reduce 17%
+11/05/02 15:57:18 INFO mapred.JobClient:  map 84% reduce 22%
+11/05/02 15:57:21 INFO mapred.JobClient:  map 86% reduce 22%
+11/05/02 15:57:30 INFO mapred.JobClient:  map 87% reduce 22%
+11/05/02 15:57:36 INFO mapred.JobClient:  map 88% reduce 25%
+11/05/02 15:57:39 INFO mapred.JobClient:  map 89% reduce 25%
+11/05/02 15:57:44 INFO mapred.JobClient:  map 89% reduce 26%
+11/05/02 15:57:48 INFO mapred.JobClient:  map 90% reduce 26%
+11/05/02 15:57:54 INFO mapred.JobClient:  map 90% reduce 27%
+11/05/02 15:57:57 INFO mapred.JobClient:  map 91% reduce 27%
+11/05/02 15:58:08 INFO mapred.JobClient:  map 92% reduce 27%
+11/05/02 15:58:12 INFO mapred.JobClient:  map 92% reduce 28%
+11/05/02 15:58:22 INFO mapred.JobClient:  map 92% reduce 29%
+11/05/02 15:58:25 INFO mapred.JobClient:  map 93% reduce 29%
+11/05/02 15:58:43 INFO mapred.JobClient:  map 94% reduce 29%
+11/05/02 15:58:57 INFO mapred.JobClient:  map 94% reduce 30%
+11/05/02 15:59:09 INFO mapred.JobClient:  map 95% reduce 30%
+11/05/02 15:59:42 INFO mapred.JobClient:  map 96% reduce 30%
+11/05/02 16:00:19 INFO mapred.JobClient:  map 97% reduce 30%
+11/05/02 16:00:28 INFO mapred.JobClient:  map 97% reduce 31%
+11/05/02 16:00:57 INFO mapred.JobClient:  map 98% reduce 31%
+11/05/02 16:01:32 INFO mapred.JobClient:  map 98% reduce 32%
+11/05/02 16:01:53 INFO mapred.JobClient:  map 99% reduce 32%
+11/05/02 16:03:06 INFO mapred.JobClient:  map 100% reduce 32%
+11/05/02 16:03:30 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/02 16:03:37 INFO mapred.JobClient: Job complete: job_201104211619_3656
+11/05/02 16:03:38 INFO mapred.JobClient: Counters: 18
+11/05/02 16:03:38 INFO mapred.JobClient:   Job Counters 
+11/05/02 16:03:38 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/02 16:03:38 INFO mapred.JobClient:     Rack-local map tasks=337
+11/05/02 16:03:38 INFO mapred.JobClient:     Launched map tasks=631
+11/05/02 16:03:38 INFO mapred.JobClient:     Data-local map tasks=294
+11/05/02 16:03:38 INFO mapred.JobClient:   FileSystemCounters
+11/05/02 16:03:38 INFO mapred.JobClient:     FILE_BYTES_READ=1043477
+11/05/02 16:03:38 INFO mapred.JobClient:     HDFS_BYTES_READ=72688538373
+11/05/02 16:03:38 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=2107392
+11/05/02 16:03:38 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=1469982
+11/05/02 16:03:38 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/02 16:03:38 INFO mapred.JobClient:     Reduce input groups=2
+11/05/02 16:03:38 INFO mapred.JobClient:     Combine output records=0
+11/05/02 16:03:38 INFO mapred.JobClient:     Map input records=94861
+11/05/02 16:03:38 INFO mapred.JobClient:     Reduce shuffle bytes=1046699
+11/05/02 16:03:38 INFO mapred.JobClient:     Reduce output records=94861
+11/05/02 16:03:38 INFO mapred.JobClient:     Spilled Records=189722
+11/05/02 16:03:38 INFO mapred.JobClient:     Map output bytes=853749
+11/05/02 16:03:38 INFO mapred.JobClient:     Combine input records=0
+11/05/02 16:03:38 INFO mapred.JobClient:     Map output records=94861
+11/05/02 16:03:38 INFO mapred.JobClient:     Reduce input records=94861
+/opt/hadoop/bin/hadoop jar Im2Gray.jar  /virginia/uvagfx/lliu/out/sib-100000   2.57s user 0.32s system 0% cpu 8:17.94 total
+Inside add input path
+11/05/02 16:03:40 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+11/05/02 16:03:42 INFO input.FileInputFormat: Total input paths to process : 1
+11/05/02 16:03:49 INFO mapred.JobClient: Running job: job_201104211619_3659
+11/05/02 16:03:50 INFO mapred.JobClient:  map 0% reduce 0%
+11/05/02 16:04:23 INFO mapred.JobClient:  map 1% reduce 0%
+11/05/02 16:04:25 INFO mapred.JobClient:  map 4% reduce 0%
+11/05/02 16:04:25 INFO mapred.JobClient: Task Id : attempt_201104211619_3659_m_000081_0, Status : FAILED
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+java.lang.Throwable: Child Error
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:471)
+Caused by: java.io.IOException: Task process exit with nonzero status of 1.
+	at org.apache.hadoop.mapred.TaskRunner.run(TaskRunner.java:458)
+
+11/05/02 16:04:25 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 16:04:25 WARN mapred.JobClient: Error reading task outputvm-10-160-227-58
+11/05/02 16:04:26 INFO mapred.JobClient:  map 6% reduce 0%
+11/05/02 16:04:27 INFO mapred.JobClient:  map 10% reduce 0%
+11/05/02 16:04:28 INFO mapred.JobClient:  map 13% reduce 0%
+11/05/02 16:04:32 INFO mapred.JobClient:  map 14% reduce 0%
+11/05/02 16:04:33 INFO mapred.JobClient:  map 17% reduce 0%
+11/05/02 16:04:36 INFO mapred.JobClient:  map 22% reduce 0%
+11/05/02 16:04:37 INFO mapred.JobClient:  map 24% reduce 0%
+11/05/02 16:04:38 INFO mapred.JobClient:  map 25% reduce 0%
+11/05/02 16:04:41 INFO mapred.JobClient:  map 26% reduce 0%
+11/05/02 16:04:42 INFO mapred.JobClient:  map 29% reduce 0%
+11/05/02 16:04:44 INFO mapred.JobClient:  map 33% reduce 0%
+11/05/02 16:04:45 INFO mapred.JobClient:  map 36% reduce 0%
+11/05/02 16:04:46 INFO mapred.JobClient:  map 38% reduce 0%
+11/05/02 16:04:51 INFO mapred.JobClient:  map 40% reduce 0%
+11/05/02 16:04:52 INFO mapred.JobClient:  map 42% reduce 0%
+11/05/02 16:04:53 INFO mapred.JobClient:  map 43% reduce 0%
+11/05/02 16:04:54 INFO mapred.JobClient:  map 48% reduce 0%
+11/05/02 16:04:55 INFO mapred.JobClient:  map 50% reduce 0%
+11/05/02 16:04:56 INFO mapred.JobClient:  map 51% reduce 0%
+11/05/02 16:05:01 INFO mapred.JobClient:  map 55% reduce 0%
+11/05/02 16:05:03 INFO mapred.JobClient:  map 60% reduce 0%
+11/05/02 16:05:04 INFO mapred.JobClient:  map 62% reduce 0%
+11/05/02 16:05:05 INFO mapred.JobClient:  map 63% reduce 0%
+11/05/02 16:05:09 INFO mapred.JobClient:  map 66% reduce 0%
+11/05/02 16:05:11 INFO mapred.JobClient:  map 67% reduce 0%
+11/05/02 16:05:12 INFO mapred.JobClient:  map 71% reduce 0%
+11/05/02 16:05:13 INFO mapred.JobClient:  map 73% reduce 0%
+11/05/02 16:05:14 INFO mapred.JobClient:  map 74% reduce 0%
+11/05/02 16:05:15 INFO mapred.JobClient:  map 75% reduce 0%
+11/05/02 16:05:18 INFO mapred.JobClient:  map 76% reduce 0%
+11/05/02 16:05:20 INFO mapred.JobClient:  map 78% reduce 0%
+11/05/02 16:05:22 INFO mapred.JobClient:  map 81% reduce 0%
+11/05/02 16:05:23 INFO mapred.JobClient:  map 82% reduce 0%
+11/05/02 16:05:28 INFO mapred.JobClient:  map 83% reduce 3%
+11/05/02 16:05:30 INFO mapred.JobClient:  map 84% reduce 3%
+11/05/02 16:05:31 INFO mapred.JobClient:  map 85% reduce 3%
+11/05/02 16:05:37 INFO mapred.JobClient:  map 86% reduce 17%
+11/05/02 16:05:39 INFO mapred.JobClient:  map 87% reduce 17%
+11/05/02 16:05:46 INFO mapred.JobClient:  map 88% reduce 17%
+11/05/02 16:05:49 INFO mapred.JobClient:  map 89% reduce 17%
+11/05/02 16:05:55 INFO mapred.JobClient:  map 89% reduce 22%
+11/05/02 16:05:58 INFO mapred.JobClient:  map 90% reduce 22%
+11/05/02 16:06:05 INFO mapred.JobClient:  map 90% reduce 25%
+11/05/02 16:06:13 INFO mapred.JobClient:  map 90% reduce 28%
+11/05/02 16:06:17 INFO mapred.JobClient:  map 91% reduce 28%
+11/05/02 16:06:22 INFO mapred.JobClient:  map 91% reduce 29%
+11/05/02 16:06:43 INFO mapred.JobClient:  map 92% reduce 29%
+11/05/02 16:07:01 INFO mapred.JobClient:  map 93% reduce 29%
+11/05/02 16:07:17 INFO mapred.JobClient:  map 93% reduce 30%
+11/05/02 16:07:20 INFO mapred.JobClient:  map 94% reduce 30%
+11/05/02 16:07:55 INFO mapred.JobClient:  map 95% reduce 30%
+11/05/02 16:08:24 INFO mapred.JobClient:  map 96% reduce 30%
+11/05/02 16:09:00 INFO mapred.JobClient:  map 97% reduce 30%
+11/05/02 16:09:36 INFO mapred.JobClient:  map 98% reduce 30%
+11/05/02 16:10:10 INFO mapred.JobClient:  map 98% reduce 31%
+11/05/02 16:10:20 INFO mapred.JobClient:  map 99% reduce 31%
+11/05/02 16:10:28 INFO mapred.JobClient:  map 99% reduce 32%
+11/05/02 16:11:36 INFO mapred.JobClient:  map 100% reduce 32%
+11/05/02 16:11:58 INFO mapred.JobClient:  map 100% reduce 100%
+11/05/02 16:12:07 INFO mapred.JobClient: Job complete: job_201104211619_3659
+11/05/02 16:12:07 INFO mapred.JobClient: Counters: 18
+11/05/02 16:12:07 INFO mapred.JobClient:   Job Counters 
+11/05/02 16:12:07 INFO mapred.JobClient:     Launched reduce tasks=1
+11/05/02 16:12:07 INFO mapred.JobClient:     Rack-local map tasks=360
+11/05/02 16:12:07 INFO mapred.JobClient:     Launched map tasks=616
+11/05/02 16:12:07 INFO mapred.JobClient:     Data-local map tasks=256
+11/05/02 16:12:07 INFO mapred.JobClient:   FileSystemCounters
+11/05/02 16:12:07 INFO mapred.JobClient:     FILE_BYTES_READ=1043477
+11/05/02 16:12:07 INFO mapred.JobClient:     HDFS_BYTES_READ=72688538373
+11/05/02 16:12:07 INFO mapred.JobClient:     FILE_BYTES_WRITTEN=2107392
+11/05/02 16:12:07 INFO mapred.JobClient:     HDFS_BYTES_WRITTEN=1470207
+11/05/02 16:12:07 INFO mapred.JobClient:   Map-Reduce Framework
+11/05/02 16:12:07 INFO mapred.JobClient:     Reduce input groups=2
+11/05/02 16:12:07 INFO mapred.JobClient:     Combine output records=0
+11/05/02 16:12:07 INFO mapred.JobClient:     Map input records=94861
+11/05/02 16:12:07 INFO mapred.JobClient:     Reduce shuffle bytes=1046699
+11/05/02 16:12:07 INFO mapred.JobClient:     Reduce output records=94861
+11/05/02 16:12:07 INFO mapred.JobClient:     Spilled Records=189722
+11/05/02 16:12:07 INFO mapred.JobClient:     Map output bytes=853749
+11/05/02 16:12:07 INFO mapred.JobClient:     Combine input records=0
+11/05/02 16:12:07 INFO mapred.JobClient:     Map output records=94861
+11/05/02 16:12:07 INFO mapred.JobClient:     Reduce input records=94861
+/opt/hadoop/bin/hadoop jar Im2Gray.jar  /virginia/uvagfx/lliu/out/sib-100000   2.57s user 0.30s system 0% cpu 8:29.53 total

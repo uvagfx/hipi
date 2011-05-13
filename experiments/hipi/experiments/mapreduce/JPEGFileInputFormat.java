@@ -1,6 +1,7 @@
 package hipi.experiments.mapreduce;
 
 import java.io.IOException;
+import java.util.List;
 
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
@@ -10,6 +11,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;

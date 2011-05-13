@@ -232,6 +232,9 @@ public class HipiImageBundle extends AbstractImageBundle {
 	private Path _data_file = null;
 	private long _imageCount = -1;
 
+	private long _blockSize = 0;
+	private short _replication = 0;
+
 	/**
 	 * 
 	 * @param file_path The {@link Path} indicating where the image bundle is (or should be written to)
@@ -239,6 +242,22 @@ public class HipiImageBundle extends AbstractImageBundle {
 	 */
 	public HipiImageBundle(Path file_path, Configuration conf) {
 		super(file_path, conf);
+	}
+	
+	public HipiImageBundle(Path file_path, Configuration conf, short replication) {
+		super(file_path, conf);
+		_replication = replication;
+	}
+	
+	public HipiImageBundle(Path file_path, Configuration conf, long blockSize) {
+		super(file_path, conf);
+		_blockSize = blockSize;
+	}
+	
+	public HipiImageBundle(Path file_path, Configuration conf, short replication, long blockSize) {
+		super(file_path, conf);
+		_replication = replication;
+		_blockSize = blockSize;
 	}
 
 	private void writeBundleHeader() throws IOException {
@@ -284,11 +303,14 @@ public class HipiImageBundle extends AbstractImageBundle {
 		// data
 		// file will simply append .dat suffix
 		_index_file = _file_path;
-		_index_output_stream = new DataOutputStream(FileSystem.get(_conf)
-				.create(_index_file));
+		FileSystem fs = FileSystem.get(_conf);
+		_index_output_stream = new DataOutputStream(fs.create(_index_file));
 		_data_file = _file_path.suffix(".dat");
-		_data_output_stream = new DataOutputStream(FileSystem.get(_conf)
-				.create(_data_file));
+		if (_blockSize <= 0)
+			_blockSize = fs.getDefaultBlockSize();
+		if (_replication <= 0)
+			_replication = fs.getDefaultReplication();
+		_data_output_stream = new DataOutputStream(fs.create(_data_file, true, fs.getConf().getInt("io.file.buffer.size", 4096), _replication, _blockSize));
 		_countingOffset = 0;
 		writeBundleHeader();
 	}

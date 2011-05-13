@@ -4,6 +4,8 @@ import hipi.experiments.mapreduce.JPEGFileInputFormat;
 import hipi.experiments.mapreduce.JPEGSequenceFileInputFormat;
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
+import hipi.image.io.ImageEncoder;
+import hipi.image.io.JPEGImageUtil;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 
 import java.io.IOException;

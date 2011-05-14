@@ -2,12 +2,19 @@
 <body>
 <h1 align="center">Getting Started</h1>
 <h2 align="center">Setting up the Hadoop Framework</h2
-
+<div class="todo">TODO: Sean -- add in instructions for setting up the Hadoop Framework</div>
 <hr>
 <h2 align="center">Downloading the HIPI API</h2>
-<p>Now that you have Hadoop installed and working, you'll need to download the HIPI API from our <a href="download.html">download</a> page.</p>
+<p>Now that you have Hadoop installed and working, you'll need to download the HIPI API from our <a href="download.html">download</a> page. We have three separate versions available to download: developers, full, and compact. The developers version features our entire source code, including example programs and experimental program that we used to assess the advantage of HIPI. The full version features all the source code, and the compact version features only the necessary files and methods to run a HIPI job.</p>
+<p>Once you have downloaded HIPI, you must add HIPI to your build path and you are ready to start running HIPI jobs. HIPI jobs can be run using typical MapReduce frameworks but should take advantage of HIPI's features. 
+</p>
 
 <p>
+To begin a MapReduce job using HIPI you must first specify the input to the job as a HIPI Image Bundle (with the ImageBundleInputFormat). Using this input, ImageHeaders will be the key to the Map phase, and FloatImages will be the values, making image-based map tasks very easy. Within the map() method of the Mapper, you can implement whatever tasks you would like to complete, and emit results to the Reducer correspondingly. From this point, you are free to adjust the Reducer and the outputs to fit the needs of your tasks.
+</p>
+<p>
+You can check out the <a href="examples.html">examples</a> page for several templates available to start creating jobs from.
 </p>
 </body>
 </html>
+ 

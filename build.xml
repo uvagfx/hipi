@@ -17,7 +17,7 @@
     <!-- Compile -->
     <javac target="1.6" nowarn="on" srcdir="${srcdir}:./src:./experiments:./examples" includes="${files}" destdir="./bin" classpath="${hadoop.classpath}:${metadata.jar}" />
     <!-- Create the jar -->
-    <jar destfile="${jarfilename}" basedir="./bin">
+    <jar destfile="${jardir}/${jarfilename}" basedir="./bin">
       <zipfileset src="${metadata.jar}" />
       <manifest>
 	<attribute name="Main-Class" value="${mainclass}" />
@@ -31,6 +31,7 @@
       <param name="srcdir" value="experiments/hipi/experiments/averageimage" />
       <param name="files" value="AverageImageCull.java" />			
       <param name="jarfilename" value="averageimagecull.jar" />
+      <param name="jardir" value="experiments" />
       <param name="mainclass" value="hipi.experiments.averageimage.AverageImageCull" />
     </antcall>
   </target>
@@ -41,6 +42,7 @@
       <param name="srcdir" value="examples/hipi/examples/createsequencefile" />
       <param name="files" value="CreateSequenceFile.java" />			
       <param name="jarfilename" value="createsequencefile.jar" />
+      <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.createsequencefile.CreateSequenceFile" />
     </antcall>
   </target>
@@ -51,6 +53,7 @@
       <param name="srcdir" value="examples/hipi/examples/downloader" />
       <param name="files" value="DownloaderInputFormat.java, DownloaderRecordReader.java, Downloader.java" />
       <param name="jarfilename" value="downloader.jar" />
+      <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.downloader.Downloader" />
     </antcall>
   </target>
@@ -61,6 +64,7 @@
       <param name="srcdir" value="experiments/hipi/experiments/im2gray" />
       <param name="files" value="Im2Gray.java" />			
       <param name="jarfilename" value="im2gray.jar" />
+      <param name="jardir" value="experiments" />
       <param name="mainclass" value="hipi.experiments.im2gray.Im2Gray" />
     </antcall>
   </target>
@@ -71,6 +75,7 @@
       <param name="srcdir" value="experiments/hipi/experiments/inputtest" />
       <param name="files" value="InputTest.java" />			
       <param name="jarfilename" value="inputtest.jar" />
+      <param name="jardir" value="experiments" />
       <param name="mainclass" value="hipi.experiments.inputtest.InputTest" />
     </antcall>
   </target>
@@ -80,7 +85,8 @@
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/jpegfromhib" />
       <param name="files" value="JpegFromHib.java" />
-      <param name="jarfilename" value="hib2jpg" />
+      <param name="jarfilename" value="hib2jpg.jar" />
+      <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.jpegfromhib.JpegFromHib" />
     </antcall>
   </target>
@@ -90,9 +96,11 @@
   <target name="all" depends="compileall" />
 
   <!-- Clean -->
-  <target name="clean">
-    <delete dir="staging" />
+  <target name="clean">    
     <delete dir="bin" />
+    <delete>
+      <fileset dir="." includes="examples/*.jar,experiments/*.jar" />
+    </delete>
   </target>
 
 </project>

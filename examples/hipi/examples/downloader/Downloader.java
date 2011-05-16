@@ -23,6 +23,23 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
+/**
+ * A utility MapReduce program that takes a list of image URL's, downloads them, and creates 
+ * a {@link hipi.imagebndle.HipiImageBundle} from them.
+ * 
+ * When running this program, the user must specify 3 parameters. The first is the location 
+ * of the list of URL's (one URL per line), the second is the output path for the HIB that will
+ * be generated, and the third is the number of nodes that should be used during the 
+ * program's execution. This final parameter should be chosen with respect to the total
+ * bandwidth your particular cluster is able to handle. An example usage would be:
+ * 
+ * downloader.jar /path/to/urls.txt /path/to/output.hib 10
+ * 
+ * This program will automatically force 10 nodes to download the set of URL's contained in 
+ * the input list, thus if your list contains 100,000 images, each node in this example will
+ * be responsible for downloading 10,000 images.
+ *
+ */
 public class Downloader extends Configured implements Tool{
 
 	

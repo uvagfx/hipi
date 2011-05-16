@@ -81,12 +81,46 @@
 	href="">HipiImageBundle</a> class and can be used directly in
 	the Hadoop MapReduce framework. Several common operations can
 	be performed on HIBs, including:
-	<div class="todo">TODO: Show small code snippets for each of these</div>
 	<ul>
-	  <li>Create a HIB</li>
-	  <li>Add images to an already existing HIB</li>
-	  <li>Merge two HIBs</li>
-	  <li>Read the images from a HIB (random access is permitted)</li>
+	  <li>
+	    Create a HIB
+	    <pre id="Classes">
+  Configuration conf = <font id="New">new</font> Configuration();
+  HipiImageBundle hib = <font id="New">new</font> HipiImageBundle(<font id="New">new</font> Path(<font id="StringLiteral">"/path/to/file.hib"</font>), conf);
+  hib.open(AbstractImageBundle.FILE_MODE_WRITE, <font id="True">true</font>);
+  ...
+	    </pre>
+	  </li>
+	  <li>
+	    Add images to an already existing HIB
+	    <pre id="Classes">
+  File file = <font id="New">new</font> File(<font id="StringLiteral">"/path/to/file.jpg"</font>);
+  FileInputStream fis = <font id="New">new</font> FileInputStream(file);
+  hib.addImage(fis, ImageType.JPEG_IMAGE);
+  ...
+	    </pre>
+	  </li>
+	  <li>
+	    Merge two HIBs
+	    <pre id="Classes">
+  Path temp_path = <font id="New">new</font> Path(<font id="StringLiteral">"/path/to/file.hib"</font>);
+  HipiImageBundle input_bundle = <font id="New">new</font> HipiImageBundle(temp_path, conf);
+  hib.append(input_bundle);
+  ...
+	    </pre>
+	  </li>
+	  <li>
+	    Read the images from a HIB (random access is permitted
+	    through <a href="">HipiImageBundle.FileReader</a>)
+	    <pre id="Classes">
+  <font id="While">while</font> (hib.prepareNext()) {
+  	ImageHeader imageHeader = hib.readHeader();
+	FloatImage image = hib.readImage();
+	...
+  }
+  hib.close();
+	    </pre>
+	  </li>
 	</ul>
 	<div class="important">Important Note:</div>
 	HIBs must be opened in either FILE_MODE_READ or
@@ -94,6 +128,20 @@
 	href="">AbstractImageBundle::open</a>), and once they have
 	been opened in one mode, the mode cannot be switched.  <br
 	/><br />
+
+	<div class="important">Important Note:</div> When creating a
+	HIB through the <a href="">HipiImageBundle::create</a> method,
+	you can specify an optional parameter called blockSize. This
+	parameter is very important as it controls the way a HIB will
+	be distributed to the map
+	tasks. The <a href="">ImageBundleInputFormat</a> splits a HIB
+	into sections based on the block size of the HIB itself in
+	order to most effectively distirbute the job. However, if the
+	block size is set too large, then a small number of machines
+	will be processing all of the images in the HIB. Therefore it
+	is advised that the block size be set such that the number of
+	blocks the entire HIB spans is roughly the number of nodes in
+	the cluster.<br /><br />
 
 	You can create a HIPI Image Bundle from a set of files using
 	the operations listed above, or via some external source
@@ -154,16 +202,16 @@
 	Canon PowerShot S500 digital camera and having dimensions 2592
 	by 1944. The function CullMapper::cull returns a boolean
 	indicating whether the image described by ImageHeader should
-	be processed (true) or should be discarded (false);
+	be discarded (true) or should be processed (false);
 
 	<pre id="Classes">
     <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyMapper <font id="Extends">extends</font> CullMapper&lt;ImageHeader, FloatImage, NullWritable, FloatImage&gt;
     {       
         <font id="Public">public</font> <font id="Boolean">boolean</font> cull(ImageHeader key) <font id="Throws">throws</font> IOException, InterruptedException {
             <font id="If">if</font>(key.getEXIFInformation(<font id="StringLiteral">"Model"</font>).equals(<font id="StringLiteral">"Canon PowerShot S500"</font>) &amp;&amp; key.width == <font id="IntegerLiteral">2592</font> &amp;&amp; key.height == <font id="IntegerLiteral">1944</font>)
-                <font id="Return">return</font> <font id="True">true</font>;
-            <font id="Else">else</font>
                 <font id="Return">return</font> <font id="False">false</font>;
+            <font id="Else">else</font>
+                <font id="Return">return</font> <font id="True">true</font>;
         }
         
         <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
@@ -172,24 +220,45 @@
 	
 	<h3>HIPI Job</h3>
 	
-      </div>
+	HIPI provides a useful extension of the standard
+	Hadoop <a href="">Job</a> class that allows a user to set
+	parameters that are common in scenarios where HIPI would be
+	used. The two main operations that can be performed using a
+	<a href="">HipiJob</a> are:
+	<ul>
+	  <li>Enable/disable speculative execution</li>
+	  <li>Enable/disable compression of Map output records</li>
+	</ul>
+	The former method
+	(<a href="">HipiJob::set{Map,Reduce}SpeculativeExecution</a>)
+	controls whether Hadoop should run multiple instances of
+	the <em>the same</em> Map task to potentially increase
+	performance. Whether this is a good idea is specific to the
+	application, but in general, this should be enabled. This
+	ensures that if a particular node in the Hadoop cluster is
+	experiencing performance degradation, the entire job will not
+	be affected. Hadoop will automatically kill the slower task,
+	and use the output from a different instance. Of course this
+	incurs the overhead of spawning more tasks than is actually
+	needed.  <br /><br />
+	
+	The second operation
+	(<a href="">HipiJob::setCompressMapOutput</a>) enables or
+	disables compression of the output records from the Map tasks
+	before they are sent to the Reduce tasks. This option should
+	be enabled if there is a significant amount of data being
+	transfered between the two sets of tasks. Note that the
+	efficacy of this approach is controlled implicitly by how well
+	the records can be compressed and the relationship between the
+	size of the records, the bandwidth of the cluster, and the
+	time spend compressing and decompressing the files.
 
-      <h2>HIPI Platforms</h2>
-      <div class="section">
-	HIPI stands for Hadoop Image Processing Interface because it
-	is meant to run on Apache Hadoop. Take a look at our <a
-	href="gettingstarted.html"> Getting Started</a> page for
-	details on how to install and set up Hadoop. Check out the <a
-	href="http://hadoop.apache.org/">Apache Hadoop</a> website for
-	more details on Hadoop.
       </div>
       
       <h2>Examples</h2>
       <div class="section">
-	Examples can be found on the <a
-	href="examples.html">examples</a> page. We provide several
-	examples, including trivial and non-trivial applications of
-	HIPI being used on Hadoop's platform.
+	All of our examples can be found on
+	the <a href="examples.html">examples</a> page.
       </div>
 
     </div>

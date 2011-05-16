@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.BinaryComparable;
 import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.Text;
@@ -68,9 +66,6 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 	 */
 	private ImageType _image_type;
 
-	private static final Log LOG = LogFactory.getLog(ImageHeader.class
-			.getName());
-
 	/**
 	 * Adds an EXIF field to this header object. The information consists of a
 	 * key-value pair where the key is the field name as it appears in the EXIF
@@ -83,12 +78,6 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 	 *            the EXIF information
 	 */
 	public void addEXIFInformation(String key, String value) {
-		if (_exif_information.containsKey(key)) {
-			LOG.warn("Overwriting EXIF information for field " + key + " with "
-					+ value + " (old value: " + _exif_information.get(key)
-					+ ")");
-		}
-
 		_exif_information.put(key, value);
 	}
 

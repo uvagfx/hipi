@@ -11,8 +11,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -29,9 +27,6 @@ import org.apache.hadoop.fs.Path;
  * 
  */
 public abstract class AbstractImageBundle {
-
-	private static final Log LOG = LogFactory.getLog(AbstractImageBundle.class
-			.getName());
 
 	public static final int FILE_MODE_READ = 1;
 	public static final int FILE_MODE_WRITE = 2;
@@ -72,14 +67,9 @@ public abstract class AbstractImageBundle {
 	 *            an error
 	 * @throws IOException
 	 */
-	public final void open(int mode, boolean overwrite)
-			throws IOException {
-		LOG.info("Attempting to access file " + _file_path.getName()
-				+ " with mode " + mode);
+	public final void open(int mode, boolean overwrite) throws IOException {
 
-		if (_fileMode == -1 && mode == FILE_MODE_WRITE) {
-			LOG.info("Attempting to open file " + _file_path.getName()
-					+ " for writing (overwrite: " + overwrite + ")");
+		if (_fileMode == -1 && mode == FILE_MODE_WRITE) {			
 			// Check to see whether the file exists
 			if (FileSystem.get(_conf).exists(_file_path) && !overwrite) {
 				throw new IOException("File " + _file_path.getName()
@@ -88,8 +78,6 @@ public abstract class AbstractImageBundle {
 			_fileMode = FILE_MODE_WRITE;
 			openForWrite();
 		} else if (_fileMode == -1 && mode == FILE_MODE_READ) {
-			LOG.info("Attempting to open file " + _file_path.getName()
-					+ " for reading");
 			_fileMode = FILE_MODE_READ;
 			openForRead();
 		} else {

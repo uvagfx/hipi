@@ -1,0 +1,98 @@
+<project basedir="." default="all">
+
+  <target name="setup">
+    <property name="hadoop.home" value="/hadoop/hadoop-0.20.1+152" />
+    <property name="hadoop.version" value="0.20.1+152" />
+    <property name="hadoop.classpath" value="${hadoop.home}/hadoop-${hadoop.version}-core.jar" />
+    <property name="metadata.jar" value="3rdparty/metadata-extractor-2.3.1.jar" />
+  </target>
+
+  <target name="test_settings">
+    <fail unless="hadoop.home" message="The property hadoop.home was not specified. You must specify the home directory for Hadoop in the build.xml file." />
+    <fail unless="hadoop.version" message="The property hadoop.version was not specified. You must specify version of Hadoop you are using in the build.xml file." />
+  </target>
+
+  <target name="compile">
+    <mkdir dir="bin" />
+    <!-- Compile -->
+    <javac target="1.6" nowarn="on" srcdir="${srcdir}:./src:./experiments:./examples" includes="${files}" destdir="./bin" classpath="${hadoop.classpath}:${metadata.jar}" />
+    <!-- Create the jar -->
+    <jar destfile="${jarfilename}" basedir="./bin">
+      <zipfileset src="${metadata.jar}" />
+      <manifest>
+	<attribute name="Main-Class" value="${mainclass}" />
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- Computes the average image of a subset of the images via the CullMapper -->
+  <target name="avgimgcull">
+    <antcall target="compile">
+      <param name="srcdir" value="experiments/hipi/experiments/averageimage" />
+      <param name="files" value="AverageImageCull.java" />			
+      <param name="jarfilename" value="averageimagecull.jar" />
+      <param name="mainclass" value="hipi.experiments.averageimage.AverageImageCull" />
+    </antcall>
+  </target>
+
+  <!-- Create a sequence file from a HIB-->
+  <target name="seqfile">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/createsequencefile" />
+      <param name="files" value="CreateSequenceFile.java" />			
+      <param name="jarfilename" value="createsequencefile.jar" />
+      <param name="mainclass" value="hipi.examples.createsequencefile.CreateSequenceFile" />
+    </antcall>
+  </target>
+
+  <!-- The distributed downloader, which takes a database of URL's and creates a HIB -->
+  <target name="downloader">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/downloader" />
+      <param name="files" value="DownloaderInputFormat.java, DownloaderRecordReader.java, Downloader.java" />
+      <param name="jarfilename" value="downloader.jar" />
+      <param name="mainclass" value="hipi.examples.downloader.Downloader" />
+    </antcall>
+  </target>
+
+  <!-- Converts a set of images to grayscale -->
+  <target name="im2gray">
+    <antcall target="compile">
+      <param name="srcdir" value="experiments/hipi/experiments/im2gray" />
+      <param name="files" value="Im2Gray.java" />			
+      <param name="jarfilename" value="im2gray.jar" />
+      <param name="mainclass" value="hipi.experiments.im2gray.Im2Gray" />
+    </antcall>
+  </target>
+
+  <!-- Test the various input types for HIPI -->
+  <target name="inputtest">
+    <antcall target="compile">
+      <param name="srcdir" value="experiments/hipi/experiments/inputtest" />
+      <param name="files" value="InputTest.java" />			
+      <param name="jarfilename" value="inputtest.jar" />
+      <param name="mainclass" value="hipi.experiments.inputtest.InputTest" />
+    </antcall>
+  </target>
+  
+  <!-- Extract a HIB into a folder and a sequence file of its constituent images -->
+  <target name="hib2jpg">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/jpegfromhib" />
+      <param name="files" value="JpegFromHib.java" />
+      <param name="jarfilename" value="hib2jpg" />
+      <param name="mainclass" value="hipi.examples.jpegfromhib.JpegFromHib" />
+    </antcall>
+  </target>
+
+  <target name="compileall" depends="avgimgcull, seqfile, downloader, im2gray, inputtest, hib2jpg" />
+
+  <target name="all" depends="setup, test_settings, compileall" />
+
+  <!-- Clean -->
+  <target name="clean">
+    <delete dir="staging" />
+    <delete dir="bin" />
+  </target>
+
+</project>

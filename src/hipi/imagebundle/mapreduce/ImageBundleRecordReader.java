@@ -24,7 +24,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 public class ImageBundleRecordReader extends
 		RecordReader<ImageHeader, FloatImage> {
 
-	protected Configuration conf;
+	private Configuration conf;
 	private HipiImageBundle.FileReader reader;
 
 	@Override

@@ -21,10 +21,10 @@ import org.apache.hadoop.io.Writable;
  */
 public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 
-	protected int _w;
-	protected int _h;
-	protected int _b;
-	protected float[] _pels;
+	private int _w;
+	private int _h;
+	private int _b;
+	private float[] _pels;
 
 	public FloatImage() {}
 	

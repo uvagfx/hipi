@@ -1,4 +1,4 @@
-package hipi.experiments.covariance;
+package hipi.examples.covariance;
 
 import hipi.experiments.mapreduce.JPEGFileInputFormat;
 import hipi.experiments.mapreduce.JPEGSequenceFileInputFormat;

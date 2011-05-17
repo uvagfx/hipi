@@ -1,20 +1,93 @@
-<html>
-<body>
-<h1 align="center">Getting Started</h1>
-<h2 align="center">Setting up the Hadoop Framework</h2
-<div class="todo">TODO: Sean -- add in instructions for setting up the Hadoop Framework</div>
-<hr>
-<h2 align="center">Downloading the HIPI API</h2>
-<p>Now that you have Hadoop installed and working, you'll need to download the HIPI API from our <a href="download.html">download</a> page. We have three separate versions available to download: developers, full, and compact. The developers version features our entire source code, including example programs and experimental program that we used to assess the advantage of HIPI. The full version features all the source code, and the compact version features only the necessary files and methods to run a HIPI job.</p>
-<p>Once you have downloaded HIPI, you must add HIPI to your build path and you are ready to start running HIPI jobs. HIPI jobs can be run using typical MapReduce frameworks but should take advantage of HIPI's features. 
-</p>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="Description" content="HIPI - Hadoop Image Processing Interface getting started page tells you what you need to know to start using HIPI on Hadoop MapReduce." />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    
+    <link rel="stylesheet" type="text/css" href="include/main.css" />
+    <link rel="stylesheet" type="text/css" href="include/javasyntax.css" />
+    <title>HIPI - Hadoop Image Processing Interface :: Getting Started</title>
+  </head>
+  
+  <body>
+    <div class="header">
+      <h1>HIPI - Hadoop Image Processing Framework</h1>
+    </div>
+    <div class="navigation_menu">
+      <ul>
+	<li><a href="index.html">Introduction</a></li>
+	<li><a href="gettingstarted.html">Getting Started</a></li>
+	<li><a href="doc/api/index.html">Documentation</a></li>
+	<li><a href="examples.html">Examples</a></li>
+	<li><a href="downloads.html">Downloads</a></li>
+	<li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+    
+    <!-- Begin Content -->
+    <div class="content">
+      
+      <h2>Setting up the Hadoop Framework</h2>
+      <h3>Getting Hadoop</h3>
+      <div class="section">
+	You must first download the Hadoop MapReduce framework from <a
+	class="external_link"
+	href="http://hadoop.apache.org/mapreduce/">Apache's
+	website</a>. We suggest using Hadoop version 0.20.1 as it is
+	the most recent version on which HIPI has been tested
+	completely.<br /><br />
+      
+	<h3>Configuring Hadoop</h3> 
 
-<p>
-To begin a MapReduce job using HIPI you must first specify the input to the job as a HIPI Image Bundle (with the ImageBundleInputFormat). Using this input, ImageHeaders will be the key to the Map phase, and FloatImages will be the values, making image-based map tasks very easy. Within the map() method of the Mapper, you can implement whatever tasks you would like to complete, and emit results to the Reducer correspondingly. From this point, you are free to adjust the Reducer and the outputs to fit the needs of your tasks.
-</p>
-<p>
-You can check out the <a href="examples.html">examples</a> page for several templates available to start creating jobs from.
-</p>
-</body>
+	Please refer to the Hadoop documentation pages listed below
+	for specifics on how to configure your installation:
+	<ul>
+	  <li>For Hadoop 0.20.1 use this <a class="external_link" href="http://hadoop.apache.org/common/docs/r0.20.1/quickstart.html">Quickstart Guide</a></li>
+	  <li>For the most current Hadoop version use this <a class="external_link" href="http://hadoop.apache.org/common/docs/current/quickstart.html">Quickstart Guide</a></li>
+	</ul>
+
+	It is a good idea to add the bin directory to your PATH
+	environment variable to avoid having to type the absolute path
+	to Hadoop for every command. For example, if you downloaded
+	the Hadoop 0.20.1 library and unpacked it to
+	/hadoop/hadoop-0.20.1/, then you would add the following to
+	your .bashrc (or equivalent):
+	<pre id="Current">
+  export PATH=$PATH:/hadoop/hadoop-0.20.1/bin
+	</pre>		
+      </div>
+
+      <h2>Downloading the HIPI API</h2>
+      <div class="section">
+	Now that you have Hadoop installed and working, you'll need to
+	download the HIPI API from our <a
+	href="downloads.html">downloads</a> page. We have three
+	separate versions available to download: developer, src, and
+	release. The developer version contains our entire source
+	code, including example programs and experimental programs
+	that we used to take quantitative measurements of HIPI. The
+	src version features the entire HIPI source code tree, but
+	does not contain the experiments. Finally, the release version
+	contains just the necessary class files needed to use HIPI
+	along with the source code for the example programs.<br /><br
+	/>
+
+	In order to use the HIPI API, you must add the jar file you
+	downloaded above to the build path. The way you achieve this
+	varies from setup to setup. In Eclipse you will have to add
+	the jar file to the Java Build Path in your Project
+	Settings. In ANT you will specify the jar file in the
+	classpath attribute of the Javac Task along with any other
+	libraries you may need (such as Hadoop).<br /><br />
+
+	You can find sample ANT build tasks in the main directory of
+	HIPI in the build.xml file. <br /><br />
+      	
+	Please see the <a href="examples.html">examples</a> page for
+	information on creating programs that utilize HIPI.
+      </div>
+    </div>
+    <!-- End Content -->
+  </body>
 </html>
- 
+  

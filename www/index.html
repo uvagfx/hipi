@@ -17,7 +17,7 @@
       <ul>
 	<li><a href="index.html">Introduction</a></li>
 	<li><a href="gettingstarted.html">Getting Started</a></li>
-	<li><a href="documentation.html">Documentation</a></li>
+	<li><a href="doc/api/index.html">Documentation</a></li>
 	<li><a href="examples.html">Examples</a></li>
 	<li><a href="downloads.html">Downloads</a></li>
 	<li><a href="about.html">About</a></li>
@@ -88,7 +88,6 @@
   Configuration conf = <font id="New">new</font> Configuration();
   HipiImageBundle hib = <font id="New">new</font> HipiImageBundle(<font id="New">new</font> Path(<font id="StringLiteral">"/path/to/file.hib"</font>), conf);
   hib.open(AbstractImageBundle.FILE_MODE_WRITE, <font id="True">true</font>);
-  ...
 	    </pre>
 	  </li>
 	  <li>
@@ -97,7 +96,6 @@
   File file = <font id="New">new</font> File(<font id="StringLiteral">"/path/to/file.jpg"</font>);
   FileInputStream fis = <font id="New">new</font> FileInputStream(file);
   hib.addImage(fis, ImageType.JPEG_IMAGE);
-  ...
 	    </pre>
 	  </li>
 	  <li>
@@ -106,7 +104,6 @@
   Path temp_path = <font id="New">new</font> Path(<font id="StringLiteral">"/path/to/file.hib"</font>);
   HipiImageBundle input_bundle = <font id="New">new</font> HipiImageBundle(temp_path, conf);
   hib.append(input_bundle);
-  ...
 	    </pre>
 	  </li>
 	  <li>
@@ -116,7 +113,6 @@
   <font id="While">while</font> (hib.prepareNext()) {
   	ImageHeader imageHeader = hib.readHeader();
 	FloatImage image = hib.readImage();
-	...
   }
   hib.close();
 	    </pre>
@@ -158,13 +154,48 @@
 	representation of an image file as a set of pixels specified
 	with single floating-point precision. Several common
 	operations can be performed on a FloatImage:
-	<div class="todo">TODO: Show small code snippets for each of these</div>
 	<ul>
-	  <li>Get/set pixels values</li>
-	  <li>Convert to grayscale</li>
-	  <li>Scalar multiplication</li>
-	  <li>Addition</li>
-	  <li>Image cropping</li>
+	  <li>
+	    Create a float image from a file (see <a href="">JPEGImageUtil</a>)
+	    <pre id="Classes">
+  FileInputStream file = <font id="New">new</font> FileInputStream(<font id="StringLiteral">"/path/to/image.jpg"</font>);
+  FloatImage image = JPEGImageUtil.getInstance().decodeImage(file);
+	    </pre>
+	  </li>
+	  <li>
+	    Get/set pixels values
+	    <pre id="Classes">
+  <font id="Float">float</font> red = image.getPixel(0, 0, 0);
+  <font id="Float">float</font> green = image.getPixel(0, 0, 1);
+  <font id="Float">float</font> blue = image.getPixel(0, 0, 2);
+  image.setPixel(0, 0, 0, red / 2);
+  image.setPixel(0, 0, 1, green / 2);
+  image.setPixel(0, 0, 2, blue / 2);
+	    </pre>
+	  </li>
+	  <li>
+	    Convert to grayscale
+	    <pre id="Classes">
+  FloatImage gray_image = image.convert(FloatImage.RGB2GRAY);
+	    </pre>
+	  </li>
+	  <li>
+	    Basic arithmetic
+	    <pre id="Classes">
+  FloatImage image2 = <font id="New">new</font> FloatImage(image.getWidth(), image.getHeight(), image.getBands());
+  image2.add(2.0f);
+  image.scale(image2);
+  image.scale(2.0f);
+  image.add(image2);
+  image.add(2.0f);
+	    </pre>
+	  </li>
+	  <li>
+	    Image cropping
+	    <pre id="Classes">
+  FloatImage crop = image.crop(0, 0, 20, 20);
+	    </pre>
+	  </li>
 	</ul>
 
 	A <a href="">FloatImage</a> is actually just a three-dimensional set of
@@ -215,7 +246,6 @@
         }
         
         <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
-	...
 	</pre>
 	
 	<h3>HIPI Job</h3>

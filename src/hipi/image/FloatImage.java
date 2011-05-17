@@ -121,7 +121,7 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 		return _h;
 	}
 
-	public int getBand() {
+	public int getBands() {
 		return _b;
 	}
 

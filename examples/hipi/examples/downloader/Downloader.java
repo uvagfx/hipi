@@ -69,7 +69,7 @@ public class Downloader extends Configured implements Tool{
 			int iprev = i;
 			while((uri = reader.readLine()) != null)			
 			{
-				if(i >= iprev+100){
+				if(i >= iprev+100) {
 					hib.close();
 					context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
 					temp_path = conf.get("downloader.outpath") + i + ".hib.tmp";
@@ -89,10 +89,10 @@ public class Downloader extends Configured implements Tool{
 
 					try {
 						URL link = new URL(uri);
+						System.err.println("Downloading " + link.toString());
 						conn = link.openConnection();
 						conn.connect();
 						type = conn.getContentType();
-						//System.out.println(type + ":" + fpath);
 					} catch (Exception e)
 					{
 						System.err.println("Connection error to image : " + uri);
@@ -105,11 +105,9 @@ public class Downloader extends Configured implements Tool{
 					if (type.compareTo("image/gif") == 0)
 						continue;
 
-					if (type != null)
-					{										
-						if (type.compareTo("image/jpeg") == 0)
-							hib.addImage(conn.getInputStream(), ImageType.JPEG_IMAGE);
-					}		
+					if (type != null && type.compareTo("image/jpeg") == 0)
+						hib.addImage(conn.getInputStream(), ImageType.JPEG_IMAGE);
+					
 				} catch(Exception e)
 				{
 					e.printStackTrace();
@@ -128,8 +126,7 @@ public class Downloader extends Configured implements Tool{
 				// Emit success
 				stopT = System.currentTimeMillis();
 				float el = (float)(stopT-startT)/1000.0f;
-				System.out.println("Took " + el + " seconds");
-				System.out.println("-----------------------\n");
+				System.err.println("> Took " + el + " seconds\n");				
 			}
 
 
@@ -218,15 +215,11 @@ public class Downloader extends Configured implements Tool{
 
 		//*************** IMPORTANT ****************\\
 		job.setMapOutputKeyClass(BooleanWritable.class);
-		//job.setMapOutputValueClass(AbstractImageBundle.class);
 		job.setMapOutputValueClass(Text.class);
-		// Set out/in paths
-		//createDir(outputPath, conf);
 		FileOutputFormat.setOutputPath(job, new Path(outputFile + "_output"));
 
 		DownloaderInputFormat.setInputPaths(job, new Path(inputFile));
 
-		//conf.set("mapred.job.tracker", "local");
 		job.setNumReduceTasks(1);
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
 		return 0;

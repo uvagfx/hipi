@@ -23,19 +23,13 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> 
 {
-
-	protected class QuickFile
-	{
-		public String host;
-		public Path file;
-	}
-
 	/**
 	 * Returns an object that can be used to read records of type ImageInputFormat
 	 */
 	@Override
 	public RecordReader<IntWritable, Text> createRecordReader(InputSplit genericSplit, TaskAttemptContext context) 
-	throws IOException, InterruptedException {
+	throws IOException, InterruptedException 
+	{
 		return new DownloaderRecordReader();
 	}
 
@@ -47,20 +41,21 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 		int nodes = conf.getInt("downloader.nodes", 10);
 
 
-		ArrayList<QuickFile> hosts = new ArrayList<QuickFile>(0);
+		ArrayList<String> hosts = new ArrayList<String>(0);
 		List<InputSplit> splits = new ArrayList<InputSplit>();
 
 		FileSystem fileSystem = FileSystem.get(conf);
 		String tempOutputPath = conf.get("downloader.outpath") + "_tmp";
 		Path tempOutputDir = new Path(tempOutputPath);
 		
-		if (fileSystem.exists(tempOutputDir)) {
+		if (fileSystem.exists(tempOutputDir)) 
+		{
 			fileSystem.delete(tempOutputDir, true);
 		}
 		fileSystem.mkdirs(tempOutputDir);
 		
 		int i = 0;
-		while( hosts.size() < nodes && i < 2*nodes)
+		while( hosts.size() < nodes && i < 2*nodes) 
 		{
 			String tempFileString = tempOutputPath + "/" + i;
 			Path tempFile = new Path(tempFileString);
@@ -73,9 +68,9 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 			BlockLocation[] blocks = fileSystem.getFileBlockLocations(match, 0, length);
 
 			boolean save = true;
-			for (int j = 0; j < hosts.size(); j++)
+			for (int j = 0; j < hosts.size(); j++) 
 			{
-				if (blocks[0].getHosts()[0].compareTo(hosts.get(j).host) == 0)
+				if (blocks[0].getHosts()[0].compareTo(hosts.get(j)) == 0) 
 				{
 					save = false;
 					System.out.println("Repeated host: " + i);
@@ -83,12 +78,9 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 				}
 			}
 
-			if (save)
+			if (save) 
 			{
-				QuickFile Q = new QuickFile();
-				Q.host = blocks[0].getHosts()[0];
-				Q.file = tempFile;
-				hosts.add(Q);
+				hosts.add(blocks[0].getHosts()[0]);
 				System.out.println("Found host successfully: " + i);
 			}
 			i++;
@@ -101,27 +93,33 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 		Path path = file.getPath();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(path)));
 		int num_lines = 0;
-		while(reader.readLine() != null){
+		while(reader.readLine() != null) 
+		{
 			num_lines++;
 		}
 		reader.close();
 		
-		int per = (int) Math.ceil(((float) (num_lines)) / ((float) hosts.size()));
-
-		System.out.println("Each node responsible for " + per + " image downloads");
-
-		int index = 0;
+		int span = (int) Math.ceil(((float) (num_lines)) / ((float) hosts.size()));
+		int last = num_lines - span * (hosts.size()-1);
+		System.out.println("First n-1 nodes responsible for " + span + " images");
+		System.out.println("Last node responsible for " + last + " images");
+		
 		FileSplit[] f = new FileSplit[hosts.size()];
-		for (i = 0; i < f.length; i++)
+		for (int j = 0; j < f.length; j++) 
 		{
 			String[] host = new String[1];
-			host[0] = hosts.get(index++).host;
-			if (index >= hosts.size())
-				index = 0;
-
-			splits.add( new FileSplit(path , (i*per) , per, host));
+			host[0] = hosts.get(j);
+			if (j < f.length - 1) 
+			{
+				splits.add( new FileSplit(path , (j*span) , span, host));
+			} else 
+			{
+				splits.add( new FileSplit(path , (j*span) , last, host));
+			}
 		}
-		if (fileSystem.exists(tempOutputDir)) {
+		
+		if (fileSystem.exists(tempOutputDir)) 
+		{
 			fileSystem.delete(tempOutputDir, true);
 		}
 		return splits;    

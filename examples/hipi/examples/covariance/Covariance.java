@@ -160,7 +160,7 @@ public class Covariance extends Configured implements Tool {
 			job.setInputFormatClass(JPEGFileInputFormat.class);
 		else if (inputFileType.equals("sequence"))
 			job.setInputFormatClass(JPEGSequenceFileInputFormat.class);
-		else{
+		else {
 			System.out.println("Usage: covariance <inputdir> <outputdir> <filetype>");
 			System.exit(0);			
 		}
@@ -216,6 +216,11 @@ public class Covariance extends Configured implements Tool {
 	}
 	
 	public int run(String[] args) throws Exception {
+		if (args.length < 3) {
+			System.out.println("Usage: covariance <inputdir> <outputdir> <filetype>");
+			System.exit(0);
+		}
+		
 		int success = runMeanCompute(args);
 		if (success == 1)
 			return 1;

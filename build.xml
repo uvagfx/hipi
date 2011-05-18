@@ -37,6 +37,17 @@
   </target>
 
   <!-- Create a sequence file from a HIB-->
+  <target name="covariance">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/covariance" />
+      <param name="files" value="Covariance.java" />			
+      <param name="jarfilename" value="covariance.jar" />
+      <param name="jardir" value="examples" />
+      <param name="mainclass" value="hipi.examples.covariance.Covariance" />
+    </antcall>
+  </target>
+
+  <!-- Create a sequence file from a HIB-->
   <target name="seqfile">
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/createsequencefile" />
@@ -102,7 +113,7 @@
     </antcall>
   </target>
 
-  <target name="compileall" depends="avgimgcull, seqfile, downloader, im2gray, inputtest, hib2jpg, dumphib" />
+  <target name="compileall" depends="avgimgcull, covariance, seqfile, downloader, im2gray, inputtest, hib2jpg, dumphib" />
 
   <target name="all" depends="compileall" />
 

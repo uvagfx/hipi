@@ -191,7 +191,7 @@
 
       Running this script will cause the Covariance job to be compiled and executed. The Covariance job has two phases:
       <ol>
-	<li>Compute the mean of 100 randomly sampled patches in each of the images in the <a href="">HipiImageBundle</a> (HIB)</li>
+	<li>Compute the mean of 100 randomly sampled patches in each of the images in the <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB)</li>
 	<li>Compute the covariance of the same 100 patches per image, using the pre-calculated mean</li>
       </ol>
 
@@ -210,7 +210,7 @@
       The Covariance program is unique in that it actually chains two
       jobs together and communicates the output of the first job to
       the second via the <a class="external_link"
-      href="">DistributedCache</a>.
+      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/filecache/DistributedCache.html">DistributedCache</a>.
 
       <h3>The Two Drivers</h3>
 
@@ -219,9 +219,10 @@
       the mean can be computed in tandem with the covariance, we chose
       to compute it in a different job to illustrate chaining multiple
       jobs and using the <a class="external_link"
-      href="">DistributedCache</a>. Thus, the <tt>main()</tt> method
-      of the Covariance.java class calls a <tt>run()</tt> that spawns
-      these two tasks in separate, serial jobs:
+      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/filecache/DistributedCache.html">DistributedCache</a>. Thus,
+      the <tt>main()</tt> method of the Covariance.java class calls a
+      <tt>run()</tt> that spawns these two tasks in separate, serial
+      jobs:
       <pre id="Current">
   <font id="Public">public</font> <font id="Static">static</font> <font id="Void">void</font> main(String[] args) <font id="Throws">throws</font> Exception {
     ToolRunner.run(<font id="New">new</font> Covariance(), args);
@@ -238,16 +239,17 @@
 
       The <tt>runMeanCompute()</tt> method is responsible for
       computing the mean of 10 randomly sampled patches in eahc of the
-      images in the input <a href="">HipiImageBundle</a> (HIB). Its
-      contents are rather standard so we will forego a detailed
-      explanation of it here. Please see the <a
+      images in the input <a
+      href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
+      (HIB). Its contents are rather standard so we will forego a
+      detailed explanation of it here. Please see the <a
       href="dumphib.html">DumpHIB</a> example for an explanation of
       setting up a standard HIPI job.<br /><br />
 
       The <tt>runCovariance()</tt> method is slightly more
       complicated. It makes use of the <a class="external_link"
-      href="">DistributedCache</a> to distribute the precomputed mean
-      to all of the Mapper's:
+      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/filecache/DistributedCache.html">DistributedCache</a>
+      to distribute the precomputed mean to all of the Mapper's:
       <pre id="Current">
   <font id="Public">public</font> <font id="Int">int</font> runCovariance(String[] args) <font id="Throws">throws</font> Exception {
     ...
@@ -258,7 +260,9 @@
       Note that this must correspond to where the output of the
       <tt>runMeanCompute()</tt> method was specified to be produced
       via the <a class="external_link"
-      href="">FileOutputFormat:setOutputPath()</a> method:
+      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/mapred/FileOutputFormat.html#setOutputPath(org.apache.hadoop.mapred.JobConf,
+      org.apache.hadoop.fs.Path)">FileOutputFormat:setOutputPath()</a>
+      method:
       <pre id="Current">
   <font id="Public">public</font> <font id="Int">int</font> runMeanCompute(String[] args) <font id="Throws">throws</font> Exception {
     ...
@@ -270,7 +274,8 @@
 
       The Mapper for the Mean job computes the mean of the 100
       randomly sampled patches in each of the images in the input <a
-      href="">HipiImageBundle</a> (HIB):
+      href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
+      (HIB):
       <pre id="Current">
   <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
     <font id="If">if</font> (value != <font id="Null">null</font> &amp;&amp; value.getWidth() &gt; N &amp;&amp; value.getHeight() &gt; N) {
@@ -300,7 +305,8 @@
       have the same number of elements contributing to their partial
       mean, there is no need to weight the partial means
       differently. The output of the Reducer is simply the mean
-      represented as a <a href="">FloatImage</a>:
+      represented as a <a
+      href="../doc/api/hipi/image/FloatImage.html">FloatImage</a>:
       <pre id="Current">
   <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable&lt;FloatImage&gt; values, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
     FloatImage mean = <font id="New">new</font> FloatImage(N, N, <font id="IntegerLiteral">1</font>);
@@ -320,11 +326,15 @@
 
       The Covariance Mapper computes the partial covariance of the
       same 100 patches that were used to compute the mean in each of
-      the images in the input <a href="">HipiImageBundle</a> (HIB). In
-      doings, it needs to be able to access the <a
-      class="external_link" href="">DistributedCache</a> in order to
-      load the precomputed mean. This operation happens in the <a
-      class="external_link" href="">Mapper:setup()</a> method:
+      the images in the input <a
+      href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
+      (HIB). In doings, it needs to be able to access the <a
+      class="external_link"
+      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/filecache/DistributedCache.html">DistributedCache</a>
+      in order to load the precomputed mean. This operation happens in
+      the <a class="external_link"
+      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a>
+      method:
       <pre id="Current">
   <font id="Float">float</font>[] mean;
 

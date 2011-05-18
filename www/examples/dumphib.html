@@ -30,9 +30,9 @@
       <div class="section">
 	DumpHIB is a very simple program designed to illustrate the
 	basic usage of the HIPI API. It takes as input a <a
-	href="">HipiImageBundle</a> (HIB) and outputs a text file
-	containing various properties of the images contained in the
-	HIB.
+	href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
+	(HIB) and outputs a text file containing various properties of
+	the images contained in the HIB.
 
 	<h3>Compiling the Example</h3>
 	
@@ -87,20 +87,20 @@
 	</pre>
 
 	Running this script will iterate through the <a
-	href="">HipiImageBundle</a> (HIB) located at
-	<tt>/hdfs/path/to/input.hib</tt> on the HDFS. The output for
-	this job will be contained in the directory
-	<tt>/hdfs/path/to/output</tt>, also on the HDFS, and will
-	contain information about all of the images in the HIB.
+	href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
+	(HIB) located at <tt>/hdfs/path/to/input.hib</tt> on the
+	HDFS. The output for this job will be contained in the
+	directory <tt>/hdfs/path/to/output</tt>, also on the HDFS, and
+	will contain information about all of the images in the HIB.
       </div>
 
       <h2>Understanding DumpHIB</h2>
       <div class="section">
 	The DumpHIB program is more of an illustrative tool than a
 	useful program. It simply iterates through a <a
-	href="">HipiImageBundle</a> (HIB) and outputs various pieces
-	of information about each of the images contained therein.<br
-	/><br />
+	href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
+	(HIB) and outputs various pieces of information about each of
+	the images contained therein.<br /><br />
 
 	The only class comprising this example is DumpHIB.java and is
 	contained in <tt>examples/hipi/examples/dumphib/</tt> off the
@@ -114,12 +114,13 @@
 	actually launching the job. The Mapper class is responsible
 	for the parallel operation that will inspect each image sent
 	to it. It receives images as records where the key is an <a
-	href="">ImageHeader</a> and the value is a <a
-	href="">FloatImage</a>. The output of the Mapper is the width,
-	height, hash, and camera information for each of the
-	images. This is sent to a trivial Reducer that simply outputs
-	all of these attributes to a file, with one image being
-	represented per line.
+	href="../doc/api/hipi/image/ImageHeader.html">ImageHeader</a>
+	and the value is a <a
+	href="../doc/api/hipi/image/FloatImage.html">FloatImage</a>. The
+	output of the Mapper is the width, height, hash, and camera
+	information for each of the images. This is sent to a trivial
+	Reducer that simply outputs all of these attributes to a file,
+	with one image being represented per line.
 
 	<h3>The Driver</h3> 
 
@@ -170,15 +171,17 @@
 	</pre>
 
 	In this case, the input to the job will be an <a
-	href="">ImageBundleInputFormat</a> (HIB's) and the output will
-	be records where the keys are <a class="external_link"
-	href="">IntWritables</a> (integers) and the values are <a
-	class="external_link" href="">Texts</a> (strings). The reason
-	these parameters are not the native types <tt>int</tt> and
-	<tt>String</tt> is because Hadoop needs to be able to
-	serialize and compare keys and values when executing a
-	job. Thus, these classes essentially encapsulate the
-	<tt>int</tt> and <tt>String</tt> types.<br /><br />
+	href="../doc/api/hipi/imagebundle/mapreduce/ImageBundleInputFormat.html">ImageBundleInputFormat</a>
+	(HIB's) and the output will be records where the keys are <a
+	class="external_link"
+	href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/io/IntWritable.html">IntWritables</a>
+	(integers) and the values are <a class="external_link"
+	href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/io/Text.html">Texts</a>
+	(strings). The reason these parameters are not the native
+	types <tt>int</tt> and <tt>String</tt> is because Hadoop needs
+	to be able to serialize and compare keys and values when
+	executing a job. Thus, these classes essentially encapsulate
+	the <tt>int</tt> and <tt>String</tt> types.<br /><br />
 
 	The last step in the Driver method is to set the input and
 	output paths, and execute the job:
@@ -200,11 +203,14 @@
 	<h3>The Mapper</h3>
 
 	The Mapper class in this example receives records generated
-	from the input <a href="">HipiImageBundle</a> (HIB)
-	automatically via the HIPI API. The key for these records is
-	an <a href="">ImageHeader</a> and the value is a <a
-	href="">FloatImage</a>. Thus, the signature of the Mapper
-	class and the <tt>map()</tt> method take the form:
+	from the input <a
+	href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
+	(HIB) automatically via the HIPI API. The key for these
+	records is an <a
+	href="../doc/api/hipi/image/ImageHeader.html">ImageHeader</a>
+	and the value is a <a href="../doc/api/hipi/image/FloatImage.html">FloatImage</a>. Thus, the
+	signature of the Mapper class and the <tt>map()</tt> method
+	take the form:
 	<pre id="Current">
   <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> DumpHibMapper <font id="Extends">extends</font> Mapper&lt;ImageHeader, FloatImage, IntWritable, Text&gt; {
     <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {

@@ -34,9 +34,12 @@
 	Mappers nor the Reducers. Hence it is a measure of the
 	efficiency in setting up a job using different input
 	formats. The input types considered were <a
-	href="">HipiImageBundles</a>, <a class="external_link"
-	href="">SequenceFiles</a>, the <a class="external_link"
-	href="">HARFileSystem</a>, and many small image files:
+	href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundles</a>,
+	<a class="external_link"
+	href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/io/SequenceFile.html">SequenceFiles</a>,
+	the <a class="external_link"
+	href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/fs/HarFileSystem.html">HARFileSystem</a>,
+	and many small image files:
 
 	<img class="centered_image" src="images/experiments/empty-perf.png" alt="" />
 
@@ -62,13 +65,14 @@
 
       <h3>Average Image with Culling Test</h3>
       <div class="section">
-	HIPI's <a href="">CullMapper</a> is a useful extension of the
-	Hadoop Mapper class that allows a user to cull images that do
-	not pass a certain set of criteria. In this experiment, the
-	average image of the Canon PowerShot S500 digital camera is
-	computed when the image taken had a resolution of
-	2592x1944. The relevant portion of the code responsible for
-	performing the culling is copied below:
+	HIPI's <a
+	href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html">CullMapper</a>
+	is a useful extension of the Hadoop Mapper class that allows a
+	user to cull images that do not pass a certain set of
+	criteria. In this experiment, the average image of the Canon
+	PowerShot S500 digital camera is computed when the image taken
+	had a resolution of 2592x1944. The relevant portion of the
+	code responsible for performing the culling is copied below:
 	<pre id="Classes">
     <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyMapper <font id="Extends">extends</font> CullMapper&lt;ImageHeader, FloatImage, NullWritable, FloatImage&gt;
     {       

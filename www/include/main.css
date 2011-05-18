@@ -33,7 +33,7 @@ a { color:#36c; text-decoration:none; }
 body { font-family:Helvetica,Arial,sans_serif; font-size:12px; }
 h2 { font-size:180%; }
 img { border:none; padding:10px; }
-pre { border:1px dashed #E1E1E1; color:#333344; background:#FAFAFA; font-family:monospace; overflow:auto; font-size:11px; padding-top:12px; margin:5px; line-height:14px; }
+pre { border:1px dashed #E1E1E1; color:#333344; background:#FAFAFA; font-family:monospace; overflow:auto; font-size:11px; padding-top:12px; margin:20px; line-height:14px; }
 
 .content { width:1024px; margin-left:auto; margin-right:auto; }
 .content .section { border-bottom:1px solid #9cf; margin-bottom:20px; padding-bottom:10px; }

@@ -91,7 +91,18 @@
     </antcall>
   </target>
 
-  <target name="compileall" depends="avgimgcull, seqfile, downloader, im2gray, inputtest, hib2jpg" />
+  <!-- Dump some information about all of the information in a HIB -->
+  <target name="dumphib">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/dumphib" />
+      <param name="files" value="DumpHib.java" />
+      <param name="jarfilename" value="dumphib.jar" />
+      <param name="jardir" value="examples" />
+      <param name="mainclass" value="hipi.examples.dumphib.DumpHib" />
+    </antcall>
+  </target>
+
+  <target name="compileall" depends="avgimgcull, seqfile, downloader, im2gray, inputtest, hib2jpg, dumphib" />
 
   <target name="all" depends="compileall" />
 

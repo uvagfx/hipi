@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="Description" content="Hadoop Image Processing Interface example for computing the principle components of natural image patches using Hadoop MapReduce." />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="../include/main.css" />
+    <link rel="stylesheet" type="text/css" href="../include/javasyntax.css" />
+    <title>HIPI - Hadoop Image Processing Interface :: PCA Example</title>
+  </head>
+  
+  <body>
+    <div class="header">
+      <h1>HIPI - Hadoop Image Processing Framework</h1>
+    </div>
+    <div class="navigation_menu">
+      <ul>
+	<li><a href="../index.html">Introduction</a></li>
+	<li><a href="../gettingstarted.html">Getting Started</a></li>
+	<li><a href="../doc/api/index.html">Documentation</a></li>
+	<li><a href="../examples.html">Examples</a></li>
+	<li><a href="../downloads.html">Downloads</a></li>
+	<li><a href="../about.html">About</a></li>
+      </ul>
+    </div>
+    
+    <!-- Begin Content -->
+    <div class="content">
+
+      <h2>DumpHIB</h2>
+      <div class="section">
+	DumpHIB is a very simple program designed to illustrate the
+	basic usage of the HIPI API. It takes as input a <a
+	href="">HipiImageBundle</a> (HIB) and outputs a text file
+	containing various properties of the images contained in the
+	HIB.
+
+	<h3>Compiling the Example</h3>
+	
+	Before you can compile this (or any other example) you must
+	configure the compiling script so that it knows where your
+	Hadoop installation resides. Open up the build.xml file in the
+	root directory of your HIPI installation. At the top of the
+	file are two important properties that are left blank named
+	<strong>hadoop.home</strong> and
+	<strong>hadoop.version</strong>. Fill in the value attributes
+	of these two properties with the location of your Hadoop
+	installation and your Hadoop version. For instance, if you
+	downloaded Hadoop 0.20.1 and unpacked it to
+	/hadoop/hadoop-0.20.1, then you would have the following
+	build.xml file:
+	<pre id="Current">
+  &#60;project basedir="." default="all"&#62;
+	  
+  &#60;target name="setup"&#62;
+  &#60;property name="hadoop.home" value="/hadoop/hadoop-0.20.1" /&#62;
+  &#60;property name="hadoop.version" value="0.20.1" /&#62;
+  &#60;property name="hadoop.classpath" value="${hadoop.home}/hadoop-${hadoop.version}-core.jar" /&#62;
+  &#60;property name="metadata.jar" value="3rdparty/metadata-extractor-2.3.1.jar" /&#62;
+  &#60;/target&#62;
+  ...
+	</pre>
+	  
+	You can compile this example by executing the following
+	command in the root directory where you unpacked HIPI:
+	<pre id="Current">
+  $> ant dumphib
+	</pre>
+	    	    
+	<div class="important">Important Note:</div> You must be using
+	Java JDK version 1.6 in order to ensure that HIPI will compile
+	correctly. Although ealrier versions <em>may</em> work, we
+	have not fully tested them.
+	    
+	<h3>Running the Example</h3> 
+	    
+	We have provided a script in the <tt>examples</tt> directory
+	of the HIPI installation that will automatically compile the
+	dumphib program, upload the resulting jar to the Hadoop
+	Distributed Filesystem (HDFS), and run the dumphib job. This
+	script (and all of the example scripts) relies on the
+	environment variable HDFS_HOME being set to the HDFS path
+	where you will upload your compiled jar files. In most cases
+	this can simply be set in your .bashrc (or equivalent) as:
+	<pre id="Current">
+  export HDFS_HOME=/	     
+	</pre>
+
+	The dumphib program takes two command line parameters, which
+	you can specify directly to the <tt>runDumpHIB.sh</tt>
+	script. For example:
+	<pre id="Current">
+  $> ./runDumpHIB.sh /hdfs/path/to/input.hib /hdfs/path/to/output
+	</pre>
+
+	Running this script will iterate through the <a
+	href="">HipiImageBundle</a> (HIB) located at
+	<tt>/hdfs/path/to/input.hib</tt> on the HDFS. The output for
+	this job will be contained in the directory
+	<tt>/hdfs/path/to/output</tt>, also on the HDFS, and will
+	contain information about all of the images in the HIB.
+      </div>
+
+      <h2>Understanding DumpHIB</h2>
+      <div class="section">
+
+      </div>
+
+    </div>
+    <!-- End Content -->
+  </body>
+</html>

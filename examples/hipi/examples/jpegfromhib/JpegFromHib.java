@@ -12,14 +12,12 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -64,10 +62,10 @@ public class JpegFromHib extends Configured implements Tool{
 	{	
 
 		// Read in the configurations
-		if (args.length < 3)
+		if (args.length < 2)
 		{
 			System.out.println("args: " + args.length);
-			System.out.println("Usage: jpegfromhib <hibfile> <small files output dir> <sequence file output>");
+			System.out.println("Usage: hib2jpg <hibfile> <output dir>");
 			System.exit(0);
 		}
 
@@ -79,7 +77,7 @@ public class JpegFromHib extends Configured implements Tool{
 		String outputPath = args[1];
 		conf.setStrings("jpegfromhib.outdir", outputPath);
 
-		Job job = new Job(conf, "jpegfromhib");
+		Job job = new Job(conf, "hib2jpg");
 		job.setJarByClass(JpegFromHib.class);
 		job.setMapperClass(MyMapper.class);
 		job.setReducerClass(Reducer.class);
@@ -92,8 +90,8 @@ public class JpegFromHib extends Configured implements Tool{
 		job.setInputFormatClass(JpegFromHibInputFormat.class);
 
 		// Set out/in paths
-		removeDir(args[2], conf);
-		FileOutputFormat.setOutputPath(job, new Path(args[2]));
+		removeDir(args[1], conf);
+		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 		ImageBundleInputFormat.setInputPaths(job, new Path(args[0]));	
 
 		job.setNumReduceTasks(1);

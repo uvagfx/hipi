@@ -62,22 +62,14 @@
   &#60;property name="metadata.jar" value="3rdparty/metadata-extractor-2.3.1.jar" /&#62;
   &#60;/target&#62;
   ...
-          </pre><br />
+          </pre>
 	  
 	  You can compile this example by executing the following
 	  command in the root directory where you unpacked HIPI:
 	  <pre id="Current">
   $> ant downloader
-	    </pre><br />
-	    
-	    This will run an ANT script that will create the file
-	    examples/download.jar. If you navigate to the examples folder
-	    and execute the following command, you should see the usage
-	    message for the downloader program:
-	    <pre id="Current">
-  $> ./runDownloader.sh
 	    </pre>
-	    
+	    	    
 	    <div class="important">Important Note:</div> You must be
 	    using Java JDK version 1.6 in order to ensure that HIPI
 	    will compile correctly. Although ealrier versions
@@ -85,20 +77,33 @@
 	    
 	    <h3>Running the Example</h3> 
 	    
-	    The downloader program takes three command line parameters,
-	    which you can specify directly to the
-	    <tt>runDownloader.sh</tt> script. The first parameter is the
-	    Hadoop Distributed File System (HDFS) path to the list of
-	    URL's to be downloaded. Each URL must reside as an ASCII
-	    string on its own line in this file. The second parameter is
-	    the HDFS path to the output file that will be created once the
-	    program has finished. The third and final parameter specifies
-	    the number of nodes that will be used to distribute the
+	    We have provided a script in the <tt>examples</tt>
+	    directory of the HIPI installation that will automatically
+	    compile the downloader program, upload the resulting jar
+	    to the Hadoop Distributed Filesystem (HDFS), and run the
+	    downloader job. This script (and all of the example
+	    scripts) relies on the environment variable HDFS_HOME
+	    being set to the HDFS path where you will upload your
+	    compiled jar files. In most cases this can simply be set
+	    in your .bashrc (or equivalent) as:
+	    <pre id="Current">
+  export HDFS_HOME=/	     
+	    </pre>
+
+	    The downloader program takes three command line
+	    parameters, which you can specify directly to the
+	    <tt>runDownloader.sh</tt> script. The first parameter is
+	    the HDFS path to the list of URL's to be downloaded. Each
+	    URL must reside as an ASCII string on its own line in this
+	    file. The second parameter is the HDFS path to the output
+	    file that will be created once the program has
+	    finished. The third and final parameter specifies the
+	    number of nodes that will be used to distribute the
 	    downloader. This should be set in accordance with the
 	    bandwidth your system can sustain. For example:
 	    <pre id="Current">
   $> ./runDownloader.sh /hdfs/path/to/list.txt /hdfs/path/to/output.hib 100
-	    </pre><br />
+	    </pre>
 	      
 	    In this case, 100 nodes will download the images specified in
 	    the list.txt file and will be stored as a <a
@@ -336,15 +341,12 @@
 	records to the <a class="external_link" href="">Mapper</a>
 	task where the keys are the starting line in the input list of
 	URL's and the values are the URL's to be downloaded (separated
-	again by newline characters).<br /><br />
-
-	The Mapper's task is to download each of the URL's to a local
-	<a href="">HipiImageBundle</a> (HIB), which will then be sent
-	to the <a class="external_link" href="">Reducer</a> so it can
-	be combined with the other HIB's. <br /><br />
-
-	A temporary HIB is created on each of the map nodes to hold
-	the set of images it is responsible for downloading:
+	again by newline characters). The Mapper's task is to download
+	each of the URL's to a local <a href="">HipiImageBundle</a>
+	(HIB), which will then be sent to the <a class="external_link"
+	href="">Reducer</a> so it can be combined with the other
+	HIB's. A temporary HIB is created on each of the map nodes to
+	hold the set of images it is responsible for downloading:
 	<pre id="Current">
   <font id="Public">public</font> <font id="Void">void</font> map(IntWritable key, Text value, Context context) <font id="Throws">throws</font> IOException, InterruptedException
   {

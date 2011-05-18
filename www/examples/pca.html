@@ -6,6 +6,10 @@
     <link rel="stylesheet" type="text/css" href="../include/main.css" />
     <link rel="stylesheet" type="text/css" href="../include/javasyntax.css" />
     <title>HIPI - Hadoop Image Processing Interface :: PCA Example</title>
+    
+    <style type="text/css">
+      .math { font-size:110%; font-weight:bold; }
+    </style>
   </head>
   
   <body>
@@ -26,13 +30,102 @@
     <!-- Begin Content -->
     <div class="content">
 
-      <h2>DumpHIB</h2>
+      <h2>Covariance</h2>
       <div class="section">
-	DumpHIB is a very simple program designed to illustrate the
-	basic usage of the HIPI API. It takes as input a <a
-	href="">HipiImageBundle</a> (HIB) and outputs a text file
-	containing various properties of the images contained in the
-	HIB.
+	The Covariance program is the main computation routine used
+	when computing the Principle Components of a dataset of
+	images. For information on how to generate a dataset of
+	images, please see our <a href="downloader.html">Distributed
+	Downloader Example</a>. If you are new to HIPI, you should
+	also work through the <a href="dumphib.html">DumpHIB</a>
+	example before proceeding.<br /><br />
+
+      </div>
+
+      <h2>Introduction</h2>
+      <div class="section">
+      This example will run through a non-trivial application based on
+      <a class="external_link"
+      href="http://www.ib.cnea.gov.ar/~redneu/clasicos/Hancock_Baddeley_Smith_1992.pdf">&#34;The
+      Principal Components of Natural Images&#34;</a> by Hancock et
+      al. Using HIPI, we run the same experiment described in the
+      paper on a massive data set (as opposed to 15 images in the
+      original paper) and compare our results for the first 15
+      principal components of randomly sampled images. To do this, we
+      calculate the covariance matrix for 100 random samples from each
+      image, then perform Singluar Value Decomposition (SVD) on the
+      covariance matrix to recover the principal components. Recall
+      that the covariance of a set of points <span
+      class="math">x<sub>i</sub></span> is calculated according to the
+      following formula:
+
+      <img class="centered_image" src="../images/pca/cov_formula.png" alt="" />
+
+      In our case, each <span class="math">x<sub>i</sub></span> is a
+      randomly sampled patch of pixels from our image set, and <span
+      class="math">x&#772;</span> is the mean of the random
+      samples. Notice the sum of products can be rewritten using
+      matrix notation where <span class="math">x&#770;</span> are the
+      mean-centered patches (<span class="math">x<sub>i</sub> -
+      x&#772;</span>).Computing this quantity can be formulated in a
+      parallel context by noting that the covariance matrix is
+      decomposable into the sum of products of smaller matrices:
+
+      <img class="centered_image" src="../images/pca/cov_parallel.png" alt="" />
+
+      Thus, each of the matrix products can be computed independently
+      in a Mapper's task and then summed together in a single
+      Reducer. Note that in order to compute the covariance matrix in
+      this case, the mean must be known a priori. This is not strictly
+      true in general as the mean can be computed inline with the
+      covariance matrix, however we choose to compute it in a separate
+      program to illustrate the use of the <a
+      class="external_link">DistributedCache</a>.<br /><br />
+
+      Once the covariance matrix is computed, a simple MATLAB routine
+      is used to compute the first 15 eigenvectors using the SVD
+      algorithm. Here is a comparison of the output of our algorithm
+      running on HIPI and drawing 100 randomly sampled patches from a
+      set of 100,000 images compared to the seminal result of Hancock
+      et al. using only 15 images:
+
+      <table class="centered_table">
+	<tr>
+	  <td><img src="../images/pca/hancock.png" alt="" /></td>
+	  <td><img src="../images/pca/hipi-100000.png" alt="" /></td>
+	</tr>
+	<tr class="caption">
+	  <td>Hancock et al. - First 15 Principle Components (20,000 patches)</td>
+	  <td>HIPI - First 15 Principle Components (10,000,000 patches)</td>
+	</tr>
+      </table>
+
+      As expected, the principle components do not <em>perfectly</em>
+      correlate due mostly to rotations (SVD is rotationally
+      invariant) and the ambiguity in displaying negative v. positive
+      values.
+    </div>
+
+	The general flow of the application is as follows
+	<ol>
+	  <li>Determine location of random sample patches</li>
+	  <li>Calculate mean of sample patches</li>
+	  <li>
+	    Compute the contribution of a particular patch x_i to the
+	    Covariance Matrix: <img style="display:block;"
+	    src="../images/cov_partial_sum.png" alt="" />
+	  </li>
+	  <li>Sum the contribution of each random sample to get the Covariance Matrix</li>
+	  <li>Perform SVD on the Covariance Matrix to acquire first 15 principal components (done in Matlab)</li>
+	</ol>
+
+	This flow requires us to run multiple MapReduce jobs (one to
+	compute the average, one to compute the covariance). However,
+	our example program handles this all in one program. The user
+	is only required to provide the input of images (a HIPI Image
+	Bundle), the number of random samples per image, the size of
+	the sample patch, and the location to output the covariance
+	matrix.
 
 	<h3>Compiling the Example</h3>
 	

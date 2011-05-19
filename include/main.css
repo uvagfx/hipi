@@ -48,5 +48,5 @@ table { margin-top:10px; margin-bottom:20px; }
 .todo { color:#3c3; font-size:110%; padding:10px; border:1px solid #3c3;}
 
 .external_link { background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFZJREFUeF59z4EJADEIQ1F36k7u5E7ZKXeUQPACJ3wK7UNokVxVk9kHnQH7bY9hbDyDhNXgjpRLqFlo4M2GgfyJHhjq8V4agfrgPQX3JtJQGbofmCHgA/nAKks+JAjFAAAAAElFTkSuQmCC'); 
-		 padding-right:13px; background-repeat:no-repeat; background-position-x: 100%; background-position-y: 50%; 
+		 padding-right:13px; background-repeat:no-repeat; background-position: 100%, 50%; 
 	       }

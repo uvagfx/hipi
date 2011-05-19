@@ -1,7 +1,7 @@
 <project basedir="." default="all">
 
   <target name="setup">
-    <property name="hadoop.home" value="/hadoop/hadoop-0.20.1+152" />
+    <property name="hadoop.home" value="/opt/hadoop/" />
     <property name="hadoop.version" value="0.20.1+152" />
     <property name="hadoop.classpath" value="${hadoop.home}/hadoop-${hadoop.version}-core.jar" />
     <property name="metadata.jar" value="3rdparty/metadata-extractor-2.3.1.jar" />

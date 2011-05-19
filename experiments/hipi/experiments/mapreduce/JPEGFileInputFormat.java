@@ -53,8 +53,7 @@ FileInputFormat<ImageHeader, FloatImage> {
 	public static void addInputPath(Job job,
 	                                  Path path) throws IOException {
 		Configuration conf = job.getConfiguration();
-		System.out.println("Inside add input path");
-	    FileSystem fs = path.getFileSystem(conf);//FileSystem.get(conf);
+	    FileSystem fs = path.getFileSystem(conf);
 	    path = path.makeQualified(fs);
 	    String dirStr = StringUtils.escapeString(path.toString());
 	    String dirs = conf.get("mapred.input.dir");

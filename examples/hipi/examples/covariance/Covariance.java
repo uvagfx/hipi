@@ -4,6 +4,7 @@ import hipi.experiments.mapreduce.JPEGFileInputFormat;
 import hipi.experiments.mapreduce.JPEGSequenceFileInputFormat;
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
+import hipi.imagebundle.mapreduce.HipiJob;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 import hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
 
@@ -128,19 +129,24 @@ public class Covariance extends Configured implements Tool {
 		}
 	}
 
-	public static void removeDir(String path, Configuration conf) throws IOException {
+	public static void rmdir(String path, Configuration conf) throws IOException {
 		Path output_path = new Path(path);
-
 		FileSystem fs = FileSystem.get(conf);
-
 		if (fs.exists(output_path)) {
 			fs.delete(output_path, true);
 		}
 	}
+	
+	public static void mkdir(String path, Configuration conf) throws IOException {
+		Path output_path = new Path(path);
+		FileSystem fs = FileSystem.get(conf);
+		if (!fs.exists(output_path))
+			fs.mkdirs(output_path);
+	}
 
 	public int runMeanCompute(String[] args) throws Exception {
 
-		Job job = new Job(getConf(), "Covariance");
+		HipiJob job = new HipiJob(getConf(), "Covariance");
 		job.setJarByClass(Covariance.class);
 		job.setOutputKeyClass(IntWritable.class);
 		job.setOutputValueClass(FloatImage.class);
@@ -165,23 +171,25 @@ public class Covariance extends Configured implements Tool {
 			System.exit(0);			
 		}
 		job.setOutputFormatClass(BinaryOutputFormat.class);
-		job.getConfiguration().setBoolean("mapred.map.tasks.speculative.execution", true);
-		job.getConfiguration().setBoolean("mapred.compress.map.output", true);
+		job.setCompressMapOutput(true);
+		job.setMapSpeculativeExecution(true);
+		job.setReduceSpeculativeExecution(true);
 
 		FileInputFormat.setInputPaths(job, new Path(args[0]));
-		removeDir("/virginia/uvagfx/lliu/out-mean", getConf());
-		FileOutputFormat.setOutputPath(job, new Path("/virginia/uvagfx/lliu/out-mean"));
+		mkdir(args[1], job.getConfiguration());
+		rmdir(args[1] + "/mean-output/", job.getConfiguration());
+		FileOutputFormat.setOutputPath(job, new Path(args[1] + "/mean-output/"));
 
 		boolean success = job.waitForCompletion(true);
 		return success ? 0 : 1;
 	}
 	
 	public int runCovariance(String[] args) throws Exception {
-		Job job = new Job(getConf(), "Covariance");
+		HipiJob job = new HipiJob(getConf(), "Covariance");
 		job.setJarByClass(Covariance.class);
 
 		/* DistributedCache will be deprecated in 0.21 */
-		DistributedCache.addCacheFile(new URI("hdfs:///virginia/uvagfx/lliu/out-mean/part-r-00000"), job.getConfiguration());
+		DistributedCache.addCacheFile(new URI("hdfs://" + args[1] + "/mean-output/part-r-00000"), job.getConfiguration());
 
 		job.setOutputKeyClass(IntWritable.class);
 		job.setOutputValueClass(FloatImage.class);
@@ -204,12 +212,14 @@ public class Covariance extends Configured implements Tool {
 			System.exit(0);			
 		}
 		job.setOutputFormatClass(BinaryOutputFormat.class);
-		job.getConfiguration().setBoolean("mapred.map.tasks.speculative.execution", true);
-		job.getConfiguration().setBoolean("mapred.compress.map.output", true);
+		job.setCompressMapOutput(true);
+		job.setMapSpeculativeExecution(true);
+		job.setReduceSpeculativeExecution(true);
 
 		FileInputFormat.setInputPaths(job, new Path(args[0]));
-		removeDir(args[1], getConf());
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		mkdir(args[1], job.getConfiguration());
+		rmdir(args[1] + "/covariance-output/", job.getConfiguration());
+		FileOutputFormat.setOutputPath(job, new Path(args[1] + "/covariance-output/"));
 
 		boolean success = job.waitForCompletion(true);
 		return success ? 0 : 1;

@@ -25,6 +25,16 @@
     </jar>
   </target>
 
+  <target name="hibimport">
+    <antcall target="compile">
+      <param name="srcdir" value="src/hipi/tool" />
+      <param name="files" value="CreateHipiImageBundle.java" />			
+      <param name="jarfilename" value="hibimport.jar" />
+      <param name="jardir" value="tool" />
+      <param name="mainclass" value="hipi.tool.CreateHipiImageBundle" />
+    </antcall>
+  </target>
+
   <!-- Computes the average image of a subset of the images via the CullMapper -->
   <target name="avgimgcull">
     <antcall target="compile">

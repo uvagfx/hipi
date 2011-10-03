@@ -1,7 +1,5 @@
 package hipi.examples.covariance;
 
-import hipi.experiments.mapreduce.JPEGFileInputFormat;
-import hipi.experiments.mapreduce.JPEGSequenceFileInputFormat;
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
 import hipi.imagebundle.mapreduce.HipiJob;
@@ -155,17 +153,9 @@ public class Covariance extends Configured implements Tool {
 		job.setCombinerClass(MeanReduce.class);
 		job.setReducerClass(MeanReduce.class);
 
-		JPEGFileInputFormat.addInputPath(job, new Path(args[0]));
-
 		String inputFileType = args[2];
 		if(inputFileType.equals("hib"))
 			job.setInputFormatClass(ImageBundleInputFormat.class);
-		else if(inputFileType.equals("har"))
-			job.setInputFormatClass(JPEGFileInputFormat.class);
-		else if(inputFileType.equals("small_files"))
-			job.setInputFormatClass(JPEGFileInputFormat.class);
-		else if (inputFileType.equals("sequence"))
-			job.setInputFormatClass(JPEGSequenceFileInputFormat.class);
 		else {
 			System.out.println("Usage: covariance <inputdir> <outputdir> <filetype>");
 			System.exit(0);			
@@ -201,12 +191,6 @@ public class Covariance extends Configured implements Tool {
 		String inputFileType = args[2];
 		if(inputFileType.equals("hib"))
 			job.setInputFormatClass(ImageBundleInputFormat.class);
-		else if(inputFileType.equals("har"))
-			job.setInputFormatClass(JPEGFileInputFormat.class);
-		else if(inputFileType.equals("small_files"))
-			job.setInputFormatClass(JPEGFileInputFormat.class);
-		else if (inputFileType.equals("sequence"))
-			job.setInputFormatClass(JPEGSequenceFileInputFormat.class);
 		else{
 			System.out.println("Usage: covariance <inputdir> <outputdir> <filetype>");
 			System.exit(0);			

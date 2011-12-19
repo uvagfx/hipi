@@ -66,7 +66,7 @@ public class PNGImageUtilTestCase {
 			fis = new FileInputStream("data/test/PNGImageUtilTestCase/decode/" + fileName[i] + ".png");
 			pngImage = pngDecoder.decodeImage(fis);
 			assumeNotNull(pngImage);
-			assertArrayEquals(fileName[i] + " decoding fails for " + fileName[i], ppmImage.getData(), pngImage.getData(), 0);
+			assertEquals(fileName[i] + " decoding fails for " + fileName[i], ppmImage, pngImage);
 		}
 	}
 

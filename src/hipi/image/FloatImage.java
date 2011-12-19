@@ -39,6 +39,26 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 		this(width, height, bands, new float[width * height * bands]);
 	}
 	
+	@Override
+	public boolean equals(Object that) {
+		if (this == that)
+			return true;
+		if (!(that instanceof FloatImage))
+			return false;
+		FloatImage thatImage = (FloatImage)that;
+		if (thatImage.getWidth() == _w && thatImage.getHeight() == _h &&
+			thatImage.getBands() == _b) {
+			float delta = 1.0f;
+			float[] pels = thatImage.getData();
+			for (int i = 0; i < _w * _h * _b; i++) {
+				if (Math.abs(_pels[i] - pels[i]) > delta) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 	
 	/**
 	 * Crops a float image according the the x,y location and the width, height passed in.

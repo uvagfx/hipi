@@ -1,6 +1,6 @@
 package hipi.unittest;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.*;
 import hipi.image.FloatImage;
 import hipi.image.io.ImageDecoder;
 import hipi.image.io.PPMImageUtil;
@@ -31,7 +31,7 @@ public class FloatImageTestCase {
 			ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 			FloatImage newImage = new FloatImage();
 			newImage.readFields(new DataInputStream(bis));
-			assertArrayEquals(fileName[i] + " writable test fails", image.getData(), newImage.getData(), 1);
+			assertEquals(fileName[i] + " writable test fails", image, newImage);
 		}
 	}
 }

@@ -34,7 +34,7 @@ public abstract class AbstractImageBundleTestCase {
 			aib.next();
 			FloatImage image = aib.getCurrentImage();
 			FloatImage source = decoder.decodeImage(new FileInputStream("data/test/ImageBundleTestCase/read/" + count + ".jpg"));
-			assertArrayEquals(count + " image fails", source.getData(), image.getData(), 1);
+			assertEquals(count + " image fails", source, image);
 			count++;
 		}
 		aib.close();
@@ -49,11 +49,11 @@ public abstract class AbstractImageBundleTestCase {
 			aib.next();
 			FloatImage source = decoder.decodeImage(new FileInputStream("data/test/ImageBundleTestCase/read/" + count + ".jpg"));
 			FloatImage image = aib.getCurrentImage();
-			assertArrayEquals(count + " image, first trial fails", source.getData(), image.getData(), 1);
+			assertEquals(count + " image, first trial fails", source, image);
 			image = aib.getCurrentImage();
-			assertArrayEquals(count + " image, second trial fails", source.getData(), image.getData(), 1);
+			assertEquals(count + " image, second trial fails", source, image);
 			image = aib.getCurrentImage();
-			assertArrayEquals(count + " image, third trial fails", source.getData(), image.getData(), 1);
+			assertEquals(count + " image, third trial fails", source, image);
 			count++;
 		}
 		aib.close();
@@ -66,7 +66,7 @@ public abstract class AbstractImageBundleTestCase {
 		aib.next(); aib.next();
 		FloatImage source = decoder.decodeImage(new FileInputStream("data/test/ImageBundleTestCase/read/1.jpg"));
 		FloatImage image = aib.getCurrentImage();
-		assertArrayEquals("skip image fails", source.getData(), image.getData(), 1);
+		assertEquals("skip image fails", source, image);
 		aib.close();
 	}
 
@@ -81,14 +81,14 @@ public abstract class AbstractImageBundleTestCase {
 		aib.next();
 		source = decoder.decodeImage(new FileInputStream("data/test/ImageBundleTestCase/read/0.jpg"));
 		image = aib.getCurrentImage();
-		assertArrayEquals("first image fails", source.getData(), image.getData(), 1);
+		assertEquals("first image fails", source, image);
 		assertTrue("first trial fail to assert hasNext", aib.hasNext());
 		assertTrue("second trial fail to assert hasNext", aib.hasNext());
 		assertTrue("third trial fail to assert hasNext", aib.hasNext());
 		aib.next();
 		source = decoder.decodeImage(new FileInputStream("data/test/ImageBundleTestCase/read/1.jpg"));
 		image = aib.getCurrentImage();
-		assertArrayEquals("second image fails", source.getData(), image.getData(), 1);
+		assertEquals("second image fails", source, image);
 		assertFalse("first trial fail to assert hasNext", aib.hasNext());
 		assertFalse("second trial fail to assert hasNext", aib.hasNext());
 		assertFalse("third trial fail to assert hasNext", aib.hasNext());

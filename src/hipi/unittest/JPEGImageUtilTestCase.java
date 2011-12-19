@@ -71,7 +71,7 @@ public class JPEGImageUtilTestCase {
 			fis = new FileInputStream("data/test/JPEGImageUtilTestCase/decode/" + fileName[i] + ".jpg");
 			jpgImage = jpgDecoder.decodeImage(fis);
 			assumeNotNull(jpgImage);
-			assertArrayEquals(fileName[i] + " decoding fails", ppmImage.getData(), jpgImage.getData(), 1);
+			assertEquals(fileName[i] + " decoding fails", ppmImage, jpgImage);
 		}
 	}
 

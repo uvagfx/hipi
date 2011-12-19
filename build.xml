@@ -15,12 +15,12 @@
   <target name="compile" depends="setup, test_settings">
     <mkdir dir="bin" />
     <!-- Compile -->
-    <javac target="1.6" nowarn="on" srcdir="${srcdir}:./src:./examples:./experiments" includes="${files}" destdir="./bin" classpath="${hadoop.classpath}:${metadata.jar}" />
+    <javac nowarn="on" includeantruntime="no" srcdir="${srcdir}" destdir="./bin" classpath="${hadoop.classpath}:./src/hipi.jar" />
     <!-- Create the jar -->
     <jar destfile="${jardir}/${jarfilename}" basedir="./bin">
-      <zipfileset src="${metadata.jar}" />
+	  <zipfileset src="./src/hipi.jar" />
       <manifest>
-	<attribute name="Main-Class" value="${mainclass}" />
+	    <attribute name="Main-Class" value="${mainclass}" />
       </manifest>
     </jar>
   </target>
@@ -28,21 +28,9 @@
   <target name="hibimport">
     <antcall target="compile">
       <param name="srcdir" value="src/hipi/tool" />
-      <param name="files" value="CreateHipiImageBundle.java" />			
       <param name="jarfilename" value="hibimport.jar" />
       <param name="jardir" value="tool" />
       <param name="mainclass" value="hipi.tool.CreateHipiImageBundle" />
-    </antcall>
-  </target>
-
-  <!-- Computes the average image of a subset of the images via the CullMapper -->
-  <target name="avgimgcull">
-    <antcall target="compile">
-      <param name="srcdir" value="experiments/hipi/experiments/averageimage" />
-      <param name="files" value="AverageImageCull.java" />			
-      <param name="jarfilename" value="averageimagecull.jar" />
-      <param name="jardir" value="experiments" />
-      <param name="mainclass" value="hipi.experiments.averageimage.AverageImageCull" />
     </antcall>
   </target>
 
@@ -50,21 +38,9 @@
   <target name="covariance">
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/covariance" />
-      <param name="files" value="Covariance.java" />			
       <param name="jarfilename" value="covariance.jar" />
       <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.covariance.Covariance" />
-    </antcall>
-  </target>
-
-  <!-- Create a sequence file from a HIB-->
-  <target name="seqfile">
-    <antcall target="compile">
-      <param name="srcdir" value="examples/hipi/examples/createsequencefile" />
-      <param name="files" value="CreateSequenceFile.java" />			
-      <param name="jarfilename" value="createsequencefile.jar" />
-      <param name="jardir" value="examples" />
-      <param name="mainclass" value="hipi.examples.createsequencefile.CreateSequenceFile" />
     </antcall>
   </target>
 
@@ -72,40 +48,16 @@
   <target name="downloader">
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/downloader" />
-      <param name="files" value="DownloaderInputFormat.java, DownloaderRecordReader.java, Downloader.java" />
       <param name="jarfilename" value="downloader.jar" />
       <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.downloader.Downloader" />
     </antcall>
   </target>
 
-  <!-- Converts a set of images to grayscale -->
-  <target name="im2gray">
-    <antcall target="compile">
-      <param name="srcdir" value="experiments/hipi/experiments/im2gray" />
-      <param name="files" value="Im2Gray.java" />			
-      <param name="jarfilename" value="im2gray.jar" />
-      <param name="jardir" value="experiments" />
-      <param name="mainclass" value="hipi.experiments.im2gray.Im2Gray" />
-    </antcall>
-  </target>
-
-  <!-- Test the various input types for HIPI -->
-  <target name="inputtest">
-    <antcall target="compile">
-      <param name="srcdir" value="experiments/hipi/experiments/inputtest" />
-      <param name="files" value="InputTest.java" />			
-      <param name="jarfilename" value="inputtest.jar" />
-      <param name="jardir" value="experiments" />
-      <param name="mainclass" value="hipi.experiments.inputtest.InputTest" />
-    </antcall>
-  </target>
-  
   <!-- Extract a HIB into a folder and a sequence file of its constituent images -->
   <target name="hib2jpg">
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/jpegfromhib" />
-      <param name="files" value="JpegFromHib.java" />
       <param name="jarfilename" value="hib2jpg.jar" />
       <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.jpegfromhib.JpegFromHib" />
@@ -116,16 +68,13 @@
   <target name="dumphib">
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/dumphib" />
-      <param name="files" value="DumpHib.java" />
       <param name="jarfilename" value="dumphib.jar" />
       <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.dumphib.DumpHib" />
     </antcall>
   </target>
 
-  <target name="compileall" depends="avgimgcull, covariance, seqfile, downloader, im2gray, inputtest, hib2jpg, dumphib" />
-
-  <target name="all" depends="compileall" />
+  <target name="all" depends="hibimport, covariance, downloader, hib2jpg, dumphib" />
 
   <!-- Clean -->
   <target name="clean">    

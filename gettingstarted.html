@@ -33,27 +33,24 @@
 	You must first download the Hadoop MapReduce framework from <a
 	class="external_link"
 	href="http://hadoop.apache.org/mapreduce/">Apache's
-	website</a>. We suggest using Hadoop version 0.20.1 as it is
-	the most recent version on which HIPI has been tested
-	completely.<br /><br />
+	website</a>.<br /><br />
       
 	<h3>Configuring Hadoop</h3> 
 
 	Please refer to the Hadoop documentation pages listed below
 	for specifics on how to configure your installation:
 	<ul>
-	  <li>For Hadoop 0.20.1 use this <a class="external_link" href="http://hadoop.apache.org/common/docs/r0.20.1/quickstart.html">Quickstart Guide</a></li>
 	  <li>For the most current Hadoop version use this <a class="external_link" href="http://hadoop.apache.org/common/docs/current/quickstart.html">Quickstart Guide</a></li>
 	</ul>
 
 	It is a good idea to add the bin directory to your PATH
 	environment variable to avoid having to type the absolute path
 	to Hadoop for every command. For example, if you downloaded
-	the Hadoop 0.20.1 library and unpacked it to
-	/hadoop/hadoop-0.20.1/, then you would add the following to
+	and unpacked Hadoop to
+	/opt/hadoop/, then you would add the following to
 	your .bashrc (or equivalent):
 	<pre id="Current">
-  export PATH=$PATH:/hadoop/hadoop-0.20.1/bin
+  export PATH=$PATH:/opt/hadoop/bin
 	</pre>		
       </div>
 
@@ -86,14 +83,6 @@
 	Please see the <a href="examples.html">examples</a> page for
 	information on creating programs that utilize HIPI.
       </div>
-
-	  <h2>Compile with HIPI API</h2>
-	  <div class="section">
-	Now, we distributed one compact HIPI library so that you can
-	incorporate HIPI into your own project easily. First, you'll
-	need to download the HIPI API from our
-	<a href="downloads.html">downloads</a> page.
-	  </div>
     </div>
     <!-- End Content -->
   </body>

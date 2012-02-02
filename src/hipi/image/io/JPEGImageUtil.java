@@ -17,10 +17,15 @@ import java.util.Iterator;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGEncodeParam;
-import com.sun.image.codec.jpeg.JPEGImageDecoder;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 
 public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 	
@@ -81,8 +86,18 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 	}
 
 	public FloatImage decodeImage(InputStream is) throws IOException {
-		JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(is);
-		Raster raster = decoder.decodeAsRaster();
+		ImageInputStream iis = ImageIO.createImageInputStream(is);
+		Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("jpeg");
+		ImageReader reader = readers.next();
+		if (!reader.canReadRaster()) {
+			while (readers.hasNext()) {
+				reader = readers.next();
+				if (reader.canReadRaster())
+					break;
+			}
+		}
+		reader.setInput(iis);
+		Raster raster = reader.readRaster(0, new ImageReadParam());
 		DataBuffer dataBuffer = raster.getDataBuffer();
 		int w = raster.getWidth();
 		int h = raster.getHeight();
@@ -124,9 +139,12 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 		return image;
 	}
 
-public void encodeImage(FloatImage image, ImageHeader header, OutputStream os)
+	public void encodeImage(FloatImage image, ImageHeader header, OutputStream os)
 			throws IOException {
-		JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(os);
+		ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+		Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpeg");
+		ImageWriter writer = writers.next();
+		writer.setOutput(ios);
 		BufferedImage bufferedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
 		float[] data = image.getData();
 		int[] rgb = new int[image.getWidth() * image.getHeight()];
@@ -138,8 +156,9 @@ public void encodeImage(FloatImage image, ImageHeader header, OutputStream os)
 			rgb[i] = r << 16 | g << 8 | b;
 		}
 		bufferedImage.setRGB(0, 0, image.getWidth(), image.getHeight(), rgb, 0, image.getWidth());
-		JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(bufferedImage);
-		encoder.encode(bufferedImage, param);
+		IIOImage iioImage = new IIOImage(bufferedImage, null, null);
+		ImageWriteParam param = writer.getDefaultWriteParam();
+		writer.write(null, iioImage, param);
 	}
 
 	public ImageHeader createSimpleHeader(FloatImage image) {

@@ -51,7 +51,7 @@ public class DumpHib extends Configured implements Tool {
 	}
 
 	public int run(String[] args) throws Exception {
-		Configuration conf = new Configuration();
+		Configuration conf = super.getConf();
 		if (args.length < 2) {
 			System.out.println("Usage: dumphib <input hib> <outputdir>");
 			System.exit(0);

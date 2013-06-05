@@ -10,7 +10,7 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.BooleanWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
@@ -23,7 +23,7 @@ import org.apache.hadoop.util.ToolRunner;
 
 public class JpegFromHib extends Configured implements Tool{
 
-	public static class MyMapper extends Mapper<NullWritable, BytesWritable, BooleanWritable, Text>
+	public static class MyMapper extends Mapper<NullWritable, BytesWritable, IntWritable, Text>
 	{
 		public Path path;
 		public FileSystem fileSystem;
@@ -54,7 +54,7 @@ public class JpegFromHib extends Configured implements Tool{
 			//and change the output key and values appropriately
 			//context.write(new LongWritable(sig), value);
 			
-			context.write(new BooleanWritable(true), new Text(hashval));
+			context.write(new IntWritable(1), new Text(hashval));
 		}
 	}
 
@@ -83,7 +83,7 @@ public class JpegFromHib extends Configured implements Tool{
 		job.setReducerClass(Reducer.class);
 
 		// Set formats
-		job.setOutputKeyClass(BooleanWritable.class);
+		job.setOutputKeyClass(IntWritable.class);
 		job.setOutputValueClass(Text.class);       
 		//job.setOutputFormatClass(SequenceFileOutputFormat.class);
 

@@ -22,8 +22,11 @@ import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
@@ -158,7 +161,25 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 		bufferedImage.setRGB(0, 0, image.getWidth(), image.getHeight(), rgb, 0, image.getWidth());
 		IIOImage iioImage = new IIOImage(bufferedImage, null, null);
 		ImageWriteParam param = writer.getDefaultWriteParam();
-		writer.write(null, iioImage, param);
+
+    ImageTypeSpecifier typeSpecifier = ImageTypeSpecifier.createFromBufferedImageType(BufferedImage.TYPE_INT_RGB);
+
+    //adding metadata
+    IIOMetadata metadata = writer.getDefaultImageMetadata(typeSpecifier, param);
+
+    IIOMetadataNode textEntry = new IIOMetadataNode("tEXtEntry");
+    textEntry.setAttribute("keyword", "mykey");
+    textEntry.setAttribute("value", "myvalue");
+
+    IIOMetadataNode text = new IIOMetadataNode("tEXt");
+    text.appendChild(textEntry);
+
+    IIOMetadataNode root = new IIOMetadataNode("javax_imageio_png_1.0");
+    root.appendChild(text);
+
+    metadata.mergeTree("javax_imageio_png_1.0", root);
+
+		writer.write(metadata, iioImage, param);
 	}
 
 	public ImageHeader createSimpleHeader(FloatImage image) {

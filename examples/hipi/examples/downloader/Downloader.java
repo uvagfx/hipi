@@ -18,7 +18,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -48,7 +47,7 @@ import org.apache.hadoop.util.ToolRunner;
 public class Downloader extends Configured implements Tool{
 
 	
-	public static class DownloaderMapper extends Mapper<IntWritable, Text, BooleanWritable, Text>
+	public static class DownloaderMapper extends Mapper<IntWritable, Text, IntWritable, Text>
 	{
 		private static Configuration conf;
 		// This method is called on every node
@@ -76,7 +75,7 @@ public class Downloader extends Configured implements Tool{
 			{
 				if(i >= iprev+100) {
 					hib.close();
-					context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
+					context.write(new IntWritable(1), new Text(hib.getPath().toString()));
 					temp_path = conf.get("downloader.outpath") + i + ".hib.tmp";
 					hib = new HipiImageBundle(new Path(temp_path), conf);
 					hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
@@ -142,7 +141,7 @@ public class Downloader extends Configured implements Tool{
 			{
 				reader.close();
 				hib.close();
-				context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
+				context.write(new IntWritable(1), new Text(hib.getPath().toString()));
 			} catch (Exception e)
 			{
 				e.printStackTrace();
@@ -151,7 +150,7 @@ public class Downloader extends Configured implements Tool{
 		}
 	}
 
-	public static class DownloaderReducer extends Reducer<BooleanWritable, Text, BooleanWritable, Text> {
+	public static class DownloaderReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
 
 		private static Configuration conf;		
 		public void setup(Context jc) throws IOException
@@ -159,10 +158,10 @@ public class Downloader extends Configured implements Tool{
 			conf = jc.getConfiguration();
 		}
 
-		public void reduce(BooleanWritable key, Iterable<Text> values, Context context) 
+		public void reduce(IntWritable key, Iterable<Text> values, Context context)
 		throws IOException, InterruptedException
 		{
-			if(key.get()){
+			if(key.get() == 1){
 				FileSystem fileSystem = FileSystem.get(conf);
 				HipiImageBundle hib = new HipiImageBundle(new Path(conf.get("downloader.outfile")), conf);
 				hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
@@ -177,7 +176,7 @@ public class Downloader extends Configured implements Tool{
 					fileSystem.delete(index_path, false);
 					fileSystem.delete(data_path, false);
 					
-					context.write(new BooleanWritable(true), new Text(input_bundle.getPath().toString()));
+					context.write(new IntWritable(1), new Text(input_bundle.getPath().toString()));
 					context.progress();
 				}
 				hib.close();
@@ -217,12 +216,12 @@ public class Downloader extends Configured implements Tool{
 		job.setReducerClass(DownloaderReducer.class);
 
 		// Set formats
-		job.setOutputKeyClass(BooleanWritable.class);
+		job.setOutputKeyClass(IntWritable.class);
 		job.setOutputValueClass(Text.class);       
 		job.setInputFormatClass(DownloaderInputFormat.class);
 
 		//*************** IMPORTANT ****************\\
-		job.setMapOutputKeyClass(BooleanWritable.class);
+		job.setMapOutputKeyClass(IntWritable.class);
 		job.setMapOutputValueClass(Text.class);
 		FileOutputFormat.setOutputPath(job, new Path(outputFile + "_output"));
 

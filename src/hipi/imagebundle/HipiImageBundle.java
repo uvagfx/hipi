@@ -422,8 +422,7 @@ public class HipiImageBundle extends AbstractImageBundle {
     byte metaData[] = null;
     if (header != null) {
       metaData = header.getMetaDataAsBytes();
-      String jsonText = new String(metaData, "UTF-8");
-      System.err.println("Writing out metaData " + jsonText);
+      metaDataLength = metaData.length;
     }
 		_cacheLength = (metaDataLength + imageData.length);
 		_cacheType = ((metaDataLength << 8) | (type.toValue() & 0xff));

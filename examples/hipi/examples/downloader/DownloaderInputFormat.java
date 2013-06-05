@@ -69,25 +69,25 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 
       String[] blockHosts = blocks[0].getHosts();
       for (int count = 0; count < blockHosts.length; count += 1) {
-        System.out.println("Block host: " + blockHosts[count]);
+        String blockHost = blockHosts[count];
+
+        boolean save = true;
+        for (int j = 0; j < hosts.size(); j++) 
+        {
+          if (blockHost.compareTo(hosts.get(j)) == 0)
+          {
+            save = false;
+            System.out.println("Repeated host: " + i);
+            break;
+          }
+        }
+
+        if (save) 
+        {
+          hosts.add(blockHost);
+          System.out.println("Found host successfully: " + i + " - " + blockHost);
+        }
       }
-
-			boolean save = true;
-			for (int j = 0; j < hosts.size(); j++) 
-			{
-				if (blocks[0].getHosts()[0].compareTo(hosts.get(j)) == 0) 
-				{
-					save = false;
-					System.out.println("Repeated host: " + i);
-					break;
-				}
-			}
-
-			if (save) 
-			{
-				hosts.add(blocks[0].getHosts()[0]);
-				System.out.println("Found host successfully: " + i);
-			}
 			i++;
 		}
 

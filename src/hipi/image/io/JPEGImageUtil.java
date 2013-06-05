@@ -179,6 +179,8 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 
     metadata.mergeTree("javax_imageio_png_1.0", root);
 
+    System.err.println("Added metadata");
+
 		writer.write(metadata, iioImage, param);
 	}
 

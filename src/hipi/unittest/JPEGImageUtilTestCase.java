@@ -101,4 +101,10 @@ public class JPEGImageUtilTestCase {
 		}
 	}
 
+	public static void main(String[] args) throws Exception {
+		JPEGImageUtilTestCase testCase = new JPEGImageUtilTestCase();
+    testCase.testEncodeImage();
+		System.exit(0);
+	}
+
 }

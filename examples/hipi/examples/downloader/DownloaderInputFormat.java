@@ -67,6 +67,11 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 			long length = match.getLen();
 			BlockLocation[] blocks = fileSystem.getFileBlockLocations(match, 0, length);
 
+      String[] blockHosts = blocks[0].getHosts();
+      for (int count = 0; count < blockHosts.length; count += 1) {
+        System.out.println("Block host: " + blockHosts[count]);
+      }
+
 			boolean save = true;
 			for (int j = 0; j < hosts.size(); j++) 
 			{

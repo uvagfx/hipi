@@ -71,7 +71,7 @@ public class JpegFromHib extends Configured implements Tool{
 
 
 		// Setup configuration
-		Configuration conf = new Configuration();
+		Configuration conf = super.getConf();
 		
 		// set the dir to output the jpegs to
 		String outputPath = args[1];

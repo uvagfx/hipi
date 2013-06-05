@@ -189,7 +189,7 @@ public class Downloader extends Configured implements Tool{
 		}
 
 		// Setup configuration
-		Configuration conf = new Configuration();
+		Configuration conf = super.getConf();
 
 		String inputFile = args[0];
 		String outputFile = args[1];

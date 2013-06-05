@@ -46,13 +46,16 @@ public class HipiImageBundle extends AbstractImageBundle {
 
 		private byte _sig[] = new byte[8];
 		private int _cacheLength = 0;
+		private int _metaDataLength = 0;
+		private int _imageDataLength = 0;
 		private int _cacheType = 0;
 		private long _countingOffset = 0;
 		private long _start = 0;
 		private long _end = 0;
 		private ImageHeader _header;
 		private FloatImage _image;
-		private byte[] _byte_array_data;
+		private byte[] _meta_array_data;
+		private byte[] _image_array_data;
 
 		/**
 		 * 
@@ -134,13 +137,30 @@ public class HipiImageBundle extends AbstractImageBundle {
 					_cacheLength = _cacheType = 0;
 					return false;
 				}
-				_byte_array_data = new byte[_cacheLength];
+
+        _metaDataLength = (_cacheType >> 8);
+        _imageDataLength = (_cacheLength - _metaDataLength);
+
+        if (_metaDataLength > 0) {
+          _meta_array_data = new byte[_metaDataLength];
+          readOff = 0;
+          // it may requires several round-trip in order for this to work
+          byteRead = _data_input_stream.read(_meta_array_data);
+          while (byteRead < _meta_array_data.length - readOff && byteRead > 0) {
+            readOff += byteRead;
+            byteRead = _data_input_stream.read(_meta_array_data, readOff, _meta_array_data.length - readOff);
+          }
+        } else {
+          _meta_array_data = null;
+        }
+
+				_image_array_data = new byte[_imageDataLength];
 				readOff = 0;
 				// it may requires several round-trip in order for this to work
-				byteRead = _data_input_stream.read(_byte_array_data);
-				while (byteRead < _byte_array_data.length - readOff && byteRead > 0) {
+				byteRead = _data_input_stream.read(_image_array_data);
+				while (byteRead < _image_array_data.length - readOff && byteRead > 0) {
 					readOff += byteRead;
-					byteRead = _data_input_stream.read(_byte_array_data, readOff, _byte_array_data.length - readOff);
+					byteRead = _data_input_stream.read(_image_array_data, readOff, _image_array_data.length - readOff);
 				}
 				if (byteRead <= 0) {
 					_cacheLength = _cacheType = 0;
@@ -163,7 +183,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 		 */
 		public byte[] getRawBytes() throws IOException {
 			if (_cacheLength > 0) {
-				return _byte_array_data;
+				return _image_array_data;
 			}
 			return null;
 		}
@@ -181,9 +201,9 @@ public class HipiImageBundle extends AbstractImageBundle {
 						.fromValue(_cacheType));
 				if (decoder == null)
 					return null;
-				ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
+				ByteArrayInputStream _image_array_input_stream = new ByteArrayInputStream(_image_array_data);
 				try {
-					_header = decoder.decodeImageHeader(_byte_array_input_stream);
+					_header = decoder.decodeImageHeader(_image_array_input_stream, _meta_array_data);
 				} catch (Exception e) {
 					e.printStackTrace();
 					_header = null;
@@ -206,9 +226,9 @@ public class HipiImageBundle extends AbstractImageBundle {
 						.fromValue(_cacheType));
 				if (decoder == null)
 					return null;
-				ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
+				ByteArrayInputStream _image_array_input_stream = new ByteArrayInputStream(_image_array_data);
 				try {
-					_image = decoder.decodeImage(_byte_array_input_stream);
+					_image = decoder.decodeImage(_image_array_input_stream);
 				} catch (Exception e) {
 					e.printStackTrace();
 					_image = null;
@@ -395,11 +415,16 @@ public class HipiImageBundle extends AbstractImageBundle {
 	 * the image offset to the index file.
 	 */
 	@Override
-	public void addImage(InputStream image_stream, ImageType type)
+	public void addImage(InputStream image_stream, ImageType type, ImageHeader header)
 	throws IOException {
-		byte data[] = readBytes(image_stream);
-		_cacheLength = data.length;
-		_cacheType = type.toValue();
+		byte imageData[] = readBytes(image_stream);
+    int metaDataLength = 0;
+    byte metaData[] = null;
+    if (header != null) {
+      metaData = header.getMetaDataAsBytes();
+    }
+		_cacheLength = (metaDataLength + imageData.length);
+		_cacheType = ((metaDataLength << 8) | (type.toValue() & 0xff));
 		_sig[0] = (byte) (_cacheLength >> 24);
 		_sig[1] = (byte) ((_cacheLength >> 16) & 0xff);
 		_sig[2] = (byte) ((_cacheLength >> 8) & 0xff);
@@ -409,8 +434,11 @@ public class HipiImageBundle extends AbstractImageBundle {
 		_sig[6] = (byte) ((_cacheType >> 8) & 0xff);
 		_sig[7] = (byte) (_cacheType & 0xff);
 		_data_output_stream.write(_sig);
-		_data_output_stream.write(data);
-		_countingOffset += 8 + data.length;
+    if (metaDataLength > 0) {
+      _data_output_stream.write(metaData);
+    }
+		_data_output_stream.write(imageData);
+		_countingOffset += 8 + metaDataLength + imageData.length;
 		_index_output_stream.writeLong(_countingOffset);
 	}
 

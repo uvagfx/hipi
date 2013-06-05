@@ -13,6 +13,9 @@ import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 /**
  * Base class for ImageHeaders. An ImageHeader is a way to store header and 
  * metadata of images, including EXIF information.
@@ -36,7 +39,8 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 			_val = val;
 		}
 
-		public static ImageType fromValue(int value) {
+		public static ImageType fromValue(int input) {
+      int value = (input & 0xff);
 			for (ImageType type : values()) {
 				if (type._val == value) {
 					return type;
@@ -65,6 +69,12 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 	 * few bytes.
 	 */
 	private ImageType _image_type;
+	/**
+	 * A Map containing the key-value pairs of general meta-data for the image.
+	 * This is stored adjacent to the image in the HIB file, but unlike EXIF is
+   * not stored within the image, and can be arbitrary key/value string pairs.
+	 */
+	private Map<String, String> _meta_data = new HashMap<String, String>();
 
 	/**
 	 * Adds an EXIF field to this header object. The information consists of a
@@ -99,10 +109,79 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 			return value;
 		}
 	}
-	
-	public ImageHeader(ImageType type)
+
+	/**
+	 * Adds an metadata field to this header object. The information consists of a
+	 * key-value pair where the key is an application-specific field name and the 
+   * value is the corresponding information for that field.
+	 * 
+	 * @param key
+	 *            the metadata field name
+	 * @param value
+	 *            the metadata information
+	 */
+	public void addMetaData(String key, String value) {
+		_meta_data.put(key, value);
+	}
+
+	/**
+	 * Get an metadata value designated by the key. The key is an arbitrary
+   * application-defined string.
+	 *
+	 * @param key
+	 *            the field name of the metadata information desired
+	 * @return either the value corresponding to the key or the empty string if
+	 *         the key was not found
+	 */
+	public String getMetaData(String key) {
+		String value = _meta_data.get(key);
+
+		if (value == null) {
+			return "";
+		} else {
+			return value;
+		}
+	}
+
+  /**
+   * Create a binary representation of the application-specific metadata, ready
+   * to be serialized into a HIB file.
+   *
+   * @return A byte array containing the JSON serialized metadata, encoded as UTF-8
+   */
+  public byte[] getMetaDataAsBytes() {
+    try {
+      String jsonText = JSONValue.toJSONString(_meta_data);
+      final byte[] utf8Bytes = jsonText.getBytes("UTF-8");
+      return utf8Bytes;
+    } catch (java.io.UnsupportedEncodingException e) {
+      System.err.println("UTF-8 encoding exception in getMetaDataAsBytes()");
+      return null;
+    }
+  }
+
+  /**
+   * Recreates the general metadata from serialized bytes, usually from a HIB file.
+   *
+   * @param utf8Bytes
+   *                The UTF-8-encoded bytes of a JSON object representing the data
+   */
+  public void setMetaDataFromBytes(byte[] utf8Bytes) {
+    try {
+      String jsonText = new String(utf8Bytes, "UTF-8");
+      JSONObject jsonObject = (JSONObject)JSONValue.parse(jsonText);
+      _meta_data = (HashMap)jsonObject;
+    } catch (java.io.UnsupportedEncodingException e) {
+      System.err.println("UTF-8 encoding exception in setMetaDataAsBytes()");
+    }
+  }
+
+	public ImageHeader(ImageType type, byte[] meta_data_bytes)
 	{
 		_image_type = type;
+    if (meta_data_bytes != null) {
+      setMetaDataFromBytes(meta_data_bytes);
+    }
 	}
 	
 	public ImageHeader()

@@ -1,6 +1,7 @@
 package hipi.examples.downloader;
 
 import hipi.image.FloatImage;
+import hipi.image.ImageHeader;
 import hipi.image.ImageHeader.ImageType;
 import hipi.image.io.ImageDecoder;
 import hipi.image.io.JPEGImageUtil;
@@ -109,11 +110,10 @@ public class Downloader extends Configured implements Tool{
 					if (type.compareTo("image/gif") == 0)
 						continue;
 
-					if (type != null && type.compareTo("image/jpeg") == 0)
-          {
-            ImageDecoder decoder = JPEGImageUtil.getInstance();
-            FloatImage source = decoder.decodeImage(conn.getInputStream());
-						hib.addImage(source);
+					if (type != null && type.compareTo("image/jpeg") == 0) {
+            ImageHeader header = new ImageHeader();
+            header.addMetaData("source_url", uri);
+						hib.addImage(conn.getInputStream(), ImageType.JPEG_IMAGE, header);
           }
 					
 				} catch(Exception e)

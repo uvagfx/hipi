@@ -39,8 +39,8 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public ImageHeader decodeImageHeader(InputStream is) throws IOException {
-		ImageHeader header = new ImageHeader(ImageType.JPEG_IMAGE);
+	public ImageHeader decodeImageHeader(InputStream is, byte[] meta_data_bytes) throws IOException {
+		ImageHeader header = new ImageHeader(ImageType.JPEG_IMAGE, meta_data_bytes);
 		try {
 			DataInputStream dis = new DataInputStream(new BufferedInputStream(is));
 			dis.mark(Integer.MAX_VALUE);
@@ -185,7 +185,7 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 	}
 
 	public ImageHeader createSimpleHeader(FloatImage image) {
-		return new ImageHeader(ImageType.JPEG_IMAGE);
+		return new ImageHeader(ImageType.JPEG_IMAGE, null);
 	}
 
 }

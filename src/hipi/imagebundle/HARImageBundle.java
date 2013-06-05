@@ -84,7 +84,7 @@ public class HARImageBundle extends AbstractImageBundle {
 	}
 	
 	@Override
-	public void addImage(InputStream image_stream, ImageType type)
+	public void addImage(InputStream image_stream, ImageType type, ImageHeader header)
 	throws IOException {
 		Path src_path = new Path(Path.SEPARATOR, "image_" + _imageCount);
 		int hash = HarFileSystem.getHarHash(src_path);
@@ -122,7 +122,7 @@ public class HARImageBundle extends AbstractImageBundle {
 			if (decoder == null)
 				return null;
 			ByteArrayInputStream bis = new ByteArrayInputStream(_cacheData);
-			ImageHeader header = decoder.decodeImageHeader(bis);
+			ImageHeader header = decoder.decodeImageHeader(bis, null);
 			bis.close();
 			return header;
 		}

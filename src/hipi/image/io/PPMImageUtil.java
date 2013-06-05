@@ -2,6 +2,7 @@ package hipi.image.io;
 
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
+import hipi.image.ImageHeader.ImageType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,8 +35,8 @@ public class PPMImageUtil implements ImageDecoder, ImageEncoder {
 		os.write(raw);
 	}
 
-	public ImageHeader decodeImageHeader(InputStream is) throws IOException {
-		return new ImageHeader();
+	public ImageHeader decodeImageHeader(InputStream is, byte[] meta_data_bytes) throws IOException {
+		return new ImageHeader(ImageType.PPM_IMAGE, meta_data_bytes);
 	}
 
 	public FloatImage decodeImage(InputStream is) throws IOException {

@@ -1,6 +1,9 @@
 package hipi.examples.dumphib;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -34,7 +37,13 @@ public class DumpHib extends Configured implements Tool {
 				String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
 				String camera = key.getEXIFInformation("Model");
         String sourceURL = key.getMetaData("source_url");
-				String output = "source_url=" + sourceURL + " " + imageWidth + "x" + imageHeight + "\t(" + hexHash + ")\t	" + camera;
+				String output = imageWidth + "x" + imageHeight + "\t(" + hexHash + ")\t	" + camera;
+        HashMap<String, String> metaData = key.getAllMetaData();
+        for (Map.Entry<String, String> entry : metaData.entrySet()) {
+          String dataName = entry.getKey();
+          String dataValue = entry.getValue();
+          output += dataName + "=" + dataValue + "\t";
+        }
 				context.write(new IntWritable(1), new Text(output));
 			}
 		}

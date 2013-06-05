@@ -124,6 +124,21 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 		_meta_data.put(key, value);
 	}
 
+  /**
+   * Adds a new map full of meta data, similar to addMetaData(String, String),
+   * but iterating through the input list overwriting any existing values.
+   *
+   * @param input
+   *            the map containing the new meta data
+   */
+  public void addMetaData(Map<String, String> input) {
+    for (Map.Entry<String, String> entry : input.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      addMetaData(key, value);
+    }
+  }
+
 	/**
 	 * Get an metadata value designated by the key. The key is an arbitrary
    * application-defined string.
@@ -142,6 +157,16 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 			return value;
 		}
 	}
+
+  /**
+   * Get the entire list of all metadata that applications have associated with
+   * this image.
+   *
+   * @return a hash map containing the keys and values of the metadata
+   */
+  public HashMap<String, String> getAllMetaData() {
+    return new HashMap<String, String>(_meta_data);
+  }
 
   /**
    * Create a binary representation of the application-specific metadata, ready

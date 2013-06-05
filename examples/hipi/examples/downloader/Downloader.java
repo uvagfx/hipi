@@ -1,9 +1,11 @@
 package hipi.examples.downloader;
 
+import hipi.image.FloatImage;
 import hipi.image.ImageHeader.ImageType;
 import hipi.imagebundle.HipiImageBundle;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
@@ -106,7 +108,11 @@ public class Downloader extends Configured implements Tool{
 						continue;
 
 					if (type != null && type.compareTo("image/jpeg") == 0)
-						hib.addImage(conn.getInputStream(), ImageType.JPEG_IMAGE);
+          {
+            FloatImage newImage = new FloatImage();
+            newImage.readFields(new DataInputStream(conn.getInputStream()));
+						hib.addImage(newImage);
+          }
 					
 				} catch(Exception e)
 				{

@@ -50,7 +50,10 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 			byte[] data = new byte[6];
 			// read in each block to find width / height / bitDepth
 			for (;;) {
-				dis.read(data, 0, 4);
+				int bytesRead = dis.read(data, 0, 4);
+        if (bytesRead == -1) {
+          return null;
+        }
 				if ((data[0] & 0xff) != 0xff)
 					return null;
 				if ((data[1] & 0xff) == 0x01 || ((data[1] & 0xff) >= 0xd0 && (data[1] & 0xff) <= 0xd7))
@@ -178,8 +181,6 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
     root.appendChild(text);
 
     metadata.mergeTree("javax_imageio_png_1.0", root);
-
-    System.err.println("Added metadata");
 
 		writer.write(metadata, iioImage, param);
 	}

@@ -219,7 +219,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 		 * @throws IOException
 		 */
 		public FloatImage getCurrentValue() throws IOException {
-			if (_image != null)
+      if (_image != null)
 				return _image;
 			if (_cacheLength > 0) {
 				ImageDecoder decoder = CodecManager.getDecoder(ImageType

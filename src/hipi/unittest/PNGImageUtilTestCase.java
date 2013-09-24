@@ -57,7 +57,7 @@ public class PNGImageUtilTestCase {
 		ppmDecoder = PPMImageUtil.getInstance();
 		FileInputStream fis;
 		FloatImage ppmImage, pngImage;
-		String[] fileName = {"canon-ixus", "cmyk-jpeg-format"};
+		String[] fileName = {"canon-ixus", "cmyk-jpeg-format", "canon-ixus-grayscale"};
 		for (int i = 0; i < fileName.length; i++)
 		{
 			fis = new FileInputStream("data/test/PNGImageUtilTestCase/truth/" + fileName[i] + ".ppm");
@@ -81,7 +81,7 @@ public class PNGImageUtilTestCase {
 		FileInputStream pis;
 		FileOutputStream pos;
 		FloatImage image;
-		String[] fileName = {"canon-ixus", "cmyk-jpeg-format"};
+		String[] fileName = {"canon-ixus", "cmyk-jpeg-format", "canon-ixus-grayscale"};
 		for (int i = 0; i < fileName.length; i++)
 		{
 			pis = new FileInputStream("data/test/PNGImageUtilTestCase/truth/" + fileName[i] + ".ppm");
@@ -89,7 +89,7 @@ public class PNGImageUtilTestCase {
 			pos = new FileOutputStream("/tmp/" + fileName[i] + ".png");
 			encoder.encodeImage(image, null, pos);
 			Runtime rt = Runtime.getRuntime();
-			Process pr = rt.exec("compare -metric MSE data/test/PNGImageUtilTestCase/truth/" + fileName[i] + ".ppm /tmp/" + fileName[i] + ".png /tmp/psnr.png");
+			Process pr = rt.exec("/usr/local/bin/compare -metric MSE data/test/PNGImageUtilTestCase/truth/" + fileName[i] + ".ppm /tmp/" + fileName[i] + ".png /tmp/psnr.png");
 			Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));
 			float mse = scanner.hasNextFloat() ? scanner.nextFloat() : -1;
 			assertTrue(fileName[i] + " MSE is too high : " + mse, mse == 0);

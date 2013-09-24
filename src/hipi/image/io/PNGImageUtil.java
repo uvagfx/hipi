@@ -77,7 +77,7 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 	/** grey scale image mode. */    
 	private static final byte GREYSCALE_MODE = 1;
 	/** full color image mode. */    
-	private static final byte COLOR_MODE = 2;
+	private static final byte COLOR_MODE = 3;
 	private CRC32 crc;
 	public static PNGImageUtil getInstance() {
 		return static_object;
@@ -151,12 +151,13 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 			throw new IOException("That image is too wide or tall.");
 		int width = (int) widthLong;
 		int height = (int) heightLong;
-		float[] pels = new float[width * height * 3];
+		int bands = (int) (chunks.getColorType() + 1);
+		float[] pels = new float[width * height * bands];
 		byte[] image_bytes = chunks.getImageData();
 
 		for(int i = 0; i < image_bytes.length; i++)
 			pels[i] = (float) ((image_bytes[i]&0xff)/255.0);
-		FloatImage image = new FloatImage(width, height, 3, pels); //hard code 3
+		FloatImage image = new FloatImage(width, height, bands, pels); //hard code 3
 
 		return image;
 	}
@@ -281,8 +282,9 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 				// Compute the real length.
 				int width = (int) getWidth();
 				int height = (int) getHeight();
+				int bands = (int) (getColorType() + 1);
 				int bitsPerPixel = getBitsPerPixel();
-				int length = width * height * bitsPerPixel / 8 * 3; //hard code the 3 for RGB for now
+				int length = width * height * bitsPerPixel / 8 * bands; //hard code the 3 for RGB for now
 
 				byte[] prunedData = new byte[length];
 
@@ -290,7 +292,7 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 				if (getInterlace() == 0) {
 					int index = 0;
 					for (int i = 0; i < length; i++) {
-						if (i % (width * bitsPerPixel / 8 * 3) == 0) { // again, hard code the 3 for RGB
+						if (i % (width * bitsPerPixel / 8 * bands) == 0) { // again, hard code the 3 for RGB
 							index++; // Skip the filter byte.
 						}
 						prunedData[i] = imageData[index++];
@@ -368,6 +370,7 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 		crc = new CRC32();
 		int width = image.getWidth();
 		int height = image.getHeight();
+		int bands = image.getBands();
 		final byte id[] = {-119, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13};
 		write(os, id);
 		crc.reset();
@@ -376,7 +379,7 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 		write(os, height);
 		byte head[]=null;
 
-		int mode = COLOR_MODE;
+		int mode = bands;
 		switch (mode) {
 		case BW_MODE: head=new byte[]{1, 0, 0, 0, 0}; break;
 		case GREYSCALE_MODE: head=new byte[]{8, 0, 0, 0, 0}; break;
@@ -386,21 +389,18 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 		write(os, (int)crc.getValue());
 		ByteArrayOutputStream compressed = new ByteArrayOutputStream(65536);
 		BufferedOutputStream bos = new BufferedOutputStream( new DeflaterOutputStream(compressed, new Deflater(9)));
-		switch (mode) {
-		case COLOR_MODE:
-			for (int y=0;y<height;y++) {
-				bos.write(0);
-				for (int x=0;x<width;x++) {
-					int r = Math.min(Math.max((int)(image.getPixel(x, y, 0)*255), 0), 255);
-					int g = Math.min(Math.max((int)(image.getPixel(x, y, 1)*255), 0), 255);
-					int b = Math.min(Math.max((int)(image.getPixel(x, y, 2)*255), 0), 255);
-					bos.write((byte)r);
-					bos.write((byte)g);
-					bos.write((byte)b);
+		
+		for (int y=0; y < height; y++) {
+			bos.write(0);
+			for (int x = 0; x < width; x++) {
+				for (int b = 0; b < bands; b++) {
+					int pix = Math.min(Math.max((int)(image.getPixel(x, y, b)*255), 0), 255);
+					bos.write((byte)pix);
 				}
+					
 			}
-			break;
 		}
+		
 		bos.close();
 		write(os, compressed.size());
 		crc.reset();

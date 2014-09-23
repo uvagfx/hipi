@@ -67,22 +67,27 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 			long length = match.getLen();
 			BlockLocation[] blocks = fileSystem.getFileBlockLocations(match, 0, length);
 
-			boolean save = true;
-			for (int j = 0; j < hosts.size(); j++) 
-			{
-				if (blocks[0].getHosts()[0].compareTo(hosts.get(j)) == 0) 
-				{
-					save = false;
-					System.out.println("Repeated host: " + i);
-					break;
-				}
-			}
+      String[] blockHosts = blocks[0].getHosts();
+      for (int count = 0; count < blockHosts.length; count += 1) {
+        String blockHost = blockHosts[count];
 
-			if (save) 
-			{
-				hosts.add(blocks[0].getHosts()[0]);
-				System.out.println("Found host successfully: " + i);
-			}
+        boolean save = true;
+        for (int j = 0; j < hosts.size(); j++) 
+        {
+          if (blockHost.compareTo(hosts.get(j)) == 0)
+          {
+            save = false;
+            System.out.println("Repeated host: " + i);
+            break;
+          }
+        }
+
+        if (save) 
+        {
+          hosts.add(blockHost);
+          System.out.println("Found host successfully: " + i + " - " + blockHost);
+        }
+      }
 			i++;
 		}
 

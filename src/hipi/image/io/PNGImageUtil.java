@@ -90,8 +90,8 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 	 * @param is The {@link InputStream} that contains the PNG image
 	 * @return The {@link ImageHeader} found in the input stream
 	 */
-	public ImageHeader decodeImageHeader(InputStream is) throws IOException {
-		ImageHeader header = new ImageHeader();
+	public ImageHeader decodeImageHeader(InputStream is, byte[] meta_data_bytes) throws IOException {
+		ImageHeader header = new ImageHeader(ImageType.PNG_IMAGE, meta_data_bytes);
 		DataInputStream in = new DataInputStream(is);
 		readSignature(in);
 
@@ -353,7 +353,7 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder{
 	}
 
 	public ImageHeader createSimpleHeader(FloatImage image) {
-		return new ImageHeader(ImageType.PNG_IMAGE);
+		return new ImageHeader(ImageType.PNG_IMAGE, null);
 	}
 	
 	/**

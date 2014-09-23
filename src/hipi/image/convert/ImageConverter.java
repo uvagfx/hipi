@@ -29,7 +29,7 @@ public class ImageConverter {
 			InputStream image_in, OutputStream image_out, 
 			ImageDecoder decoder_in, ImageEncoder encoder_out) throws IOException {
 
-		ImageHeader header = decoder_in.decodeImageHeader(image_in);
+		ImageHeader header = decoder_in.decodeImageHeader(image_in, null);
 		FloatImage float_image = decoder_in.decodeImage(image_in);
 		encoder_out.encodeImage(float_image, header, image_out);
 	}

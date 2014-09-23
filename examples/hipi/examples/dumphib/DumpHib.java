@@ -1,6 +1,9 @@
 package hipi.examples.dumphib;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -28,19 +31,41 @@ public class DumpHib extends Configured implements Tool {
 		@Override
 		public void map(ImageHeader key, FloatImage value, Context context)
 		throws IOException, InterruptedException {
-			if (value != null) {
-				int imageWidth = value.getWidth();
-				int imageHeight = value.getHeight();
-				String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
-				String camera = key.getEXIFInformation("Model");
-				String output = imageWidth + "x" + imageHeight + "\t(" + hexHash + ")\t	" + camera;
-								
-				context.write(new IntWritable(1), new Text(output));
-			}
+			if ((value == null) || (key == null)) {
+        return;
+      }
+      int imageWidth = value.getWidth();
+      int imageHeight = value.getHeight();
+      float[] floatData = value.getData();
+      if (floatData == null) {
+        return;
+      }
+      byte[] byteData = ByteUtils.FloatArraytoByteArray(floatData);
+      String hexHash = ByteUtils.asHex(byteData);
+      String camera = key.getEXIFInformation("Model");
+      if (camera == null) {
+        camera = "<null>";
+      }
+      String output = imageWidth + "x" + imageHeight + "\t(" + hexHash + ")\t	" + camera;
+      HashMap<String, String> metaData = key.getAllMetaData();
+      if (metaData != null) {
+        for (Map.Entry<String, String> entry : metaData.entrySet()) {
+          String dataName = entry.getKey();
+          if (dataName == null) {
+            dataName = "<null>";
+          }
+          String dataValue = entry.getValue();
+          if (dataValue == null) {
+            dataValue = "<null>";
+          }
+          output += dataName + "=" + dataValue + "\t";
+        }
+      }
+      context.write(new IntWritable(1), new Text(output));
 		}
 
 	}
-	
+
 	public static class DumpHibReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
 		public void reduce(IntWritable key, Iterable<Text> values, Context context) 
 		throws IOException, InterruptedException {
@@ -51,7 +76,7 @@ public class DumpHib extends Configured implements Tool {
 	}
 
 	public int run(String[] args) throws Exception {
-		Configuration conf = new Configuration();
+		Configuration conf = super.getConf();
 		if (args.length < 2) {
 			System.out.println("Usage: dumphib <input hib> <outputdir>");
 			System.exit(0);

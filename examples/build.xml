@@ -1,9 +1,9 @@
 <project basedir="." default="all">
 
   <target name="setup">
-    <property name="hadoop.home" value="/opt/hadoop/" />
-    <property name="hadoop.version" value="0.20.1+152" />
-    <property name="hadoop.classpath" value="${hadoop.home}/hadoop-${hadoop.version}-core.jar" />
+    <property name="hadoop.home" value="/usr/local/hadoop/" />
+    <property name="hadoop.version" value="1.1.2" />
+    <property name="hadoop.classpath" value="${hadoop.home}/hadoop-core-${hadoop.version}.jar" />
   </target>
 
   <target name="test_settings">

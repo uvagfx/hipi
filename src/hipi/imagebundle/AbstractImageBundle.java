@@ -126,10 +126,10 @@ public abstract class AbstractImageBundle {
 
 		encoder.encodeImage(image, header, baos);
 
-		addImage(new ByteArrayInputStream(baos.toByteArray()), header.getImageType());
+		addImage(new ByteArrayInputStream(baos.toByteArray()), header.getImageType(), header);
 	}
 	
-	public abstract void addImage(InputStream image_stream, ImageType type) throws IOException;
+	public abstract void addImage(InputStream image_stream, ImageType type, ImageHeader header) throws IOException;
 
 	/**
 	 * Get the number of images contained in this bundle

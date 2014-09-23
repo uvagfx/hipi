@@ -99,15 +99,21 @@ public class ImageBundleInputFormat extends
 					int next = Math.min(offsets.size() - i, numImages) - 1;
 					int startIndex = getBlockIndex(blkLocations, lastOffset);
 					currentOffset = offsets.get(i + next);
-					int endIndex = getBlockIndex(blkLocations, currentOffset - 1);
-					ArrayList<String> hosts = new ArrayList<String>();
-					// check getBlockIndex, and getBlockSize
-					for (int j = startIndex; j <= endIndex; j++) {
-						String[] blkHosts = blkLocations[j].getHosts();
-						for (int k = 0; k < blkHosts.length; k++)
-							hosts.add(blkHosts[k]);
-					}
-					splits.add(new FileSplit(hib.getDataFile().getPath(), lastOffset, currentOffset - lastOffset, hosts.toArray(new String[hosts.size()])));
+          BlockLocation last = blkLocations[blkLocations.length -1];
+          long fileLength = last.getOffset() + last.getLength();
+          if (currentOffset > fileLength) {
+            System.err.println(String.format("Block offset is outside the file length, ignoring block : %s/%s", currentOffset, fileLength));
+          } else {
+            int endIndex = getBlockIndex(blkLocations, currentOffset - 1);
+            ArrayList<String> hosts = new ArrayList<String>();
+            // check getBlockIndex, and getBlockSize
+            for (int j = startIndex; j <= endIndex; j++) {
+              String[] blkHosts = blkLocations[j].getHosts();
+              for (int k = 0; k < blkHosts.length; k++)
+                hosts.add(blkHosts[k]);
+            }
+            splits.add(new FileSplit(hib.getDataFile().getPath(), lastOffset, currentOffset - lastOffset, hosts.toArray(new String[hosts.size()])));
+          }
 					lastOffset = currentOffset;
 					i += next + 1;
 					taskRemaining--;

@@ -1,9 +1,9 @@
 <project basedir="." default="all">
 
   <target name="setup">
-    <property name="hadoop.home" value="/opt/hadoop/" />
-    <property name="hadoop.version" value="0.20.1+152" />
-    <property name="hadoop.classpath" value="${hadoop.home}/hadoop-${hadoop.version}-core.jar" />
+    <property name="hadoop.home" value="/usr/local/hadoop/" />
+    <property name="hadoop.version" value="1.1.2" />
+    <property name="hadoop.classpath" value="${hadoop.home}/hadoop-core-${hadoop.version}.jar" />
     <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.3.1.jar" />
   </target>
 
@@ -15,7 +15,7 @@
   <target name="all" depends="setup, test_settings">
     <mkdir dir="../lib" />
     <!-- Compile -->
-    <javac nowarn="on" includeantruntime="no" srcdir="./hipi/container:./hipi/image:./hipi/imagebundle:./hipi/util" destdir="../lib" classpath="${hadoop.classpath}:${metadata.jar}" />
+    <javac nowarn="on" includeantruntime="no" srcdir="./hipi/container:./hipi/image:./hipi/imagebundle:./hipi/util" destdir="../lib" classpath="${hadoop.classpath}:${metadata.jar}:../3rdparty/junit-4.11.jar:../3rdparty/hamcrest-core-1.3.jar:../3rdparty/json-simple-1.1.1.jar" />
     <!-- Create the jar -->
     <jar destfile="./hipi.jar" basedir="../lib">
       <zipfileset src="${metadata.jar}" />

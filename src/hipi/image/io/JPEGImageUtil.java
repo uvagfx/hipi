@@ -22,8 +22,11 @@ import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
@@ -36,8 +39,8 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public ImageHeader decodeImageHeader(InputStream is) throws IOException {
-		ImageHeader header = new ImageHeader(ImageType.JPEG_IMAGE);
+	public ImageHeader decodeImageHeader(InputStream is, byte[] meta_data_bytes) throws IOException {
+		ImageHeader header = new ImageHeader(ImageType.JPEG_IMAGE, meta_data_bytes);
 		try {
 			DataInputStream dis = new DataInputStream(new BufferedInputStream(is));
 			dis.mark(Integer.MAX_VALUE);
@@ -47,7 +50,10 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 			byte[] data = new byte[6];
 			// read in each block to find width / height / bitDepth
 			for (;;) {
-				dis.read(data, 0, 4);
+				int bytesRead = dis.read(data, 0, 4);
+        if (bytesRead == -1) {
+          return null;
+        }
 				if ((data[0] & 0xff) != 0xff)
 					return null;
 				if ((data[1] & 0xff) == 0x01 || ((data[1] & 0xff) >= 0xd0 && (data[1] & 0xff) <= 0xd7))
@@ -158,11 +164,29 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 		bufferedImage.setRGB(0, 0, image.getWidth(), image.getHeight(), rgb, 0, image.getWidth());
 		IIOImage iioImage = new IIOImage(bufferedImage, null, null);
 		ImageWriteParam param = writer.getDefaultWriteParam();
-		writer.write(null, iioImage, param);
+
+    ImageTypeSpecifier typeSpecifier = ImageTypeSpecifier.createFromBufferedImageType(BufferedImage.TYPE_INT_RGB);
+
+    //adding metadata
+    IIOMetadata metadata = writer.getDefaultImageMetadata(typeSpecifier, param);
+
+    IIOMetadataNode textEntry = new IIOMetadataNode("tEXtEntry");
+    textEntry.setAttribute("keyword", "mykey");
+    textEntry.setAttribute("value", "myvalue");
+
+    IIOMetadataNode text = new IIOMetadataNode("tEXt");
+    text.appendChild(textEntry);
+
+    IIOMetadataNode root = new IIOMetadataNode("javax_imageio_png_1.0");
+    root.appendChild(text);
+
+    metadata.mergeTree("javax_imageio_png_1.0", root);
+
+		writer.write(metadata, iioImage, param);
 	}
 
 	public ImageHeader createSimpleHeader(FloatImage image) {
-		return new ImageHeader(ImageType.JPEG_IMAGE);
+		return new ImageHeader(ImageType.JPEG_IMAGE, null);
 	}
 
 }

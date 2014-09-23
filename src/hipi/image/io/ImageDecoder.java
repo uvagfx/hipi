@@ -14,7 +14,7 @@ import hipi.image.ImageHeader;
  */
 public interface ImageDecoder {
 	
-	public ImageHeader decodeImageHeader(InputStream is) throws IOException;
+	public ImageHeader decodeImageHeader(InputStream is, byte[] meta_data_bytes) throws IOException;
 	public FloatImage decodeImage(InputStream is) throws IOException;
 
 }

@@ -43,7 +43,7 @@ public class SeqImageBundle extends AbstractImageBundle {
 	}
 
 	@Override
-	public void addImage(InputStream image_stream, ImageType type)
+	public void addImage(InputStream image_stream, ImageType type, ImageHeader header)
 			throws IOException {
 		byte data[] = new byte[image_stream.available()];
 		image_stream.read(data);
@@ -65,7 +65,7 @@ public class SeqImageBundle extends AbstractImageBundle {
 			if (decoder == null)
 				return null;
 			ByteArrayInputStream bis = new ByteArrayInputStream(_cacheData);
-			ImageHeader header = decoder.decodeImageHeader(bis);
+			ImageHeader header = decoder.decodeImageHeader(bis, null);
 			bis.close();
 			return header;
 		}

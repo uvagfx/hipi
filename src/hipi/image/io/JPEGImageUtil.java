@@ -71,10 +71,10 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 			dis.reset();
 			MetadataReader reader = new MetadataReader(dis);
 			Metadata metadata = reader.extract();
-			Iterator directories = metadata.getDirectoryIterator();
+			Iterator directories = metadata.getDirectories().iterator();
 			while (directories.hasNext()) {
 				Directory directory = (Directory)directories.next();
-				Iterator tags = directory.getTagIterator();
+				Iterator tags = directory.getTags().iterator();
 				while (tags.hasNext()) {
 					Tag tag = (Tag)tags.next();
 					header.addEXIFInformation(tag.getTagName(), tag.getDescription());

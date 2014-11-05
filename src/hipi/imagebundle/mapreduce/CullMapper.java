@@ -3,6 +3,7 @@ package hipi.imagebundle.mapreduce;
 import java.io.IOException;
 
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Mapper.Context;
 
 /**
  * The CullMapper class allows for a culling stage to occur prior to the Map phase being executed. This gives
@@ -30,7 +31,7 @@ public class CullMapper <KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends Mapper<KEYIN,
 		return false;
 	}
 	
-	@Override
+    
 	public void run(Context context) throws IOException, InterruptedException {
 		setup(context);
 		while (context.nextKeyValue()) {

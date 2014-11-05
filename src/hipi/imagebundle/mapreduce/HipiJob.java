@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
-
 /**
  * This class extends the normal {@link org.apache.hadoop.mapreduce.Job} class defined 
  * in Hadoop to allow a more intuitive configuration of the Job.

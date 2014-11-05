@@ -3,7 +3,7 @@
   <target name="setup">
     <property name="hadoop.home" value="/opt/hadoop-2.5.1/share/hadoop" />
     <property name="hadoop.version" value="2.5.1" />
-    <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-2.5.1.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-2.5.1.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/hdfs/hadoop-hdfs-2.5.1.jar" />
+    <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-2.5.1.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-2.5.1.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/hdfs/hadoop-hdfs-2.5.1.jar:${hadoop.home}/common/hadoop-nfs-2.5.1.jar" />
     <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.6.4.jar" />
   </target>
 

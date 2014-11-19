@@ -81,7 +81,8 @@ public class Covariance extends Configured implements Tool {
 				for (int j = 0; j < N; j++)
 					g[i * N + j] *= tg;
 			/* DistributedCache will be deprecated in 0.21 */
-			Path file = DistributedCache.getLocalCacheFiles(job.getConfiguration())[0];
+			//Path file = DistributedCache.getLocalCacheFiles(job.getConfiguration())[0];
+            Path file = new Path(job.getCacheFiles()[0]);
 			FSDataInputStream dis = FileSystem.getLocal(job.getConfiguration()).open(file);
 			dis.skip(4);
 			FloatImage image = new FloatImage();
@@ -179,8 +180,9 @@ public class Covariance extends Configured implements Tool {
 		job.setJarByClass(Covariance.class);
 
 		/* DistributedCache will be deprecated in 0.21 */
-		DistributedCache.addCacheFile(new URI("hdfs://" + args[1] + "/mean-output/part-r-00000"), job.getConfiguration());
-
+		//DistributedCache.addCacheFile(new URI("hdfs://" + args[1] + "/mean-output/part-r-00000"), job.getConfiguration());
+        job.addCacheFile(new Path("hdfs://" + args[1] + "/mean-output/part-r-00000").toUri());
+        
 		job.setOutputKeyClass(IntWritable.class);
 		job.setOutputValueClass(FloatImage.class);
 
@@ -211,6 +213,8 @@ public class Covariance extends Configured implements Tool {
 	
 	public int run(String[] args) throws Exception {
 		if (args.length < 3) {
+            System.out.println("Number of arguments is incorrect.");
+            System.out.println("Expecting 3 arguments. Received "+args.length+".");
 			System.out.println("Usage: covariance <inputdir> <outputdir> <filetype>");
 			System.exit(0);
 		}

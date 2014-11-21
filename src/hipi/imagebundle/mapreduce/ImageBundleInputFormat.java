@@ -21,8 +21,10 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.RecordReader;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+
+
 
 /**
  * With one or many HipiImageBundles as an input, ImageBundleInputFormat will generate InputSplits for the MapReduce
@@ -31,7 +33,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
  */
 
 public class ImageBundleInputFormat extends
-		FileInputFormat<ImageHeader, FloatImage> {
+		FileInputFormat <ImageHeader, FloatImage> {
 
 	/**
 	 * Creates an {@link ImageBundleRecordReader}

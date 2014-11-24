@@ -17,6 +17,7 @@
     <!-- Compile -->
       <javac nowarn="on" includeantruntime="no" srcdir="${srcdir}" destdir="./bin" classpath="${hadoop.classpath}:./src/hipi.jar">
          <compilerarg value="-Xlint:deprecation" />
+         <compilerarg value="-Xdiags:verbose" />
       </javac>
     <!-- Create the jar -->
     

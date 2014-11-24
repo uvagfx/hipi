@@ -93,6 +93,7 @@ public class DumpHib extends Configured implements Tool {
         submitter.runJob(jConf);
         
 		System.exit(0);
+		return 0;
 
 	}
 

@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapred.JobConf;
 /**
  * This class extends the normal {@link org.apache.hadoop.mapreduce.Job} class defined 
  * in Hadoop to allow a more intuitive configuration of the Job.
  *
  */
-public class HipiJob extends Job {
+public class HipiJob extends JobConf {
 
 	public HipiJob() throws IOException {
 		this(new Configuration());
@@ -29,9 +30,9 @@ public class HipiJob extends Job {
 	 * @throws IOException
 	 */
 	public HipiJob(Configuration conf, String jobName) throws IOException {
-		super(conf, jobName);
+		super(conf);
 		// Set some default behavior that works for most jobs in HIPI
-		this.setInputFormatClass(ImageBundleInputFormat.class);
+		this.setInputFormat(ImageBundleInputFormat.class);
 	}
 
 	/**
@@ -39,7 +40,7 @@ public class HipiJob extends Job {
 	 * @param speculativeExecution {@value true} if speculative execution should be turned on for map tasks, else {@value false}.
 	 */
 	public void setMapSpeculativeExecution(boolean speculativeExecution) {		
-		this.conf.setBoolean("mapred.map.tasks.speculative.execution", speculativeExecution);		
+		this.setBoolean("mapred.map.tasks.speculative.execution", speculativeExecution);		
 	}
 	
 	/**
@@ -47,7 +48,7 @@ public class HipiJob extends Job {
 	 * @param speculativeExecution {@value true} if speculative execution should be turned on for map tasks, else {@value false}.
 	 */
 	public void setReduceSpeculativeExecution(boolean speculativeExecution) {
-		this.conf.setBoolean("mapred.reduce.tasks.speculative.execution", speculativeExecution);
+		this.setBoolean("mapred.reduce.tasks.speculative.execution", speculativeExecution);
 	}
 	
 	/**
@@ -55,7 +56,7 @@ public class HipiJob extends Job {
 	 * @param compressOutput {@value true} if compression should be enabled, else {@value false}.
 	 */
 	public void setCompressMapOutput(boolean compressOutput) {
-		this.conf.setBoolean("mapred.compress.map.output", compressOutput);
-		this.conf.set("mapred.output.compression.type", "BLOCK");
+		this.setBoolean("mapred.compress.map.output", compressOutput);
+		this.set("mapred.output.compression.type", "BLOCK");
 	}
 }

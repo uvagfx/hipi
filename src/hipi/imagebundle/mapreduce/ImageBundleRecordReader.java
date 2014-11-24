@@ -10,7 +10,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.InputSplit;
-import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
@@ -21,13 +21,12 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
  * 
  *
  */
-public class ImageBundleRecordReader extends
+public class ImageBundleRecordReader implements
 		RecordReader<ImageHeader, FloatImage> {
 
 	private Configuration conf;
 	private HipiImageBundle.FileReader reader;
 
-	@Override
 	public void initialize(InputSplit split, TaskAttemptContext context)
 			throws IOException, InterruptedException {
 		FileSplit bundleSplit = (FileSplit) split;
@@ -47,23 +46,36 @@ public class ImageBundleRecordReader extends
 	}
 
 	@Override
-	public ImageHeader getCurrentKey() throws IOException, InterruptedException {
-		return reader.getCurrentKey();
+	public ImageHeader createKey() {
+		//TODO
+		try {
+			return reader.getCurrentKey();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	@Override
-	public FloatImage getCurrentValue() throws IOException,
-			InterruptedException {
-		return reader.getCurrentValue();
+	public FloatImage createValue() {
+		try {
+			return reader.getCurrentValue();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	@Override //TODO
+	public long getPos() throws IOException {
+		return 1;
 	}
 
 	@Override
-	public float getProgress() throws IOException, InterruptedException {
+	public float getProgress() throws IOException {
 		return reader.getProgress();
 	}
 
 	@Override
-	public boolean nextKeyValue() throws IOException, InterruptedException {
+	public boolean next(ImageHeader key, FloatImage value) throws IOException {
 		return reader.nextKeyValue();
 	}
 }

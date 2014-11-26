@@ -14,19 +14,32 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapreduce.JobContext;
-import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.FileSplit;
 
 public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> 
 {
+
+	@Override
+	public RecordReader<IntWritable, Text> getRecordReader(InputSplit split, JobConf job, Reporter reporter) {
+		DownloaderRecordReader reader = new DownloaderRecordReader();
+		try {
+			reader.initialize(split, job);
+		} catch (IOException ioe) {
+			System.out.println(ioe);
+		}
+		return reader;
+	}
+
 	/**
 	 * Returns an object that can be used to read records of type ImageInputFormat
 	 */
-	@Override
 	public RecordReader<IntWritable, Text> createRecordReader(InputSplit genericSplit, TaskAttemptContext context) 
 	throws IOException, InterruptedException 
 	{
@@ -35,17 +48,16 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 
 
 	@Override
-	public List<InputSplit> getSplits(JobContext job) throws IOException 
+	public InputSplit[] getSplits(JobConf jConf, int numSplits) throws IOException 
 	{
-		Configuration conf = job.getConfiguration();
-		int nodes = conf.getInt("downloader.nodes", 10);
+		int nodes = jConf.getInt("downloader.nodes", 10);
 
 
 		ArrayList<String> hosts = new ArrayList<String>(0);
 		List<InputSplit> splits = new ArrayList<InputSplit>();
 
-		FileSystem fileSystem = FileSystem.get(conf);
-		String tempOutputPath = conf.get("downloader.outpath") + "_tmp";
+		FileSystem fileSystem = FileSystem.get(jConf);
+		String tempOutputPath = jConf.get("downloader.outpath") + "_tmp";
 		Path tempOutputDir = new Path(tempOutputPath);
 		
 		if (fileSystem.exists(tempOutputDir)) 
@@ -89,7 +101,7 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 		System.out.println("Tried to get " + nodes + " nodes, got " + hosts.size());
 
 
-		FileStatus file = listStatus(job).get(0);
+		FileStatus file = listStatus(jConf)[0];
 		Path path = file.getPath();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(path)));
 		int num_lines = 0;
@@ -122,6 +134,13 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 		{
 			fileSystem.delete(tempOutputDir, true);
 		}
-		return splits;    
+
+		InputSplit [] splitArray = new InputSplit[splits.size()];
+		for(int index = 0; index < splits.size(); index++)
+		{
+			splitArray[index] = splits.get(index);
+		}
+
+		return splitArray;    
 	}
 }

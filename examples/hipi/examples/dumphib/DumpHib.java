@@ -27,6 +27,8 @@ import hipi.image.ImageHeader;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 import hipi.util.ByteUtils;
 
+import org.apache.hadoop.mapred.JobClient;
+
 public class DumpHib extends Configured implements Tool {
 
 	public static class DumpHibMapper extends MapReduceBase implements Mapper<ImageHeader, FloatImage, IntWritable, Text> {
@@ -79,18 +81,17 @@ public class DumpHib extends Configured implements Tool {
         
 		String inputPath = args[0];
 		String outputPath = args[1];
+		System.out.println("Input path: "+inputPath);
+		System.out.println("Output path: "+outputPath);
 
-		Job job = new Job(jConf);
-        job.setJobName("dumphib");
 
 		// Set out/in paths
 		removeDir(outputPath, jConf);
 		FileOutputFormat.setOutputPath(jConf, new Path(outputPath));
 		FileInputFormat.setInputPaths(jConf, new Path(inputPath));	
 
-        //TODO
-        Submitter submitter = new Submitter();
-        submitter.runJob(jConf);
+		System.out.println("about to run job...");
+		JobClient.runJob(jConf);
         
 		System.exit(0);
 		return 0;

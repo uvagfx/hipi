@@ -12,7 +12,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapred.JobConf;
 
 /**
  * Provides the basic functionality of an ImageBundle record reader. Utilizes 
@@ -27,7 +28,7 @@ public class ImageBundleRecordReader implements
 	private Configuration conf;
 	private HipiImageBundle.FileReader reader;
 
-	public void initialize(InputSplit split, TaskAttemptContext context)
+	public void initialize(InputSplit split, JobConf jConf)
 			throws IOException, InterruptedException {
 		FileSplit bundleSplit = (FileSplit) split;
 		conf = context.getConfiguration();

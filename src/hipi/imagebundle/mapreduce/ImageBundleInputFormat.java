@@ -55,6 +55,7 @@ public class ImageBundleInputFormat extends
 	 */
 	@Override
 	public InputSplit[] getSplits(JobConf job, int numSplits) throws IOException {
+		System.out.println("~~~~~~~~~~~~~~~ IN GET SPLITS !~~~~~~~~~~~~~~");
 		int numMapTasks = job.getInt("hipi.map.tasks", 0);
 		List<FileSplit> splits = new ArrayList<FileSplit>();
 		for (FileStatus file : listStatus(job)) {
@@ -63,6 +64,7 @@ public class ImageBundleInputFormat extends
 			HipiImageBundle hib = new HipiImageBundle(path, job);
 			hib.open(AbstractImageBundle.FILE_MODE_READ);
 			// offset should be guaranteed to be in order
+			System.out.println("offsets data: "+hib.getOffsets().size());
 			List<Long> offsets = hib.getOffsets();
 			BlockLocation[] blkLocations = fs.getFileBlockLocations(hib.getDataFile(), 0, offsets.get(offsets.size() - 1));
 			if (numMapTasks == 0) {
@@ -121,6 +123,7 @@ public class ImageBundleInputFormat extends
 			hib.close();
 		}
 		FileSplit[] splitsArray = new FileSplit[splits.size()];
+		System.out.println("size: "+splits.size());
 		for(int i = 0; i < splits.size(); i++) {
 			splitsArray[i] = splits.get(i);
 		}

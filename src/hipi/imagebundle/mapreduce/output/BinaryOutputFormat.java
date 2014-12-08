@@ -10,14 +10,20 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.GzipCodec;
-import org.apache.hadoop.mapreduce.RecordWriter;
+import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.ReflectionUtils;
+
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.util.Progressable;
+import org.apache.hadoop.mapreduce.OutputFormat; 
+import org.apache.hadoop.mapred.FileOutputFormat;
+import org.apache.hadoop.mapred.Reporter;
 
 public class BinaryOutputFormat<K, V> extends FileOutputFormat<K, V> {
 
-	protected static class BinaryRecordWriter<K, V> extends RecordWriter<K, V> {
+	protected static class BinaryRecordWriter<K, V> implements RecordWriter<K, V> {
 
 		protected DataOutputStream out;
 		
@@ -26,23 +32,25 @@ public class BinaryOutputFormat<K, V> extends FileOutputFormat<K, V> {
 		}
 		
 		@Override
-		public void close(TaskAttemptContext context) throws IOException,
-				InterruptedException {
-			out.close();
+		public void close(Reporter reporter) {
+			try {
+				out.close();
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
 		}
 
 		@Override
-		public void write(K key, V value) throws IOException,
-				InterruptedException {
+		public void write(K key, V value) throws IOException {
 			((Writable) key).write(out);
 			((Writable) value).write(out);
 		}
 	}
 
 	@Override
-	public RecordWriter<K, V> getRecordWriter(TaskAttemptContext job)
-			throws IOException, InterruptedException {
-		Configuration conf = job.getConfiguration();
+	public RecordWriter<K, V> getRecordWriter(FileSystem ignored, JobConf job, String name, Progressable progress)
+			throws IOException {
+		Configuration conf = job;
 		boolean isCompressed = getCompressOutput(job);
 		CompressionCodec codec = null;
 		String extension = "";
@@ -51,7 +59,7 @@ public class BinaryOutputFormat<K, V> extends FileOutputFormat<K, V> {
 			codec = ReflectionUtils.newInstance(codecClass, conf);
 			extension = codec.getDefaultExtension();
 		}
-		Path file = getDefaultWorkFile(job, extension);
+		Path file = getTaskOutputPath(job, extension);
 		FileSystem fs = file.getFileSystem(conf);
 		FSDataOutputStream fileOut = fs.create(file, false);
 		if (!isCompressed) {

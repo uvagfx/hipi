@@ -31,7 +31,7 @@ public class ImageBundleRecordReader implements
 	public void initialize(InputSplit split, JobConf jConf)
 			throws IOException, InterruptedException {
 		FileSplit bundleSplit = (FileSplit) split;
-		conf = context.getConfiguration();
+		conf = jConf;
 		Path path = bundleSplit.getPath();
 		FileSystem fs = path.getFileSystem(conf);
 		// reader specifies start and end, for which start + length would be the beginning of a new file,

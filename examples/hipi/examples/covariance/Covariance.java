@@ -8,8 +8,8 @@ import hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Iterator;
 
-import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -20,17 +20,30 @@ import org.apache.hadoop.mapreduce.lib.input.*;
 import org.apache.hadoop.mapreduce.lib.output.*;
 import org.apache.hadoop.util.*;
 
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.Reducer;
+import org.apache.hadoop.mapred.Mapper;
+import org.apache.hadoop.mapred.MapReduceBase;
+import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapred.FileOutputFormat;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.pipes.Submitter;
+import org.apache.hadoop.mapred.JobClient;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.JobContext;
+
 public class Covariance extends Configured implements Tool {
 
 	public static final int N = 48;
 	public static final float sigma = 10;
 
 
-	public static class MeanMap extends
+	public static class MeanMap extends MapReduceBase implements
 			Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {		
 		
-		public void map(ImageHeader key, FloatImage value, Context context)
-				throws IOException, InterruptedException {
+		public void map(ImageHeader key, FloatImage value, OutputCollector<IntWritable, FloatImage> output, Reporter reporter)
+				throws IOException {
 			if (value != null && value.getWidth() > N && value.getHeight() > N) {
 				FloatImage mean = new FloatImage(N, N, 1);
 				for (int i = 0; i < 10; i++) {
@@ -42,35 +55,35 @@ public class Covariance extends Configured implements Tool {
 					}
 				}
 				mean.scale(0.01f);
-				context.write(new IntWritable(0), mean);
+				output.collect(new IntWritable(0), mean);
 			}
 		}
 	}
 
-	public static class MeanReduce extends
+	public static class MeanReduce extends MapReduceBase implements
 			Reducer<IntWritable, FloatImage, IntWritable, FloatImage> {
-		public void reduce(IntWritable key, Iterable<FloatImage> values,
-				Context context) throws IOException, InterruptedException {
+		public void reduce(IntWritable key, Iterator<FloatImage> values, OutputCollector<IntWritable, FloatImage> output, Reporter reporter) 
+			throws IOException {
 			FloatImage mean = new FloatImage(N, N, 1);
 			int total = 0;
-			for (FloatImage val : values) {
-				mean.add(val);
+			while(values.hasNext()) {
+				mean.add(values.next());
 				total++;
 			}
 			if (total > 0) {
 				mean.scale(1.0f / total);
-				context.write(key, mean);
+				output.collect(key, mean);
 			}
 		}
 	}
 
-	public static class CovarianceMap extends
+	public static class CovarianceMap extends MapReduceBase implements
 			Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {		
 
 		float[] g;
 		float[] mean;
 
-		public void setup(Context job) throws IOException {
+		public void setup(JobContext job) throws IOException {
 			g = new float[N * N];
 			float tg = 0;
 			for (int i = 0; i < N; i++)
@@ -83,15 +96,15 @@ public class Covariance extends Configured implements Tool {
 			/* DistributedCache will be deprecated in 0.21 */
 			//Path file = DistributedCache.getLocalCacheFiles(job.getConfiguration())[0];
             Path file = new Path(job.getCacheFiles()[0]);
-			FSDataInputStream dis = FileSystem.getLocal(job.getConfiguration()).open(file);
+			FSDataInputStream dis = FileSystem.getLocal(job.getJobConf()).open(file);
 			dis.skip(4);
 			FloatImage image = new FloatImage();
 			image.readFields(dis);
 			mean = image.getData();
 		}
 
-		public void map(ImageHeader key, FloatImage value, Context context)
-				throws IOException, InterruptedException {
+		public void map(ImageHeader key, FloatImage value, OutputCollector<IntWritable, FloatImage> output, Reporter reporter)
+				throws IOException {
 			if (value != null && value.getWidth() > N && value.getHeight() > N) {
 				float[][] tp = new float[100][N * N];
 				for (int i = 0; i < 10; i++) {
@@ -111,20 +124,20 @@ public class Covariance extends Configured implements Tool {
 						for (int k = 0; k < 100; k++)
 							cov[i * N * N + j] += tp[k][i] * tp[k][j];
 					}
-				context.write(new IntWritable(0), new FloatImage(N * N, N * N, 1, cov));
+				output.collect(new IntWritable(0), new FloatImage(N * N, N * N, 1, cov));
 			}
 		}
 	}
 
-	public static class CovarianceReduce extends
+	public static class CovarianceReduce extends MapReduceBase implements
 			Reducer<IntWritable, FloatImage, IntWritable, FloatImage> {
-		public void reduce(IntWritable key, Iterable<FloatImage> values,
-				Context context) throws IOException, InterruptedException {
+		public void reduce(IntWritable key, Iterator<FloatImage> values, OutputCollector<IntWritable, FloatImage> output, Reporter reporter) 
+			throws IOException {
 			FloatImage cov = new FloatImage(N * N, N * N, 1);
-			for (FloatImage val : values) {
-				cov.add(val);
+			while (values.hasNext()) {
+				cov.add(values.next());
 			}
-			context.write(key, cov);
+			output.collect(key, cov);
 		}
 	}
 
@@ -136,7 +149,7 @@ public class Covariance extends Configured implements Tool {
 		}
 	}
 	
-	public static void mkdir(String path, Configuration conf) throws IOException {
+	public static void mkdir(String path, JobConf conf) throws IOException {
 		Path output_path = new Path(path);
 		FileSystem fs = FileSystem.get(conf);
 		if (!fs.exists(output_path))
@@ -144,6 +157,7 @@ public class Covariance extends Configured implements Tool {
 	}
 
 	public int runMeanCompute(String[] args) throws Exception {
+
 
 		HipiJob job = new HipiJob(getConf(), "Covariance");
 		job.setJarByClass(Covariance.class);
@@ -156,23 +170,24 @@ public class Covariance extends Configured implements Tool {
 
 		String inputFileType = args[2];
 		if(inputFileType.equals("hib"))
-			job.setInputFormatClass(ImageBundleInputFormat.class);
+			job.setInputFormat(ImageBundleInputFormat.class);
 		else {
 			System.out.println("Usage: covariance <inputdir> <outputdir> <filetype>");
 			System.exit(0);			
 		}
-		job.setOutputFormatClass(BinaryOutputFormat.class);
+		job.setOutputFormat(BinaryOutputFormat.class);
 		job.setCompressMapOutput(true);
 		job.setMapSpeculativeExecution(true);
 		job.setReduceSpeculativeExecution(true);
 
 		FileInputFormat.setInputPaths(job, new Path(args[0]));
-		mkdir(args[1], job.getConfiguration());
-		rmdir(args[1] + "/mean-output/", job.getConfiguration());
+		mkdir(args[1], job);
+		rmdir(args[1] + "/mean-output/", job);
 		FileOutputFormat.setOutputPath(job, new Path(args[1] + "/mean-output/"));
 
-		boolean success = job.waitForCompletion(true);
-		return success ? 0 : 1;
+		JobClient.runJob(job);
+        
+		return 0;
 	}
 	
 	public int runCovariance(String[] args) throws Exception {
@@ -181,7 +196,8 @@ public class Covariance extends Configured implements Tool {
 
 		/* DistributedCache will be deprecated in 0.21 */
 		//DistributedCache.addCacheFile(new URI("hdfs://" + args[1] + "/mean-output/part-r-00000"), job.getConfiguration());
-        job.addCacheFile(new Path("hdfs://" + args[1] + "/mean-output/part-r-00000").toUri());
+		Job j = Job.getInstance(getConf());
+        j.addCacheFile(new Path("hdfs://" + args[1] + "/mean-output/part-r-00000").toUri());
         
 		job.setOutputKeyClass(IntWritable.class);
 		job.setOutputValueClass(FloatImage.class);
@@ -192,23 +208,24 @@ public class Covariance extends Configured implements Tool {
 
 		String inputFileType = args[2];
 		if(inputFileType.equals("hib"))
-			job.setInputFormatClass(ImageBundleInputFormat.class);
+			job.setInputFormat(ImageBundleInputFormat.class);
 		else{
 			System.out.println("Usage: covariance <inputdir> <outputdir> <filetype>");
 			System.exit(0);			
 		}
-		job.setOutputFormatClass(BinaryOutputFormat.class);
+		job.setOutputFormat(BinaryOutputFormat.class);
 		job.setCompressMapOutput(true);
 		job.setMapSpeculativeExecution(true);
 		job.setReduceSpeculativeExecution(true);
 
 		FileInputFormat.setInputPaths(job, new Path(args[0]));
-		mkdir(args[1], job.getConfiguration());
-		rmdir(args[1] + "/covariance-output/", job.getConfiguration());
+		mkdir(args[1], job);
+		rmdir(args[1] + "/covariance-output/", job);
 		FileOutputFormat.setOutputPath(job, new Path(args[1] + "/covariance-output/"));
 
-		boolean success = job.waitForCompletion(true);
-		return success ? 0 : 1;
+		JobClient.runJob(job);
+        
+		return 0;
 	}
 	
 	public int run(String[] args) throws Exception {

@@ -24,6 +24,15 @@ public class DownloaderRecordReader implements RecordReader<IntWritable, Text>
 	private long start_line;
 	private long current_line;
 	private String[] urlList;
+
+	public DownloaderRecordReader(InputSplit split, JobConf jConf) {
+		super();
+		try {
+			initialize(split, jConf);
+		} catch (IOException ioe) {
+			System.err.println(ioe);
+		}
+	}
 	
 	public void initialize(InputSplit split, JobConf jConf) throws IOException {
 		FileSplit f = (FileSplit) split;
@@ -74,7 +83,7 @@ public class DownloaderRecordReader implements RecordReader<IntWritable, Text>
 
 	@Override
 	public IntWritable createKey() {
-		return new IntWritable();
+		return new IntWritable((int)current_line);
 	}
 
 	public IntWritable getKey(int location) {
@@ -83,7 +92,7 @@ public class DownloaderRecordReader implements RecordReader<IntWritable, Text>
 
 	@Override
 	public Text createValue() {
-		return new Text();
+		return new Text(urlList[(int)current_line]);
 	}
 
 	public Text getValue(int location) {
@@ -115,7 +124,7 @@ public class DownloaderRecordReader implements RecordReader<IntWritable, Text>
 
 	@Override
 	public long getPos() throws IOException {
-		return start_line + current_line;
+		return current_line;
 	}
 
 

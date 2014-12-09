@@ -70,13 +70,15 @@ public class Downloader extends Configured implements Tool{
 			hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 
 			String word = value.toString();
-
+			System.out.println("Input value: " + word);
 			BufferedReader reader = new BufferedReader(new StringReader(word));
 			String uri;
 			int i = key.get();
 			int iprev = i;
+
 			while((uri = reader.readLine()) != null)			
 			{
+				System.out.println("next uri: "+uri);
 				if(i >= iprev+100) {
 					hib.close();
 					output.collect(new BooleanWritable(true), new Text(hib.getPath().toString()));

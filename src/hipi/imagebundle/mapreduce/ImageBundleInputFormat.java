@@ -55,11 +55,12 @@ public class ImageBundleInputFormat extends
 	 */
 	@Override
 	public InputSplit[] getSplits(JobConf job, int numSplits) throws IOException {
-		System.out.println("~~~~~~~~~~~~~~~ IN GET SPLITS !~~~~~~~~~~~~~~");
+		System.out.println("~~~~~~~~~~~~~~~ IN GET SPLIT !~~~~~~~~~~~~~~");
 		int numMapTasks = job.getInt("hipi.map.tasks", 0);
 		List<FileSplit> splits = new ArrayList<FileSplit>();
 		for (FileStatus file : listStatus(job)) {
 			Path path = file.getPath();
+			System.out.println("Hib path: " + path.toString());
 			FileSystem fs = path.getFileSystem(job);
 			HipiImageBundle hib = new HipiImageBundle(path, job);
 			hib.open(AbstractImageBundle.FILE_MODE_READ);

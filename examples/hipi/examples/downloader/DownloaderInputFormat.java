@@ -28,23 +28,18 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 
 	@Override
 	public RecordReader<IntWritable, Text> getRecordReader(InputSplit split, JobConf job, Reporter reporter) {
-		DownloaderRecordReader reader = new DownloaderRecordReader();
-		try {
-			reader.initialize(split, job);
-		} catch (IOException ioe) {
-			System.out.println(ioe);
-		}
+		DownloaderRecordReader reader = new DownloaderRecordReader(split, job);
 		return reader;
 	}
 
 	/**
 	 * Returns an object that can be used to read records of type ImageInputFormat
 	 */
-	public RecordReader<IntWritable, Text> createRecordReader(InputSplit genericSplit, TaskAttemptContext context) 
-	throws IOException, InterruptedException 
-	{
-		return new DownloaderRecordReader();
-	}
+	// public RecordReader<IntWritable, Text> createRecordReader(InputSplit genericSplit, TaskAttemptContext context) 
+	// throws IOException, InterruptedException 
+	// {
+	// 	return new DownloaderRecordReader();
+	// }
 
 
 	@Override
@@ -103,6 +98,7 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 
 		FileStatus file = listStatus(jConf)[0];
 		Path path = file.getPath();
+		System.out.println("Input Path: "+path.toString());
 		BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(path)));
 		int num_lines = 0;
 		while(reader.readLine() != null) 

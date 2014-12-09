@@ -15,28 +15,39 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
-import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapred.RecordReader;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.FileSplit;
+
 
 public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesWritable> 
 {
 
+	@Override
+	public RecordReader<NullWritable, BytesWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) 
+	throws IOException {
+		return new JpegFromHibRecordReader();
+
+	}
+
+
 	/**
 	 * Returns an object that can be used to read records of type ImageInputFormat
 	 */
-	@Override
 	public RecordReader<NullWritable, BytesWritable> createRecordReader(InputSplit genericSplit, TaskAttemptContext context) 
 	throws IOException, InterruptedException {
 		return new JpegFromHibRecordReader();
 	}
 
 	@Override
-	public List<InputSplit> getSplits(JobContext job) throws IOException {
-		Configuration conf = job.getConfiguration();
+	public InputSplit[] getSplits(JobConf job, int numSplits) throws IOException {
+		JobConf conf = job;
 		int numMapTasks = conf.getInt("hipi.map.tasks", 0);
 		List<InputSplit> splits = new ArrayList<InputSplit>();
 		for (FileStatus file : listStatus(job)) {
@@ -102,6 +113,12 @@ public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesW
 			}
 			hib.close();
 		}
-		return splits;
+		InputSplit [] splitArray = new InputSplit[splits.size()];
+		for(int index = 0; index < splits.size(); index++)
+		{
+			splitArray[index] = splits.get(index);
+		}
+
+		return splitArray;
 	}
 }

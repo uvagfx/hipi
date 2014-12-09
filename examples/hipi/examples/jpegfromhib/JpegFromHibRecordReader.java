@@ -10,9 +10,10 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
-import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+
+import org.apache.hadoop.mapred.RecordReader;
 
 /**
  * Provides the basic functionality of an ImageBundle record reader's
@@ -30,13 +31,12 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
  *            Typically this is either an empty object or the RawImageHeader
  *            object.
  */
-public class JpegFromHibRecordReader extends
+public class JpegFromHibRecordReader implements
 		RecordReader<NullWritable, BytesWritable> {
 
 	protected Configuration conf;
 	private HipiImageBundle.FileReader reader;
 
-	@Override
 	public void initialize(InputSplit split, TaskAttemptContext context)
 			throws IOException, InterruptedException {
 		FileSplit bundleSplit = (FileSplit) split;
@@ -56,22 +56,39 @@ public class JpegFromHibRecordReader extends
 	}
 
 	@Override
+	public NullWritable createKey() {
+		return NullWritable.get();
+	}
+
 	public NullWritable getCurrentKey() throws IOException, InterruptedException {
 		return NullWritable.get();
 	}
 
 	@Override
+	public BytesWritable createValue() {
+		return new BytesWritable();
+	}
+
 	public BytesWritable getCurrentValue() throws IOException,
 			InterruptedException {
 		return new BytesWritable(reader.getRawBytes());
 	}
 
 	@Override
-	public float getProgress() throws IOException, InterruptedException {
+	public float getProgress() throws IOException {
 		return reader.getProgress();
 	}
 
 	@Override
+	public long getPos(){
+		return 1; //TODO
+	}
+
+	@Override
+	public boolean next(NullWritable key, BytesWritable value) throws IOException {
+		return reader.nextKeyValue();
+	}
+
 	public boolean nextKeyValue() throws IOException, InterruptedException {
 		return reader.nextKeyValue();
 	}

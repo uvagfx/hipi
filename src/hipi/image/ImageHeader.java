@@ -150,4 +150,23 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 			Text.writeString(out, entry.getValue());
 		}
 	}
+
+	public int getWidth() {
+		return this.width;
+	}
+
+	public int getHeight() {
+		return this.height;
+	}
+
+	public Map<String, String> getEXIFInformation() {
+		return this._exif_information;
+	}
+
+	public void set(ImageHeader ih) {
+		this.width = ih.getWidth();
+		this.height = ih.getHeight();
+		this._image_type = ih.getImageType();
+		this._exif_information = ih.getEXIFInformation();
+	}
 }

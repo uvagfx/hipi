@@ -9,7 +9,7 @@ import hipi.imagebundle.HipiImageBundle;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapred.FileSplit;
@@ -28,8 +28,17 @@ public class ImageBundleRecordReader implements
 	private Configuration conf;
 	private HipiImageBundle.FileReader reader;
 
+	public ImageBundleRecordReader(InputSplit split, JobConf jConf) {
+		super();
+		try {
+			initialize(split, jConf);
+		} catch (IOException ioe) {
+			System.err.println(ioe);
+		}
+	}
+
 	public void initialize(InputSplit split, JobConf jConf)
-			throws IOException, InterruptedException {
+			throws IOException {
 		FileSplit bundleSplit = (FileSplit) split;
 		conf = jConf;
 		Path path = bundleSplit.getPath();
@@ -49,6 +58,7 @@ public class ImageBundleRecordReader implements
 	@Override
 	public ImageHeader createKey() {
 		//TODO
+		reader.nextKeyValue();
 		try {
 			return reader.getCurrentKey();
 		} catch (Exception e) {
@@ -59,6 +69,10 @@ public class ImageBundleRecordReader implements
 	@Override
 	public FloatImage createValue() {
 		try {
+			FloatImage val = reader.getCurrentValue();
+			if(val == null ) {
+				System.out.println("NULL VAL");
+			}
 			return reader.getCurrentValue();
 		} catch (Exception e) {
 			return null;
@@ -72,11 +86,23 @@ public class ImageBundleRecordReader implements
 
 	@Override
 	public float getProgress() throws IOException {
+		System.out.println("Current System Progress: "+reader.getProgress());
 		return reader.getProgress();
 	}
 
 	@Override
 	public boolean next(ImageHeader key, FloatImage value) throws IOException {
-		return reader.nextKeyValue();
+		if (reader.nextKeyValue()) {
+			key.set(reader.getCurrentKey());
+			value.set(reader.getCurrentValue());
+			if(value == null ) {
+				System.out.println("NULL VAL");
+			} else {
+				System.out.println("NOT NULL VAL");
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

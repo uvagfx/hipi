@@ -23,6 +23,7 @@ public class DownloaderRecordReader implements RecordReader<IntWritable, Text>
 	private String urls;
 	private long start_line;
 	private long current_line;
+	private int current_key;
 	private String[] urlList;
 
 	public DownloaderRecordReader(InputSplit split, JobConf jConf) {
@@ -58,6 +59,7 @@ public class DownloaderRecordReader implements RecordReader<IntWritable, Text>
 
 		urlList = urls.split("\n");
 		current_line = 0;
+		current_key = 0;
 		reader.close();
 	}
 
@@ -83,39 +85,21 @@ public class DownloaderRecordReader implements RecordReader<IntWritable, Text>
 
 	@Override
 	public IntWritable createKey() {
-		return new IntWritable((int)current_line);
+		return new IntWritable((int)start_line);
 	}
 
-	public IntWritable getKey(int location) {
-		return new IntWritable(location);
-	}
 
 	@Override
 	public Text createValue() {
-		return new Text(urlList[(int)current_line]);
-	}
-
-	public Text getValue(int location) {
-		return new Text(urlList[location]);
-	}
-
-	public boolean nextKeyValue() throws IOException, InterruptedException {
-		if(singletonEmit == false){
-			singletonEmit = true;
-			return true;
-		}
-		else
-			return false;
+		return new Text(urls);
 	}
 
 	@Override
 	public boolean next(IntWritable key, Text value) throws IOException {
-		System.out.println("Current Position: "+getPos());
-		System.out.println("Length: "+urlList.length);
-		if(getPos() < urlList.length) {
-			key = getKey((int)getPos());
-			value = getValue((int)getPos());
-			current_line = current_line + 1;
+		if(singletonEmit == false) {
+			singletonEmit = true;
+			key.set((int)start_line);
+			value.set(urls);
 			return true;
 		} else {
 			return false;
@@ -124,7 +108,7 @@ public class DownloaderRecordReader implements RecordReader<IntWritable, Text>
 
 	@Override
 	public long getPos() throws IOException {
-		return current_line;
+		return start_line;
 	}
 
 

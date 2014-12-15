@@ -130,7 +130,7 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 		{
 			fileSystem.delete(tempOutputDir, true);
 		}
-
+		System.out.println("num splits: "+splits.size());
 		InputSplit [] splitArray = new InputSplit[splits.size()];
 		for(int index = 0; index < splits.size(); index++)
 		{

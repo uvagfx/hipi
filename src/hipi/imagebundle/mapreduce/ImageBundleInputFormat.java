@@ -44,7 +44,7 @@ public class ImageBundleInputFormat extends
 	@Override
 	public RecordReader<ImageHeader, FloatImage> getRecordReader(
 			InputSplit split, JobConf job, Reporter reporter) throws IOException {
-		return new ImageBundleRecordReader();
+		return new ImageBundleRecordReader(split, job);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class ImageBundleInputFormat extends
 	 */
 	@Override
 	public InputSplit[] getSplits(JobConf job, int numSplits) throws IOException {
-		System.out.println("~~~~~~~~~~~~~~~ IN GET SPLIT !~~~~~~~~~~~~~~");
+		System.out.println("~~~~~~~~~~~~~~~ IN GET SPLITS !~~~~~~~~~~~~~~");
 		int numMapTasks = job.getInt("hipi.map.tasks", 0);
 		List<FileSplit> splits = new ArrayList<FileSplit>();
 		for (FileStatus file : listStatus(job)) {
@@ -65,9 +65,11 @@ public class ImageBundleInputFormat extends
 			HipiImageBundle hib = new HipiImageBundle(path, job);
 			hib.open(AbstractImageBundle.FILE_MODE_READ);
 			// offset should be guaranteed to be in order
-			System.out.println("offsets data: "+hib.getOffsets().size());
 			List<Long> offsets = hib.getOffsets();
+			System.out.println("offsets data: "+offsets.size());
+			System.out.println("before: " + offsets.get(offsets.size() - 1));
 			BlockLocation[] blkLocations = fs.getFileBlockLocations(hib.getDataFile(), 0, offsets.get(offsets.size() - 1));
+			System.out.println("after: "+blkLocations[0]);
 			if (numMapTasks == 0) {
 				int i = 0, b = 0;
 				long lastOffset = 0, currentOffset = 0;
@@ -121,6 +123,7 @@ public class ImageBundleInputFormat extends
 					System.out.println("imageRemaining: " + imageRemaining + "\ttaskRemaining: " + taskRemaining + "\tlastOffset: " + lastOffset + "\ti: " + i);
 				}
 			}
+			
 			hib.close();
 		}
 		FileSplit[] splitsArray = new FileSplit[splits.size()];

@@ -52,9 +52,9 @@ public class Downloader extends Configured implements Tool{
 	
 	public static class DownloaderMapper extends MapReduceBase implements Mapper<IntWritable, Text, BooleanWritable, Text>
 	{
-		private JobConf jConf;
+		private static JobConf jConf;
 
-
+		@Override
 		public void configure(JobConf jConf) {
 	        this.jConf = jConf;
        	}
@@ -63,17 +63,20 @@ public class Downloader extends Configured implements Tool{
 		public void map(IntWritable key, Text value, OutputCollector<BooleanWritable, Text> output,  Reporter reporter) 
 		throws IOException
 		{
+			System.out.println("MAP KEY: "+key.toString());
+			System.out.println("MAP VALUE: "+value.toString());
 			String temp_path = jConf.get("downloader.outpath") + key.get() + ".hib.tmp";
-			System.out.println("Temp path: " + temp_path);
+			// System.out.println("Temp path: " + temp_path);
 			
 			HipiImageBundle hib = new HipiImageBundle(new Path(temp_path), jConf);
 			hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 
 			String word = value.toString();
-			System.out.println("Input value: " + word);
+			// System.out.println("Input value: " + word);
 			BufferedReader reader = new BufferedReader(new StringReader(word));
 			String uri;
 			int i = key.get();
+			// System.out.println("i: "+i);
 			int iprev = i;
 
 			while((uri = reader.readLine()) != null)			
@@ -139,24 +142,27 @@ public class Downloader extends Configured implements Tool{
 				System.err.println("> Took " + el + " seconds\n");				
 			}
 
-
 			try
 			{
+
+				output.collect(new BooleanWritable(true), new Text(hib.getPath().toString()));
 				reader.close();
 				hib.close();
-				output.collect(new BooleanWritable(true), new Text(hib.getPath().toString()));
+
 			} catch (Exception e)
 			{
 				e.printStackTrace();
 			}
+			System.out.println("end of map");
 
 		}
 	}
 
 	public static class DownloaderReducer extends MapReduceBase implements Reducer <BooleanWritable, Text, BooleanWritable, Text> {
 
-		private JobConf jConf;
+		private static JobConf jConf;
 
+		@Override
 		public void configure(JobConf jConf) {
 	        this.jConf = jConf;
        	}
@@ -165,12 +171,14 @@ public class Downloader extends Configured implements Tool{
 		public void reduce(BooleanWritable key, Iterator<Text> values, OutputCollector<BooleanWritable, Text> output, Reporter reporter) 
 		throws IOException
 		{
+			System.out.println("in reduce");
 			if(key.get()){
 				FileSystem fileSystem = FileSystem.get(jConf);
 				HipiImageBundle hib = new HipiImageBundle(new Path(jConf.get("downloader.outfile")), jConf);
 				hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 				while (values.hasNext()) {
 					Text temp_string = values.next();
+					System.out.println("Reduce path: "+temp_string.toString());
 					Path temp_path = new Path(temp_string.toString());
 					HipiImageBundle input_bundle = new HipiImageBundle(temp_path, jConf);
 					hib.append(input_bundle);
@@ -182,7 +190,7 @@ public class Downloader extends Configured implements Tool{
 					fileSystem.delete(data_path, false);
 					
 					output.collect(new BooleanWritable(true), new Text(input_bundle.getPath().toString()));
-					// context.progress();
+					reporter.progress();
 				}
 				hib.close();
 			}

@@ -222,4 +222,11 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 
 		return compare(b1, 0, length1, b2, 0, length2);
 	}
+
+	public void set(FloatImage fi) {
+		this._w = fi.getWidth();
+		this._h = fi.getHeight();
+		this._b = fi.getBands();
+		this._pels = fi.getData();
+	}
 }

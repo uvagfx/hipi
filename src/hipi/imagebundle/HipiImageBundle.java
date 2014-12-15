@@ -59,7 +59,19 @@ public class HipiImageBundle extends AbstractImageBundle {
 		 * @return The progress of reading through the HipiImageBundle according to the start and end specified in the constructor
 		 */
 		public float getProgress() {
-			return (_end - _start) > 0 ? (float)(_countingOffset - _start) / (_end - _start) : 0;
+			float retVal = (_end - _start) > 0 ? (float)(_countingOffset - _start) / (_end - _start) : 0;
+
+			//clamping for floating point rounding errors
+			if(retVal > 1.0) {
+				retVal = 1.0f;
+			}
+
+			if(retVal < 0.0) {
+				retVal = 0.0f;
+			}
+
+			return retVal;
+
 		}
 
 		/**
@@ -102,6 +114,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 		public boolean nextKeyValue() {
 			try {
 				if (_end > 0 && _countingOffset > _end) {
+					System.out.println("CountingOffset: "+_countingOffset);
 					_cacheLength = _cacheType = 0;
 					return false;
 				}
@@ -114,6 +127,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 					byteRead = _data_input_stream.read(_sig, readOff, 8 - readOff);
 				}
 				if (byteRead <= 0) {
+					System.out.println("ByteRead: "+byteRead);
 					_cacheLength = _cacheType = 0;
 					return false;
 				}
@@ -143,6 +157,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 					byteRead = _data_input_stream.read(_byte_array_data, readOff, _byte_array_data.length - readOff);
 				}
 				if (byteRead <= 0) {
+					System.out.println("ByteRead: "+byteRead);
 					_cacheLength = _cacheType = 0;
 					return false;
 				}
@@ -150,6 +165,8 @@ public class HipiImageBundle extends AbstractImageBundle {
 				_countingOffset += _cacheLength + 8;
 				return true;
 			} catch (IOException e) {
+				System.out.println("EXCEPTION");
+				System.out.println(e);
 				return false;
 			}
 		}
@@ -179,8 +196,10 @@ public class HipiImageBundle extends AbstractImageBundle {
 			if (_cacheLength > 0) {
 				ImageDecoder decoder = CodecManager.getDecoder(ImageType
 						.fromValue(_cacheType));
-				if (decoder == null)
+				if (decoder == null) {
+					System.out.println("decoder is null");
 					return null;
+				}
 				ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
 				try {
 					_header = decoder.decodeImageHeader(_byte_array_input_stream);
@@ -190,6 +209,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 				}
 				return _header;
 			}
+			System.out.println("final case - null");
 			return null;
 		}
 

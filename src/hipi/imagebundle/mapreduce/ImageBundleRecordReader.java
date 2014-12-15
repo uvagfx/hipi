@@ -43,11 +43,13 @@ public class ImageBundleRecordReader implements
 		conf = jConf;
 		Path path = bundleSplit.getPath();
 		FileSystem fs = path.getFileSystem(conf);
+
 		// reader specifies start and end, for which start + length would be the beginning of a new file,
 		// which is undesirable to reader, -1 must be applied.
 		System.out.println("record start from " + bundleSplit.getStart() + " end at " + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
 		reader = new HipiImageBundle.FileReader(fs, path, conf,
 				bundleSplit.getStart(), bundleSplit.getStart() + bundleSplit.getLength() - 1);
+		// reader.nextKeyValue();
 	}
 
 	@Override
@@ -57,26 +59,36 @@ public class ImageBundleRecordReader implements
 
 	@Override
 	public ImageHeader createKey() {
-		//TODO
-		reader.nextKeyValue();
-		try {
-			return reader.getCurrentKey();
-		} catch (Exception e) {
-			return null;
-		}
+		return new ImageHeader();
+		// try {
+		// 	if(reader.getCurrentKey() == null) {
+		// 		System.out.println("KEY IS NULL");
+		// 	}
+		// 	return reader.getCurrentKey();
+		// } catch (Exception e) {
+		// 	System.out.println("EXCEPTION");
+		// 	System.out.println(e);
+		// 	return null;
+		// }
 	}
 
 	@Override
 	public FloatImage createValue() {
-		try {
-			FloatImage val = reader.getCurrentValue();
-			if(val == null ) {
-				System.out.println("NULL VAL");
-			}
-			return reader.getCurrentValue();
-		} catch (Exception e) {
-			return null;
-		}
+		return new FloatImage();
+		// try {
+		// 	if(reader.getCurrentValue() == null) {
+		// 		System.out.println("VALUE IS NULL");
+		// 	}
+		// 	FloatImage val = reader.getCurrentValue();
+		// 	if(val == null ) {
+		// 		System.out.println("NULL VAL");
+		// 	}
+		// 	return reader.getCurrentValue();
+		// } catch (Exception e) {
+		// 	System.out.println("EXCEPTION");
+		// 	System.out.println(e);
+		// 	return null;
+		// }
 	}
 
 	@Override //TODO
@@ -92,14 +104,21 @@ public class ImageBundleRecordReader implements
 
 	@Override
 	public boolean next(ImageHeader key, FloatImage value) throws IOException {
-		if (reader.nextKeyValue()) {
-			key.set(reader.getCurrentKey());
-			value.set(reader.getCurrentValue());
-			if(value == null ) {
-				System.out.println("NULL VAL");
-			} else {
-				System.out.println("NOT NULL VAL");
-			}
+		boolean success = reader.nextKeyValue();
+		if(key == null || value == null) {
+			System.out.println("null values!");
+			return false;
+		}
+
+		key.set(reader.getCurrentKey());
+		value.set(reader.getCurrentValue());
+		if(value == null ) {
+			System.out.println("NULL VAL");
+		} else {
+			System.out.println("NOT NULL VAL");
+		}
+
+		if(success) {
 			return true;
 		} else {
 			return false;

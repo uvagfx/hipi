@@ -11,7 +11,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.JobConf;
 
@@ -37,19 +36,20 @@ public class ImageBundleRecordReader implements
 		}
 	}
 
-	public void initialize(InputSplit split, JobConf jConf)
-			throws IOException {
+	public void initialize(InputSplit split, JobConf jConf) throws IOException {
+
 		FileSplit bundleSplit = (FileSplit) split;
 		conf = jConf;
 		Path path = bundleSplit.getPath();
 		FileSystem fs = path.getFileSystem(conf);
 
-		// reader specifies start and end, for which start + length would be the beginning of a new file,
-		// which is undesirable to reader, -1 must be applied.
-		System.out.println("record start from " + bundleSplit.getStart() + " end at " + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
+		// reader specifies start and end, for which start + length would be the beginning of a new 
+		// file, which is undesirable to reader, -1 must be applied.
+		System.out.println("record start from " + bundleSplit.getStart() + " end at " + 
+			(bundleSplit.getStart() + bundleSplit.getLength() - 1));
+
 		reader = new HipiImageBundle.FileReader(fs, path, conf,
 				bundleSplit.getStart(), bundleSplit.getStart() + bundleSplit.getLength() - 1);
-		// reader.nextKeyValue();
 	}
 
 	@Override
@@ -60,63 +60,35 @@ public class ImageBundleRecordReader implements
 	@Override
 	public ImageHeader createKey() {
 		return new ImageHeader();
-		// try {
-		// 	if(reader.getCurrentKey() == null) {
-		// 		System.out.println("KEY IS NULL");
-		// 	}
-		// 	return reader.getCurrentKey();
-		// } catch (Exception e) {
-		// 	System.out.println("EXCEPTION");
-		// 	System.out.println(e);
-		// 	return null;
-		// }
 	}
 
 	@Override
 	public FloatImage createValue() {
 		return new FloatImage();
-		// try {
-		// 	if(reader.getCurrentValue() == null) {
-		// 		System.out.println("VALUE IS NULL");
-		// 	}
-		// 	FloatImage val = reader.getCurrentValue();
-		// 	if(val == null ) {
-		// 		System.out.println("NULL VAL");
-		// 	}
-		// 	return reader.getCurrentValue();
-		// } catch (Exception e) {
-		// 	System.out.println("EXCEPTION");
-		// 	System.out.println(e);
-		// 	return null;
-		// }
 	}
 
-	@Override //TODO
+	@Override
 	public long getPos() throws IOException {
 		return 1;
 	}
 
 	@Override
 	public float getProgress() throws IOException {
-		System.out.println("Current System Progress: "+reader.getProgress());
 		return reader.getProgress();
 	}
 
 	@Override
 	public boolean next(ImageHeader key, FloatImage value) throws IOException {
+
 		boolean success = reader.nextKeyValue();
+
 		if(key == null || value == null) {
-			System.out.println("null values!");
+			System.out.println("key and/or value is null");
 			return false;
 		}
 
 		key.set(reader.getCurrentKey());
 		value.set(reader.getCurrentValue());
-		if(value == null ) {
-			System.out.println("NULL VAL");
-		} else {
-			System.out.println("NOT NULL VAL");
-		}
 
 		if(success) {
 			return true;

@@ -31,33 +31,36 @@ import org.apache.hadoop.mapred.JobClient;
 
 public class DumpHib extends Configured implements Tool {
 
-	public static class DumpHibMapper extends MapReduceBase implements Mapper<ImageHeader, FloatImage, IntWritable, Text> {
-        
-        
+	public static class DumpHibMapper extends MapReduceBase implements Mapper<ImageHeader, 
+		FloatImage, IntWritable, Text> {
+          
 		@Override
-		public void map(ImageHeader key, FloatImage value, OutputCollector<IntWritable, Text> output, Reporter reporter)
-		throws IOException {
+		public void map(ImageHeader key, FloatImage value, 
+			OutputCollector<IntWritable, Text> output, Reporter reporter) throws IOException {
+
 			if (value != null) {
-				int imageWidth = value.getWidth();
-				int imageHeight = value.getHeight();
+				int imgWidth = value.getWidth();
+				int imgHeight = value.getHeight();
 				String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
 				String camera = key.getEXIFInformation("Model");
-				String outputString = imageWidth + "x" + imageHeight + "\t(" + hexHash + ")\t	" + camera;
-				System.out.println("DOWNLOADER TEST: "+outputString);
-				output.collect(new IntWritable(1), new Text(outputString));				
-				//context.write(new IntWritable(1), new Text(output));
+				String outputStr = imgWidth + "x" + imgHeight + "\t(" + hexHash + ")\t	" + camera;
+				System.out.println("Mapper Result: "+outputStr);
+				output.collect(new IntWritable(1), new Text(outputStr));				
 			} else {
-				System.out.println("value was null");
+				System.out.println("Mapper value was null");
 			}
 		}
 
 	}
 	
-	public static class DumpHibReducer extends MapReduceBase implements Reducer<IntWritable, Text, IntWritable, Text> {
+	public static class DumpHibReducer extends MapReduceBase implements Reducer<IntWritable, Text, 
+		IntWritable, Text> {
+
         @Override
-		public void reduce(IntWritable key, Iterator<Text> values, OutputCollector<IntWritable, Text> output, Reporter reporter) 
-		throws IOException {
-			while(values.hasNext()) {
+		public void reduce(IntWritable key, Iterator<Text> values, 
+			OutputCollector<IntWritable, Text> output, Reporter reporter) throws IOException {
+
+			while (values.hasNext()) {
 				output.collect(key, values.next());
 			}
 		}
@@ -93,10 +96,7 @@ public class DumpHib extends Configured implements Tool {
 		FileOutputFormat.setOutputPath(jConf, new Path(outputPath));
 		FileInputFormat.setInputPaths(jConf, new Path(inputPath));	
 
-		System.out.println("about to run job...");
 		JobClient.runJob(jConf);
-        
-		System.exit(0);
 		return 0;
 
 	}

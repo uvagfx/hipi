@@ -327,9 +327,9 @@ public class HipiImageBundle extends AbstractImageBundle {
 		_index_output_stream = new DataOutputStream(fs.create(_index_file));
 		_data_file = _file_path.suffix(".dat");
 		if (_blockSize <= 0)
-			_blockSize = fs.getDefaultBlockSize();
+			_blockSize = fs.getDefaultBlockSize(_file_path);
 		if (_replication <= 0)
-			_replication = fs.getDefaultReplication();
+			_replication = fs.getDefaultReplication(_file_path);
 		_data_output_stream = new DataOutputStream(fs.create(_data_file, true, fs.getConf().getInt("io.file.buffer.size", 4096), _replication, _blockSize));
 		_countingOffset = 0;
 		writeBundleHeader();

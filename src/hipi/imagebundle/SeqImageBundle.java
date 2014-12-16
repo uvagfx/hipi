@@ -16,6 +16,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.SequenceFile.Writer;
+import org.apache.hadoop.io.SequenceFile.Reader;
 
 public class SeqImageBundle extends AbstractImageBundle {
 
@@ -31,13 +33,15 @@ public class SeqImageBundle extends AbstractImageBundle {
 
 	@Override
 	protected void openForWrite() throws IOException {
-		_writer = SequenceFile.createWriter(FileSystem.get(_conf), _conf, _file_path, LongWritable.class, BytesWritable.class);
+		//_writer = SequenceFile.createWriter(FileSystem.get(_conf), _conf, _file_path, LongWritable.class, BytesWritable.class);
+		_writer = SequenceFile.createWriter(_conf, Writer.file(_file_path), Writer.keyClass(LongWritable.class), Writer.valueClass(BytesWritable.class));
 		_total = 1;
 	}
 
 	@Override
 	protected void openForRead() throws IOException {
-		_reader = new SequenceFile.Reader(FileSystem.get(_conf), _file_path, _conf);
+		//_reader = new SequenceFile.Reader(FileSystem.get(_conf), _file_path, _conf);
+		_reader = new Reader(_conf, Reader.file(_file_path));
 		_cacheData = null;
 		_cacheType = 0;
 	}

@@ -17,13 +17,10 @@ import org.apache.hadoop.mapred.JobConf;
 /**
  * Treats keys as index into training array and value as the training vector. 
  */
-public class DownloaderRecordReader implements RecordReader<IntWritable, Text> 
-{
+public class DownloaderRecordReader implements RecordReader<IntWritable, Text> {
 	private boolean singletonEmit;
 	private String urls;
 	private long start_line;
-	private long current_line;
-	private int current_key;
 	private String[] urlList;
 
 	public DownloaderRecordReader(InputSplit split, JobConf jConf) {
@@ -47,19 +44,17 @@ public class DownloaderRecordReader implements RecordReader<IntWritable, Text>
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(path)));
 		int i = 0;
-		while(i < start_line && reader.readLine() != null){
+		while (i < start_line && reader.readLine() != null) {
 			i++;
 		}
 		
 		urls = "";
 		String line;
-		for(i = 0; i < num_lines && (line = reader.readLine()) != null; i++){
+		for (i = 0; i < num_lines && (line = reader.readLine()) != null; i++) {
 			urls += line + '\n';
 		}
 
 		urlList = urls.split("\n");
-		current_line = 0;
-		current_key = 0;
 		reader.close();
 	}
 

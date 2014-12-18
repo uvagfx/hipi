@@ -9,10 +9,11 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
+import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RecordReader;
 
 /**
@@ -37,10 +38,18 @@ public class JpegFromHibRecordReader implements
 	protected Configuration conf;
 	private HipiImageBundle.FileReader reader;
 
-	public void initialize(InputSplit split, TaskAttemptContext context)
-			throws IOException, InterruptedException {
+	public JpegFromHibRecordReader(InputSplit split, JobConf jConf) {
+		try {
+			initialize(split, jConf);
+		} catch (IOException ioe) {
+			System.err.println(ioe);
+		}
+	}
+
+
+	private void initialize(InputSplit split, JobConf jConf) throws IOException {
 		FileSplit bundleSplit = (FileSplit) split;
-		conf = context.getConfiguration();
+		conf = jConf;
 		Path path = bundleSplit.getPath();
 		FileSystem fs = path.getFileSystem(conf);
 		// reader specifies start and end, for which start + length would be the beginning of a new file,
@@ -86,10 +95,13 @@ public class JpegFromHibRecordReader implements
 
 	@Override
 	public boolean next(NullWritable key, BytesWritable value) throws IOException {
-		return reader.nextKeyValue();
-	}
+		if (reader.nextKeyValue()) {
+			BytesWritable imageData = new BytesWritable(reader.getRawBytes());
+			value.set(imageData);
+			return true;
+		} else {
+			return false;
+		}
 
-	public boolean nextKeyValue() throws IOException, InterruptedException {
-		return reader.nextKeyValue();
 	}
 }

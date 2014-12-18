@@ -44,6 +44,8 @@ public class Covariance extends Configured implements Tool {
 		
 		public void map(ImageHeader key, FloatImage value, OutputCollector<IntWritable, FloatImage> output, Reporter reporter)
 				throws IOException {
+				System.out.println("BEGIN MAP");
+				System.out.println("image dim: "+ value.getWidth() + "x" + value.getHeight());
 			if (value != null && value.getWidth() > N && value.getHeight() > N) {
 				FloatImage mean = new FloatImage(N, N, 1);
 				for (int i = 0; i < 10; i++) {
@@ -64,6 +66,7 @@ public class Covariance extends Configured implements Tool {
 			Reducer<IntWritable, FloatImage, IntWritable, FloatImage> {
 		public void reduce(IntWritable key, Iterator<FloatImage> values, OutputCollector<IntWritable, FloatImage> output, Reporter reporter) 
 			throws IOException {
+				System.out.println("IN REDUCE");
 			FloatImage mean = new FloatImage(N, N, 1);
 			int total = 0;
 			while(values.hasNext()) {
@@ -72,7 +75,9 @@ public class Covariance extends Configured implements Tool {
 			}
 			if (total > 0) {
 				mean.scale(1.0f / total);
+				//System.out.println("mean: "+mean);
 				output.collect(key, mean);
+				reporter.progress();
 			}
 		}
 	}
@@ -105,6 +110,7 @@ public class Covariance extends Configured implements Tool {
 
 		public void map(ImageHeader key, FloatImage value, OutputCollector<IntWritable, FloatImage> output, Reporter reporter)
 				throws IOException {
+
 			if (value != null && value.getWidth() > N && value.getHeight() > N) {
 				float[][] tp = new float[100][N * N];
 				for (int i = 0; i < 10; i++) {
@@ -179,18 +185,20 @@ public class Covariance extends Configured implements Tool {
 		job.setCompressMapOutput(true);
 		job.setMapSpeculativeExecution(true);
 		job.setReduceSpeculativeExecution(true);
-
+		FileOutputFormat.setCompressOutput(job, true);
 		FileInputFormat.setInputPaths(job, new Path(args[0]));
 		mkdir(args[1], job);
 		rmdir(args[1] + "/mean-output/", job);
 		FileOutputFormat.setOutputPath(job, new Path(args[1] + "/mean-output/"));
-
+		System.out.println("InputPath: "+args[0]);
+		System.out.println("OutputPath: "+args[1]+"/mean-output/");
 		JobClient.runJob(job);
         
 		return 0;
 	}
 	
 	public int runCovariance(String[] args) throws Exception {
+		System.out.println("~~~~~~~IN COVARIANCE~~~~~~~~~~");
 		HipiJob job = new HipiJob(getConf(), "Covariance");
 		job.setJarByClass(Covariance.class);
 
@@ -239,7 +247,8 @@ public class Covariance extends Configured implements Tool {
 		int success = runMeanCompute(args);
 		if (success == 1)
 			return 1;
-		return runCovariance(args);
+		return 0;
+		//return runCovariance(args); 
 	}
 
 	public static void main(String[] args) throws Exception {

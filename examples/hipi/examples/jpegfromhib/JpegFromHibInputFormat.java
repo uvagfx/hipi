@@ -32,18 +32,17 @@ public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesW
 	@Override
 	public RecordReader<NullWritable, BytesWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) 
 	throws IOException {
-		return new JpegFromHibRecordReader();
-
+		return new JpegFromHibRecordReader(split, job);
 	}
 
 
-	/**
-	 * Returns an object that can be used to read records of type ImageInputFormat
-	 */
-	public RecordReader<NullWritable, BytesWritable> createRecordReader(InputSplit genericSplit, TaskAttemptContext context) 
-	throws IOException, InterruptedException {
-		return new JpegFromHibRecordReader();
-	}
+	// /**
+	//  * Returns an object that can be used to read records of type ImageInputFormat
+	//  */
+	// public RecordReader<NullWritable, BytesWritable> createRecordReader(InputSplit genericSplit, TaskAttemptContext context) 
+	// throws IOException, InterruptedException {
+	// 	return new JpegFromHibRecordReader();
+	// }
 
 	@Override
 	public InputSplit[] getSplits(JobConf job, int numSplits) throws IOException {

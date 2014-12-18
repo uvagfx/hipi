@@ -2,11 +2,6 @@ package hipi.examples.jpegfromhib;
 
 import hipi.imagebundle.AbstractImageBundle;
 import hipi.imagebundle.HipiImageBundle;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
@@ -15,9 +10,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.mapreduce.JobContext;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
-
 import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Reporter;
@@ -25,24 +17,20 @@ import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileSplit;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesWritable> 
-{
+
+public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesWritable> {
 
 	@Override
-	public RecordReader<NullWritable, BytesWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) 
-	throws IOException {
+	public RecordReader<NullWritable, BytesWritable> getRecordReader(InputSplit split, JobConf job, 
+		Reporter reporter) throws IOException {
 		return new JpegFromHibRecordReader(split, job);
 	}
-
-
-	// /**
-	//  * Returns an object that can be used to read records of type ImageInputFormat
-	//  */
-	// public RecordReader<NullWritable, BytesWritable> createRecordReader(InputSplit genericSplit, TaskAttemptContext context) 
-	// throws IOException, InterruptedException {
-	// 	return new JpegFromHibRecordReader();
-	// }
 
 	@Override
 	public InputSplit[] getSplits(JobConf job, int numSplits) throws IOException {
@@ -56,7 +44,8 @@ public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesW
 			hib.open(AbstractImageBundle.FILE_MODE_READ);
 			// offset should be guaranteed to be in order
 			List<Long> offsets = hib.getOffsets();
-			BlockLocation[] blkLocations = fs.getFileBlockLocations(hib.getDataFile(), 0, offsets.get(offsets.size() - 1));
+			BlockLocation[] blkLocations = fs.getFileBlockLocations(hib.getDataFile(), 0, 
+				offsets.get(offsets.size() - 1));
 			if (numMapTasks == 0) {
 				int i = 0, b = 0;
 				long lastOffset = 0, currentOffset = 0;
@@ -79,7 +68,8 @@ public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesW
 					} else { // currentOffset == next
 						hosts = blkLocations[b].getHosts();
 					}
-					splits.add(new FileSplit(hib.getDataFile().getPath(), lastOffset, currentOffset - lastOffset, hosts));
+					splits.add(new FileSplit(hib.getDataFile().getPath(), lastOffset, 
+						currentOffset - lastOffset, hosts));
 					lastOffset = currentOffset;
 				}
 				System.out.println(b + " tasks spawned");
@@ -102,22 +92,22 @@ public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesW
 						for (int k = 0; k < blkHosts.length; k++)
 							hosts.add(blkHosts[k]);
 					}
-					splits.add(new FileSplit(hib.getDataFile().getPath(), lastOffset, currentOffset - lastOffset, hosts.toArray(new String[hosts.size()])));
+					splits.add(new FileSplit(hib.getDataFile().getPath(), lastOffset, currentOffset 
+						- lastOffset, hosts.toArray(new String[hosts.size()])));
 					lastOffset = currentOffset;
 					i += next + 1;
 					taskRemaining--;
 					imageRemaining -= numImages;
-					System.out.println("imageRemaining: " + imageRemaining + "\ttaskRemaining: " + taskRemaining + "\tlastOffset: " + lastOffset + "\ti: " + i);
+					System.out.println("imageRemaining: " + imageRemaining + "\ttaskRemaining: " + 
+						taskRemaining + "\tlastOffset: " + lastOffset + "\ti: " + i);
 				}
 			}
 			hib.close();
 		}
 		InputSplit [] splitArray = new InputSplit[splits.size()];
-		for(int index = 0; index < splits.size(); index++)
-		{
+		for(int index = 0; index < splits.size(); index++) {
 			splitArray[index] = splits.get(index);
 		}
-
 		return splitArray;
 	}
 }

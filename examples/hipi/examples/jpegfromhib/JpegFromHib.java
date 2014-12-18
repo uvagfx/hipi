@@ -4,7 +4,6 @@ import hipi.image.ImageHeader.ImageType;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 import hipi.util.ByteUtils;
 
-import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -14,7 +13,6 @@ import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -29,11 +27,13 @@ import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
 
 import java.util.Iterator;
+import java.io.IOException;
 
 public class JpegFromHib extends Configured implements Tool{
 
-	public static class JpegFromHibMapper extends MapReduceBase implements Mapper<NullWritable, BytesWritable, BooleanWritable, Text>
-	{
+	public static class JpegFromHibMapper extends MapReduceBase implements 
+		Mapper<NullWritable, BytesWritable, BooleanWritable, Text> {
+
 		public Path path;
 		public FileSystem fileSystem;
 
@@ -50,8 +50,8 @@ public class JpegFromHib extends Configured implements Tool{
        	}
 
        	@Override
-		public void map(NullWritable key, BytesWritable value, OutputCollector<BooleanWritable, Text> output, Reporter reporter) 
-		throws IOException{
+		public void map(NullWritable key, BytesWritable value, 
+			OutputCollector<BooleanWritable, Text> output, Reporter reporter) throws IOException {
 
 			if (value == null) {
 				return;
@@ -72,11 +72,11 @@ public class JpegFromHib extends Configured implements Tool{
 			//context.write(new LongWritable(sig), value);
 			
 			output.collect(new BooleanWritable(true), new Text(hashval));
-			System.out.println("OUT OF MAP");
 		}
 	}
 
-	public static class JpegFromHibReducer extends MapReduceBase implements Reducer<BooleanWritable, Text, BooleanWritable, Text> {
+	public static class JpegFromHibReducer extends MapReduceBase implements 
+		Reducer<BooleanWritable, Text, BooleanWritable, Text> {
 		@Override
 		public void reduce(BooleanWritable key, Iterator<Text> values, 
 			OutputCollector<BooleanWritable, Text> output, Reporter reporter) throws IOException {

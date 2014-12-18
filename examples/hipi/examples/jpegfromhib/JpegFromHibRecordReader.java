@@ -9,7 +9,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.InputSplit;
@@ -52,9 +51,10 @@ public class JpegFromHibRecordReader implements
 		conf = jConf;
 		Path path = bundleSplit.getPath();
 		FileSystem fs = path.getFileSystem(conf);
-		// reader specifies start and end, for which start + length would be the beginning of a new file,
-		// which is undesirable to reader, -1 must be applied.
-		System.out.println("record start from " + bundleSplit.getStart() + " end at " + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
+		// reader specifies start and end, for which start + length would be the beginning of a new 
+		// file, which is undesirable to reader, -1 must be applied.
+		System.out.println("record start from " + bundleSplit.getStart() + " end at " + 
+			(bundleSplit.getStart() + bundleSplit.getLength() - 1));
 		reader = new HipiImageBundle.FileReader(fs, path, conf,
 				bundleSplit.getStart(), bundleSplit.getStart() + bundleSplit.getLength() - 1);
 	}
@@ -69,18 +69,9 @@ public class JpegFromHibRecordReader implements
 		return NullWritable.get();
 	}
 
-	public NullWritable getCurrentKey() throws IOException, InterruptedException {
-		return NullWritable.get();
-	}
-
 	@Override
 	public BytesWritable createValue() {
 		return new BytesWritable();
-	}
-
-	public BytesWritable getCurrentValue() throws IOException,
-			InterruptedException {
-		return new BytesWritable(reader.getRawBytes());
 	}
 
 	@Override

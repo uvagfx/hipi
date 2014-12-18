@@ -68,6 +68,15 @@
     </antcall>
   </target>
 
+  <target name="createsequencefile">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/createsequencefile" />
+      <param name="jarfilename" value="createsequencefile.jar" />
+      <param name="jardir" value="examples" />
+      <param name="mainclass" value="hipi.examples.createsequencefile.CreateSequenceFile" />
+    </antcall>
+  </target>
+
   <!-- Dump some information about all of the information in a HIB -->
   <target name="dumphib">
     <antcall target="compile">
@@ -78,7 +87,7 @@
     </antcall>
   </target>
 
-  <target name="all" depends="hibimport, covariance, downloader, hib2jpg, dumphib" />
+  <target name="all" depends="hibimport, covariance, downloader, hib2jpg, createsequencefile, dumphib" />
 
   <!-- Clean -->
   <target name="clean">    

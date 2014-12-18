@@ -67,7 +67,21 @@
     </jar>
   </target>
 
-  <target name="all" depends="covariance, downloader, dumphib, hib2jpg">
+  <!-- create sequence file from jpeg files -->
+  <target name="createsequencefile" depends="setup, test_settings">
+    <mkdir dir="bin" />
+    <!-- Compile -->
+    <javac nowarn="on" includeantruntime="no" srcdir="./hipi/examples/createsequencefile" destdir="./bin" classpath="${hadoop.classpath}:../src/hipi.jar" />
+    <!-- Create the jar -->
+    <jar destfile="./createsequencefile.jar" basedir="./bin">
+    <zipfileset src="../src/hipi.jar" />
+      <manifest>
+      <attribute name="Main-Class" value="hipi.examples.createsequencefile.CreateSequenceFile" />
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="all" depends="covariance, downloader, dumphib, hib2jpg, createsequencefile">
   </target>
 
   <!-- Clean -->

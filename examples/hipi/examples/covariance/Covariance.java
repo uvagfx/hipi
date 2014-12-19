@@ -5,10 +5,15 @@ import hipi.image.ImageHeader;
 import hipi.imagebundle.mapreduce.HipiJob;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 import hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
+import hipi.imagebundle.HipiImageBundle;
+import hipi.image.ImageHeader.ImageType;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
+import java.io.DataOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -33,6 +38,8 @@ import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.JobContext;
 
+
+
 public class Covariance extends Configured implements Tool {
 
 	public static final int N = 48;
@@ -40,12 +47,18 @@ public class Covariance extends Configured implements Tool {
 
 
 	public static class MeanMap extends MapReduceBase implements
-			Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {		
+			Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {	
+
+		private static JobConf jConf;
+
+		@Override
+		public void configure(JobConf jConf) {
+	        this.jConf = jConf;
+       	}	
 		
 		public void map(ImageHeader key, FloatImage value, OutputCollector<IntWritable, FloatImage> output, Reporter reporter)
 				throws IOException {
-				System.out.println("BEGIN MAP");
-				System.out.println("image dim: "+ value.getWidth() + "x" + value.getHeight());
+			System.out.println("image dim: "+ value.getWidth() + "x" + value.getHeight());
 			if (value != null && value.getWidth() > N && value.getHeight() > N) {
 				FloatImage mean = new FloatImage(N, N, 1);
 				for (int i = 0; i < 10; i++) {
@@ -64,21 +77,36 @@ public class Covariance extends Configured implements Tool {
 
 	public static class MeanReduce extends MapReduceBase implements
 			Reducer<IntWritable, FloatImage, IntWritable, FloatImage> {
+
+		private static JobConf jConf;
+
+		@Override
+		public void configure(JobConf jConf) {
+	        this.jConf = jConf;
+       	}	
+
 		public void reduce(IntWritable key, Iterator<FloatImage> values, OutputCollector<IntWritable, FloatImage> output, Reporter reporter) 
 			throws IOException {
-				System.out.println("IN REDUCE");
 			FloatImage mean = new FloatImage(N, N, 1);
 			int total = 0;
 			while(values.hasNext()) {
-				mean.add(values.next());
+				FloatImage temp = values.next();
+				mean.add(temp);
 				total++;
 			}
 			if (total > 0) {
 				mean.scale(1.0f / total);
-				//System.out.println("mean: "+mean);
 				output.collect(key, mean);
 				reporter.progress();
+				createTestHib(mean);
 			}
+		}
+
+		private void createTestHib(FloatImage mean) throws IOException {
+			HipiImageBundle hib = new HipiImageBundle(new Path("zdv8rb/updated/covariance/output2.hib"), jConf);
+			hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
+			hib.addImage(mean);
+			hib.close();
 		}
 	}
 

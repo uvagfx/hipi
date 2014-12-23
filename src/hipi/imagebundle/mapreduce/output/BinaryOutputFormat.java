@@ -50,17 +50,17 @@ public class BinaryOutputFormat<K, V> extends FileOutputFormat<K, V> {
 	@Override
 	public RecordWriter<K, V> getRecordWriter(FileSystem ignored, JobConf job, String name, Progressable progress)
 			throws IOException {
-		Configuration conf = job;
 		boolean isCompressed = getCompressOutput(job);
 		CompressionCodec codec = null;
 		String extension = "";
 		if (isCompressed) {
 			Class<? extends CompressionCodec> codecClass = getOutputCompressorClass(job, GzipCodec.class);
-			codec = ReflectionUtils.newInstance(codecClass, conf);
+			codec = ReflectionUtils.newInstance(codecClass, job);
 			extension = codec.getDefaultExtension();
 		}
-		Path file = getTaskOutputPath(job, extension);
-		FileSystem fs = file.getFileSystem(conf);
+		Path file = getTaskOutputPath(job, "temp"+extension);
+		System.out.println("~~~~~~~~~~~~~~~~~~~Output path: "+file.toString());
+		FileSystem fs = file.getFileSystem(job);
 		FSDataOutputStream fileOut = fs.create(file, false);
 		if (!isCompressed) {
 			return new BinaryRecordWriter<K, V>(fileOut);

@@ -157,9 +157,6 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 		_w = input.readInt();
 		_h = input.readInt();
 		_b = input.readInt();
-		System.out.println("w: "+ _w);
-		System.out.println("h: "+_h);
-		System.out.println("b:"+_b);
 		byte[] pixel_buffer = new byte[_w * _h * _b * 4];
 		input.readFully(pixel_buffer);
 		_pels = ByteUtils.ByteArraytoFloatArray(pixel_buffer);

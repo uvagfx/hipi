@@ -59,7 +59,6 @@ public class BinaryOutputFormat<K, V> extends FileOutputFormat<K, V> {
 			extension = codec.getDefaultExtension();
 		}
 		Path file = getTaskOutputPath(job, "temp"+extension);
-		System.out.println("~~~~~~~~~~~~~~~~~~~Output path: "+file.toString());
 		FileSystem fs = file.getFileSystem(job);
 		FSDataOutputStream fileOut = fs.create(file, false);
 		if (!isCompressed) {

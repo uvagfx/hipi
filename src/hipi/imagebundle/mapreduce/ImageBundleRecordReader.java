@@ -9,10 +9,10 @@ import hipi.imagebundle.HipiImageBundle;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapred.InputSplit;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.FileSplit;
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 /**
  * Provides the basic functionality of an ImageBundle record reader. Utilizes 
@@ -21,25 +21,18 @@ import org.apache.hadoop.mapred.JobConf;
  * 
  *
  */
-public class ImageBundleRecordReader implements
+public class ImageBundleRecordReader extends
 		RecordReader<ImageHeader, FloatImage> {
 
 	private Configuration conf;
 	private HipiImageBundle.FileReader reader;
 
-	public ImageBundleRecordReader(InputSplit split, JobConf jConf) {
-		super();
-		try {
-			initialize(split, jConf);
-		} catch (IOException ioe) {
-			System.err.println(ioe);
-		}
-	}
 
-	public void initialize(InputSplit split, JobConf jConf) throws IOException {
+	@Override
+	public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
 
 		FileSplit bundleSplit = (FileSplit) split;
-		conf = jConf;
+		conf = context.getConfiguration();
 		Path path = bundleSplit.getPath();
 		FileSystem fs = path.getFileSystem(conf);
 
@@ -58,18 +51,15 @@ public class ImageBundleRecordReader implements
 	}
 
 	@Override
-	public ImageHeader createKey() {
-		return new ImageHeader();
+	public ImageHeader getCurrentKey() throws IOException, 
+			InterruptedException {
+		return reader.getCurrentKey();
 	}
 
 	@Override
-	public FloatImage createValue() {
-		return new FloatImage();
-	}
-
-	@Override
-	public long getPos() throws IOException {
-		return 1;
+	public FloatImage getCurrentValue() throws IOException,
+			InterruptedException {
+		return reader.getCurrentValue();
 	}
 
 	@Override
@@ -78,22 +68,7 @@ public class ImageBundleRecordReader implements
 	}
 
 	@Override
-	public boolean next(ImageHeader key, FloatImage value) throws IOException {
-
-		boolean success = reader.nextKeyValue();
-
-		if(key == null || value == null) {
-			System.out.println("key and/or value is null");
-			return false;
-		}
-
-		key.set(reader.getCurrentKey());
-		value.set(reader.getCurrentValue());
-
-		if(success) {
-			return true;
-		} else {
-			return false;
-		}
+	public boolean nextKeyValue() throws IOException, InterruptedException {
+		return reader.nextKeyValue();
 	}
 }

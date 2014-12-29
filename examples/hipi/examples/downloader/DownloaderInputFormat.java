@@ -1,5 +1,6 @@
 package hipi.examples.downloader;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -7,34 +8,40 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileSplit;
-import org.apache.hadoop.mapred.InputSplit;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.RecordReader;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hadoop.mapreduce.InputFormat;
+import org.apache.hadoop.mapreduce.JobContext;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> {
 
 	@Override
-	public RecordReader<IntWritable, Text> getRecordReader(InputSplit split, JobConf job, 
-		Reporter reporter) {
-		return new DownloaderRecordReader(split, job);
+	public RecordReader<IntWritable, Text> createRecordReader(InputSplit split, TaskAttemptContext context) 
+		throws IOException, InterruptedException {
+		return new DownloaderRecordReader();
 	}
 
 	@Override
-	public InputSplit[] getSplits(JobConf jConf, int numSplits) throws IOException {
-		int nodes = jConf.getInt("downloader.nodes", 10);
+	public List<InputSplit> getSplits(JobContext job) throws IOException {
+
+		Configuration conf = job.getConfiguration();
+
+		int nodes = conf.getInt("downloader.nodes", 10);
 
 		ArrayList<String> hosts = new ArrayList<String>(0);
+		List<InputSplit> splits = new ArrayList<InputSplit>();
 
-		FileSystem fileSystem = FileSystem.get(jConf);
-		String tempOutputPath = jConf.get("downloader.outpath") + "_tmp";
+		FileSystem fileSystem = FileSystem.get(conf);
+		String tempOutputPath = conf.get("downloader.outpath") + "_tmp";
 		Path tempOutputDir = new Path(tempOutputPath);
 		
 		if (fileSystem.exists(tempOutputDir)) {
@@ -73,7 +80,7 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> {
 		System.out.println("Tried to get " + nodes + " nodes, got " + hosts.size());
 
 
-		FileStatus file = listStatus(jConf)[0];
+		FileStatus file = listStatus(job).get(0);
 		Path path = file.getPath();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(path)));
 		int num_lines = 0;
@@ -87,21 +94,20 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> {
 		System.out.println("First n-1 nodes responsible for " + span + " images");
 		System.out.println("Last node responsible for " + last + " images");
 		
-		InputSplit[] splits = new InputSplit[hosts.size()];
-		for (int j = 0; j < splits.length; j++) {
+		FileSplit[] f = new FileSplit[hosts.size()];
+		for (int j = 0; j < f.length; j++) {
 			String[] host = new String[1];
 			host[0] = hosts.get(j);
-			if (j < splits.length - 1) {
-				splits[j] = new FileSplit(path , (j*span) , span, host);
+			if (j < f.length - 1) {
+				splits.add(new FileSplit(path , (j*span) , span, host));
 			} else {
-				splits[j] = new FileSplit(path , (j*span) , last, host);
+				splits.add(new FileSplit(path , (j*span) , last, host));
 			}
 		}
 		
 		if (fileSystem.exists(tempOutputDir)) {
 			fileSystem.delete(tempOutputDir, true);
 		}
-
 		return splits;
 	}
 }

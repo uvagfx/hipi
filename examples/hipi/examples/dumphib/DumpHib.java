@@ -9,16 +9,11 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.jobcontrol.Job;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.pipes.Submitter;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -31,12 +26,12 @@ import org.apache.hadoop.mapred.JobClient;
 
 public class DumpHib extends Configured implements Tool {
 
-	public static class DumpHibMapper extends MapReduceBase implements Mapper<ImageHeader, 
-		FloatImage, IntWritable, Text> {
+	public static class DumpHibMapper extends Mapper
+		<ImageHeader, FloatImage, IntWritable, Text> {
           
 		@Override
-		public void map(ImageHeader key, FloatImage value, 
-			OutputCollector<IntWritable, Text> output, Reporter reporter) throws IOException {
+		public void map(ImageHeader key, FloatImage value, Context context) 
+			throws IOException, InterruptedException {
 
 			if (value != null) {
 				int imgWidth = value.getWidth();
@@ -45,40 +40,39 @@ public class DumpHib extends Configured implements Tool {
 				String camera = key.getEXIFInformation("Model");
 				String outputStr = imgWidth + "x" + imgHeight + "\t(" + hexHash + ")\t	" + camera;
 				System.out.println("Mapper Result: "+outputStr);
-				output.collect(new IntWritable(1), new Text(outputStr));				
+				context.write(new IntWritable(1), new Text(outputStr));				
 			} else {
-				System.out.println("Mapper value was null");
+				System.err.println("Mapper value was null");
 			}
 		}
 
 	}
 	
-	public static class DumpHibReducer extends MapReduceBase implements Reducer<IntWritable, Text, 
+	public static class DumpHibReducer extends Reducer <IntWritable, Text, 
 		IntWritable, Text> {
 
         @Override
-		public void reduce(IntWritable key, Iterator<Text> values, 
-			OutputCollector<IntWritable, Text> output, Reporter reporter) throws IOException {
-
-			while (values.hasNext()) {
-				output.collect(key, values.next());
+		public void reduce(IntWritable key, Iterable<Text> values, Context context) 
+				throws IOException, InterruptedException {
+			for (Text value : values) {
+				context.write(key, value);
 			}
 		}
 	}
 
 	public int run(String[] args) throws Exception {
-        
+        Configuration conf = new Configuration();
         // Set job configuration
-        JobConf jConf = new JobConf();
-        jConf.setJarByClass(DumpHib.class);
-        jConf.setMapperClass(DumpHibMapper.class);
-        jConf.setReducerClass(DumpHibReducer.class);
-        jConf.setNumReduceTasks(1);
+        Job job = Job.getInstance(conf, "dumphib");
+        job.setJarByClass(DumpHib.class);
+        job.setMapperClass(DumpHibMapper.class);
+        job.setReducerClass(DumpHibReducer.class);
+        job.setNumReduceTasks(1);
         
         // Set formats
-		jConf.setOutputKeyClass(IntWritable.class);
-		jConf.setOutputValueClass(Text.class);
-		jConf.setInputFormat(ImageBundleInputFormat.class);
+		job.setOutputKeyClass(IntWritable.class);
+		job.setOutputValueClass(Text.class);
+		job.setInputFormatClass(ImageBundleInputFormat.class);
         
 		if (args.length < 2) {
 			System.out.println("Usage: dumphib <input hib> <outputdir>");
@@ -92,11 +86,12 @@ public class DumpHib extends Configured implements Tool {
 
 
 		// Set out/in paths
-		removeDir(outputPath, jConf);
-		FileOutputFormat.setOutputPath(jConf, new Path(outputPath));
-		FileInputFormat.setInputPaths(jConf, new Path(inputPath));	
+		removeDir(outputPath, conf);
+		FileOutputFormat.setOutputPath(job, new Path(outputPath));
+		FileInputFormat.setInputPaths(job, new Path(inputPath));	
 
-		JobClient.runJob(jConf);
+		job.setNumReduceTasks(1);
+		System.exit(job.waitForCompletion(true) ? 0 : 1);
 		return 0;
 
 	}
@@ -106,10 +101,10 @@ public class DumpHib extends Configured implements Tool {
 		System.exit(exitCode);
 	}
 
-	public static void removeDir(String path, JobConf jConf) throws IOException {
+	public static void removeDir(String path, Configuration conf) throws IOException {
 		Path output_path = new Path(path);
 
-		FileSystem fs = FileSystem.get(jConf);
+		FileSystem fs = FileSystem.get(conf);
 
 		if (fs.exists(output_path)) {
 			fs.delete(output_path, true);

@@ -19,13 +19,12 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.InputFormat;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.InputSplit;
-import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 
 
@@ -40,10 +39,10 @@ public class ImageBundleInputFormat extends FileInputFormat <ImageHeader, FloatI
 	 * Creates an {@link ImageBundleRecordReader}
 	 */
 	@Override
-	public RecordReader<ImageHeader, FloatImage> getRecordReader( InputSplit split, JobConf job, 
-		Reporter reporter) throws IOException {
+	public RecordReader<ImageHeader, FloatImage> createRecordReader(InputSplit split, 
+		TaskAttemptContext context) throws IOException, InterruptedException {
 
-		return new ImageBundleRecordReader(split, job);
+		return new ImageBundleRecordReader();
 	}
 
 	/**
@@ -53,13 +52,14 @@ public class ImageBundleInputFormat extends FileInputFormat <ImageHeader, FloatI
 	 * to Hadoop's setup for the size of data chunks (smaller data chunks yield more map tasks).
 	 */
 	@Override
-	public InputSplit[] getSplits(JobConf job, int numSplits) throws IOException {
-		int numMapTasks = job.getInt("hipi.map.tasks", 0);
-		List<FileSplit> splits = new ArrayList<FileSplit>();
+	public List<InputSplit> getSplits(JobContext job) throws IOException {
+		Configuration conf = job.getConfiguration();
+		int numMapTasks = conf.getInt("hipi.map.tasks", 0);
+		List<InputSplit> splits = new ArrayList<InputSplit>();
 		for (FileStatus file : listStatus(job)) {
 			Path path = file.getPath();
-			FileSystem fs = path.getFileSystem(job);
-			HipiImageBundle hib = new HipiImageBundle(path, job);
+			FileSystem fs = path.getFileSystem(conf);
+			HipiImageBundle hib = new HipiImageBundle(path, conf);
 			hib.open(AbstractImageBundle.FILE_MODE_READ);
 			// offset should be guaranteed to be in order
 			List<Long> offsets = hib.getOffsets();
@@ -124,11 +124,7 @@ public class ImageBundleInputFormat extends FileInputFormat <ImageHeader, FloatI
 			
 			hib.close();
 		}
-		FileSplit[] splitsArray = new FileSplit[splits.size()];
-		for(int i = 0; i < splits.size(); i++) {
-			splitsArray[i] = splits.get(i);
-		}
 
-		return splitsArray;
+		return splits;
 	}
 }

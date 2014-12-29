@@ -3,22 +3,19 @@ package hipi.examples.downloader;
 import hipi.image.ImageHeader.ImageType;
 import hipi.imagebundle.HipiImageBundle;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +23,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
+
 
 /**
  * A utility MapReduce program that takes a list of image URL's, downloads them, and creates 
@@ -46,23 +44,22 @@ import java.util.Iterator;
  */
 public class Downloader extends Configured implements Tool{
 
-	public static class DownloaderMapper extends MapReduceBase implements 
-		Mapper<IntWritable, Text, BooleanWritable, Text> {
+	public static class DownloaderMapper extends Mapper 
+		<IntWritable, Text, BooleanWritable, Text> {
 
-		private static JobConf jConf;
+		private static Configuration conf;
 
 		@Override
-		public void configure(JobConf jConf) {
-	        this.jConf = jConf;
+		public void setup(Context jc) throws IOException, InterruptedException {
+	        this.conf = jc.getConfiguration();
        	}
 
 		@Override
-		public void map(IntWritable key, Text value, OutputCollector<BooleanWritable, Text> output, 
-			Reporter reporter) throws IOException {
-
-			String temp_path = jConf.get("downloader.outpath") + key.get() + ".hib.tmp";
+		public void map(IntWritable key, Text value, Context context) 
+			throws IOException, InterruptedException {
+			String temp_path = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
 			
-			HipiImageBundle hib = new HipiImageBundle(new Path(temp_path), jConf);
+			HipiImageBundle hib = new HipiImageBundle(new Path(temp_path), conf);
 			hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 
 			String word = value.toString();
@@ -75,9 +72,9 @@ public class Downloader extends Configured implements Tool{
 				System.out.println("next uri: "+uri);
 				if (i >= iprev+100) {
 					hib.close();
-					output.collect(new BooleanWritable(true), new Text(hib.getPath().toString()));
-					temp_path = jConf.get("downloader.outpath") + i + ".hib.tmp";
-					hib = new HipiImageBundle(new Path(temp_path), jConf);
+					context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
+					temp_path = conf.get("downloader.outpath") + i + ".hib.tmp";
+					hib = new HipiImageBundle(new Path(temp_path), conf);
 					hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 					iprev = i;
 				}
@@ -123,7 +120,7 @@ public class Downloader extends Configured implements Tool{
 			}
 
 			try {
-				output.collect(new BooleanWritable(true), new Text(hib.getPath().toString()));
+				context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
 				reader.close();
 				hib.close();
 			} catch (Exception e) {
@@ -132,36 +129,36 @@ public class Downloader extends Configured implements Tool{
 		}
 	}
 
-	public static class DownloaderReducer extends MapReduceBase implements Reducer <BooleanWritable,
-		Text, BooleanWritable, Text> {
+	public static class DownloaderReducer extends Reducer 
+		<BooleanWritable, Text, BooleanWritable, Text> {
 
-		private static JobConf jConf;
+		private static Configuration conf;
 
 		@Override
-		public void configure(JobConf jConf) {
-	        this.jConf = jConf;
+		public void setup(Context jc) throws IOException, InterruptedException {
+	        this.conf = jc.getConfiguration();
        	}
 
 		@Override
-		public void reduce(BooleanWritable key, Iterator<Text> values, 
-			OutputCollector<BooleanWritable, Text> output, Reporter reporter) throws IOException {
+		public void reduce(BooleanWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 			if (key.get()) {
-				FileSystem fileSystem = FileSystem.get(jConf);
-				Path outputHibPath = new Path(jConf.get("downloader.outfile"));
-				HipiImageBundle hib = new HipiImageBundle(outputHibPath, jConf);
+				FileSystem fileSystem = FileSystem.get(conf);
+				Path outputHibPath = new Path(conf.get("downloader.outfile"));
+				HipiImageBundle hib = new HipiImageBundle(outputHibPath, conf);
 				hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
-				while (values.hasNext()) {
-					Text temp_string = values.next();
+				for (Text temp_string : values) {
 					Path temp_path = new Path(temp_string.toString());
-					HipiImageBundle input_bundle = new HipiImageBundle(temp_path, jConf);
-					hib.append(input_bundle);				
+					HipiImageBundle input_bundle = new HipiImageBundle(temp_path, conf);
+					hib.append(input_bundle);
+					
 					Path index_path = input_bundle.getPath();
 					Path data_path = new Path(index_path.toString() + ".dat");
+					System.out.println("Deleting: " + data_path.toString());
 					fileSystem.delete(index_path, false);
 					fileSystem.delete(data_path, false);
-					Text inputBundlePath = new Text(input_bundle.getPath().toString());
-					output.collect(new BooleanWritable(true), inputBundlePath);
-					reporter.progress();
+					
+					context.write(new BooleanWritable(true), new Text(input_bundle.getPath().toString()));
+					context.progress();
 				}
 				hib.close();
 			}
@@ -184,26 +181,28 @@ public class Downloader extends Configured implements Tool{
 
 		String outputPath = outputFile.substring(0, outputFile.lastIndexOf('/')+1);
 
-		JobConf jConf = new JobConf();
-		jConf.setInt("downloader.nodes", nodes);
-		jConf.setStrings("downloader.outfile", outputFile);
-		jConf.setStrings("downloader.outpath", outputPath);
-		jConf.setJarByClass(Downloader.class);
-		jConf.setMapperClass(DownloaderMapper.class);
-		jConf.setReducerClass(DownloaderReducer.class);
-		jConf.setOutputKeyClass(BooleanWritable.class);
-		jConf.setOutputValueClass(Text.class);       
-		jConf.setInputFormat(DownloaderInputFormat.class);
+		Configuration conf = new Configuration();
+		conf.setInt("downloader.nodes", nodes);
+		conf.setStrings("downloader.outfile", outputFile);
+		conf.setStrings("downloader.outpath", outputPath);
+
+		Job job = Job.getInstance(conf, "Downloader");
+		job.setJarByClass(Downloader.class);
+		job.setMapperClass(DownloaderMapper.class);
+		job.setReducerClass(DownloaderReducer.class);
+		job.setOutputKeyClass(BooleanWritable.class);
+		job.setOutputValueClass(Text.class);       
+		job.setInputFormatClass(DownloaderInputFormat.class);
 
 		//*************** IMPORTANT ****************\\
-		jConf.setMapOutputKeyClass(BooleanWritable.class);
-		jConf.setMapOutputValueClass(Text.class);
-		FileOutputFormat.setOutputPath(jConf, new Path(outputFile + "_output"));
+		job.setMapOutputKeyClass(BooleanWritable.class);
+		job.setMapOutputValueClass(Text.class);
+		FileOutputFormat.setOutputPath(job, new Path(outputFile + "_output"));
 
-		DownloaderInputFormat.setInputPaths(jConf, new Path(inputFile));
+		DownloaderInputFormat.setInputPaths(job, new Path(inputFile));
 
-		jConf.setNumReduceTasks(1);
-		JobClient.runJob(jConf);
+		job.setNumReduceTasks(1);
+		System.exit(job.waitForCompletion(true) ? 0 : 1);
 		return 0;
 	}
 

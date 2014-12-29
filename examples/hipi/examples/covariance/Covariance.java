@@ -48,8 +48,8 @@ public class Covariance extends Configured implements Tool {
 
 	public static Job cacheJob;
 
-	public static class MeanMap extends MapReduceBase implements
-			Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {	
+	public static class MeanMap extends MapReduceBase implements 
+		Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {	
 
 		private static JobConf jConf;
 
@@ -58,9 +58,9 @@ public class Covariance extends Configured implements Tool {
 	        this.jConf = jConf;
        	}	
 		
-		public void map(ImageHeader key, FloatImage value, OutputCollector<IntWritable, FloatImage> output, Reporter reporter)
-				throws IOException {
-			System.out.println("image dim: "+ value.getWidth() + "x" + value.getHeight());
+		@Override
+		public void map(ImageHeader key, FloatImage value, 
+			OutputCollector<IntWritable, FloatImage> output, Reporter reporter) throws IOException {
 			if (value != null && value.getWidth() > N && value.getHeight() > N) {
 				FloatImage mean = new FloatImage(N, N, 1);
 				for (int i = 0; i < 10; i++) {
@@ -87,8 +87,8 @@ public class Covariance extends Configured implements Tool {
 	        this.jConf = jConf;
        	}	
 
-		public void reduce(IntWritable key, Iterator<FloatImage> values, OutputCollector<IntWritable, FloatImage> output, Reporter reporter) 
-			throws IOException {
+		public void reduce(IntWritable key, Iterator<FloatImage> values, 
+			OutputCollector<IntWritable, FloatImage> output, Reporter reporter) throws IOException {
 			FloatImage mean = new FloatImage(N, N, 1);
 			int total = 0;
 			while(values.hasNext()) {
@@ -105,7 +105,8 @@ public class Covariance extends Configured implements Tool {
 		}
 
 		private void createTestHib(FloatImage mean) throws IOException {
-			HipiImageBundle hib = new HipiImageBundle(new Path("zdv8rb/updated/covariance/output2.hib"), jConf);
+			HipiImageBundle hib = 
+				new HipiImageBundle(new Path("zdv8rb/updated/covariance/output2.hib"), jConf);
 			hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 			hib.addImage(mean);
 			hib.close();
@@ -123,82 +124,45 @@ public class Covariance extends Configured implements Tool {
 
 		@Override
 		public void configure(JobConf jConf) {
-			System.out.println("~~~TRYING TO CONFIGURE~~~");
 			try {
-				System.out.println("JOBCONF NAME: "+jConf.getJobName());
 		        this.jConf = jConf;
 		        Job job = Job.getInstance(jConf, "Covariance");
-		        System.out.println("JOB NAME: "+job.getJobName());
 		        g = new float[N * N];
 				float tg = 0;
-				for (int i = 0; i < N; i++)
-					for (int j = 0; j < N; j++)
-						tg += g[i * N + j] = (float) Math.exp(-((i - N / 2) * (i - N / 2) / (sigma * sigma) + (j - N / 2) * (j - N / 2) / (sigma * sigma)));
+				for (int i = 0; i < N; i++) {
+					for (int j = 0; j < N; j++) {
+						tg += g[i * N + j] = (float) Math.exp(-((i - N / 2) * (i - N / 2) / 
+							(sigma * sigma) + (j - N / 2) * (j - N / 2) / (sigma * sigma)));
+					}
+				}
 				tg = (N * N) / tg;
-				for (int i = 0; i < N; i++)
-					for (int j = 0; j < N; j++)
+
+				for (int i = 0; i < N; i++) {
+					for (int j = 0; j < N; j++) {
 						g[i * N + j] *= tg;
-				/* DistributedCache will be deprecated in 0.21 */
-				//Path file = DistributedCache.getLocalCacheFiles(job.getConfiguration())[0];
-				System.out.println("Trying to get cache files");
+					}
+				}
+
 				URI[] files = new URI[1];
 				if (cacheJob.getCacheFiles() != null) {
-					System.out.println("#CacheFiles: "+cacheJob.getCacheFiles().length);
 		            files = cacheJob.getCacheFiles();
 	        	} else {
 	        		System.out.println("cache files null...");
 	        	}
-	   //      	System.out.println("Path: "+files[0].toString());
-	   //      	Path p = new Path(files[0].toString());
-	   //      	System.out.println("test worked");
-	   //      	LocalFileSystem lfs = FileSystem.getLocal(jConf);
-	   //      	if(lfs == null) {
-	   //      		System.out.println("local file system was null");
-	   //      	} else {
-	   //      		System.out.println("lfs initialization was fine");
-	   //      	}
-
-				// FSDataInputStream test = lfs.open(p);
-				// System.out.println("totally got here");
-				// FSDataInputStream dis = FileSystem.getLocal(jConf).open(new Path(files[0].toString()));
-				// System.out.println("this line worked");
-
 				
 				FSDataInputStream dis = FileSystem.get(jConf).open(new Path(files[0].toString()));
 				dis.skip(4);
 				FloatImage image = new FloatImage();
-				System.out.println("About to read image...");
 				image.readFields(dis);
-				System.out.println("Image read");
 				mean = image.getData();
 			} catch (IOException ioe) {
-				System.out.println("Problems in configure!");
 				System.err.println(ioe);
 			}
        	}	
 
-		// public void setup(JobContext job) throws IOException {
-		// 	g = new float[N * N];
-		// 	float tg = 0;
-		// 	for (int i = 0; i < N; i++)
-		// 		for (int j = 0; j < N; j++)
-		// 			tg += g[i * N + j] = (float) Math.exp(-((i - N / 2) * (i - N / 2) / (sigma * sigma) + (j - N / 2) * (j - N / 2) / (sigma * sigma)));
-		// 	tg = (N * N) / tg;
-		// 	for (int i = 0; i < N; i++)
-		// 		for (int j = 0; j < N; j++)
-		// 			g[i * N + j] *= tg;
-		// 	/* DistributedCache will be deprecated in 0.21 */
-		// 	//Path file = DistributedCache.getLocalCacheFiles(job.getConfiguration())[0];
-  //           Path file = new Path(job.getCacheFiles()[0]);
-		// 	FSDataInputStream dis = FileSystem.getLocal(job.getJobConf()).open(file);
-		// 	dis.skip(4);
-		// 	FloatImage image = new FloatImage();
-		// 	image.readFields(dis);
-		// 	mean = image.getData();
-		// }
-
-		public void map(ImageHeader key, FloatImage value, OutputCollector<IntWritable, FloatImage> output, Reporter reporter)
-				throws IOException {
+       	@Override
+		public void map(ImageHeader key, FloatImage value, 
+			OutputCollector<IntWritable, FloatImage> output, Reporter reporter) throws IOException {
 
 			if (value != null && value.getWidth() > N && value.getHeight() > N) {
 				float[][] tp = new float[100][N * N];
@@ -234,18 +198,22 @@ public class Covariance extends Configured implements Tool {
 	        this.jConf = jConf;
        	}	
 
-		public void reduce(IntWritable key, Iterator<FloatImage> values, OutputCollector<IntWritable, FloatImage> output, Reporter reporter) 
-			throws IOException {
+		public void reduce(IntWritable key, Iterator<FloatImage> values, 
+			OutputCollector<IntWritable, FloatImage> output, Reporter reporter) throws IOException {
+
 			FloatImage cov = new FloatImage(N * N, N * N, 1);
+
 			while (values.hasNext()) {
 				cov.add(values.next());
 			}
+
 			output.collect(key, cov);
 			createTestHib(cov);
 		}
 
 		private void createTestHib(FloatImage mean) throws IOException {
-			HipiImageBundle hib = new HipiImageBundle(new Path("/zdv8rb/updated/covariance/final.hib"), jConf);
+			HipiImageBundle hib = 
+				new HipiImageBundle(new Path("/zdv8rb/updated/covariance/final.hib"), jConf);
 			hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 			hib.addImage(mean);
 			hib.close();
@@ -308,8 +276,6 @@ public class Covariance extends Configured implements Tool {
 		HipiJob job = new HipiJob(getConf(), "Covariance");
 		job.setJarByClass(Covariance.class);
 
-		/* DistributedCache will be deprecated in 0.21 */
-		//DistributedCache.addCacheFile(new URI("hdfs://" + args[1] + "/mean-output/part-r-00000"), job.getConfiguration());
 		cacheJob = Job.getInstance(job, "Covariance");
         cacheJob.addCacheFile(new Path("hdfs://" + args[1] + "/mean-output/temp").toUri());
         
@@ -319,8 +285,6 @@ public class Covariance extends Configured implements Tool {
 		job.setMapperClass(CovarianceMap.class);
 		job.setCombinerClass(CovarianceReduce.class);
 		job.setReducerClass(CovarianceReduce.class);
-
-		//job.addResource(new Path("hdfs://" + args[1] + "/mean-output/part-r-00000").toString());
 
 		String inputFileType = args[2];
 		if(inputFileType.equals("hib"))
@@ -355,7 +319,6 @@ public class Covariance extends Configured implements Tool {
 		int success = runMeanCompute(args);
 		if (success == 1)
 			return 1;
-		//return 0;
 		return runCovariance(args); 
 	}
 

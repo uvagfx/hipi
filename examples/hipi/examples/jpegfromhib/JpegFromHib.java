@@ -16,42 +16,33 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.JobContext;
-import org.apache.hadoop.mapred.FileOutputFormat; 
-import org.apache.hadoop.mapred.JobClient;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import java.util.Iterator;
 import java.io.IOException;
 
 public class JpegFromHib extends Configured implements Tool{
 
-	public static class JpegFromHibMapper extends MapReduceBase implements 
+	public static class JpegFromHibMapper extends 
 		Mapper<NullWritable, BytesWritable, BooleanWritable, Text> {
 
 		public Path path;
 		public FileSystem fileSystem;
 
 		@Override
-		public void configure(JobConf jConf) {
-	        try {
-	        	fileSystem = FileSystem.get(jConf);
-	        	path = new Path( jConf.get("jpegfromhib.outdir"));
-				fileSystem.mkdirs(path);
-			} catch (IOException ioe) {
-				System.err.println(ioe);
-			}
-
+		public void setup(Context jc) throws IOException {
+			Configuration conf = jc.getConfiguration();
+        	fileSystem = FileSystem.get(jc.getConfiguration());
+        	path = new Path(conf.get("jpegfromhib.outdir"));
+			fileSystem.mkdirs(path);
        	}
 
        	@Override
 		public void map(NullWritable key, BytesWritable value, 
-			OutputCollector<BooleanWritable, Text> output, Reporter reporter) throws IOException {
+			Context context) throws IOException, InterruptedException {
 
 			if (value == null) {
 				return;
@@ -71,18 +62,7 @@ public class JpegFromHib extends Configured implements Tool{
 			//and change the output key and values appropriately
 			//context.write(new LongWritable(sig), value);
 			
-			output.collect(new BooleanWritable(true), new Text(hashval));
-		}
-	}
-
-	public static class JpegFromHibReducer extends MapReduceBase implements 
-		Reducer<BooleanWritable, Text, BooleanWritable, Text> {
-		@Override
-		public void reduce(BooleanWritable key, Iterator<Text> values, 
-			OutputCollector<BooleanWritable, Text> output, Reporter reporter) throws IOException {
-			while(values.hasNext()) {
-				output.collect(key, values.next());
-			}
+			context.write(new BooleanWritable(true), new Text(hashval));
 		}
 	}
 
@@ -100,31 +80,32 @@ public class JpegFromHib extends Configured implements Tool{
 		// set the dir to output the jpegs to
 		String outputPath = args[1];
 
-		JobConf job = new JobConf();
+		Configuration conf = new Configuration();
+		conf.setStrings("jpegfromhib.outdir", outputPath);
 
-		job.setStrings("jpegfromhib.outdir", outputPath);
+		Job job = Job.getInstance(conf, "hib2jpg");
 		job.setJarByClass(JpegFromHib.class);
 		job.setMapperClass(JpegFromHibMapper.class);
-		job.setReducerClass(JpegFromHibReducer.class);
+		job.setReducerClass(Reducer.class);
 
 		// Set formats
 		job.setOutputKeyClass(BooleanWritable.class);
 		job.setOutputValueClass(Text.class);       
 		//job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
-		job.setInputFormat(JpegFromHibInputFormat.class);
+		job.setInputFormatClass(JpegFromHibInputFormat.class);
 
 		// Set out/in paths
-		removeDir(args[1], job);
+		removeDir(args[1], conf);
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 		ImageBundleInputFormat.setInputPaths(job, new Path(args[0]));	
 
 		job.setNumReduceTasks(1);
 
-		JobClient.runJob(job);
+		System.exit(job.waitForCompletion(true) ? 0 : 1);
 		return 0;
 	}
-	public static void removeDir(String path, JobConf conf) throws IOException {
+	public static void removeDir(String path, Configuration conf) throws IOException {
 		Path output_path = new Path(path);
 
 		FileSystem fs = FileSystem.get(conf);

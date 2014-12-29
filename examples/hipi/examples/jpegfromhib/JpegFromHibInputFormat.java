@@ -10,12 +10,12 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.mapred.InputSplit;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,17 +27,17 @@ import java.util.Set;
 public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesWritable> {
 
 	@Override
-	public RecordReader<NullWritable, BytesWritable> getRecordReader(InputSplit split, JobConf job, 
-		Reporter reporter) throws IOException {
-		return new JpegFromHibRecordReader(split, job);
+	public RecordReader<NullWritable, BytesWritable> createRecordReader(InputSplit split, TaskAttemptContext context)
+		 throws IOException, InterruptedException {
+		return new JpegFromHibRecordReader();
 	}
 
 	@Override
-	public InputSplit[] getSplits(JobConf job, int numSplits) throws IOException {
-		JobConf conf = job;
+	public List<InputSplit> getSplits(JobContext jc) throws IOException {
+		Configuration conf = jc.getConfiguration();
 		int numMapTasks = conf.getInt("hipi.map.tasks", 0);
 		List<InputSplit> splits = new ArrayList<InputSplit>();
-		for (FileStatus file : listStatus(job)) {
+		for (FileStatus file : listStatus(jc)) {
 			Path path = file.getPath();
 			FileSystem fs = path.getFileSystem(conf);
 			HipiImageBundle hib = new HipiImageBundle(path, conf);
@@ -104,10 +104,6 @@ public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesW
 			}
 			hib.close();
 		}
-		InputSplit [] splitArray = new InputSplit[splits.size()];
-		for(int index = 0; index < splits.size(); index++) {
-			splitArray[index] = splits.get(index);
-		}
-		return splitArray;
+		return splits;
 	}
 }

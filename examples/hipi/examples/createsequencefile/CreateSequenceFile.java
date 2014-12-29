@@ -22,26 +22,21 @@ import hipi.image.io.ImageEncoder;
 import hipi.image.io.JPEGImageUtil;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
 
 public class CreateSequenceFile extends Configured
 implements Tool {
 
-	public static class SequenceFileMapper extends MapReduceBase implements Mapper<ImageHeader, FloatImage, LongWritable, BytesWritable> {
+	public static class SequenceFileMapper extends Mapper<ImageHeader, FloatImage, LongWritable, BytesWritable> {
 		@Override
-		public void map(ImageHeader key, FloatImage value, 
-			OutputCollector<LongWritable, BytesWritable> output, Reporter reporter)
-		throws IOException {
+		public void map(ImageHeader key, FloatImage value, Context context)
+		throws IOException, InterruptedException {
 			if(value != null){
 				ImageEncoder encoder = JPEGImageUtil.getInstance();
 				ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -49,21 +44,10 @@ implements Tool {
 				os.close();
 				byte[] val = os.toByteArray();
 				long sig = 0<<2 | ImageType.JPEG_IMAGE.toValue();
-				output.collect(new LongWritable(sig), new BytesWritable(val));
+				context.write(new LongWritable(sig), new BytesWritable(val));
 			}
 		}
 
-	}
-
-	public static class SequenceFileReducer extends MapReduceBase implements 
-		Reducer<LongWritable, BytesWritable, LongWritable, BytesWritable> {
-		@Override
-		public void reduce(LongWritable key, Iterator<BytesWritable> values, 
-			OutputCollector<LongWritable, BytesWritable> output, Reporter reporter) throws IOException {
-			while(values.hasNext()) {
-				output.collect(key, values.next());
-			}
-		}
 	}
 
 	public int run(String[] args) throws Exception {
@@ -80,16 +64,16 @@ implements Tool {
 		conf.setStrings("createsequencefile.outdir", outputPath);
 
 
-		JobConf job = new JobConf();
+		Job job = Job.getInstance(conf, "createsequencefile");
 		job.setJarByClass(CreateSequenceFile.class);
 		job.setMapperClass(SequenceFileMapper.class);
-		job.setReducerClass(SequenceFileReducer.class);
+		job.setReducerClass(Reducer.class);
 
 		// Set formats
 		job.setOutputKeyClass(LongWritable.class);
 		job.setOutputValueClass(BytesWritable.class);   
-		job.setOutputFormat(SequenceFileOutputFormat.class);
-		job.setInputFormat(ImageBundleInputFormat.class);
+		job.setOutputFormatClass(SequenceFileOutputFormat.class);
+		job.setInputFormatClass(ImageBundleInputFormat.class);
 
 		// Set out/in paths
 		removeDir(outputPath, conf);
@@ -97,7 +81,8 @@ implements Tool {
 		FileInputFormat.setInputPaths(job, new Path(args[0]));	
 
 		job.setNumReduceTasks(1);
-		JobClient.runJob(job);
+		
+		System.exit(job.waitForCompletion(true) ? 0 : 1);
 		return 0;
 
 	}

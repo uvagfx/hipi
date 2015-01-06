@@ -30,21 +30,15 @@ import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.Iterator;
 
-
-
-
 public class Covariance extends Configured implements Tool {
 
 	public static final int N = 48;
 	public static final float sigma = 10;
 
-
 	public static class MeanMap extends Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {	
-		
 		@Override
 		public void map(ImageHeader key, FloatImage value, Context context) 
-			throws IOException, InterruptedException {
-
+				throws IOException, InterruptedException {
 			if (value != null && value.getWidth() > N && value.getHeight() > N) {
 				context.write(new IntWritable(0), generateMeanImage(value, 10, 10));
 			}
@@ -65,7 +59,7 @@ public class Covariance extends Configured implements Tool {
 		}
 	}
 
-	public static class MeanReduce extends
+	public static class MeanReduce extends 
 			Reducer<IntWritable, FloatImage, IntWritable, FloatImage> {
 
        	@Override
@@ -112,23 +106,20 @@ public class Covariance extends Configured implements Tool {
 					}
 				}
 				tg = (N * N) / tg;
-
 				for (int i = 0; i < N; i++) {
 					for (int j = 0; j < N; j++) {
 						g[i * N + j] *= tg;
 					}
 				}
-
 				URI[] files = new URI[1];
 				if (job.getCacheFiles() != null) {
 		            files = job.getCacheFiles();
 	        	} else {
-	        		System.out.println("cache files null...");
+	        		System.err.println("cache files null...");
 	        	}
-
-	        	System.out.println("Path: "+files[0].toString());
 				
-				FSDataInputStream dis = FileSystem.get(job.getConfiguration()).open(new Path(files[0].toString()));
+				Path cacheFilePath = new Path(files[0].toString());
+				FSDataInputStream dis = FileSystem.get(job.getConfiguration()).open(cacheFilePath);
 				dis.skip(4);
 				FloatImage image = new FloatImage();
 				image.readFields(dis);
@@ -139,7 +130,8 @@ public class Covariance extends Configured implements Tool {
        	}	
 
        	@Override
-		public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException {
+		public void map(ImageHeader key, FloatImage value, Context context) 
+				throws IOException, InterruptedException {
 
 			if (value != null && value.getWidth() > N && value.getHeight() > N) {
 				float[][] tp = new float[100][N * N];
@@ -243,7 +235,6 @@ public class Covariance extends Configured implements Tool {
 	}
 	
 	public int runCovariance(String[] args) throws Exception {
-		System.out.println("~~~~~~~IN COVARIANCE~~~~~~~~~~");
 		HipiJob job = new HipiJob(getConf(), "Covariance");
 		job.setJarByClass(Covariance.class);
 

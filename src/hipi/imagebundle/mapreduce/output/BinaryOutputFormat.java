@@ -10,20 +10,18 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.GzipCodec;
-import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.util.ReflectionUtils;
 
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.mapreduce.OutputFormat; 
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapreduce.RecordWriter;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class BinaryOutputFormat<K, V> extends FileOutputFormat<K, V> {
 
-	protected static class BinaryRecordWriter<K, V> implements RecordWriter<K, V> {
+	protected static class BinaryRecordWriter<K, V> extends RecordWriter<K, V> {
 
 		protected DataOutputStream out;
 		
@@ -32,34 +30,30 @@ public class BinaryOutputFormat<K, V> extends FileOutputFormat<K, V> {
 		}
 		
 		@Override
-		public void close(Reporter reporter) {
-			try {
+		public void close(TaskAttemptContext context) throws IOException, InterruptedException {
 				out.close();
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-			}
 		}
 
 		@Override
-		public void write(K key, V value) throws IOException {
+		public void write(K key, V value) throws IOException, InterruptedException {
 			((Writable) key).write(out);
 			((Writable) value).write(out);
 		}
 	}
 
 	@Override
-	public RecordWriter<K, V> getRecordWriter(FileSystem ignored, JobConf job, String name, Progressable progress)
-			throws IOException {
+	public RecordWriter<K, V> getRecordWriter(TaskAttemptContext job)
+			throws IOException, InterruptedException {
 		boolean isCompressed = getCompressOutput(job);
 		CompressionCodec codec = null;
 		String extension = "";
 		if (isCompressed) {
 			Class<? extends CompressionCodec> codecClass = getOutputCompressorClass(job, GzipCodec.class);
-			codec = ReflectionUtils.newInstance(codecClass, job);
+			codec = ReflectionUtils.newInstance(codecClass, job.getConfiguration());
 			extension = codec.getDefaultExtension();
 		}
-		Path file = getTaskOutputPath(job, "temp"+extension);
-		FileSystem fs = file.getFileSystem(job);
+		Path file = getDefaultWorkFile(job, extension);
+		FileSystem fs = file.getFileSystem(job.getConfiguration());
 		FSDataOutputStream fileOut = fs.create(file, false);
 		if (!isCompressed) {
 			return new BinaryRecordWriter<K, V>(fileOut);

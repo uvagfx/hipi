@@ -8,23 +8,28 @@ import hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
 import hipi.imagebundle.HipiImageBundle;
 import hipi.image.ImageHeader.ImageType;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Iterator;
-import java.io.DataOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
-
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.conf.*;
-import org.apache.hadoop.io.*;
-import org.apache.hadoop.mapreduce.*;
-import org.apache.hadoop.mapreduce.lib.input.*;
-import org.apache.hadoop.mapreduce.lib.output.*;
-import org.apache.hadoop.util.*;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+
+import java.io.IOException;
+import java.io.DataOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.util.Iterator;
+
 
 
 
@@ -55,7 +60,7 @@ public class Covariance extends Configured implements Tool {
 					mean.add(patch);
 				}
 			}
-			mean.scale(1.0 / (xPatchCount * yPatchCount));
+			mean.scale((float)(1.0 / (xPatchCount * yPatchCount)));
 			return mean;
 		}
 	}
@@ -66,7 +71,7 @@ public class Covariance extends Configured implements Tool {
        	@Override
 		public void reduce(IntWritable key, Iterable<FloatImage> values, Context context) 
 			throws IOException, InterruptedException {
-				
+
 			FloatImage mean = new FloatImage(N, N, 1);
 			int total = 0;
 			for (FloatImage val : values) {

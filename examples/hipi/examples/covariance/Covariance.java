@@ -37,21 +37,26 @@ public class Covariance extends Configured implements Tool {
 	public static class MeanMap extends Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {	
 		
 		@Override
-		public void map(ImageHeader key, FloatImage value, 
-			Context context) throws IOException, InterruptedException {
+		public void map(ImageHeader key, FloatImage value, Context context) 
+			throws IOException, InterruptedException {
+
 			if (value != null && value.getWidth() > N && value.getHeight() > N) {
-				FloatImage mean = new FloatImage(N, N, 1);
-				for (int i = 0; i < 10; i++) {
-					int x = (value.getWidth() - N) * i / 10;
-					for (int j = 0; j < 10; j++) {
-						int y = (value.getHeight() - N) * j / 10;
-						FloatImage patch = value.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
-						mean.add(patch);
-					}
-				}
-				mean.scale(0.01f);
-				context.write(new IntWritable(0), mean);
+				context.write(new IntWritable(0), generateMeanImage(value, 10, 10));
 			}
+		}
+
+		private FloatImage generateMeanImage(FloatImage input, int xPatchCount, int yPatchCount) {
+			FloatImage mean = new FloatImage(N, N, 1);
+			for(int i = 0; i < xPatchCount; i++) {
+				int x = (input.getWidth() - N) * i / xPatchCount;
+				for (int j = 0; j < yPatchCount; j++) {
+					int y = (input.getHeight() - N) * j / yPatchCount;
+					FloatImage patch = input.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
+					mean.add(patch);
+				}
+			}
+			mean.scale(1.0 / (xPatchCount * yPatchCount));
+			return mean;
 		}
 	}
 
@@ -59,7 +64,9 @@ public class Covariance extends Configured implements Tool {
 			Reducer<IntWritable, FloatImage, IntWritable, FloatImage> {
 
        	@Override
-		public void reduce(IntWritable key, Iterable<FloatImage> values, Context context) throws IOException, InterruptedException {
+		public void reduce(IntWritable key, Iterable<FloatImage> values, Context context) 
+			throws IOException, InterruptedException {
+				
 			FloatImage mean = new FloatImage(N, N, 1);
 			int total = 0;
 			for (FloatImage val : values) {
@@ -254,8 +261,8 @@ public class Covariance extends Configured implements Tool {
 		}
 		job.setOutputFormatClass(BinaryOutputFormat.class);
 		job.setCompressMapOutput(true);
-		job.setMapSpeculativeExecution(true);
-		job.setReduceSpeculativeExecution(true);
+		job.setSpeculativeExecution(true);
+		
 
 		FileInputFormat.setInputPaths(job, new Path(args[0]));
 		mkdir(args[1], job.getConfiguration());

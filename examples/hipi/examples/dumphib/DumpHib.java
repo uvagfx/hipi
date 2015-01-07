@@ -1,7 +1,9 @@
 package hipi.examples.dumphib;
 
-import java.io.IOException;
-import java.util.Iterator;
+import hipi.image.FloatImage;
+import hipi.image.ImageHeader;
+import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
+import hipi.util.ByteUtils;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -17,40 +19,26 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import hipi.image.FloatImage;
-import hipi.image.ImageHeader;
-import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
-import hipi.util.ByteUtils;
-
-import org.apache.hadoop.mapred.JobClient;
+import java.io.IOException;
+import java.util.Iterator;
 
 public class DumpHib extends Configured implements Tool {
 
 	public static class DumpHibMapper extends Mapper
-		<ImageHeader, FloatImage, IntWritable, Text> {
-          
+		<ImageHeader, FloatImage, IntWritable, Text> {      
 		@Override
 		public void map(ImageHeader key, FloatImage value, Context context) 
-			throws IOException, InterruptedException {
-
-			if (value != null) {
-				int imgWidth = value.getWidth();
-				int imgHeight = value.getHeight();
-				String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
-				String camera = key.getEXIFInformation("Model");
-				String outputStr = imgWidth + "x" + imgHeight + "\t(" + hexHash + ")\t	" + camera;
-				System.out.println("Mapper Result: "+outputStr);
-				context.write(new IntWritable(1), new Text(outputStr));				
-			} else {
-				System.err.println("Mapper value was null");
-			}
+				throws IOException, InterruptedException {
+			String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
+			String camera = key.getEXIFInformation("Model");
+			String outputStr = value.getWidth() + "x" + value.getHeight() 
+								+ "\t(" + hexHash + ")\t	" + camera;
+			System.out.println("Image Data: "+outputStr);
+			context.write(new IntWritable(1), new Text(outputStr));				
 		}
-
 	}
 	
-	public static class DumpHibReducer extends Reducer <IntWritable, Text, 
-		IntWritable, Text> {
-
+	public static class DumpHibReducer extends Reducer <IntWritable, Text, IntWritable, Text> {
         @Override
 		public void reduce(IntWritable key, Iterable<Text> values, Context context) 
 				throws IOException, InterruptedException {
@@ -62,17 +50,15 @@ public class DumpHib extends Configured implements Tool {
 
 	public int run(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        // Set job configuration
+
         Job job = Job.getInstance(conf, "dumphib");
         job.setJarByClass(DumpHib.class);
         job.setMapperClass(DumpHibMapper.class);
         job.setReducerClass(DumpHibReducer.class);
-        job.setNumReduceTasks(1);
-        
-        // Set formats
 		job.setOutputKeyClass(IntWritable.class);
 		job.setOutputValueClass(Text.class);
 		job.setInputFormatClass(ImageBundleInputFormat.class);
+		job.setNumReduceTasks(1);
         
 		if (args.length < 2) {
 			System.out.println("Usage: dumphib <input hib> <outputdir>");
@@ -81,33 +67,26 @@ public class DumpHib extends Configured implements Tool {
         
 		String inputPath = args[0];
 		String outputPath = args[1];
-		System.out.println("Input path: "+inputPath);
-		System.out.println("Output path: "+outputPath);
 
-
-		// Set out/in paths
 		removeDir(outputPath, conf);
 		FileOutputFormat.setOutputPath(job, new Path(outputPath));
 		FileInputFormat.setInputPaths(job, new Path(inputPath));	
 
 		job.setNumReduceTasks(1);
-		System.exit(job.waitForCompletion(true) ? 0 : 1);
-		return 0;
-
+		return job.waitForCompletion(true) ? 0 : 1;
 	}
 
-	public static void main(String[] args) throws Exception {
-		int exitCode = ToolRunner.run(new DumpHib(), args);
-		System.exit(exitCode);
-	}
-
-	public static void removeDir(String path, Configuration conf) throws IOException {
+	private static void removeDir(String path, Configuration conf) throws IOException {
 		Path output_path = new Path(path);
-
 		FileSystem fs = FileSystem.get(conf);
-
 		if (fs.exists(output_path)) {
 			fs.delete(output_path, true);
 		}
 	}
+
+	public static void main(String[] args) throws Exception {
+		int res = ToolRunner.run(new DumpHib(), args);
+		System.exit(res);
+	}
+
 }

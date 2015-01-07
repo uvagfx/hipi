@@ -24,7 +24,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
 
-
 /**
  * A utility MapReduce program that takes a list of image URL's, downloads them, and creates 
  * a {@link hipi.imagebundle.HipiImageBundle} from them.
@@ -42,10 +41,10 @@ import java.util.Iterator;
  * be responsible for downloading 10,000 images.
  *
  */
-public class Downloader extends Configured implements Tool{
+public class Downloader extends Configured implements Tool {
 
-	public static class DownloaderMapper extends Mapper 
-		<IntWritable, Text, BooleanWritable, Text> {
+	public static class DownloaderMapper 
+			extends Mapper <IntWritable, Text, BooleanWritable, Text> {
 
 		private static Configuration conf;
 
@@ -56,9 +55,9 @@ public class Downloader extends Configured implements Tool{
 
 		@Override
 		public void map(IntWritable key, Text value, Context context) 
-			throws IOException, InterruptedException {
+				throws IOException, InterruptedException {
+
 			String temp_path = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
-			
 			HipiImageBundle hib = new HipiImageBundle(new Path(temp_path), conf);
 			hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 
@@ -69,7 +68,6 @@ public class Downloader extends Configured implements Tool{
 			int iprev = i;
 
 			while ((uri = reader.readLine()) != null) {
-				System.out.println("next uri: "+uri);
 				if (i >= iprev+100) {
 					hib.close();
 					context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
@@ -80,7 +78,7 @@ public class Downloader extends Configured implements Tool{
 				}
 				long startT=0;
 				long stopT=0;	   
-				startT = System.currentTimeMillis();	    	    
+				startT = System.currentTimeMillis();    	    
 
 				try {
 					String type = "";
@@ -129,8 +127,8 @@ public class Downloader extends Configured implements Tool{
 		}
 	}
 
-	public static class DownloaderReducer extends Reducer 
-		<BooleanWritable, Text, BooleanWritable, Text> {
+	public static class DownloaderReducer 
+			extends Reducer <BooleanWritable, Text, BooleanWritable, Text> {
 
 		private static Configuration conf;
 
@@ -140,7 +138,8 @@ public class Downloader extends Configured implements Tool{
        	}
 
 		@Override
-		public void reduce(BooleanWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+		public void reduce(BooleanWritable key, Iterable<Text> values, Context context) 
+				throws IOException, InterruptedException {
 			if (key.get()) {
 				FileSystem fileSystem = FileSystem.get(conf);
 				Path outputHibPath = new Path(conf.get("downloader.outfile"));
@@ -150,14 +149,12 @@ public class Downloader extends Configured implements Tool{
 					Path temp_path = new Path(temp_string.toString());
 					HipiImageBundle input_bundle = new HipiImageBundle(temp_path, conf);
 					hib.append(input_bundle);
-					
 					Path index_path = input_bundle.getPath();
 					Path data_path = new Path(index_path.toString() + ".dat");
-					System.out.println("Deleting: " + data_path.toString());
 					fileSystem.delete(index_path, false);
 					fileSystem.delete(data_path, false);
-					
-					context.write(new BooleanWritable(true), new Text(input_bundle.getPath().toString()));
+					Text outputPath =  new Text(input_bundle.getPath().toString());
+					context.write(new BooleanWritable(true), outputPath);
 					context.progress();
 				}
 				hib.close();
@@ -166,20 +163,17 @@ public class Downloader extends Configured implements Tool{
 	}
 
 
-	public int run(String[] args) throws Exception
-	{	
+	public int run(String[] args) throws Exception {	
 
-		// Read in the configuration file
-		if (args.length < 3) {
+		if (args.length != 3) {
 			System.out.println("Usage: downloader <input file> <output file> <nodes>");
 			System.exit(0);
 		}
 
 		String inputFile = args[0];
 		String outputFile = args[1];
-		int nodes = Integer.parseInt(args[2]);
-
 		String outputPath = outputFile.substring(0, outputFile.lastIndexOf('/')+1);
+		int nodes = Integer.parseInt(args[2]);
 
 		Configuration conf = new Configuration();
 		conf.setInt("downloader.nodes", nodes);
@@ -193,17 +187,15 @@ public class Downloader extends Configured implements Tool{
 		job.setOutputKeyClass(BooleanWritable.class);
 		job.setOutputValueClass(Text.class);       
 		job.setInputFormatClass(DownloaderInputFormat.class);
-
-		//*************** IMPORTANT ****************\\
 		job.setMapOutputKeyClass(BooleanWritable.class);
 		job.setMapOutputValueClass(Text.class);
+		job.setNumReduceTasks(1);
+
 		FileOutputFormat.setOutputPath(job, new Path(outputFile + "_output"));
 
 		DownloaderInputFormat.setInputPaths(job, new Path(inputFile));
 
-		job.setNumReduceTasks(1);
-		System.exit(job.waitForCompletion(true) ? 0 : 1);
-		return 0;
+		return job.waitForCompletion(true) ? 0 : 1;
 	}
 
 	public static void main(String[] args) throws Exception {

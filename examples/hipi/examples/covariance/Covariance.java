@@ -81,7 +81,7 @@ public class Covariance extends Configured implements Tool {
 
 		private void createTestHib(FloatImage mean, Configuration conf) throws IOException {
 			HipiImageBundle hib = 
-				new HipiImageBundle(new Path("zdv8rb/updated/covariance/output2.hib"), conf);
+				new HipiImageBundle(new Path("/zdv8rb/updated/covariance/output2.hib"), conf);
 			hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 			hib.addImage(mean);
 			hib.close();
@@ -204,7 +204,7 @@ public class Covariance extends Configured implements Tool {
 	public int runMeanCompute(String[] args) throws Exception {
 
 
-		HipiJob job = new HipiJob(getConf(), "Covariance");
+		Job job = HipiJob.getHipiJobInstance(getConf(), "Covariance");
 		job.setJarByClass(Covariance.class);
 		job.setOutputKeyClass(IntWritable.class);
 		job.setOutputValueClass(FloatImage.class);
@@ -235,7 +235,7 @@ public class Covariance extends Configured implements Tool {
 	}
 	
 	public int runCovariance(String[] args) throws Exception {
-		HipiJob job = new HipiJob(getConf(), "Covariance");
+		Job job = HipiJob.getHipiJobInstance(getConf(), "Covariance");
 		job.setJarByClass(Covariance.class);
 
 		
@@ -256,7 +256,7 @@ public class Covariance extends Configured implements Tool {
 			System.exit(0);			
 		}
 		job.setOutputFormatClass(BinaryOutputFormat.class);
-		job.setCompressMapOutput(true);
+		//job.setCompressMapOutput(true);
 		job.setSpeculativeExecution(true);
 		
 

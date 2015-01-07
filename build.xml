@@ -58,11 +58,11 @@
     </antcall>
   </target>
 
-  <!-- Extract a HIB into a folder and a sequence file of its constituent images -->
-  <target name="hib2jpg">
+  <!-- Extract jpeg images from a HIB into a folder -->
+  <target name="jpegfromhib">
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/jpegfromhib" />
-      <param name="jarfilename" value="hib2jpg.jar" />
+      <param name="jarfilename" value="jpegfromhib.jar" />
       <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.jpegfromhib.JpegFromHib" />
     </antcall>
@@ -87,7 +87,7 @@
     </antcall>
   </target>
 
-  <target name="all" depends="hibimport, covariance, downloader, hib2jpg, createsequencefile, dumphib" />
+  <target name="all" depends="hibimport, covariance, downloader, jpegfromhib, createsequencefile, dumphib" />
 
   <!-- Clean -->
   <target name="clean">    

@@ -42,44 +42,46 @@
     <div class="content">
       <h2>Overview</h2>
       <div class="section">
-	HIPI is a library for <a class="external_link"
-	href="http://hadoop.apache.org/mapreduce">Hadoop's
-	MapReduce</a> framework that provides an API for performing
+	HIPI is a library for
+	the <a href="http://hadoop.apache.org/">Apache Hadoop</a>
+	programming framework that provides an API for performing
 	image processing tasks in a distributed computing
-	environment. Here is an overview of our system:
+	environment. Here is a system overview:
 	
 	<img class="centered_image" src="images/hipi_pipeline.png" width="700" alt=""/>
 	
-	The input type used in HIPI is referred to as a <a
+	The main input type used in HIPI is a <a
 	href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
 	(HIB). A HIB is a set of images combined into one large file
 	along with some metadata describing the layout of the
-	images. A HIB can be created from an already existing set of
-	images or directly through some other source (e.g. our <a
+	images. A HIB can be created from an existing set of
+	images already located on the Hadoop Distributed File System (HDFS) or from a remote source (e.g. our <a
 	href="examples/downloader.html">Distributed Downloader
 	example</a>). <br /><br />
 
-	In order to improve the efficiency of some jobs, HIPI allows a
-	user to specify a culling function that discards images that
-	do not meet a specified set of criteria (e.g. the image must
-	be less than 10 megapixels). The user-specified <a
-	href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html">CullMapper</a>
-	class is then invoked on each image that passes the culling
-	test. Images are presented to this class as a <a
-	href="doc/api/hipi/image/FloatImage.html">FloatImage</a>
-	and an associated <a
-	href="doc/api/hipi/image/ImageHeader.html">ImageHeader</a>. Although
-	HIPI does not directly modify any of the default Hadoop
-	MapReduce behavior once the Mapper's take over, a user can
-	modify execution parameters specific to image processing tasks
-	through the <a href="doc/api/hipi/imagebundle/mapreduce/HipiJob.html">HipiJob</a> object during setup.  <br
-	/><br />
+	In order to improve efficiency, HIPI adds a culling step to
+	the conventional MapReduce workflow. This allows discarding
+	images that do not meet a set of criteria based on the image
+	metadata (e.g., the image must be less than 10MP). Culling an
+	image avoids the expensive step of decompressing the full
+	pixel buffer into main memory. The user
+	specified <a href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html">CullMapper</a>
+	is invoked on each image that survives the culling
+	stage. Images are presented to this class as
+	a <a href="doc/api/hipi/image/FloatImage.html">FloatImage</a>
+	object with an
+	associated <a href="doc/api/hipi/image/ImageHeader.html">ImageHeader</a>
+	object. Although HIPI does not modify any of the default job
+	scheduling behavior in MapReduce, you can modify execution
+	parameters specific to image processing tasks through
+	the <a href="doc/api/hipi/imagebundle/mapreduce/HipiJob.html">HipiJob</a>
+	object during setup.  <br /><br />
 
-	Great care has been taken to ensure that the implementations
-	of the necessary components of Hadoop MapReduce are efficient
-	and effective for image processing tasks. Please see our <a
-	href="experiments.html">Experiments</a> section for further
-	analysis of HIPI.
+	Great care has been taken to ensure that the implementation of
+	key steps in the Hadoop MapReduce workflow are efficient for
+	image processing tasks. Please see
+	our <a href="experiments.html">Experiments</a> section for a
+	more detailed analysis including performance benchmarks.
       </div>
       
       <h2>The Four Main Classes</h2>

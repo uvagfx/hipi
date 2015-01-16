@@ -16,6 +16,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.hadoop.io.compress.DefaultCodec;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -221,10 +222,8 @@ public class Covariance extends Configured implements Tool {
 			System.exit(0);			
 		}
 		job.setOutputFormatClass(BinaryOutputFormat.class);
-		// job.setCompressMapOutput(true);
-		job.setMapSpeculativeExecution(true);
-		job.setReduceSpeculativeExecution(true);
-		// FileOutputFormat.setCompressOutput(job, true);
+		job.getConfiguration().setBoolean("mapreduce.map.output.compress", true);
+		job.setSpeculativeExecution(true);
 		FileInputFormat.setInputPaths(job, new Path(args[0]));
 		mkdir(args[1], job.getConfiguration());
 		rmdir(args[1] + "/mean-output/", job.getConfiguration());
@@ -256,7 +255,7 @@ public class Covariance extends Configured implements Tool {
 			System.exit(0);			
 		}
 		job.setOutputFormatClass(BinaryOutputFormat.class);
-		//job.setCompressMapOutput(true);
+		job.getConfiguration().setBoolean("mapreduce.map.output.compress", true);
 		job.setSpeculativeExecution(true);
 		
 

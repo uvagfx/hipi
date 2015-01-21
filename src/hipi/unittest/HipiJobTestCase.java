@@ -1,47 +1,35 @@
 package hipi.unittest;
 
 import static org.junit.Assert.*;
+
 import hipi.imagebundle.mapreduce.HipiJob;
+import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.Job;
+
 import org.junit.Before;
 import org.junit.Test;
 
 public class HipiJobTestCase {
 
-	private HipiJob job;
+	private Job job;
 	
 	@Before
 	public void setUp() throws Exception {
 		Configuration conf = new Configuration();
-		job = new HipiJob(conf);
+		job = HipiJob.getHipiJobInstance(conf);
 	}
 
+	//TODO - how to test class
 	@Test
-	public void testSetMapSpeculativeExecution() {
-		job.setMapSpeculativeExecution(false);
-		assertEquals(false, job.getConfiguration().getBoolean("mapred.map.tasks.speculative.execution", true));
-		
-		job.setMapSpeculativeExecution(true);
-		assertEquals(true, job.getConfiguration().getBoolean("mapred.map.tasks.speculative.execution", false));
-	}
-
-	@Test
-	public void testSetReduceSpeculativeExecution() {
-		job.setReduceSpeculativeExecution(false);
-		assertEquals(false, job.getConfiguration().getBoolean("mapred.reduce.tasks.speculative.execution", true));
-		
-		job.setReduceSpeculativeExecution(true);
-		assertEquals(true, job.getConfiguration().getBoolean("mapred.reduce.tasks.speculative.execution", false));
-	}
-
-	@Test
-	public void testSetCompressMapOutput() {
-		job.setCompressMapOutput(false);
-		assertEquals(false, job.getConfiguration().getBoolean("mapred.compress.map.output", true));
-		
-		job.setCompressMapOutput(true);
-		assertEquals(true, job.getConfiguration().getBoolean("mapred.compress.map.output", false));
+	public void testSetInputFormatClass() {
+		// try {
+		// 	assertTrue(job.getInputFormatClass() instanceof ImageBundleInputFormat); 
+		// } catch (ClassNotFoundException cnfe) {
+		// 	cnfe.printStackTrace();
+		// 	fail();
+		// }
 	}
 
 }

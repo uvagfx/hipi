@@ -5,6 +5,17 @@
     <property name="hadoop.version" value="2.5.1" />
     <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-2.5.1.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-2.5.1.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/hdfs/hadoop-hdfs-2.5.1.jar:${hadoop.home}/common/hadoop-nfs-2.5.1.jar" />
     <property name="metadata.jar" value="3rdparty/metadata-extractor-2.6.4.jar" />
+    <property name="junit.jar" value="3rdparty/junit-4.12.jar" />
+    <property name="hamcrest.jar" value="3rdparty/hamcrest-core-1.3.jar" />
+    <property name="commons.logging.jar" value="3rdparty/commons-logging-1.1.2.jar" />
+    <property name="guava.jar" value="3rdparty/guava-18.0.jar" />
+    <property name="commons.collections.jar" value="3rdparty/commons-collections-3.2.1.jar" />
+    <property name="commons.lang.jar" value="3rdparty/commons-lang-2.6.jar" />
+    <property name="commons.configuration.jar" value="3rdparty/commons-configuration-1.10.jar" />
+    <property name="hadoop.auth.jar" value="3rdparty/hadoop-auth-2.5.1.jar" />
+    <property name="slf4j.api.jar" value="3rdparty/slf4j-api-1.7.10.jar" />
+    <property name="log4j.jar" value="3rdparty/log4j-1.2.17.jar" />
+    <property name="avro.jar" value="3rdparty/avro-1.7.7.jar" />
   </target>
 
   <target name="test_settings">
@@ -87,6 +98,13 @@
     </antcall>
   </target>
 
+  <target name="test" depends="setup, test_settings">
+    <javac includeantruntime="false" fork="true" srcdir="src/hipi/unittest" destdir="lib/hipi/unittest" classpath="${hadoop.classpath}:./src/hipi.jar:./3rdparty/junit-4.12.jar:./3rdparty/hamcrest-core-1.3.jar" debug="on"></javac>
+    <java fork="true" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${hadoop.auth.jar}:${slf4j.api.jar}:${log4j.jar}:${metadata.jar}:${avro.jar}:./src/hipi.jar:./lib">
+       <arg value="hipi.unittest.AllTests"/>
+     </java>
+  </target>
+
   <target name="all" depends="hibimport, covariance, downloader, jpegfromhib, createsequencefile, dumphib" />
 
   <!-- Clean -->
@@ -96,5 +114,6 @@
       <fileset dir="." includes="examples/*.jar,experiments/*.jar" />
     </delete>
   </target>
+
 
 </project>

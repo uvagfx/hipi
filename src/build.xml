@@ -1,10 +1,11 @@
 <project basedir="." default="all">
 
   <target name="setup">
-    <property name="hadoop.home" value="/opt/hadoop-2.5.1/share/hadoop" />
-    <property name="hadoop.version" value="2.5.1" />
-    <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-2.5.1.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-2.5.1.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/hdfs/hadoop-hdfs-2.5.1.jar:${hadoop.home}/common/hadoop-nfs-2.5.1.jar" />
+    <property name="hadoop.home" value="/usr/local/Cellar/hadoop" />
+    <property name="hadoop.version" value="2.6.0" />
+    <property name="hadoop.classpath" value="${hadoop.home}/${hadoop.version}/libexec/share/hadoop/common/hadoop-common-${hadoop.version}.jar:${hadoop.home}/${hadoop.version}/libexec/share/hadoop/mapreduce/hadoop-mapreduce-client-core-${hadoop.version}.jar:${hadoop.home}/${hadoop.version}/libexec/share/hadoop/tools/lib/commons-cli-1.2.jar:${hadoop.home}/${hadoop.version}/libexec/share/hadoop/hdfs/hadoop-hdfs-${hadoop.version}.jar:${hadoop.home}/${hadoop.version}/libexec/share/hadoop/tools/lib/" />
     <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.6.4.jar" />
+    <property name="junit.jar" value="../3rdparty/junit-4.12.jar" />
   </target>
 
   <target name="test_settings">
@@ -15,9 +16,8 @@
   <target name="all" depends="setup, test_settings">
     <mkdir dir="../lib" />
     <!-- Compile -->
-    <javac nowarn="on" includeantruntime="no" srcdir="./hipi/container:./hipi/image:./hipi/imagebundle:./hipi/util" destdir="../lib" classpath="${hadoop.classpath}:${metadata.jar}:${junit.jar}">
+    <javac nowarn="on" includeantruntime="no" srcdir="./hipi/container:./hipi/image:./hipi/imagebundle:./hipi/util:./hipi/unittest" destdir="../lib" classpath="${hadoop.classpath}:${metadata.jar}:${junit.jar}">
       <compilerarg value="-Xlint:deprecation" />
-      <compilerarg value="-Xdiags:verbose" />
     </javac>
     <!-- Create the jar -->
     <jar destfile="./hipi.jar" basedir="../lib">

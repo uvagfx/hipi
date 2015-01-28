@@ -48,7 +48,7 @@ public class FloatImage implements Writable, RawComparator<BinaryComparable> {
 		FloatImage thatImage = (FloatImage)that;
 		if (thatImage.getWidth() == _w && thatImage.getHeight() == _h &&
 			thatImage.getBands() == _b) {
-			float delta = 1.0f;
+			float delta = 1.0f / 255.0f;
 			float[] pels = thatImage.getData();
 			for (int i = 0; i < _w * _h * _b; i++) {
 				if (Math.abs(_pels[i] - pels[i]) > delta) {

@@ -148,11 +148,12 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 		BufferedImage bufferedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
 		float[] data = image.getData();
 		int[] rgb = new int[image.getWidth() * image.getHeight()];
-		for (int i = 0; i < (image.getWidth() * image.getHeight())/3; i++)
+		for (int i = 0; i < (image.getWidth() * image.getHeight()); i++)
 		{
 			int r = Math.min(Math.max((int)(data[i * 3] * 255), 0), 255);
 			int g = Math.min(Math.max((int)(data[i * 3 + 1] * 255), 0), 255);
 			int b = Math.min(Math.max((int)(data[i * 3 + 2] * 255), 0), 255);
+			//System.out.println("r: " + r + ", g: " + g + ", b: " + b);
 			rgb[i] = r << 16 | g << 8 | b;
 		}
 		bufferedImage.setRGB(0, 0, image.getWidth(), image.getHeight(), rgb, 0, image.getWidth());

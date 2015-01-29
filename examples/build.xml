@@ -1,9 +1,10 @@
 <project basedir="." default="all">
 
   <target name="setup">
-    <property name="hadoop.home" value="/opt/hadoop-2.5.1/share/hadoop/common/" />
-    <property name="hadoop.version" value="2.5.1" />
-    <property name="hadoop.classpath" value="${hadoop.home}/hadoop-common-${hadoop.version}.jar" />
+    <property name="hadoop.home" value="/usr/local/Cellar/hadoop" />
+    <property name="hadoop.version" value="2.6.0" />
+    <property name="hadoop.classpath" value="${hadoop.home}/${hadoop.version}/libexec/share/hadoop/common/hadoop-common-${hadoop.version}.jar:${hadoop.home}/${hadoop.version}/libexec/share/hadoop/mapreduce/hadoop-mapreduce-client-core-${hadoop.version}.jar:${hadoop.home}/${hadoop.version}/libexec/share/hadoop/tools/lib/commons-cli-1.2.jar:${hadoop.home}/${hadoop.version}/libexec/share/hadoop/hdfs/hadoop-hdfs-${hadoop.version}.jar:${hadoop.home}/${hadoop.version}/libexec/share/hadoop/tools/lib/" />
+    <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.6.4.jar" />
   </target>
 
   <target name="test_settings">

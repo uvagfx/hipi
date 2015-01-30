@@ -5,7 +5,6 @@ import hipi.image.ImageHeader;
 import hipi.imagebundle.mapreduce.HipiJob;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 import hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
-import hipi.imagebundle.HipiImageBundle;
 import hipi.image.ImageHeader.ImageType;
 
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -76,16 +75,7 @@ public class Covariance extends Configured implements Tool {
 			if (total > 0) {
 				mean.scale(1.0f / total);
 				context.write(key, mean);
-				createTestHib(mean, context.getConfiguration());
 			}
-		}
-
-		private void createTestHib(FloatImage mean, Configuration conf) throws IOException {
-			HipiImageBundle hib = 
-				new HipiImageBundle(new Path("/zdv8rb/updated/covariance/output2.hib"), conf);
-			hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
-			hib.addImage(mean);
-			hib.close();
 		}
 	}
 
@@ -175,15 +165,6 @@ public class Covariance extends Configured implements Tool {
 			}
 
 			context.write(key, cov);
-			createTestHib(cov, context.getConfiguration());
-		}
-
-		private void createTestHib(FloatImage mean, Configuration conf) throws IOException {
-			HipiImageBundle hib = 
-				new HipiImageBundle(new Path("/zdv8rb/updated/covariance/final.hib"), conf);
-			hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
-			hib.addImage(mean);
-			hib.close();
 		}
 	}
 

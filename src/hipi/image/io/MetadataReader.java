@@ -9,28 +9,27 @@ import com.drew.imaging.jpeg.JpegProcessingException;
 import com.drew.metadata.Metadata;
 
 /**
- * Helper class for extracting JPEG EXIF data. 
+ * Helper class for extracting JPEG EXIF data.
  */
 public class MetadataReader {
 
-	private class UnclosableBufferedInputStream extends BufferedInputStream {
+  private class UnclosableBufferedInputStream extends BufferedInputStream {
 
-	    public UnclosableBufferedInputStream(InputStream in) {
-	        super(in);
-	    }
+    public UnclosableBufferedInputStream(InputStream in) {
+      super(in);
+    }
 
-	    @Override
-	    public void close() throws IOException {
-	    }
-	}
-	
-	private UnclosableBufferedInputStream _ubis;
-	
-	public MetadataReader(InputStream is) {
-		_ubis = new UnclosableBufferedInputStream(is);
-	}
+    @Override
+    public void close() throws IOException {}
+  }
 
-	public Metadata extract() throws JpegProcessingException {
-		return JpegMetadataReader.readMetadata(_ubis);
-	}
+  private UnclosableBufferedInputStream _ubis;
+
+  public MetadataReader(InputStream is) {
+    _ubis = new UnclosableBufferedInputStream(is);
+  }
+
+  public Metadata extract() throws JpegProcessingException {
+    return JpegMetadataReader.readMetadata(_ubis);
+  }
 }

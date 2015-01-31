@@ -17,21 +17,20 @@ import org.junit.Test;
 
 public class FloatImageTestCase {
 
-	@Test
-	public void testFloatImageWritable() throws IOException {
-		ImageDecoder decoder = PPMImageUtil.getInstance();
-		FileInputStream fis;
-		String[] fileName = {"canon-ixus", "cmyk-jpeg-format"};
-		for (int i = 0; i < fileName.length; i++)
-		{
-			fis = new FileInputStream("data/test/JPEGImageUtilTestCase/truth/" + fileName[i] + ".ppm");
-			FloatImage image = decoder.decodeImage(fis);
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			image.write(new DataOutputStream(bos));
-			ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-			FloatImage newImage = new FloatImage();
-			newImage.readFields(new DataInputStream(bis));
-			assertEquals(fileName[i] + " writable test fails", image, newImage);
-		}
-	}
+  @Test
+  public void testFloatImageWritable() throws IOException {
+    ImageDecoder decoder = PPMImageUtil.getInstance();
+    FileInputStream fis;
+    String[] fileName = {"canon-ixus", "cmyk-jpeg-format"};
+    for (int i = 0; i < fileName.length; i++) {
+      fis = new FileInputStream("data/test/JPEGImageUtilTestCase/truth/" + fileName[i] + ".ppm");
+      FloatImage image = decoder.decodeImage(fis);
+      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      image.write(new DataOutputStream(bos));
+      ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+      FloatImage newImage = new FloatImage();
+      newImage.readFields(new DataInputStream(bis));
+      assertEquals(fileName[i] + " writable test fails", image, newImage);
+    }
+  }
 }

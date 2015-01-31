@@ -13,81 +13,80 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+
 /**
- * Treats keys as index into training array and value as the training vector. 
+ * Treats keys as index into training array and value as the training vector.
  */
 public class DownloaderRecordReader extends RecordReader<IntWritable, Text> {
 
-	private boolean singletonEmit;
-	private String urls;
-	private long start_line;
-	
-	@Override
-	public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
-		FileSplit f = (FileSplit) split;
-		Path path = f.getPath();
-		FileSystem fs = path.getFileSystem(context.getConfiguration());
+  private boolean singletonEmit;
+  private String urls;
+  private long start_line;
 
-		start_line = f.getStart();
-		long num_lines = f.getLength();
+  @Override
+  public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
+    FileSplit f = (FileSplit) split;
+    Path path = f.getPath();
+    FileSystem fs = path.getFileSystem(context.getConfiguration());
 
-		singletonEmit = false;
+    start_line = f.getStart();
+    long num_lines = f.getLength();
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(path)));
-		int i = 0;
-		while (i < start_line && reader.readLine() != null) {
-			i++;
-		}
-		
-		urls = "";
-		String line;
-		for (i = 0; i < num_lines && (line = reader.readLine()) != null; i++) {
-			urls += line + '\n';
-		}
+    singletonEmit = false;
 
-		reader.close();
-	}
+    BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(path)));
+    int i = 0;
+    while (i < start_line && reader.readLine() != null) {
+      i++;
+    }
 
+    urls = "";
+    String line;
+    for (i = 0; i < num_lines && (line = reader.readLine()) != null; i++) {
+      urls += line + '\n';
+    }
 
-	/**
-	 * Get the progress within the split
-	 */
-	@Override
-	public float getProgress() {
-		if (singletonEmit) {
-			return 1.0f;
-		} else {
-			return 0.0f;
-		}
-	}
-
-	@Override
-	public void close() throws IOException {
-		return;
-	}
-
-	@Override
-	public IntWritable getCurrentKey() throws IOException,
-		InterruptedException {
-		return new IntWritable((int)start_line);
-	}
+    reader.close();
+  }
 
 
-	@Override
-	public Text getCurrentValue() throws IOException,
-		InterruptedException {
-		return new Text(urls);
-	}
+  /**
+   * Get the progress within the split
+   */
+  @Override
+  public float getProgress() {
+    if (singletonEmit) {
+      return 1.0f;
+    } else {
+      return 0.0f;
+    }
+  }
 
-	@Override
-	public boolean nextKeyValue() throws IOException, InterruptedException {
-		if (singletonEmit == false) {
-			singletonEmit = true;
-			return true;
-		} else {
-			return false;
-		}
-	}
+  @Override
+  public void close() throws IOException {
+    return;
+  }
+
+  @Override
+  public IntWritable getCurrentKey() throws IOException, InterruptedException {
+    return new IntWritable((int) start_line);
+  }
+
+
+  @Override
+  public Text getCurrentValue() throws IOException, InterruptedException {
+    return new Text(urls);
+  }
+
+  @Override
+  public boolean nextKeyValue() throws IOException, InterruptedException {
+    if (singletonEmit == false) {
+      singletonEmit = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
 
 
 }

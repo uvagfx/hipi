@@ -5,6 +5,7 @@ import hipi.image.ImageHeader;
 
 import java.io.IOException;
 import java.io.OutputStream;
+
 /**
  * This class provides the necessary functions for writing an image from a FloatImage to an
  * OutputStream.
@@ -12,6 +13,7 @@ import java.io.OutputStream;
  */
 public interface ImageEncoder {
 
-	public ImageHeader createSimpleHeader(FloatImage image);
-	public void encodeImage(FloatImage image, ImageHeader header, OutputStream os) throws IOException;
+  public ImageHeader createSimpleHeader(FloatImage image);
+
+  public void encodeImage(FloatImage image, ImageHeader header, OutputStream os) throws IOException;
 }

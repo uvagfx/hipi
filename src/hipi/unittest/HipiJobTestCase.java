@@ -13,23 +13,23 @@ import org.junit.Test;
 
 public class HipiJobTestCase {
 
-	private Job job;
-	
-	@Before
-	public void setUp() throws Exception {
-		Configuration conf = new Configuration();
-		job = HipiJob.getHipiJobInstance(conf);
-	}
+  private Job job;
 
-	//TODO - how to test class
-	@Test
-	public void testSetInputFormatClass() {
-		// try {
-		// 	assertTrue(job.getInputFormatClass() instanceof ImageBundleInputFormat); 
-		// } catch (ClassNotFoundException cnfe) {
-		// 	cnfe.printStackTrace();
-		// 	fail();
-		// }
-	}
+  @Before
+  public void setUp() throws Exception {
+    Configuration conf = new Configuration();
+    job = HipiJob.getHipiJobInstance(conf);
+  }
+
+  // TODO - how to test class
+  @Test
+  public void testSetInputFormatClass() {
+    // try {
+    // assertTrue(job.getInputFormatClass() instanceof ImageBundleInputFormat);
+    // } catch (ClassNotFoundException cnfe) {
+    // cnfe.printStackTrace();
+    // fail();
+    // }
+  }
 
 }

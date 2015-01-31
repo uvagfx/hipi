@@ -32,8 +32,8 @@ import java.util.Iterator;
 
 public class Covariance extends Configured implements Tool {
 
-  public static final int N = 48;
-  public static final float sigma = 10;
+  public static final int N = 48; //patch size
+  public static final float sigma = 10; //used in gaussian function
 
   public static class MeanMap extends Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {
     @Override
@@ -44,6 +44,7 @@ public class Covariance extends Configured implements Tool {
       }
     }
 
+    //computes the mean of the 100 randomly sampled patches in each image, returns a FloatImage storing this mean
     private FloatImage generateMeanImage(FloatImage input, int xPatchCount, int yPatchCount) {
       FloatImage mean = new FloatImage(N, N, 1);
       for (int i = 0; i < xPatchCount; i++) {
@@ -81,26 +82,28 @@ public class Covariance extends Configured implements Tool {
   public static class CovarianceMap extends
       Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {
 
-    float[] g;
+    float[] gaussianArray;
     float[] mean;
 
     @Override
     public void setup(Context job) {
+      //Create a normalized gaussian array with standard deviation of 10 pixels for patch masking
       try {
-        g = new float[N * N];
-        float tg = 0;
+        gaussianArray = new float[N * N];
+        float gaussianSum = 0;
         for (int i = 0; i < N; i++) {
           for (int j = 0; j < N; j++) {
-            tg +=
-                g[i * N + j] =
+            //two-dimensional gaussian function
+            gaussianSum +=
+                gaussianArray[i * N + j] =
                     (float) Math.exp(-((i - N / 2) * (i - N / 2) / (sigma * sigma) + (j - N / 2)
                         * (j - N / 2) / (sigma * sigma)));
           }
         }
-        tg = (N * N) / tg;
         for (int i = 0; i < N; i++) {
           for (int j = 0; j < N; j++) {
-            g[i * N + j] *= tg;
+            //normalize
+            gaussianArray[i * N + j] *= (N * N) / gaussianSum;
           }
         }
         URI[] files = new URI[1];
@@ -110,6 +113,7 @@ public class Covariance extends Configured implements Tool {
           System.err.println("cache files null...");
         }
 
+        //get mean from previously run mean job
         Path cacheFilePath = new Path(files[0].toString());
         FSDataInputStream dis = FileSystem.get(job.getConfiguration()).open(cacheFilePath);
         dis.skip(4);
@@ -124,9 +128,11 @@ public class Covariance extends Configured implements Tool {
     @Override
     public void map(ImageHeader key, FloatImage value, Context context) throws IOException,
         InterruptedException {
-
       if (value != null && value.getWidth() > N && value.getHeight() > N) {
-        float[][] tp = new float[100][N * N];
+        //holds 100 patches as they are collected from the image
+        float[][] patchArray = new float[100][N * N];
+        
+        //generates pre-processed patches and stores them in patchArray (same patches used to calculate mean)
         for (int i = 0; i < 10; i++) {
           int x = (value.getWidth() - N) * i / 10;
           for (int j = 0; j < 10; j++) {
@@ -134,20 +140,23 @@ public class Covariance extends Configured implements Tool {
             FloatImage patch = value.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
             float[] pels = patch.getData();
             for (int k = 0; k < N * N; k++) {
-              tp[i * 10 + j][k] = (pels[k] - mean[k]) * g[k];
+              //subtract average grey level from pixels, mask with gaussian value
+              patchArray[i * 10 + j][k] = (pels[k] - mean[k]) * gaussianArray[k];
             }
           }
         }
-        float[] cov = new float[N * N * N * N];
+        //stores covariance
+        float[] covarianceArray = new float[N * N * N * N];
         for (int i = 0; i < N * N; i++) {
           for (int j = 0; j < N * N; j++) {
-            cov[i * N * N + j] = 0;
+            covarianceArray[i * N * N + j] = 0;
             for (int k = 0; k < 100; k++) {
-              cov[i * N * N + j] += tp[k][i] * tp[k][j];
+              //covariance function - generate covariance from patches
+              covarianceArray[i * N * N + j] += patchArray[k][i] * patchArray[k][j];
             }
           }
         }
-        context.write(new IntWritable(0), new FloatImage(N * N, N * N, 1, cov));
+        context.write(new IntWritable(0), new FloatImage(N * N, N * N, 1, covarianceArray));
       }
     }
   }
@@ -158,7 +167,7 @@ public class Covariance extends Configured implements Tool {
     @Override
     public void reduce(IntWritable key, Iterable<FloatImage> values, Context context)
         throws IOException, InterruptedException {
-
+      //combine partial covariances from patches into global covariance
       FloatImage cov = new FloatImage(N * N, N * N, 1);
 
       for (FloatImage val : values) {

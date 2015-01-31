@@ -69,12 +69,10 @@ public class HARImageBundle extends AbstractImageBundle {
   }
 
   private void checkInvalidPath(String s, Configuration conf) {
-    System.out.println("checkInvalidPath:: " + s);
     final Path p = new Path(s);
     try {
       p.getFileSystem(conf);
     } catch (Exception e) {
-      System.out.println("heres an exception: ");
       System.out.println(e.toString());
     }
   }
@@ -82,12 +80,7 @@ public class HARImageBundle extends AbstractImageBundle {
   @Override
   protected void openForRead() throws IOException {
     _harfs = new HarFileSystem(FileSystem.get(_conf));
-
-    // Path qualifiedPath = new Path("har://", input_file.toUri() +
-    // Path.SEPARATOR + input_file.getParent().toUri().getPath());
     Path qualifiedPath = new Path("har://", _file_path.toUri().getPath());
-    // Path.SEPARATOR + input_file.getParent().toUri().getPath());
-    System.out.println("Qualified Path: " + qualifiedPath.toString());
     _harfs.initialize(qualifiedPath.toUri(), _conf);
     System.out.println("HARFS Initialized");
 

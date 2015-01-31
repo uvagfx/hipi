@@ -196,7 +196,8 @@ public class Covariance extends Configured implements Tool {
   public int runMeanCompute(String[] args) throws Exception {
 
 
-    Job job = HipiJob.getHipiJobInstance(getConf(), "Covariance");
+    Job job = Job.getInstance();
+    job.setInputFormatClass(ImageBundleInputFormat.class);
     job.setJarByClass(Covariance.class);
     job.setOutputKeyClass(IntWritable.class);
     job.setOutputValueClass(FloatImage.class);

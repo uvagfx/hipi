@@ -35,6 +35,7 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> {
 
     Configuration conf = job.getConfiguration();
 
+    //10 is the default number of nodes, if 'downloader.nodes' isn't specified
     int nodes = conf.getInt("downloader.nodes", 10);
 
     ArrayList<String> hosts = new ArrayList<String>(0);
@@ -44,6 +45,7 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> {
     String tempOutputPath = conf.get("downloader.outpath") + "_tmp";
     Path tempOutputDir = new Path(tempOutputPath);
 
+    //ensures that getSplits runs with a clean output directory
     if (fileSystem.exists(tempOutputDir)) {
       fileSystem.delete(tempOutputDir, true);
     }

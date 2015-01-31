@@ -116,7 +116,6 @@ public class HipiImageBundle extends AbstractImageBundle {
     public boolean nextKeyValue() {
       try {
         if (_end > 0 && _countingOffset > _end) {
-          System.out.println("CountingOffset: " + _countingOffset);
           _cacheLength = _cacheType = 0;
           return false;
         }
@@ -129,12 +128,10 @@ public class HipiImageBundle extends AbstractImageBundle {
           byteRead = _data_input_stream.read(_sig, readOff, 8 - readOff);
         }
         if (byteRead <= 0) {
-          System.out.println("ByteRead: " + byteRead);
           _cacheLength = _cacheType = 0;
           return false;
         }
         if (byteRead < 8)
-          System.out.println("lacking of " + byteRead);
         _cacheLength =
             ((_sig[0] & 0xff) << 24) | ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8)
                 | (_sig[3] & 0xff);
@@ -160,7 +157,6 @@ public class HipiImageBundle extends AbstractImageBundle {
               _data_input_stream.read(_byte_array_data, readOff, _byte_array_data.length - readOff);
         }
         if (byteRead <= 0) {
-          System.out.println("ByteRead: " + byteRead);
           _cacheLength = _cacheType = 0;
           return false;
         }
@@ -168,7 +164,6 @@ public class HipiImageBundle extends AbstractImageBundle {
         _countingOffset += _cacheLength + 8;
         return true;
       } catch (IOException e) {
-        System.out.println("EXCEPTION");
         System.out.println(e);
         return false;
       }
@@ -199,7 +194,6 @@ public class HipiImageBundle extends AbstractImageBundle {
       if (_cacheLength > 0) {
         ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
         if (decoder == null) {
-          System.out.println("decoder is null");
           return null;
         }
         ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
@@ -211,7 +205,6 @@ public class HipiImageBundle extends AbstractImageBundle {
         }
         return _header;
       }
-      System.out.println("final case - null");
       return null;
     }
 

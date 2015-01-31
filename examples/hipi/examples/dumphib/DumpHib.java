@@ -28,6 +28,7 @@ public class DumpHib extends Configured implements Tool {
     @Override
     public void map(ImageHeader key, FloatImage value, Context context) throws IOException,
         InterruptedException {
+      //pulls data from floatImages
       String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
       String camera = key.getEXIFInformation("Model");
       String outputStr =
@@ -41,6 +42,7 @@ public class DumpHib extends Configured implements Tool {
     @Override
     public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException,
         InterruptedException {
+      //outputs previously collected data
       for (Text value : values) {
         context.write(key, value);
       }

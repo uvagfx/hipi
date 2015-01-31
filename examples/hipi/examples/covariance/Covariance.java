@@ -180,17 +180,17 @@ public class Covariance extends Configured implements Tool {
 
   public static void rmdir(String path, Configuration conf) throws IOException {
     Path output_path = new Path(path);
-    FileSystem fs = FileSystem.get(conf);
-    if (fs.exists(output_path)) {
-      fs.delete(output_path, true);
+    FileSystem fileSystem = FileSystem.get(conf);
+    if (fileSystem.exists(output_path)) {
+      fileSystem.delete(output_path, true);
     }
   }
 
   public static void mkdir(String path, Configuration conf) throws IOException {
     Path output_path = new Path(path);
-    FileSystem fs = FileSystem.get(conf);
-    if (!fs.exists(output_path))
-      fs.mkdirs(output_path);
+    FileSystem fileSystem = FileSystem.get(conf);
+    if (!fileSystem.exists(output_path))
+      fileSystem.mkdirs(output_path);
   }
 
   public int runMeanCompute(String[] args) throws Exception {

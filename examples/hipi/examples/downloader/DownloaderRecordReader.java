@@ -25,16 +25,16 @@ public class DownloaderRecordReader extends RecordReader<IntWritable, Text> {
 
   @Override
   public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
-    FileSplit f = (FileSplit) split;
-    Path path = f.getPath();
-    FileSystem fs = path.getFileSystem(context.getConfiguration());
+    FileSplit fileSplit = (FileSplit) split;
+    Path path = fileSplit.getPath();
+    FileSystem fileSystem = path.getFileSystem(context.getConfiguration());
 
-    start_line = f.getStart();
-    long num_lines = f.getLength();
+    start_line = fileSplit.getStart();
+    long num_lines = fileSplit.getLength();
 
     singletonEmit = false;
 
-    BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(path)));
+    BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(path)));
     int i = 0;
     while (i < start_line && reader.readLine() != null) {
       i++;

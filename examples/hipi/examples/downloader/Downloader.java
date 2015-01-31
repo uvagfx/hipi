@@ -48,14 +48,14 @@ public class Downloader extends Configured implements Tool {
     private static Configuration conf;
 
     @Override
-    public void setup(Context jc) throws IOException, InterruptedException {
-      this.conf = jc.getConfiguration();
+    public void setup(Context context) throws IOException, InterruptedException {
+      this.conf = context.getConfiguration();
     }
 
     @Override
     public void map(IntWritable key, Text value, Context context) throws IOException,
         InterruptedException {
-
+      //downloads images from the input URLs, stores them in temporary HipiImageBundles to be passed to reducer
       String temp_path = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
       HipiImageBundle hib = new HipiImageBundle(new Path(temp_path), conf);
       hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
@@ -79,6 +79,7 @@ public class Downloader extends Configured implements Tool {
         long stopT = 0;
         startT = System.currentTimeMillis();
 
+        //actual download occurs here
         try {
           String type = "";
           URLConnection conn;
@@ -132,13 +133,15 @@ public class Downloader extends Configured implements Tool {
     private static Configuration conf;
 
     @Override
-    public void setup(Context jc) throws IOException, InterruptedException {
-      this.conf = jc.getConfiguration();
+    public void setup(Context context) throws IOException, InterruptedException {
+      this.conf = context.getConfiguration();
     }
 
     @Override
     public void reduce(BooleanWritable key, Iterable<Text> values, Context context)
         throws IOException, InterruptedException {
+      //combine mapper HipiImageBundles into single HipiImageBundle
+      
       if (key.get()) {
         FileSystem fileSystem = FileSystem.get(conf);
         Path outputHibPath = new Path(conf.get("downloader.outfile"));

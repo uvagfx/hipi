@@ -32,9 +32,9 @@ public class JpegFromHib extends Configured implements Tool {
     public FileSystem fileSystem;
 
     @Override
-    public void setup(Context jc) throws IOException {
-      Configuration conf = jc.getConfiguration();
-      fileSystem = FileSystem.get(jc.getConfiguration());
+    public void setup(Context context) throws IOException {
+      Configuration conf = context.getConfiguration();
+      fileSystem = FileSystem.get(context.getConfiguration());
       path = new Path(conf.get("jpegfromhib.outdir"));
       fileSystem.mkdirs(path);
     }
@@ -58,9 +58,9 @@ public class JpegFromHib extends Configured implements Tool {
 
   private static void removeDir(String path, Configuration conf) throws IOException {
     Path output_path = new Path(path);
-    FileSystem fs = FileSystem.get(conf);
-    if (fs.exists(output_path)) {
-      fs.delete(output_path, true);
+    FileSystem fileSystem = FileSystem.get(conf);
+    if (fileSystem.exists(output_path)) {
+      fileSystem.delete(output_path, true);
     }
   }
 

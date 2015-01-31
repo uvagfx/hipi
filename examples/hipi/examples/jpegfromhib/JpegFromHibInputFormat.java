@@ -33,19 +33,19 @@ public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesW
   }
 
   @Override
-  public List<InputSplit> getSplits(JobContext jc) throws IOException {
-    Configuration conf = jc.getConfiguration();
+  public List<InputSplit> getSplits(JobContext jobContext) throws IOException {
+    Configuration conf = jobContext.getConfiguration();
     int numMapTasks = conf.getInt("hipi.map.tasks", 0);
     List<InputSplit> splits = new ArrayList<InputSplit>();
-    for (FileStatus file : listStatus(jc)) {
+    for (FileStatus file : listStatus(jobContext)) {
       Path path = file.getPath();
-      FileSystem fs = path.getFileSystem(conf);
+      FileSystem fileSystem = path.getFileSystem(conf);
       HipiImageBundle hib = new HipiImageBundle(path, conf);
       hib.open(AbstractImageBundle.FILE_MODE_READ);
       // offset should be guaranteed to be in order
       List<Long> offsets = hib.getOffsets();
       BlockLocation[] blkLocations =
-          fs.getFileBlockLocations(hib.getDataFile(), 0, offsets.get(offsets.size() - 1));
+          fileSystem.getFileBlockLocations(hib.getDataFile(), 0, offsets.get(offsets.size() - 1));
       if (numMapTasks == 0) {
         int i = 0, b = 0;
         long lastOffset = 0, currentOffset = 0;

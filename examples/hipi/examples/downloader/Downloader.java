@@ -52,10 +52,10 @@ public class Downloader extends Configured implements Tool {
       this.conf = context.getConfiguration();
     }
 
+    //Downloads images from the input URLs and stores them in temporary HipiImageBundles to be passed to reducer
     @Override
     public void map(IntWritable key, Text value, Context context) throws IOException,
         InterruptedException {
-      //downloads images from the input URLs, stores them in temporary HipiImageBundles to be passed to reducer
       String temp_path = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
       HipiImageBundle hib = new HipiImageBundle(new Path(temp_path), conf);
       hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
@@ -137,10 +137,10 @@ public class Downloader extends Configured implements Tool {
       this.conf = context.getConfiguration();
     }
 
+    //combine mapper HipiImageBundles into single HipiImageBundle
     @Override
     public void reduce(BooleanWritable key, Iterable<Text> values, Context context)
         throws IOException, InterruptedException {
-      //combine mapper HipiImageBundles into single HipiImageBundle
       
       if (key.get()) {
         FileSystem fileSystem = FileSystem.get(conf);
@@ -176,8 +176,10 @@ public class Downloader extends Configured implements Tool {
     String outputFile = args[1];
     String outputPath = outputFile.substring(0, outputFile.lastIndexOf('/') + 1);
     int nodes = Integer.parseInt(args[2]);
-
+    
     Configuration conf = new Configuration();
+    
+    //Attaching constant values to Configuration
     conf.setInt("downloader.nodes", nodes);
     conf.setStrings("downloader.outfile", outputFile);
     conf.setStrings("downloader.outpath", outputPath);
@@ -186,11 +188,9 @@ public class Downloader extends Configured implements Tool {
     job.setJarByClass(Downloader.class);
     job.setMapperClass(DownloaderMapper.class);
     job.setReducerClass(DownloaderReducer.class);
+    job.setInputFormatClass(DownloaderInputFormat.class);
     job.setOutputKeyClass(BooleanWritable.class);
     job.setOutputValueClass(Text.class);
-    job.setInputFormatClass(DownloaderInputFormat.class);
-    job.setMapOutputKeyClass(BooleanWritable.class);
-    job.setMapOutputValueClass(Text.class);
     job.setNumReduceTasks(1);
 
     FileOutputFormat.setOutputPath(job, new Path(outputFile + "_output"));

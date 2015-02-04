@@ -39,6 +39,10 @@ public class JpegFromHib extends Configured implements Tool {
       fileSystem.mkdirs(path);
     }
 
+    /* In this example, the mapper creates a new output path for each BytesWritable object passed into it,
+     * using the hashval to generate a unique path. The reduce component of this example is trivial and
+     * doesn't require additional implementation.
+     */
     @Override
     public void map(NullWritable key, BytesWritable value, Context context) throws IOException,
         InterruptedException {

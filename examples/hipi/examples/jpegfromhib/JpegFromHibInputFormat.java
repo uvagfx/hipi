@@ -31,7 +31,7 @@ public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesW
       TaskAttemptContext context) throws IOException, InterruptedException {
     return new JpegFromHibRecordReader();
   }
-
+  //pulls data from HipiImageBundle, which is then read as BytesWritable objects by the RecordReader
   @Override
   public List<InputSplit> getSplits(JobContext jobContext) throws IOException {
     Configuration conf = jobContext.getConfiguration();
@@ -61,8 +61,9 @@ public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesW
             int endIndex = getBlockIndex(blkLocations, currentOffset - 1);
             for (int j = b; j < endIndex; j++) {
               String[] blkHosts = blkLocations[j].getHosts();
-              for (int k = 0; k < blkHosts.length; k++)
+              for (int k = 0; k < blkHosts.length; k++) {
                 hostSet.add(blkHosts[k]);
+              }
             }
             hosts = (String[]) hostSet.toArray(new String[hostSet.size()]);
           } else { // currentOffset == next
@@ -79,8 +80,9 @@ public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesW
         long lastOffset = 0, currentOffset;
         while (imageRemaining > 0) {
           int numImages = imageRemaining / taskRemaining;
-          if (imageRemaining % taskRemaining > 0)
+          if (imageRemaining % taskRemaining > 0) {
             numImages++;
+          }
           int next = Math.min(offsets.size() - i, numImages) - 1;
           int startIndex = getBlockIndex(blkLocations, lastOffset);
           currentOffset = offsets.get(i + next);
@@ -89,8 +91,9 @@ public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesW
           // check getBlockIndex, and getBlockSize
           for (int j = startIndex; j <= endIndex; j++) {
             String[] blkHosts = blkLocations[j].getHosts();
-            for (int k = 0; k < blkHosts.length; k++)
+            for (int k = 0; k < blkHosts.length; k++) {
               hosts.add(blkHosts[k]);
+            }
           }
           splits.add(new FileSplit(hib.getDataFile().getPath(), lastOffset, currentOffset
               - lastOffset, hosts.toArray(new String[hosts.size()])));

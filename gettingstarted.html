@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="Description" content="HIPI - Hadoop Image Processing Interface getting started page tells you what you need to know to start using HIPI on Hadoop MapReduce." />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    
+    <link rel="stylesheet" type="text/css" href="include/main.css" />
+    <link rel="stylesheet" type="text/css" href="include/javasyntax.css" />
+    <title>HIPI - Hadoop Image Processing Interface :: Getting Started</title>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-23539446-1']);
+      _gaq.push(['_trackPageview']);
+  
+  (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+  
+    </script>
+  
+  </head>
+  
+  <body>
+    <div class="header">
+      <h1>HIPI - Hadoop Image Processing Framework</h1>
+    </div>
+    <div class="navigation_menu">
+      <ul>
+	<li><a href="index.html">Introduction</a></li>
+	<li><a href="gettingstarted.html">Getting Started</a></li>
+	<li><a href="documentation.html">Documentation</a></li>
+	<li><a href="examples.html">Examples</a></li>
+	<li><a href="downloads.html">Downloads</a></li>
+	<li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+    
+    <!-- Begin Content -->
+    <div class="content">
+      
+      <h2>Setting up the Hadoop Framework</h2>
+      <h3>Getting Hadoop</h3>
+      <div class="section">
+	You must first download the Hadoop MapReduce framework from <a
+	class="external_link"
+	href="http://hadoop.apache.org/mapreduce/">Apache's
+	website</a>.<br /><br />
+      
+	<h3>Configuring Hadoop</h3> 
+
+	Please refer to the Hadoop documentation pages listed below
+	for specifics on how to configure your installation:
+	<ul>
+	  <li>For the most current Hadoop version use this <a class="external_link" href="http://hadoop.apache.org/common/#Getting+Started">Quickstart Guide</a></li>
+	  <li>To setup a single node on your computer, check out <a class="external_link" href="http://hadoop.apache.org/common/docs/stable/single_node_setup.html">Single Node Setup</a></li>
+	</ul>
+
+	It is a good idea to add the bin directory to your PATH
+	environment variable to avoid having to type the absolute path
+	to Hadoop for every command. For example, if you downloaded
+	and unpacked Hadoop to
+	/opt/hadoop/, then you would add the following to
+	your .bashrc (or equivalent):
+	<pre id="Current">
+  export PATH=$PATH:/opt/hadoop/bin
+	</pre>		
+      </div>
+
+      <h2>Downloading the HIPI API</h2>
+      <div class="section">
+	Now that you have Hadoop installed and working, you'll need to
+	download the HIPI API from our <a
+	href="downloads.html">downloads</a> page. We have three
+	separate versions available to download: developer, src, and
+	release. The developer version contains our entire source
+	code, including example programs and experimental programs
+	that we used to take quantitative measurements of HIPI. The
+	src version features the entire HIPI source code tree, but
+	does not contain the experiments. Finally, the release version
+	contains just the necessary class files needed to use HIPI
+	along with the source code for the example programs.<br /><br
+	/>
+
+	In order to use the HIPI API, you must add the jar file you
+	downloaded above to the build path. The way you achieve this
+	varies from setup to setup. In Eclipse you will have to add
+	the jar file to the Java Build Path in your Project
+	Settings. In ANT you will specify the jar file in the
+	classpath attribute of the Javac Task along with any other
+	libraries you may need (such as Hadoop).<br /><br />
+
+	You can find sample ANT build tasks in the main directory of
+	HIPI in the build.xml file. <br /><br />
+      	
+	Check out the <a href="examples.html">examples</a> page for
+	information on creating programs that utilize HIPI.<br /><br />
+      </div>
+
+      <h2>Checking What You Have</h2>
+      <div class="section">
+		  The "Getting Started" tutorial will assume that you have Hadoop
+		  installed locally, and have downloaded the hipi-0.1.0.jar package.
+		  If you are not at this point, please do so in order to proceed.<br /><br />
+
+		  A good way to make sure you have all Hadoop and HIPI environment setup
+		  is to build HIPI library/examples/tool on your own computer. Try to run
+		  "ant" at the root directory. You probably need to change hadoop.classpath
+		  and hadoop.home in build.xml to build HIPI successfully.<br /><br />
+
+		  If everything goes right, you should have tool/hibimport.jar file ready
+		  by now. Run
+		<pre id="Classes">
+  hadoop jar tool/hibimport.jar ~/Pictures picture.hib
+        </pre>
+		~/Pictures represents a directory that contains images, this command will
+		create two files: picture.hib and picture.hib.dat. Keep them around, they
+		will be useful later.<br /><br />
+      </div>
+
+	  <h2>Writing the First HIPI Program</h2>
+	  <div class="section">
+		  HIPI is a library based on Hadoop that you can easily integrated into
+		  your current Hadoop project. However, the best way to setup your first
+		  HIPI program is to create one in place.<br /></br />
+
+		  Open ./build.xml file, and add a new entry to it:
+		  <pre id="Classes">
+  &lt;target name="firstprog"&gt;
+    &lt;antcall target="compile"&gt;
+      &lt;param name="srcdir" value="firstprog" /&gt;
+      &lt;param name="jarfilename" value="firstprog.jar" /&gt;
+      &lt;param name="jardir" value="firstprog" /&gt;
+      &lt;param name="mainclass" value="FirstProgram" /&gt;
+    &lt;/antcall&gt;
+  &lt;/target&gt;
+		  </pre>
+		  Thus, you also need to create a directory ./firstprog, and create a new
+		  Java file ./firstprog/FirstProgram.java.<br /><br />
+
+		  This file can be as simple as:
+		  <pre id="Classes">
+  <font id="Public">public</font> <font id="Class">class</font> FirstProgram <font id="Extends">extends</font> Configured <font id="Implements">implements</font> Tool {
+	<font id="Public">public</font> <font id="Static">static</font> <font id="Void">void</font> main(String[] args) <font id="Throws">throws</font> Exception {
+      System.exit(0);
+    }
+  }
+		  </pre>
+
+		  Try to build again as suggested in "Checking What you Have", if it
+		  builds, you should have firstprog.jar file in ./firstprog directory.
+		  OK, this is your first dummy program.<br /><br />
+	  </div>
+
+	  <h2>Mapper and Reducer</h2>
+	  <div class="section">
+		  One thing that makes Hadoop so powerful is its MapReduce mechanism.
+		  If you learned Hadoop from its <a href="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html">official tutorial</a>
+		  You should be able to immediately add Mapper and Reducer to our
+		  dummy program, as following
+		  <pre id="Classes">
+  <font id="Public">public</font> <font id="Class">class</font> FirstProgram <font id="Extends">extends</font> Configured <font id="Implements">implements</font> Tool {
+    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyMap <font id="Extends">extends</font> Mapper&lt;ImageHeader, FloatImage, IntWritable, FloatImage&gt; {
+      <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context)
+        <font id="Throws">throws</font> IOException, InterruptedException {
+      }
+    }
+    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyReduce <font id="Extends">extends</font> Reducer&lt;IntWritable, FloatImage, IntWritable, FloatImage&gt; {
+      <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable<FloatImage> values, Context context)
+        <font id="Throws">throws</font> IOException, InterruptedException {
+      }
+    }
+
+    <font id="Public">public</font> int run(String[] args) <font id="Throws">throws</font> Exception {
+      HipiJob job = new HipiJob(getConf(), <font id="StringLiteral">"FirstProgram"</font>);
+      job.setJarByClass(FirstProgram.class);
+      job.setOutputKeyClass(IntWritable.class);
+      job.setOutputValueClass(FloatImage.class);
+
+      job.setMapperClass(MyMap.class);
+      job.setCombinerClass(MyReduce.class);
+      job.setReducerClass(MyReduce.class);
+
+      String inputFileType = args[2];
+      job.setOutputFormatClass(BinaryOutputFormat.class);
+
+      FileInputFormat.setInputPaths(job, new Path(args[0]));
+      FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+      boolean success = job.waitForCompletion(true);
+      return success ? 0 : 1;
+    }
+
+    <font id="Public">public</font> <font id="Static">static</font> <font id="Void">void</font> main(String[] args) <font id="Throws">throws</font> Exception {
+      ToolRunner.run(new FirstProgram(), args);
+      System.exit(0);
+    }
+  }
+		  </pre>
+		  This is a lot! But most of them just to setup the job, as what every Hadoop program
+		  does. The core part (Mapper/Reducer) is still empty.<br /><br />
+
+		  Make sure you have everything here by compling it!<br /><br />
+	  </div>
+
+	  <h2>Computing Average Color</h2>
+	  <div class="section">
+		  Now is a good time to figure out what we want to do with this dummy program.
+		  Computing average color of images seems to be a good practice. In the map
+		  phase, we compute average color of an image, and in the reduce phase, we sum
+		  up the average color to compute the total average image color.<br /><br />
+
+		  Here is how I will do it in MyMap:
+		  <pre id="Classes">
+    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyMap <font id="Extends">extends</font> Mapper&lt;ImageHeader, FloatImage, IntWritable, FloatImage&gt; {
+      <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context)
+        <font id="Throws">throws</font> IOException, InterruptedException {
+        if (value != null && value.getWidth() > 1 && value.getHeight() > 1 && value.getBands() == 3) {
+          FloatImage avg = new FloatImage(1, 1, 3);
+          float[] avgData = avg.getData();
+          float[] valData = value.getData();
+          for (int i = 0; i < value.getWidth(); i++) {
+            for (int j = 0; j < value.getHeight(); j++) {
+              avgData[0] += valData[i * value.getHeight() * 3 + j * 3];
+              avgData[1] += valData[i * value.getHeight() * 3 + j * 3 + 1];
+              avgData[2] += valData[i * value.getHeight() * 3 + j * 3 + 2];
+            }
+          }
+          avg.scale(1.0f / (value.getWidth() * value.getHeight()));
+          context.write(new IntWritable(0), avg);
+        }
+      }
+    }
+	</pre>
+		  The code emits a 1x1 FloatImage for reducer to process, and here is my reducer:
+		  <pre id="Classes">
+    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyReduce <font id="Extends">extends</font> Reducer&lt;IntWritable, FloatImage, IntWritable, FloatImage&gt; {
+      <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable<FloatImage> values, Context context)
+        <font id="Throws">throws</font> IOException, InterruptedException {
+        FloatImage avg = new FloatImage(1, 1, 3);
+        int total = 0;
+        for (FloatImage val : values) {
+          avg.add(val);
+          total++;
+        }
+        if (total > 0) {
+          avg.scale(1.0f / total);
+          context.write(key, avg);
+        }
+      }
+	</pre>
+	If you did everything right, it should compile.<br /><br />
+	  </div>
+
+	  <h2>Run the First Program</h2>
+	  <div class="section">
+		  The compiled jar file should be in ./firstprog/firstprog.jar, and you can run
+		  this program now with your local file picture.hib. Try this command:
+		  <pre id="Classes">
+  hadoop jar firstprog/firstprog.jar picture.hib .
+		  </pre>
+		  According to plan, you should have a binary file sitting there by now.<br /><br />
+
+		  HIPI does more. It basically extends Hadoop so that it can handle image files
+		  seamlessly. You can checkout more sophisticated <a href="examples.html">examples</a> now.<br /><br />
+	  </div>
+    </div>
+    <!-- End Content -->
+  </body>
+</html>
+  

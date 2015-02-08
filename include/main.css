@@ -1,0 +1,52 @@
+.header { width:1024px; height:180px; margin-right:auto; margin-left:auto; background-image:url('../images/header.png'); background-repeat:no-repeat; 
+	  border-bottom:1px solid #ddd;	
+	}
+.header h1 { left:-9999px; position:absolute; }
+
+.navigation_menu {
+    height:25px;
+    width:1024px;
+    margin-left:auto;
+    margin-right:auto;
+    padding:2px 0 0 0;
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.navigation_menu ul {
+    list-style-type:none;
+    margin:0px;
+    padding:0px 30px 0px 0px;
+    overflow:hidden;
+}
+
+.navigation_menu li {
+    padding: 4px 35px 4px 35px;
+    float: left;
+    height: 15px;
+    overflow: hidden;
+    border-right:1px solid #eee;
+}
+
+a { color:#36c; text-decoration:none; }
+body { font-family:Helvetica,Arial,sans_serif; font-size:12px; }
+h2 { font-size:180%; }
+img { border:none; padding:10px; }
+pre { border:1px dashed #E1E1E1; color:#333344; background:#FAFAFA; font-family:monospace; overflow:auto; font-size:11px; padding-top:12px; margin:20px; line-height:14px; }
+
+.content { width:1024px; margin-left:auto; margin-right:auto; }
+.content .section { border-bottom:1px solid #9cf; margin-bottom:20px; padding-bottom:10px; }
+
+.centered_image { display:block; margin-left:auto; margin-right:auto; }
+
+table { margin-top:10px; margin-bottom:20px; }
+.centered_table { margin-left:auto; margin-right:auto; }
+.caption td { background-color:#ddf; text-align:center; font-size:90%; }
+
+.important { color:#c33; font-weight:bold; }
+.todo { color:#3c3; font-size:110%; padding:10px; border:1px solid #3c3;}
+
+.external_link { background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFZJREFUeF59z4EJADEIQ1F36k7u5E7ZKXeUQPACJ3wK7UNokVxVk9kHnQH7bY9hbDyDhNXgjpRLqFlo4M2GgfyJHhjq8V4agfrgPQX3JtJQGbofmCHgA/nAKks+JAjFAAAAAElFTkSuQmCC'); 
+		 padding-right:13px; background-repeat:no-repeat; background-position-x:100%; background-position-y:50%; 
+	       }

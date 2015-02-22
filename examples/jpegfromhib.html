@@ -111,7 +111,7 @@
                 which contains the functionality needed to parse through a 
                 <a href="../doc/api/hipi/imagebundle/HipiImageBundle.FileReader.html">HipiImageBundle</a> (HIB). 
                 This record reader will draw raw bytes from the HIB and encapsulate them in a Hadoop 
-                <a href="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/BytesWritable.html">BytesWritable</a> object 
+                <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/BytesWritable.html">BytesWritable</a> object 
                 which will be passed into the mapper:
                 <pre>
                   @Override
@@ -142,7 +142,7 @@
                 By this definition, JpegFromHibInputFormat creates and provides data to the JpegFromHibRecordReader, which passes data into the MapReduce Job.
               <h3>JpegFromHibMapper</h3>
                 The mapper accepts as input a
-                <a href="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/BytesWritable.html">BytesWritable</a> 
+                <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/BytesWritable.html">BytesWritable</a> 
                 object which is passed to it by the previously mentioned JpegFromHibInputFormat class. Here is the mapper method in its entirety:
                 <pre>
                   @Override
@@ -161,10 +161,10 @@
                   }
                 </pre>
                 After receiving a
-                <a href="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/BytesWritable.html">BytesWritable</a>
-                object, the mapper makes use of <a href="../doc/api/hipi/util/ByteUtils.html">ByteUtils</a> to generate a hash string from the internal 
+                <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/BytesWritable.html">BytesWritable</a>
+                object, the mapper makes use of HIPI's <a href="../doc/api/hipi/util/ByteUtils.html">ByteUtils</a> to generate a hash string from the internal 
                 bytes of the input (this provides a unique name for each output image). A
-                <a href="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/fs/FSDataOutputStream.html">FSDataOutputStream</a> 
+                <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/fs/FSDataOutputStream.html">FSDataOutputStream</a> 
                 instance is then used to write a file to the previously defined outpath. Every time this method is called, a single .jpg image is generated.
 
               <h3>Reducer</h3>

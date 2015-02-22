@@ -59,7 +59,7 @@
       <div class="section">
       This example will run through a non-trivial application based on
       <a class="external_link"
-      href="http://www.ib.cnea.gov.ar/~redneu/clasicos/Hancock_Baddeley_Smith_1992.pdf">&#34;The
+      href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">&#34;The
       Principal Components of Natural Images&#34;</a> by Hancock et
       al. Using HIPI, we run the same experiment described in the
       paper on a massive data set (as opposed to 15 images in the
@@ -271,8 +271,7 @@
       Note that this must correspond to where the output of the
       <tt>runMeanCompute()</tt> method was specified to be produced
       via the <a class="external_link"
-      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/mapred/FileOutputFormat.html#setOutputPath(org.apache.hadoop.mapred.JobConf,
-      org.apache.hadoop.fs.Path)">FileOutputFormat:setOutputPath()</a>
+      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapred/FileOutputFormat.html#setOutputPath(org.apache.hadoop.mapred.JobConf, org.apache.hadoop.fs.Path)">FileOutputFormat:setOutputPath()</a>
       method:
       <pre id="Current">
   <font id="Public">public</font> <font id="Int">int</font> runMeanCompute(String[] args) <font id="Throws">throws</font> Exception {
@@ -344,7 +343,7 @@
       href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/filecache/DistributedCache.html">DistributedCache</a>
       in order to load the precomputed mean. This operation happens in
       the <a class="external_link"
-      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a>
+      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a>
       method:
       <pre id="Current">
   <font id="Float">float</font>[] mean;

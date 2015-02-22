@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-    <meta name="Description" content="Hadoop Image Processing Interface example for creating a HIB from a set of ,potentially Flickr, image URLs in a distributed manner." />
+    <meta name="Description" content="Hadoop Image Processing Interface example for creating a set of JPEG images from a HipiImageBundle." />
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="../include/main.css" />
     <link rel="stylesheet" type="text/css" href="../include/javasyntax.css" />
@@ -138,6 +138,8 @@
                 According to the Hadoop 2.5.1 API Documentation:
                   <br/><br/><q>InputSplit represents the data to be processed by an individual Mapper. Typically, it presents a byte-oriented 
                   view on the input and is the responsibility of RecordReader of the job to process this and present a record-oriented view.</q>
+                  <br/><br/>
+                By this definition, JpegFromHibInputFormat creates and provides data to the JpegFromHibRecordReader, which passes data into the MapReduce Job.
               <h3>JpegFromHibMapper</h3>
                 The mapper accepts as input a
                 <a href="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/BytesWritable.html">BytesWritable</a> 

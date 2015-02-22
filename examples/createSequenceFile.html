@@ -1,7 +1,7 @@
 <!DOCTYPE html">
 <html>
   <head>
-    <meta name="Description" content="Hadoop Image Processing Interface example for creating a HIB from a set of ,potentially Flickr, image URLs in a distributed manner." />
+    <meta name="Description" content="Hadoop Image Processing Interface example for creating a SequenceFile from a HipiImageBundle." />
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="../include/main.css" />
     <link rel="stylesheet" type="text/css" href="../include/javasyntax.css" />
@@ -108,7 +108,47 @@
       
       <h2>Understanding CreateSequcenceFile</h2>
       <div class="section">
+          <h3>Job Configuration</h3>
+            In CreateSequenceFile's run() method, many of the Hadoop
+            <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html">Job</a>'s
+            initial parameters are set. In particular, CreateSequenceFile contains the following line:
+            <pre>
+              job.setOutputFormatClass(SequenceFileOutputFormat.class);
+            </pre>
+            The <a class="external_link" class="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/lib/output/SequenceFileOutputFormat.html">SequenceFileOutputFormat</a>
+            class is provided by Hadoop and will generate an output which is structured as a Hadoop 
+            <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/SequenceFile.html">SequenceFile</a>.
+            <br/><br/><br/>
+            Another important parameter being set ensures that the Job knows how to interpret its input:
+            <pre>
+              job.setInputFormatClass(ImageBundleInputFormat.class);
+            </pre>
+            The <a href="../doc/api/hipi/imagebundle/mapreduce/ImageBundleInputFormat.html">ImageBundleInputFormat</a> class ensures that the Job
+            understands the formatting of the input and how to interact with it.
           <h3>SequenceFileMapper</h3>
+          Here is the complete code from the SequenceFileMapper's map method:
+          <pre>
+            @Override
+            public void map(ImageHeader key, FloatImage value, Context context) throws IOException,
+                InterruptedException {
+              if (value != null) {
+                ImageEncoder encoder = JPEGImageUtil.getInstance();
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                encoder.encodeImage(value, key, os);
+                os.close();
+                byte[] val = os.toByteArray();
+                long sig = 0 << 2 | ImageType.JPEG_IMAGE.toValue();
+                context.write(new LongWritable(sig), new BytesWritable(val));
+              }
+            }
+          </pre>
+          This accepts an <a href="../doc/api/hipi/image/ImageHeader.html">ImageHeader</a> and <a href="../doc/api/hipi/image/FloatImage.html">FloatImage</a>
+          as a key/value pair. It then makes use of HIPI's <a href="../doc/api/hipi/image/io/JPEGImageUtil.html">JPEGImageUtil</a> class to create an
+          <a href="../doc/api/hipi/image/io/ImageEncoder.html">ImageEncoder</a> object. This encoder encodes the image's key/value pair to a
+          <a class="external_link" href="http://docs.oracle.com/javase/7/docs/api/java/io/ByteArrayOutputStream.html">ByteArrayOutputStream</a>, which
+          can be subsequently read and passed into a 
+          <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/BytesWritable.html">BytesWritable</a> object.
+        
           <h3>Reducer</h3>
           The reducer in this example is trivial, since there is no consolidation required for the SequenceFile created by the mapper step.
             This example makes use of Hadoop's base

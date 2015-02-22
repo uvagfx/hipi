@@ -1,8 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html">
+<html>
   <head>
     <meta name="Description" content="HIPI - Hadoop Image Processing Interface is a Hadoop MapReduce library for performing image processing tasks in the Hadoop distributed computation framework." />
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta charset="UTF-8">
     
     <link rel="stylesheet" type="text/css" href="include/main.css" />
     <link rel="stylesheet" type="text/css" href="include/javasyntax.css" />
@@ -40,53 +40,47 @@
     
     <!-- Begin Content -->
     <div class="content">
+        <h2>Introduction</h2>
+        <div class="section">
+            HIPI is an image processing library for
+	the <a href="http://hadoop.apache.org/">Apache Hadoop</a>
+	distributed computing framework. The current release of HIPI has been tested against Hadoop 2.5.1. <br/><br/>
+        </div>
       <h2>Overview</h2>
       <div class="section">
-	HIPI is a library for
-	the <a href="http://hadoop.apache.org/">Apache Hadoop</a>
-	programming framework that provides an API for performing
-	image processing tasks in a distributed computing
-	environment. Here is a system overview:
 	
 	<img class="centered_image" src="images/hipi_pipeline.png" width="700" alt=""/>
 	
-	The main input type used in HIPI is a <a
+	HIPI's primary input type is the <a
 	href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
 	(HIB). A HIB is a set of images combined into one large file
-	along with some metadata describing the layout of the
-	images. A HIB can be created from an existing set of
-	images already located on the Hadoop Distributed File System (HDFS) or from a remote source (e.g. our <a
+    which includes metadata describing its internal layout. A HIB can be created from either a set of
+	images stored on the Hadoop Distributed File System (HDFS) or a remote source (e.g. our <a
 	href="examples/downloader.html">Distributed Downloader
 	example</a>). <br /><br />
 
 	In order to improve efficiency, HIPI adds a culling step to
-	the conventional MapReduce workflow. This allows discarding
-	images that do not meet a set of criteria based on the image
-	metadata (e.g., the image must be less than 10MP). Culling an
-	image avoids the expensive step of decompressing the full
-	pixel buffer into main memory. The user
-	specified <a href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html">CullMapper</a>
-	is invoked on each image that survives the culling
+	the conventional MapReduce workflow. Images which do not meet a set
+    of metadata-based criteria (e.g., the image must be less than 10MP)
+    can be discarded before the expensive step of decompressing their full
+	pixel buffers into main memory. The user-specified 
+    <a href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html">CullMapper</a>
+	is invoked on each image which survives the culling
 	stage. Images are presented to this class as
 	a <a href="doc/api/hipi/image/FloatImage.html">FloatImage</a>
 	object with an
 	associated <a href="doc/api/hipi/image/ImageHeader.html">ImageHeader</a>
-	object. Although HIPI does not modify any of the default job
-	scheduling behavior in MapReduce, you can modify execution
-	parameters specific to image processing tasks through
-	the <a href="doc/api/hipi/imagebundle/mapreduce/HipiJob.html">HipiJob</a>
-	object during setup.  <br /><br />
+	object. <br /><br />
 
-	Great care has been taken to ensure that the implementation of
-	key steps in the Hadoop MapReduce workflow are efficient for
-	image processing tasks. Please see
+	Throughout HIPI's development process, efficiency 
+    has been a primary concern. Please see
 	our <a href="experiments.html">Experiments</a> section for a
 	more detailed analysis including performance benchmarks.
       </div>
       
-      <h2>The Four Main Classes</h2>
+      <h2>The Three Main Classes</h2>
       <div class="section">
-	The classes most frequently used by a practitioner are the <a
+	The classes most frequently used in HIPI are the <a
 	href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>,
 	the <a
 	href="doc/api/hipi/image/FloatImage.html">FloatImage</a>, and
@@ -116,7 +110,7 @@
 	    </pre>
 	  </li>
 	  <li>
-	    Add images to an already existing HIB
+	    Add images to a HIB
 	    <pre id="Classes">
   File file = <font id="New">new</font> File(<font id="StringLiteral">"/path/to/file.jpg"</font>);
   FileInputStream fis = <font id="New">new</font> FileInputStream(file);
@@ -159,18 +153,18 @@
 	way a HIB will be distributed to the map tasks. The <a
 	href="doc/api/hipi/imagebundle/mapreduce/ImageBundleInputFormat.html">ImageBundleInputFormat</a>
 	splits a HIB into sections based on the block size of the HIB
-	itself in order to most effectively distirbute the
-	job. However, if the block size is set too large, then a small
+	itself in order to most effectively distribute the
+	job. If the block size is set too large, then a small
 	number of machines will be processing all of the images in the
-	HIB. Therefore it is advised that the block size be set such
-	that the number of blocks the entire HIB spans is roughly the
-	number of nodes in the cluster.<br /><br />
+	HIB. Therefore, it is advised that the block size be set so
+	that the number of blocks the entire HIB spans is roughly equivalent
+    to the number of nodes in the cluster.<br /><br />
 
 	You can create a HIPI Image Bundle from a set of files using
 	the operations listed above, or via some external source
-	(e.g. Flickr) via our <a
+	(e.g. Flickr). Our <a
 	href="examples/downloader.html">Distributed Downloader</a>
-	example. Please see the <a href="doc/api/index.html">HIB
+	example provides a good example of this. Please see the <a href="doc/api/index.html">HIB
 	javadoc page</a> for more details on all of the HIB
 	operations, and the <a href="experiments.html">experiments</a>
 	page for information regarding the design of HIBs.
@@ -280,45 +274,6 @@
         
         <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
 	</pre>
-	
-	<h3>HIPI Job</h3>
-	
-	HIPI provides a useful extension of the standard Hadoop <a
-	class="external_link"
-	href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/mapreduce/Job.html">Job</a>
-	class that allows a user to set parameters that are common in
-	scenarios where HIPI would be used. The two main operations
-	that can be performed using a <a
-	href="doc/api/hipi/imagebundle/mapreduce/HipiJob.html">HipiJob</a>
-	are:
-	<ul>
-	  <li>Enable/disable speculative execution</li>
-	  <li>Enable/disable compression of Map output records</li>
-	</ul>
-	The former method (<a
-	href="doc/api/hipi/imagebundle/mapreduce/HipiJob.html#setMapSpeculativeExecution(boolean)">HipiJob::set{Map,Reduce}SpeculativeExecution</a>)
-	controls whether Hadoop should run multiple instances of the
-	<em>the same</em> Map task to potentially increase
-	performance. Whether this is a good idea is specific to the
-	application, but in general, this should be enabled. This
-	ensures that if a particular node in the Hadoop cluster is
-	experiencing performance degradation, the entire job will not
-	be affected. Hadoop will automatically kill the slower task,
-	and use the output from a different instance. Of course this
-	incurs the overhead of spawning more tasks than is actually
-	needed.  <br /><br />
-	
-	The second operation (<a
-	href="doc/api/hipi/imagebundle/mapreduce/HipiJob.html#setCompressMapOutput(boolean)">HipiJob::setCompressMapOutput</a>)
-	enables or disables compression of the output records from the
-	Map tasks before they are sent to the Reduce tasks. This
-	option should be enabled if there is a significant amount of
-	data being transfered between the two sets of tasks. Note that
-	the efficacy of this approach is controlled implicitly by how
-	well the records can be compressed and the relationship
-	between the size of the records, the bandwidth of the cluster,
-	and the time spend compressing and decompressing the files.
-
       </div>
     </div>
     <!-- End Content -->

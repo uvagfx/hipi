@@ -92,8 +92,11 @@
       this case, the mean must be known a priori. This is not strictly
       true in general as the mean can be computed inline with the
       covariance matrix, however we choose to compute it in a separate
-      program to illustrate the use of the <a
-      class="external_link">DistributedCache</a>.<br /><br />
+      program to illustrate the use of the <a class="external_link" 
+      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">
+      Job::addCacheFile()</a> and
+      <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">
+      Job::getCacheFiles()</a> methods.<br /><br />
 
       Once the covariance matrix is computed, a simple MATLAB routine
       is used to compute the first 15 eigenvectors using the SVD
@@ -220,8 +223,11 @@
       
       The Covariance program is unique in that it actually chains two
       jobs together and communicates the output of the first job to
-      the second via the <a class="external_link"
-      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/filecache/DistributedCache.html">DistributedCache</a>.
+      the second via the <a class="external_link" 
+      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">
+      Job::addCacheFile()</a> and
+      <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">
+      Job::getCacheFiles()</a> methods.
 
       <h3>The Two Drivers</h3>
 
@@ -229,8 +235,11 @@
       computing the mean. Although technically this is not true, and
       the mean can be computed in tandem with the covariance, we chose
       to compute it in a different job to illustrate chaining multiple
-      jobs and using the <a class="external_link"
-      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/filecache/DistributedCache.html">DistributedCache</a>. Thus,
+      jobs and using the <a class="external_link" 
+      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">
+      Job::addCacheFile()</a> and
+      <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">
+      Job::getCacheFiles()</a> methods. Thus,
       the <tt>main()</tt> method of the Covariance.java class calls a
       <tt>run()</tt> that spawns these two tasks in separate, serial
       jobs:
@@ -241,7 +250,7 @@
   }
 
   <font id="Public">public</font> <font id="Int">int</font> run(String[] args) <font id="Throws">throws</font> Exception {
-    <font id="Int">int</font> success = runMeanCompute(args);
+    <font id="Int">int</font> success = runMeanCompute(args)
     <font id="If">if</font> (success == <font id="IntegerLiteral">1</font>)
       <font id="Return">return</font> <font id="IntegerLiteral">1</font>;
     <font id="Return">return</font> runCovariance(args);
@@ -258,8 +267,11 @@
       setting up a standard HIPI job.<br /><br />
 
       The <tt>runCovariance()</tt> method is slightly more
-      complicated. It makes use of the <a class="external_link"
-      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/filecache/DistributedCache.html">DistributedCache</a>
+      complicated. It makes use of the <a class="external_link" 
+      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">
+      Job::addCacheFile()</a> and
+      <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">
+      Job::getCacheFiles()</a> methods
       to distribute the precomputed mean to all of the Mapper's:
       <pre id="Current">
   <font id="Public">public</font> <font id="Int">int</font> runCovariance(String[] args) <font id="Throws">throws</font> Exception {
@@ -338,9 +350,11 @@
       same 100 patches that were used to compute the mean in each of
       the images in the input <a
       href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
-      (HIB). In doings, it needs to be able to access the <a
-      class="external_link"
-      href="http://hadoop.apache.org/common/docs/r0.20.1/api/org/apache/hadoop/filecache/DistributedCache.html">DistributedCache</a>
+      (HIB). In doings, it needs to be able to access the <a class="external_link" 
+      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">
+      Job::addCacheFile()</a> and
+      <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">
+      Job::getCacheFiles()</a> methods
       in order to load the precomputed mean. This operation happens in
       the <a class="external_link"
       href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a>

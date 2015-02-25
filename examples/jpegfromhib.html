@@ -92,7 +92,9 @@
                   
                 <h3>Running the Example</h3> 
                     We have provided a script in the <tt>examples</tt> directory of the HIPI installation that will automatically compile the 
-                    jpegfromhib program, upload the resulting jar to the Hadoop Distributed Filesystem (HDFS), and run the jpegfromhib job.
+                    jpegfromhib program, upload the resulting jar to the  <a class="external_link" 
+                    href="http://hadoop.apache.org/docs/r2.5.1/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html">
+                    Hadoop Distributed Filesystem (HDFS) </a>, and run the jpegfromhib job.
                     <br /><br />
     
                     The jpegfromhib program takes two command line parameters, which you can specify directly to the
@@ -115,10 +117,10 @@
                 which will be passed into the mapper:
                 <pre>
                   @Override
-                  public void initialize(InputSplit split, TaskAttemptContext context) throws IOException,
+                  <font id="Public">public</font> <font id="Void">void</font> initialize(InputSplit split, TaskAttemptContext context) <font id="Throws">throws</font> IOException,
                       InterruptedException {
                     ...
-                    reader = new HipiImageBundle.FileReader(fs, path, conf, bundleSplit.getStart(), 
+                    reader = <font id="New">new</font> HipiImageBundle.FileReader(fs, path, conf, bundleSplit.getStart(), 
                       bundleSplit.getStart() + bundleSplit.getLength() - 1);
                   }
                 </pre>
@@ -126,8 +128,8 @@
                 This FileReader is configured to reference the HIB in question.
                 <pre>
                   @Override
-                  public BytesWritable getCurrentValue() throws IOException, InterruptedException {
-                    return new BytesWritable(reader.getRawBytes());
+                  <font id="Public">public</font> BytesWritable getCurrentValue() <font id="Throws">throws</font> IOException, InterruptedException {
+                    <font id="Return">return</font> <font id="New">new</font> BytesWritable(reader.getRawBytes());
                   }
                 </pre>
                 This method illustrates how JpegFromHibRecordReader makes use of the previously initialized fileReader to return data from the Hib.
@@ -146,13 +148,13 @@
                 object which is passed to it by the previously mentioned JpegFromHibInputFormat class. Here is the mapper method in its entirety:
                 <pre>
                   @Override
-                  public void map(NullWritable key, BytesWritable value, Context context) throws IOException,
+                  <font id="Public">public</font> <font id="Void">void</font> map(NullWritable key, BytesWritable value, Context context) <font id="Throws">throws</font> IOException,
                       InterruptedException {
-                    if (value == null) {
-                      return;
+                    <font id="If">if</font> (value == null) {
+                      <font id="Return">return</font>;
                     }
-                    String hashval = ByteUtils.asHex(value.getBytes());
-                    Path outpath = new Path(path + "/" + hashval + ".jpg");
+                    <font id="String">String</font> hashval = ByteUtils.asHex(value.getBytes());
+                    Path outpath = new Path(path + <font id="StringLiteral">"/"</font> + hashval + <font id="StringLiteral">".jpg"</font>);
                     FSDataOutputStream os = fileSystem.create(outpath);
                     os.write(value.getBytes());
                     os.flush();

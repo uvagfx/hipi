@@ -92,7 +92,9 @@
 	    We have provided a script in the <tt>examples</tt>
 	    directory of the HIPI installation that will automatically
 	    compile the createsequencefile program, upload the resulting jar
-	    to the Hadoop Distributed Filesystem (HDFS), and run the
+	    to the <a class="external_link" 
+      href="http://hadoop.apache.org/docs/r2.5.1/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html">
+         Hadoop Distributed Filesystem (HDFS)</a>, and run the
 	    createsequencefile job. <br /><br />
 
 	    The createsequencefile program takes two command line
@@ -113,7 +115,7 @@
             <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html">Job</a>'s
             initial parameters are set. In particular, CreateSequenceFile contains the following line:
             <pre>
-              job.setOutputFormatClass(SequenceFileOutputFormat.class);
+              job.setOutputFormatClass(SequenceFileOutputFormat.<font id="Class">class</font>);
             </pre>
             The <a class="external_link" class="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/lib/output/SequenceFileOutputFormat.html">SequenceFileOutputFormat</a>
             class is provided by Hadoop and will generate an output which is structured as a Hadoop 
@@ -121,7 +123,7 @@
             <br/><br/><br/>
             Another important parameter being set ensures that the Job knows how to interpret its input:
             <pre>
-              job.setInputFormatClass(ImageBundleInputFormat.class);
+              job.setInputFormatClass(ImageBundleInputFormat.<font id="Class">class</font>);
             </pre>
             The <a href="../doc/api/hipi/imagebundle/mapreduce/ImageBundleInputFormat.html">ImageBundleInputFormat</a> class ensures that the Job
             understands the formatting of the input and how to interact with it.
@@ -129,15 +131,15 @@
           Here is the complete code from the SequenceFileMapper's map method:
           <pre>
             @Override
-            public void map(ImageHeader key, FloatImage value, Context context) throws IOException,
+            <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException,
                 InterruptedException {
-              if (value != null) {
+              <font id="If">if</font> (value != null) {
                 ImageEncoder encoder = JPEGImageUtil.getInstance();
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 encoder.encodeImage(value, key, os);
                 os.close();
-                byte[] val = os.toByteArray();
-                long sig = 0 << 2 | ImageType.JPEG_IMAGE.toValue();
+                <font id="Byte">byte</font>[] val = os.toByteArray();
+                <font id="Long">long</font> sig = 0 << 2 | ImageType.JPEG_IMAGE.toValue();
                 context.write(new LongWritable(sig), new BytesWritable(val));
               }
             }

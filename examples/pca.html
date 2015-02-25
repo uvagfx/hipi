@@ -258,7 +258,7 @@
       </pre>
 
       The <tt>runMeanCompute()</tt> method is responsible for
-      computing the mean of 10 randomly sampled patches in eahc of the
+      computing the mean of 10 randomly sampled patches in each of the
       images in the input <a
       href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
       (HIB). Its contents are rather standard so we will forego a
@@ -276,7 +276,7 @@
       <pre id="Current">
   <font id="Public">public</font> <font id="Int">int</font> runCovariance(String[] args) <font id="Throws">throws</font> Exception {
     ...
-    DistributedCache.addCacheFile(<font id="New">new</font> URI(<font id="StringLiteral">"hdfs:///path/to/mean_output/part-r-00000"</font>), job.getConfiguration());
+    job.addCacheFile(<font id="New">new</font> URI(<font id="StringLiteral">"hdfs:///path/to/mean_output/part-r-00000"</font>));
     ...
       </pre>
 
@@ -300,18 +300,27 @@
       (HIB):
       <pre id="Current">
   <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
-    <font id="If">if</font> (value != <font id="Null">null</font> &amp;&amp; value.getWidth() &gt; N &amp;&amp; value.getHeight() &gt; N) {
-      FloatImage mean = <font id="New">new</font> FloatImage(N, N, <font id="IntegerLiteral">1</font>);
-      <font id="For">for</font> (<font id="Int">int</font> i = <font id="IntegerLiteral">0</font>; i &lt; <font id="IntegerLiteral">10</font>; i++) {
-        <font id="Int">int</font> x = (value.getWidth() - N) * i / <font id="IntegerLiteral">10</font>;
-	<font id="For">for</font> (<font id="Int">int</font> j = <font id="IntegerLiteral">0</font>; j &lt; <font id="IntegerLiteral">10</font>; j++) {
-	  <font id="Int">int</font> y = (value.getHeight() - N) * j / <font id="IntegerLiteral">10</font>;
-	  FloatImage patch = value.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
-	  mean.add(patch);
-	}
+    @Override
+    public void map(ImageHeader key, FloatImage value, Context context) throws IOException,
+        InterruptedException {
+      if (value != null && value.getWidth() > N && value.getHeight() > N) {
+        context.write(new IntWritable(0), generateMeanImage(value, 10, 10));
       }
-      mean.scale(<font id="FloatPointLiteral">0.01f</font>);
-      context.write(<font id="New">new</font> IntWritable(<font id="IntegerLiteral">0</font>), mean);
+    }
+
+    <font id="Comment">//computes the mean of the 100 randomly sampled patches in each image, returns a FloatImage storing this mean</font>
+    <font id="Private">private</font> FloatImage generateMeanImage(FloatImage input, int xPatchCount, int yPatchCount) {
+      FloatImage mean = new FloatImage(N, N, 1);
+      <font id="For">for</font> (<font id="Int">int</font> i = 0; i < xPatchCount; i++) {
+        <font id="Int">int</font> x = (input.getWidth() - N) * i / xPatchCount;
+        <font id="For">for</font> (<font id="Int">int</font> j = 0; j < yPatchCount; j++) {
+        <font id="Int">int</font> y = (input.getHeight() - N) * j / yPatchCount;
+          FloatImage patch = input.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
+          mean.add(patch);
+        }
+      }
+      mean.scale((float) (1.0 / (xPatchCount * yPatchCount)));
+      <font id="Return">return</font> mean;
     }
   }
       </pre>
@@ -350,26 +359,29 @@
       same 100 patches that were used to compute the mean in each of
       the images in the input <a
       href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
-      (HIB). In doings, it needs to be able to access the <a class="external_link" 
+      (HIB). In doing this, it needs to be able to access the precomputed mean through the <a class="external_link" 
       href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">
       Job::addCacheFile()</a> and
       <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">
-      Job::getCacheFiles()</a> methods
-      in order to load the precomputed mean. This operation happens in
+      Job::getCacheFiles()</a> methods. This operation happens in
       the <a class="external_link"
       href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a>
       method:
       <pre id="Current">
-  <font id="Float">float</font>[] mean;
+        URI[] files = <font id="New">new</font> URI[1];
+        <font id="If">if</font> (job.getCacheFiles() != <font id="Null">null</font>) {
+          files = job.getCacheFiles();
+        } <font id="Else">else</font> {
+          System.err.println("cache files null...");
+        }
 
-  <font id="Public">public</font> <font id="Void">void</font> setup(Context job) <font id="Throws">throws</font> IOException {
-    Path file = DistributedCache.getLocalCacheFiles(job.getConfiguration())[<font id="IntegerLiteral">0</font>];
-    FSDataInputStream dis = FileSystem.getLocal(job.getConfiguration()).open(file);
-    dis.skip(<font id="IntegerLiteral">4</font>);
-    FloatImage image = <font id="New">new</font> FloatImage();
-    image.readFields(dis);
-    mean = image.getData();
-  }
+        <font id="Comment">//get mean from previously run mean job</font>
+        Path cacheFilePath = new Path(files[0].toString());
+        FSDataInputStream dis = FileSystem.get(job.getConfiguration()).open(cacheFilePath);
+        dis.skip(4);
+        FloatImage image = new FloatImage();
+        image.readFields(dis);
+        mean = image.getData();
       </pre>
 
       Note the <tt>dis.skip</tt> function call. This is needed to
@@ -381,20 +393,30 @@
       100 patches used in the mean computation are first converted to
       grayscale and then Gaussian weighted:
       <pre id="Current">
-  <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
-    <font id="If">if</font> (value != <font id="Null">null</font> &amp;&amp; value.getWidth() &gt; N &amp;&amp; value.getHeight() &gt; N) {
-      <font id="Float">float</font>[][] tp = <font id="New">new</font> <font id="Float">float</font>[<font id="IntegerLiteral">100</font>][N * N];
-      <font id="For">for</font> (<font id="Int">int</font> i = <font id="IntegerLiteral">0</font>; i &lt; <font id="IntegerLiteral">10</font>; i++) {
-        <font id="Int">int</font> x = (value.getWidth() - N) * i / <font id="IntegerLiteral">10</font>;
-	<font id="For">for</font> (<font id="Int">int</font> j = <font id="IntegerLiteral">0</font>; j &lt; <font id="IntegerLiteral">10</font>; j++) {
-	<font id="Int">int</font> y = (value.getHeight() - N) * j / <font id="IntegerLiteral">10</font>;
-	FloatImage patch = value.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
-	<font id="Float">float</font>[] pels = patch.getData();
-	<font id="For">for</font> (<font id="Int">int</font> k = <font id="IntegerLiteral">0</font>; k &lt; N * N; k++)
-	  tp[i * <font id="IntegerLiteral">10</font> + j][k] = (pels[k] - mean[k]) * g[k];
+    @Override
+    <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException,
+        InterruptedException {
+      <font id="If">if</font> (value != null && value.getWidth() > N && value.getHeight() > N) {
+        //holds 100 patches as they are collected from the image
+        float[][] patchArray = new float[100][N * N];
+        
+        //generates pre-processed patches and stores them in patchArray (same patches used to calculate mean)
+        <font id="For">for</font> (<font id="Int">int</font> i = 0; i < 10; i++) {
+          <font id="Int">int</font> x = (value.getWidth() - N) * i / 10;
+          <font id="For">for</font> (<font id="Int">int</font> j = 0; j < 10; j++) {
+            <font id="Int">int</font> y = (value.getHeight() - N) * j / 10;
+            FloatImage patch = value.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
+            <font id="Float">float</font>[] pels = patch.getData();
+            <font id="For">for</font> (<font id="Int">int</font> k = 0; k < N * N; k++) {
+              //subtract average grey level from pixels, mask with gaussian value
+              patchArray[i * 10 + j][k] = (pels[k] - mean[k]) * gaussianArray[k];
+            }
+          }
+        }
+        ...
+ 
       }
     }
-    ...
       </pre>
 
       The Guassian weighting is done to be consistent with the
@@ -402,17 +424,18 @@
       to the center pixels in a patch. The covariance is computed
       directly from the preprocessed patches:
       <pre id="Current">
-    <font id="Float">float</font>[] cov = <font id="New">new</font> <font id="Float">float</font>[N * N * N * N];
-    <font id="For">for</font> (<font id="Int">int</font> i = <font id="IntegerLiteral">0</font>; i &lt; N * N; i++) {
-      <font id="For">for</font> (<font id="Int">int</font> j = <font id="IntegerLiteral">0</font>; j &lt; N * N; j++) {
-        cov[i * N * N + j] = <font id="IntegerLiteral">0</font>;
-	<font id="For">for</font> (<font id="Int">int</font> k = <font id="IntegerLiteral">0</font>; k &lt; <font id="IntegerLiteral">100</font>; k++)
-          cov[i * N * N + j] += tp[k][i] * tp[k][j];
+      //stores covariance
+      <font id="Float">float</font>[] covarianceArray = <font id="New">new</font> <font id="Float">float</font>[N * N * N * N];
+      <font id="For">for</font> (<font id="Int">int</font> i = 0; i < N * N; i++) {
+        <font id="For">for</font> (<font id="Int">int</font> j = 0; j < N * N; j++) {
+          covarianceArray[i * N * N + j] = 0;
+          <font id="For">for</font> (<font id="Int">int</font> k = 0; k < 100; k++) {
+            //covariance function - generate covariance from patches
+            covarianceArray[i * N * N + j] += patchArray[k][i] * patchArray[k][j];
+          }
+        }
       }
-    }
-    context.write(<font id="New">new</font> IntWritable(<font id="IntegerLiteral">0</font>), <font id="New">new</font> FloatImage(N * N, N * N, <font id="IntegerLiteral">1</font>, cov));
-    }
-  }
+      context.write(new IntWritable(0), new FloatImage(N * N, N * N, 1, covarianceArray));
       </pre>
 
       <h3>The Covariance Reducer</h3>
@@ -424,6 +447,7 @@
       Reducer is the final covariance encoded as a FloatImage:
       <pre id="Current">
   <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable&lt;FloatImage&gt; values, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
+    //combine partial covariances from patches into global covariance
     FloatImage cov = <font id="New">new</font> FloatImage(N * N, N * N, <font id="IntegerLiteral">1</font>);
     <font id="For">for</font> (FloatImage val : values) {
       cov.add(val);

@@ -141,7 +141,8 @@
 	of the DumpHIB class, invoked via the <tt>main()</tt> method:
 	<pre id="Current">
   <font id="Public">public</font> <font id="Static">static</font> <font id="Void">void</font> main(String[] args) <font id="Throws">throws</font> Exception {
-    <font id="Int">int</font> exitCode = ToolRunner.run(<font id="New">new</font> DumpHib(), args);
+    <font id="Int">int</font> res = ToolRunner.run(<font id="New">new</font> DumpHib(), args);
+    System.exit(res);
   }
 	</pre>
 
@@ -154,7 +155,7 @@
   <font id="Public">public</font> <font id="Int">int</font> run(String[] args) <font id="Throws">throws</font> Exception {
     Configuration conf = <font id="New">new</font> Configuration();
 
-    Job job = <font id="New">new</font> Job(conf, <font id="StringLiteral">"dumphib"</font>);
+    Job job = Job.getInstance(conf, <font id="StringLiteral">"dumphib"</font>);
     job.setJarByClass(DumpHib.<font id="Class">class</font>);
     job.setMapperClass(DumpHibMapper.<font id="Class">class</font>);
     job.setReducerClass(DumpHibReducer.<font id="Class">class</font>);
@@ -204,8 +205,7 @@
     FileInputFormat.setInputPaths(job, <font id="New">new</font> Path(inputPath));    
 
     job.setNumReduceTasks(<font id="IntegerLiteral">1</font>);
-    System.exit(job.waitForCompletion(<font id="True">true</font>) ? <font id="IntegerLiteral">0</font> : <font id="IntegerLiteral">1</font>);
-    <font id="Return">return</font> <font id="IntegerLiteral">0</font>;
+    <font id="Return">return</font> job.waitForCompletion(<font id="True">true</font>) ? 0 : 1;
   }
 	</pre>
 
@@ -229,23 +229,23 @@
     <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
       ...
 	</pre>
-	
-	Since this example is rather trivial, the <tt>map()</tt>
+
+  Since this example is rather trivial, the <tt>map()</tt>
 	operation performs very simple operations on the ImageHeader
-	and the FloatImage. The width and height of the image are
-	retreived from the FloatImage directly:
-	<pre id="Current">
-      <font id="Int">int</font> imageWidth = value.getWidth();
-      <font id="Int">int</font> imageHeight = value.getHeight();	  
-	</pre>
-	
-	The hexidecimal representation of the hash of the pixel values
+	and the FloatImage. The hexidecimal representation of the hash of the pixel values
 	(represented as floating-point numbers, NOT as the raw bytes)
-	is computed, and finally the EXIF tag &#39;Model&#39; is
+	is computed, and the EXIF tag &#39;Model&#39; is
 	retreived from the ImageHeader:
 	<pre id="Current">
       String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
       String camera = key.getEXIFInformation(<font id="StringLiteral">"Model"</font>);
+	</pre>
+	
+  The width and height of the image are
+	retreived from the FloatImage directly:
+	<pre id="Current">
+      <font id="String">String</font> outputStr =
+          value.getWidth() + <font id="StringLiteral">"x"</font> + value.getHeight() + <font id="StringLiteral">"\t("</font> + hexHash + <font id="StringLiteral">")\t"</font> + camera;
 	</pre>
 
 	All of these properties are concatenated to form the output
@@ -254,8 +254,7 @@
 	to the same Reducer, thereby ensuring one output file
 	containing all of the images:
 	<pre id="Current">
-      String output = imageWidth + <font id="StringLiteral">"x"</font> + imageHeight + <font id="StringLiteral">"\t("</font> + hexHash + <font id="StringLiteral">")\t "</font> + camera;      
-      context.write(<font id="New">new</font> IntWritable(<font id="IntegerLiteral">1</font>), <font id="New">new</font> Text(output));
+      context.write(<font id="New">new</font> IntWritable(<font id="IntegerLiteral">1</font>), <font id="New">new</font> Text(outputStr));
     }
 	</pre>
 
@@ -267,6 +266,7 @@
 	<pre id="Current">
   <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> DumpHibReducer <font id="Extends">extends</font> Reducer&lt;IntWritable, Text, IntWritable, Text&gt; {
     <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable&lt;Text&gt; values, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
+      //outputs previously collected data
       <font id="For">for</font> (Text value : values) {
         context.write(key, value);
       }

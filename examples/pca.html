@@ -389,7 +389,8 @@
       computing the mean.<br /><br />
 
       The <tt>map()</tt> method uses this <tt>mean</tt> member
-      variable to compute the partial covariance for each image. The
+      variable (passed in to the method as <tt>value</tt>) 
+      to compute the partial covariance for each image. The
       100 patches used in the mean computation are first converted to
       grayscale and then Gaussian weighted:
       <pre id="Current">

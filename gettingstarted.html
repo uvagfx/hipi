@@ -96,23 +96,22 @@
 
       <h2>Checking What You Have</h2>
       <div class="section">
-		  The "Getting Started" tutorial will assume that you have Hadoop
-		  installed locally, and have downloaded the hipi-0.1.0.jar package.
-		  If you are not at this point, please do so before proceeding.<br /><br />
+		  The "Getting Started" tutorial will assume that you have Hadoop and HIPI
+		  installed locally.
+		  Please reach this point before proceeding.<br /><br />
 
-		  A good way to make sure you have all Hadoop and HIPI environment setup
+		  A good way to ensure your system is configured properly
 		  is to build HIPI library/examples/tool on your own computer. Try to run
 		  "ant" at the root directory. You probably need to change hadoop.classpath, hadoop.version,
 		  and hadoop.home in build.xml to build HIPI successfully.<br /><br />
 
-		  If everything works correctly, you should have tool/hibimport.jar file ready
-		  by now. Run
+		  To confirm that everything has compiled properly after running the ant command above, run:
 		<pre id="Classes">
   hadoop jar tool/hibimport.jar ~/Pictures picture.hib
         </pre>
-		~/Pictures represents a directory that contains images, this command will
-		create two files: picture.hib and picture.hib.dat. Keep them around, they
-		will be useful later.<br /><br />
+		Where ~/Pictures represents a directory that contains images. This command will
+		create two files on the <a class="external_link" href="http://hadoop.apache.org/docs/r2.5.1/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html">
+    Hadoop Distributed Filesystem (HDFS) </a>: picture.hib and picture.hib.dat. To view them, run the command: <tt>hadoop dfs -ls</tt><br /><br />
       </div>
     <h2>Writing Your First HIPI Program (Average Color of Images)</h2>
         <div class="section">

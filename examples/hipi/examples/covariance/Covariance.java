@@ -2,7 +2,6 @@ package hipi.examples.covariance;
 
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
-import hipi.imagebundle.mapreduce.HipiJob;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 import hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
 import hipi.image.ImageHeader.ImageType;
@@ -226,7 +225,7 @@ public class Covariance extends Configured implements Tool {
   }
 
   public int runCovariance(String[] args) throws Exception {
-    Job job = HipiJob.getHipiJobInstance(getConf(), "Covariance");
+    Job job = Job.getInstance();
     job.setJarByClass(Covariance.class);
 
 

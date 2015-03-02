@@ -111,7 +111,7 @@
         </pre>
 		Where ~/Pictures represents a directory that contains images. This command will
 		create two files on the <a class="external_link" href="http://hadoop.apache.org/docs/r2.5.1/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html">
-    Hadoop Distributed Filesystem (HDFS) </a>: picture.hib and picture.hib.dat. To view them, run the command: <tt>hadoop dfs -ls</tt><br /><br />
+    Hadoop Distributed Filesystem (HDFS) </a>: picture.hib and picture.hib.dat. To view them, run the command: <tt>hdfs dfs -ls</tt><br /><br />
       </div>
     <h2>Writing Your First HIPI Program (Average Color of Images)</h2>
         <div class="section">
@@ -135,15 +135,20 @@
 
 		  FirstProgram.java can be as simple as:
 		  <pre id="Classes">
+  <font id="Import">import org.apache.hadoop.conf.Configured;</font>
+  <font id="Import">import org.apache.hadoop.util.Tool;</font>
   <font id="Public">public</font> <font id="Class">class</font> FirstProgram <font id="Extends">extends</font> Configured <font id="Implements">implements</font> Tool {
-	<font id="Public">public</font> <font id="Static">static</font> <font id="Void">void</font> main(String[] args) <font id="Throws">throws</font> Exception {
-        System.out.println("Hello HIPI!");
-        System.exit(0);
+    <font id="Public">public</font> <font id="Static">static</font> <font id="Void">void</font> main(String[] args) <font id="Throws">throws</font> Exception {
+          System.out.println("Hello HIPI!");
+          System.exit(0);
+    }
+    <font id="Public">public</font> <font id="Int">int</font> run(<font id="String">String</font>[] args) <font id="Throws">throws</font> <font id="Exception">Exception</font> {
+        <font id="Return">return</font> 0;
     }
   }
 		  </pre>
 
-		  Try to build again as suggested in "Checking What you Have", if your code
+		  Try to build this by running <tt>ant firstprog</tt> in your root directory. If your code
 		  builds, you should have firstprog.jar file in ./firstprog directory.
 		  Congratulations! This is your *first* HIPI program.<br /><br />
 
@@ -154,6 +159,25 @@
 		  After working through this tutorial, you should be able to create Mapper and Reducer classes for our
 		  dummy program:
 		  <pre id="Classes">
+  <font id="Import">import org.apache.hadoop.conf.Configured;</font>
+  <font id="Import">import org.apache.hadoop.fs.Path;</font>
+  <font id="Import">import org.apache.hadoop.io.IntWritable;</font>
+  <font id="Import">import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;</font>
+  <font id="Import">import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;</font>
+  <font id="Import">import org.apache.hadoop.mapreduce.Job;</font>
+  <font id="Import">import org.apache.hadoop.mapreduce.Mapper;</font>
+  <font id="Import">import org.apache.hadoop.mapreduce.Reducer;</font>
+  <font id="Import">import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;</font>
+  <font id="Import">import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;</font>
+  <font id="Import">import org.apache.hadoop.util.Tool;</font>
+  <font id="Import">import org.apache.hadoop.util.ToolRunner;</font>
+
+  <font id="Import">import hipi.image.FloatImage;</font>
+  <font id="Import">import hipi.image.ImageHeader;</font>
+  <font id="Import">import hipi.imagebundle.mapreduce.output.BinaryOutputFormat;</font>
+  <font id="Import">import hipi.imagebundle.mapreduce.ImageBundleInputFormat;</font>
+
+  <font id="Import">import java.io.IOException;</font>
   <font id="Public">public</font> <font id="Class">class</font> FirstProgram <font id="Extends">extends</font> Configured <font id="Implements">implements</font> Tool {
     <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyMap <font id="Extends">extends</font> Mapper&lt;ImageHeader, FloatImage, IntWritable, FloatImage&gt; {
       <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context)
@@ -169,6 +193,7 @@
     <font id="Public">public</font> int run(String[] args) <font id="Throws">throws</font> Exception {
       Job job = Job.getInstance();
       job.setJarByClass(FirstProgram.class);
+      job.setInputFormatClass(ImageBundleInputFormat.class);
       job.setOutputKeyClass(IntWritable.class);
       job.setOutputValueClass(FloatImage.class);
 
@@ -176,7 +201,6 @@
       job.setCombinerClass(MyReduce.class);
       job.setReducerClass(MyReduce.class);
 
-      String inputFileType = args[2];
       job.setOutputFormatClass(BinaryOutputFormat.class);
 
       FileInputFormat.setInputPaths(job, new Path(args[0]));
@@ -194,7 +218,7 @@
 		  </pre>
 		  This looks like alot of code, but most of it is setting up the Hadoop <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapred/jobcontrol/Job.html">Job</a> and will look similar across all Hadoop programs you write. The core functionality of the code (the internals of your Mapper and Reducer classes) is still unimplemented.<br /><br />
 
-		  Test to ensure your code works here by compiling it (run "ant firstprog" from the directory containing your build.xml file).<br /><br />
+		  Test to ensure your code works here by compiling it (run <tt>ant firstprog</tt> from the directory containing your build.xml file).<br /><br />
 
 	  <h3>Computing Average Color</h3>
 		  Let's begin adding some functionality to our program.
@@ -216,6 +240,7 @@
               avgData[2] += valData[i * value.getHeight() * 3 + j * 3 + 2];
             }
           }
+          avg = <font id="New">new</font> FloatImage(1, 1, 3, avgData);
           avg.scale(1.0f / (value.getWidth() * value.getHeight()));
           context.write(new IntWritable(0), avg);
         }
@@ -224,8 +249,8 @@
 	</pre>
 		  This creates 1x1 FloatImage which is passed to the reducer:
 		  <pre id="Classes">
-    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyReduce <font id="Extends">extends</font> Reducer&lt;IntWritable, FloatImage, IntWritable, FloatImage&gt; 
-      <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable<FloatImage> values, Context context)
+    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyReduce <font id="Extends">extends</font> Reducer&lt;IntWritable, FloatImage, IntWritable, FloatImage&gt; {
+      <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable&lt;FloatImage&gt; values, Context context)
         <font id="Throws">throws</font> IOException, InterruptedException {
         FloatImage avg = new FloatImage(1, 1, 3);
         int total = 0;
@@ -238,6 +263,7 @@
           context.write(key, avg);
         }
       }
+    }
 	</pre>
 	Again, double-check and make sure your code compiles at this point. <br /><br />
 
@@ -245,7 +271,7 @@
 	  <div class="section">
 		  The compiled jar file should be in ./firstprog/firstprog.jar which can be run with the picture.hib file you created above:
 		  <pre id="Classes">
-  hadoop jar firstprog/firstprog.jar picture.hib .
+  hadoop jar firstprog/firstprog.jar pictures.hib .
 		  </pre>
 		  This will create a binary file which contains the average color of the images stored in picture.hib.<br /><br />
 

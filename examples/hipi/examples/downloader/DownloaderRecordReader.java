@@ -15,77 +15,78 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 /**
- * Treats keys as index into training array and value as the training vector. 
+ * Treats keys as index into training array and value as the training vector.
  */
-public class DownloaderRecordReader extends RecordReader<IntWritable, Text> 
-{
-	private boolean singletonEmit;
-	private String urls;
-	private long start_line;
-	
-	public void initialize(InputSplit split, TaskAttemptContext context)
-	throws IOException, InterruptedException {
-		FileSplit f = (FileSplit) split;
-		Path path = f.getPath();
-		Configuration conf = context.getConfiguration();
-		FileSystem fs = path.getFileSystem(conf);
+public class DownloaderRecordReader extends RecordReader<IntWritable, Text> {
 
-		start_line = f.getStart();
-		long num_lines = f.getLength();
+  private boolean singletonEmit;
+  private String urls;
+  private long start_line;
 
-		singletonEmit = false;
+  @Override
+  public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
+    FileSplit fileSplit = (FileSplit) split;
+    Path path = fileSplit.getPath();
+    FileSystem fileSystem = path.getFileSystem(context.getConfiguration());
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(path)));
-		int i = 0;
-		while(i < start_line && reader.readLine() != null){
-			i++;
-		}
-		
-		urls = "";
-		String line;
-		for(i = 0; i < num_lines && (line = reader.readLine()) != null; i++){
-			urls += line + '\n';
-		}
-		reader.close();
-	}
+    start_line = fileSplit.getStart();
+    long num_lines = fileSplit.getLength();
+
+    singletonEmit = false;
+
+    BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(path)));
+    int i = 0;
+    while (i < start_line && reader.readLine() != null) {
+      i++;
+    }
+
+    urls = "";
+    String line;
+    for (i = 0; i < num_lines && (line = reader.readLine()) != null; i++) {
+      urls += line + '\n';
+    }
+
+    reader.close();
+  }
 
 
-	/**
-	 * Get the progress within the split
-	 */
-	public float getProgress() 
-	{
-		if (singletonEmit) {
-			return 1.0f;
-		} else {
-			return 0.0f;
-		}
-	}
+  /**
+   * Get the progress within the split
+   */
+  @Override
+  public float getProgress() {
+    if (singletonEmit) {
+      return 1.0f;
+    } else {
+      return 0.0f;
+    }
+  }
 
-	public void close() throws IOException 
-	{
-		return;
-	}
+  @Override
+  public void close() throws IOException {
+    return;
+  }
 
-	@Override
-	public IntWritable getCurrentKey() throws IOException,
-	InterruptedException {
-		return new IntWritable((int)start_line);
-	}
+  @Override
+  public IntWritable getCurrentKey() throws IOException, InterruptedException {
+    return new IntWritable((int) start_line);
+  }
 
-	@Override
-	public Text getCurrentValue() throws IOException,
-	InterruptedException {
-		return new Text(urls);
-	}
 
-	@Override
-	public boolean nextKeyValue() throws IOException, InterruptedException {
-		if(singletonEmit == false){
-			singletonEmit = true;
-			return true;
-		}
-		else
-			return false;
-	}
+  @Override
+  public Text getCurrentValue() throws IOException, InterruptedException {
+    return new Text(urls);
+  }
+
+  @Override
+  public boolean nextKeyValue() throws IOException, InterruptedException {
+    if (singletonEmit == false) {
+      singletonEmit = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
 }

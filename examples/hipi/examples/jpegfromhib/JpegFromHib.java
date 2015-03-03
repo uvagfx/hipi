@@ -4,7 +4,6 @@ import hipi.image.ImageHeader.ImageType;
 import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 import hipi.util.ByteUtils;
 
-import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -14,101 +13,91 @@ import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
 
-public class JpegFromHib extends Configured implements Tool{
+import java.util.Iterator;
+import java.io.IOException;
 
-	public static class MyMapper extends Mapper<NullWritable, BytesWritable, BooleanWritable, Text>
-	{
-		public Path path;
-		public FileSystem fileSystem;
-		public void setup(Context jc) throws IOException
-		{
-			Configuration conf = jc.getConfiguration();
-			fileSystem = FileSystem.get(conf);
-			path = new Path( conf.get("jpegfromhib.outdir"));
-			fileSystem.mkdirs(path);
-		}
-		public void map(NullWritable key, BytesWritable value, Context context) 
-		throws IOException, InterruptedException{
-			if(value == null)
-				return;
-			byte[] val = value.getBytes();
-			
-			String hashval = ByteUtils.asHex(val);
-		    
-			Path outpath = new Path(path + "/" + hashval + ".jpg");
-			FSDataOutputStream os = fileSystem.create(outpath);
-			os.write(val);
-			os.flush();
-			os.close();
-			
-			long sig = 0<<2 | ImageType.JPEG_IMAGE.toValue();
-			
-			//if you want the images to be output as a sequence file, emit the line below
-			//and change the output key and values appropriately
-			//context.write(new LongWritable(sig), value);
-			
-			context.write(new BooleanWritable(true), new Text(hashval));
-		}
-	}
+public class JpegFromHib extends Configured implements Tool {
 
-	public int run(String[] args) throws Exception
-	{	
+  public static class JpegFromHibMapper extends
+      Mapper<NullWritable, BytesWritable, BooleanWritable, Text> {
 
-		// Read in the configurations
-		if (args.length < 2)
-		{
-			System.out.println("args: " + args.length);
-			System.out.println("Usage: hib2jpg <hibfile> <output dir>");
-			System.exit(0);
-		}
+    public Path path;
+    public FileSystem fileSystem;
 
+    @Override
+    public void setup(Context context) throws IOException {
+      Configuration conf = context.getConfiguration();
+      fileSystem = FileSystem.get(context.getConfiguration());
+      path = new Path(conf.get("jpegfromhib.outdir"));
+      fileSystem.mkdirs(path);
+    }
 
-		// Setup configuration
-		Configuration conf = new Configuration();
-		
-		// set the dir to output the jpegs to
-		String outputPath = args[1];
-		conf.setStrings("jpegfromhib.outdir", outputPath);
+    /* In this example, the mapper creates a new output path for each BytesWritable object passed into it,
+     * using the hashval to generate a unique path. The reduce component of this example is trivial and
+     * doesn't require additional implementation.
+     */
+    @Override
+    public void map(NullWritable key, BytesWritable value, Context context) throws IOException,
+        InterruptedException {
+      if (value == null) {
+        return;
+      }
+      String hashval = ByteUtils.asHex(value.getBytes());
+      Path outpath = new Path(path + "/" + hashval + ".jpg");
+      FSDataOutputStream os = fileSystem.create(outpath);
+      os.write(value.getBytes());
+      os.flush();
+      os.close();
 
-		Job job = new Job(conf, "hib2jpg");
-		job.setJarByClass(JpegFromHib.class);
-		job.setMapperClass(MyMapper.class);
-		job.setReducerClass(Reducer.class);
+      context.write(new BooleanWritable(true), new Text(hashval));
+    }
+  }
 
-		// Set formats
-		job.setOutputKeyClass(BooleanWritable.class);
-		job.setOutputValueClass(Text.class);       
-		//job.setOutputFormatClass(SequenceFileOutputFormat.class);
+  private static void removeDir(String path, Configuration conf) throws IOException {
+    Path output_path = new Path(path);
+    FileSystem fileSystem = FileSystem.get(conf);
+    if (fileSystem.exists(output_path)) {
+      fileSystem.delete(output_path, true);
+    }
+  }
 
-		job.setInputFormatClass(JpegFromHibInputFormat.class);
+  public int run(String[] args) throws Exception {
+    if (args.length != 2) {
+      System.out.println("Usage: jpegfromhib <hibfile> <output dir>");
+      System.exit(0);
+    }
 
-		// Set out/in paths
-		removeDir(args[1], conf);
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
-		ImageBundleInputFormat.setInputPaths(job, new Path(args[0]));	
+    String inputPath = args[0];
+    String outputPath = args[1];
 
-		job.setNumReduceTasks(1);
-		System.exit(job.waitForCompletion(true) ? 0 : 1);
-		return 0;
-	}
-	public static void removeDir(String path, Configuration conf) throws IOException {
-		Path output_path = new Path(path);
+    Configuration conf = new Configuration();
+    conf.setStrings("jpegfromhib.outdir", outputPath);
 
-		FileSystem fs = FileSystem.get(conf);
+    Job job = Job.getInstance(conf, "jpegfromhib");
+    job.setJarByClass(JpegFromHib.class);
+    job.setMapperClass(JpegFromHibMapper.class);
+    job.setReducerClass(Reducer.class);
+    job.setOutputKeyClass(BooleanWritable.class);
+    job.setOutputValueClass(Text.class);
+    job.setInputFormatClass(JpegFromHibInputFormat.class);
+    job.setNumReduceTasks(1);
 
-		if (fs.exists(output_path)) {
-			fs.delete(output_path, true);
-		}
-	}
-	public static void main(String[] args) throws Exception {
-		int res = ToolRunner.run(new JpegFromHib(), args);
-		System.exit(res);
-	}
+    removeDir(outputPath, conf);
+    FileOutputFormat.setOutputPath(job, new Path(outputPath));
+    ImageBundleInputFormat.setInputPaths(job, new Path(inputPath));
+
+    return job.waitForCompletion(true) ? 0 : 1;
+  }
+
+  public static void main(String[] args) throws Exception {
+    int res = ToolRunner.run(new JpegFromHib(), args);
+    System.exit(res);
+  }
 }

@@ -1,0 +1,26 @@
+<project basedir="." default="hipi">
+
+  <target name="hipi">
+    
+    <mkdir dir="../lib" />
+    
+    <!-- Delete existing version of library -->
+    <delete>
+      <fileset dir="../lib" includes="hipi*.jar" />
+    </delete>
+    
+    <!-- Compile -->
+    <javac nowarn="on" includeantruntime="no" srcdir="./hipi/container:./hipi/image:./hipi/imagebundle:./hipi/util:./hipi/unittest" destdir="../lib" classpath="${hadoop.classpath}:${metadata.jar}:${junit.jar}">
+      <compilerarg value="-Xlint:deprecation" />
+    </javac>
+    
+    <!-- Create the jar -->
+    <jar destfile="../lib/hipi-${hipi.version}.jar" basedir="../lib">
+      <zipfileset src="${metadata.jar}" />
+      <manifest>
+      </manifest>
+    </jar>
+    
+   </target>
+  
+</project>

@@ -1,9 +1,16 @@
 <project basedir="." default="all">
 
   <target name="setup">
-    <property name="hadoop.home" value="/opt/hadoop-2.5.1/share/hadoop" />
-    <property name="hadoop.version" value="2.5.1" />
-    <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-2.5.1.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-2.5.1.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/hdfs/hadoop-hdfs-2.5.1.jar:${hadoop.home}/common/hadoop-nfs-2.5.1.jar" />
+
+    <!-- TODO: update the following two variables according to your local installation of Hadoop -->
+    <!-- <property name="hadoop.home" value="/opt/hadoop-2.6.0/share/hadoop" /> --> <!-- Linux -->
+    <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" /> <!-- Mac OS X / Homebrew -->
+    <property name="hadoop.version" value="2.6.0" />
+
+    <property name="hipi.version" value="2.0" />
+
+    <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-${hadoop.version}.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/hdfs/hadoop-hdfs-${hadoop.version}.jar:${hadoop.home}/common/hadoop-nfs-${hadoop.version}.jar" />
+
     <property name="metadata.jar" value="3rdparty/metadata-extractor-2.6.4.jar" />
 
     <!-- jars for test suite -->
@@ -18,49 +25,56 @@
     <property name="slf4j.api.jar" value="3rdparty/slf4j-api-1.7.10.jar" />
     <property name="log4j.jar" value="3rdparty/log4j-1.2.17.jar" />
     <property name="avro.jar" value="3rdparty/avro-1.7.7.jar" />
+
   </target>
 
   <target name="test_settings">
+    <fail unless="hipi.version" message="The property hipi.version was not set. You must specify a version for HIPI to build properly." />
     <fail unless="hadoop.home" message="The property hadoop.home was not specified. You must specify the home directory for Hadoop in the build.xml file." />
     <fail unless="hadoop.version" message="The property hadoop.version was not specified. You must specify version of Hadoop you are using in the build.xml file." />
   </target>
 
-  <target name="compile" depends="setup, test_settings">
+  <target name="compile" depends="setup,test_settings,hipi">
+
     <mkdir dir="bin" />
-    <!-- Compile -->
-      <javac nowarn="on" includeantruntime="no" srcdir="${srcdir}" destdir="./bin" classpath="${hadoop.classpath}:./src/hipi.jar">
-         <compilerarg value="-Xlint:deprecation" />
-      </javac>
-    <!-- Create the jar -->
     
+    <!-- Compile -->
+    <javac nowarn="on" includeantruntime="no" srcdir="${srcdir}" destdir="./bin" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar">
+      <compilerarg value="-Xlint:deprecation" />
+    </javac>
+    
+    <!-- Create the jar -->
     <jar destfile="${jardir}/${jarfilename}" basedir="./bin">
-	  <zipfileset src="./src/hipi.jar" />
+      <zipfileset src="./lib/hipi-${hipi.version}.jar" />
       <manifest>
-	    <attribute name="Main-Class" value="${mainclass}" />
+	<attribute name="Main-Class" value="${mainclass}" />
       </manifest>
     </jar>
+    
   </target>
 
+  <!-- Builds HIPI Library -->
+  <target name="hipi" depends="setup, test_settings">
+    <ant antfile="build.xml" dir="libsrc">
+      <property name="hadoop.home" value="${hadoop.home}" />
+      <property name="hadoop.version" value="${hadoop.version}" />
+      <property name="hadoop.classpath" value="${hadoop.classpath}" />
+      <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.6.4.jar" />
+      <property name="junit.jar" value="../3rdparty/junit-4.12.jar" />
+    </ant>
+  </target>
+
+  <!-- Builds utility 'hibimport' which creates a HIB file on the HDFS from a set of images on the local FX -->
   <target name="hibimport">
     <antcall target="compile">
-      <param name="srcdir" value="src/hipi/tool" />
+      <param name="srcdir" value="libsrc/hipi/tool" />
       <param name="jarfilename" value="hibimport.jar" />
       <param name="jardir" value="tool" />
       <param name="mainclass" value="hipi.tool.CreateHipiImageBundle" />
     </antcall>
   </target>
 
-  <!-- Create a sequence file from a HIB-->
-  <target name="covariance">
-    <antcall target="compile">
-      <param name="srcdir" value="examples/hipi/examples/covariance" />
-      <param name="jarfilename" value="covariance.jar" />
-      <param name="jardir" value="examples" />
-      <param name="mainclass" value="hipi.examples.covariance.Covariance" />
-    </antcall>
-  </target>
-
-  <!-- The distributed downloader, which takes a database of URL's and creates a HIB -->
+  <!-- Downloads a list of URLs and creates a single HIB (see http://hipi.cs.virginia.edu/examples/downloader.html) -->
   <target name="downloader">
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/downloader" />
@@ -70,26 +84,7 @@
     </antcall>
   </target>
 
-  <!-- Extract jpeg images from a HIB into a folder -->
-  <target name="jpegfromhib">
-    <antcall target="compile">
-      <param name="srcdir" value="examples/hipi/examples/jpegfromhib" />
-      <param name="jarfilename" value="jpegfromhib.jar" />
-      <param name="jardir" value="examples" />
-      <param name="mainclass" value="hipi.examples.jpegfromhib.JpegFromHib" />
-    </antcall>
-  </target>
-
-  <target name="createsequencefile">
-    <antcall target="compile">
-      <param name="srcdir" value="examples/hipi/examples/createsequencefile" />
-      <param name="jarfilename" value="createsequencefile.jar" />
-      <param name="jardir" value="examples" />
-      <param name="mainclass" value="hipi.examples.createsequencefile.CreateSequenceFile" />
-    </antcall>
-  </target>
-
-  <!-- Dump some information about all of the information in a HIB -->
+  <!-- Display basic information about a HIB file (see http://hipi.cs.virginia.edu/examples/dumphib.html) -->
   <target name="dumphib">
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/dumphib" />
@@ -99,22 +94,53 @@
     </antcall>
   </target>
 
-  <target name="test" depends="setup, test_settings">
-    <javac includeantruntime="false" fork="true" srcdir="src/hipi/unittest" destdir="lib/hipi/unittest" classpath="${hadoop.classpath}:./src/hipi.jar:./3rdparty/junit-4.12.jar:./3rdparty/hamcrest-core-1.3.jar" debug="on"></javac>
-    <java fork="true" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${hadoop.auth.jar}:${slf4j.api.jar}:${log4j.jar}:${metadata.jar}:${avro.jar}:./src/hipi.jar:./lib">
-       <arg value="hipi.unittest.AllTests"/>
-     </java>
+  <!-- Extracts individual JPEG images contained within a HIB file (see http://hipi.cs.virginia.edu/examples/jpegfromhib.html) -->
+  <target name="jpegfromhib">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/jpegfromhib" />
+      <param name="jarfilename" value="jpegfromhib.jar" />
+      <param name="jardir" value="examples" />
+      <param name="mainclass" value="hipi.examples.jpegfromhib.JpegFromHib" />
+    </antcall>
   </target>
 
-  <target name="all" depends="hibimport, covariance, downloader, jpegfromhib, createsequencefile, dumphib" />
+  <!-- Converts a HIB file into a Hadoop SequenceFile (see http://hipi.cs.virginia.edu/examples/createSequenceFile.html) -->
+  <target name="createsequencefile">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/createsequencefile" />
+      <param name="jarfilename" value="createsequencefile.jar" />
+      <param name="jardir" value="examples" />
+      <param name="mainclass" value="hipi.examples.createsequencefile.CreateSequenceFile" />
+    </antcall>
+  </target>
+
+  <!-- Used to compute the principal components of natural image patches (see http://hipi.cs.virginia.edu/examples/pca.html) -->
+  <target name="covariance">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/covariance" />
+      <param name="jarfilename" value="covariance.jar" />
+      <param name="jardir" value="examples" />
+      <param name="mainclass" value="hipi.examples.covariance.Covariance" />
+    </antcall>
+  </target>
+
+  <!-- Runs all of the HIPI unit tests -->
+  <target name="test" depends="setup,test_settings,hipi">
+    <javac includeantruntime="false" fork="true" srcdir="src/hipi/unittest" destdir="lib/hipi/unittest" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:./3rdparty/junit-4.12.jar:./3rdparty/hamcrest-core-1.3.jar" debug="on"></javac>
+    <java fork="true" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${hadoop.auth.jar}:${slf4j.api.jar}:${log4j.jar}:${metadata.jar}:${avro.jar}:./lib/hipi-${hipi.version}.jar:./lib">
+      <arg value="hipi.unittest.AllTests"/>
+    </java>
+  </target>
+  
+  <target name="all" depends="hipi,hibimport,downloader,dumphib,jpegfromhib,createsequencefile,covariance" />
 
   <!-- Clean -->
-  <target name="clean">    
+  <target name="clean">
+    <delete dir="lib" />
     <delete dir="bin" />
     <delete>
       <fileset dir="." includes="examples/*.jar,experiments/*.jar" />
     </delete>
   </target>
-
 
 </project>

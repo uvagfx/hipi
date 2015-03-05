@@ -1,7 +1,7 @@
 <project basedir="." default="all">
 
   <target name="setup">
-
+    <echo message="Setting properties for build task..."/>
     <!-- TODO: update the following two variables according to your local installation of Hadoop -->
     <!-- <property name="hadoop.home" value="/opt/hadoop-2.6.0/share/hadoop" /> --> <!-- Linux -->
     <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" /> <!-- Mac OS X / Homebrew -->
@@ -25,13 +25,14 @@
     <property name="slf4j.api.jar" value="3rdparty/slf4j-api-1.7.10.jar" />
     <property name="log4j.jar" value="3rdparty/log4j-1.2.17.jar" />
     <property name="avro.jar" value="3rdparty/avro-1.7.7.jar" />
-
+    <echo message="Properties set."/>
   </target>
 
   <target name="test_settings">
-    <fail unless="hipi.version" message="The property hipi.version was not set. You must specify a version for HIPI to build properly." />
+    <echo message="Confirming that hadoop settings are set..."/>
     <fail unless="hadoop.home" message="The property hadoop.home was not specified. You must specify the home directory for Hadoop in the build.xml file." />
     <fail unless="hadoop.version" message="The property hadoop.version was not specified. You must specify version of Hadoop you are using in the build.xml file." />
+    <echo message="Properties are specified properly."/>
   </target>
 
   <target name="compile" depends="setup,test_settings,hipi">
@@ -47,7 +48,7 @@
     <jar destfile="${jardir}/${jarfilename}" basedir="./bin">
       <zipfileset src="./lib/hipi-${hipi.version}.jar" />
       <manifest>
-	<attribute name="Main-Class" value="${mainclass}" />
+	       <attribute name="Main-Class" value="${mainclass}" />
       </manifest>
     </jar>
     
@@ -55,6 +56,7 @@
 
   <!-- Builds HIPI Library -->
   <target name="hipi" depends="setup, test_settings">
+    <echo message="Building the hipi library..."/>
     <ant antfile="build.xml" dir="libsrc">
       <property name="hadoop.home" value="${hadoop.home}" />
       <property name="hadoop.version" value="${hadoop.version}" />
@@ -62,66 +64,79 @@
       <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.6.4.jar" />
       <property name="junit.jar" value="../3rdparty/junit-4.12.jar" />
     </ant>
+    <echo message="Hipi library built."/>
   </target>
 
   <!-- Builds utility 'hibimport' which creates a HIB file on the HDFS from a set of images on the local FX -->
   <target name="hibimport">
+    <echo message="Building 'hibimport' utility..."/>
     <antcall target="compile">
       <param name="srcdir" value="libsrc/hipi/tool" />
       <param name="jarfilename" value="hibimport.jar" />
       <param name="jardir" value="tool" />
       <param name="mainclass" value="hipi.tool.CreateHipiImageBundle" />
     </antcall>
+    <echo message="Hibimport built."/>
   </target>
 
   <!-- Downloads a list of URLs and creates a single HIB (see http://hipi.cs.virginia.edu/examples/downloader.html) -->
   <target name="downloader">
+    <echo message="Building downloader example..."/>
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/downloader" />
       <param name="jarfilename" value="downloader.jar" />
       <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.downloader.Downloader" />
     </antcall>
+    <echo message="Downloader built."/>
   </target>
 
   <!-- Display basic information about a HIB file (see http://hipi.cs.virginia.edu/examples/dumphib.html) -->
   <target name="dumphib">
+    <echo message="Building dumphib example..."/>
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/dumphib" />
       <param name="jarfilename" value="dumphib.jar" />
       <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.dumphib.DumpHib" />
     </antcall>
+    <echo message="Dumphib built."/>
   </target>
 
   <!-- Extracts individual JPEG images contained within a HIB file (see http://hipi.cs.virginia.edu/examples/jpegfromhib.html) -->
   <target name="jpegfromhib">
+    <echo message="Building jpegfromhib example..."/>
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/jpegfromhib" />
       <param name="jarfilename" value="jpegfromhib.jar" />
       <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.jpegfromhib.JpegFromHib" />
     </antcall>
+    <echo message="Jpegfromhib built."/>
   </target>
 
   <!-- Converts a HIB file into a Hadoop SequenceFile (see http://hipi.cs.virginia.edu/examples/createSequenceFile.html) -->
   <target name="createsequencefile">
+    <echo message="Building createsequencefile example..."/>
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/createsequencefile" />
       <param name="jarfilename" value="createsequencefile.jar" />
       <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.createsequencefile.CreateSequenceFile" />
     </antcall>
+    <echo message="Createsequencefile built."/>
   </target>
 
   <!-- Used to compute the principal components of natural image patches (see http://hipi.cs.virginia.edu/examples/pca.html) -->
   <target name="covariance">
+    <echo message="Building covariance example..."/>
     <antcall target="compile">
       <param name="srcdir" value="examples/hipi/examples/covariance" />
       <param name="jarfilename" value="covariance.jar" />
       <param name="jardir" value="examples" />
       <param name="mainclass" value="hipi.examples.covariance.Covariance" />
     </antcall>
+    <echo message="Covariance built."/>
   </target>
 
   <!-- Runs all of the HIPI unit tests -->

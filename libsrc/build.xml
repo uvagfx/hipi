@@ -17,6 +17,7 @@
     <!-- Create the jar -->
     <jar destfile="../lib/hipi-${hipi.version}.jar" basedir="../lib">
       <zipfileset src="${metadata.jar}" />
+      <zipfileset src="${xmpcore.jar}" />
       <manifest>
       </manifest>
     </jar>

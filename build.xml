@@ -11,8 +11,6 @@
 
     <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-${hadoop.version}.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/hdfs/hadoop-hdfs-${hadoop.version}.jar:${hadoop.home}/common/hadoop-nfs-${hadoop.version}.jar" />
 
-    <property name="metadata.jar" value="3rdparty/metadata-extractor-2.6.4.jar" />
-
     <!-- jars for test suite -->
     <property name="junit.jar" value="3rdparty/junit-4.12.jar" />
     <property name="hamcrest.jar" value="3rdparty/hamcrest-core-1.3.jar" />
@@ -61,7 +59,12 @@
       <property name="hadoop.home" value="${hadoop.home}" />
       <property name="hadoop.version" value="${hadoop.version}" />
       <property name="hadoop.classpath" value="${hadoop.classpath}" />
+      
+       <!-- https://github.com/drewnoakes/metadata-extractor -->
+      <property name="xmpcore.jar" value="../3rdparty/xmpcore.jar" />  <!-- metadata extractor dependency -->
       <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.6.4.jar" />
+      
+      <!-- Unit Testing -->
       <property name="junit.jar" value="../3rdparty/junit-4.12.jar" />
     </ant>
     <echo message="Hipi library built."/>

@@ -55,27 +55,26 @@
  <h3>Compiling the Example</h3>
       Before you can compile this (or any other example) you must configure the compiling script so that it knows where your Hadoop 
       installation resides. Open up the build.xml file in the root directory of your HIPI installation. At the top of this file are 
-      three important properties named <strong>hadoop.home</strong>,<strong>hadoop.version</strong>, and <strong>hadoop.classpath</strong>. 
-      Fill in the value attributes of these three properties with the location of your Hadoop installation and your Hadoop version. 
-      For instance, if you downloaded Hadoop 2.5.1 and unpacked it to /opt/hadoop-2.5.1/share/hadoop, then you would have the following 
-      build.xml file:
+      two important properties named <strong>hadoop.home</strong> and <strong>hadoop.version</strong>. 
+      Fill in the value attributes of these properties with the location of your Hadoop installation and your Hadoop version. 
+      For instance, if you downloaded Hadoop 2.5.1 and unpacked it to /usr/local/Cellar/hadoop/2.5.1/libexec/share/hadoop on OS X 
+      using <a class="external_link" href="http://brew.sh/">Homebrew</a>, then you would have the following build.xml file:
 
     <pre id="Current">
-      &#60;project basedir="." default="all"&#62;
-
-      &#60;target name="setup"&#62;
+    &#60;project basedir="." default="all"&#62;
+      &#60;echo message="Setting properties for build task..."/&#62;
+      
+      &#60;!-- TODO: update the following two variables according to your local installation of Hadoop --&#62;
+      &#60;!-- &#60;property name="hadoop.home" value="/opt/hadoop-2.5.1/share/hadoop" /&#62; --&#62; &#60;!-- Linux --&#62;
+      &#60;property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.5.1/libexec/share/hadoop" /&#62; &#60;!-- Mac OS X / Homebrew --&#62;
       &#60;property name="hadoop.version" value="2.5.1" /&#62;
-      &#60;property name="hadoop.home" value="/opt/hadoop-${hadoop.version}/share/hadoop" /&#62;
-      &#60;property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar:
-      ${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-${hadoop.version}.jar:
-      ${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/hdfs/hadoop-hdfs-${hadoop.version}.jar:
-      ${hadoop.home}/common/hadoop-nfs-${hadoop.version}.jar" /&#62;
       ...
     </pre>
 
-    <div class="important">Important Note:</div>
+    <div class="important">Important Troubleshooting Note:</div>
       Hadoop 2.5.1 requires five jars on its classpath (hadoop-common, hadoop-mapreduce-client-core, 
-      commons-cli, hadoop-hdfs, and hadoop-nfs). Ensure that these jar files are referenced in the hadoop.classpath property.</br>
+      commons-cli, hadoop-hdfs, and hadoop-nfs). Ensure that these jar files are referenced in the hadoop.classpath property 
+      (these jars should already be on the classpath).</br>
     </br>
 
     You can compile this example by executing the following command in the root directory where you unpacked HIPI:

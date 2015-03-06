@@ -80,15 +80,15 @@
         <a href="downloads.html">downloads</a> page.
         <br /><br	/>
 
-        In order to use the HIPI API, you must add the jar file you
-        downloaded above to the build path. The way you achieve this
-        varies from setup to setup. In Eclipse you will have to add
-        the jar file to the Java Build Path in your Project
-        Settings. In ANT you will specify the jar file in the
-        classpath attribute of the Javac Task along with any other
-        libraries you may need (such as Hadoop).<br /><br />
+        In order to use HIPI, you must compile the source code and add it to your
+        project's build path. If you downloaded the source from 
+        <a class="external_link" href="https://github.com/uvagfx/hipi">github</a>,
+        you must update the <tt>hadoop.home</tt> and <tt>hadoop.version</tt> 
+        properties in the root build.xml file based on your Hadoop configuration.
+        After this, run <tt>ant hipi</tt> to compile the HIPI library.<br /><br />
 
-        You can find sample ANT build tasks in HIPI's root build.xml file. <br /><br />
+        You can find sample ANT build tasks in HIPI's root build.xml file which show how to
+        compile the source code and append the resulting JAR to your build path. <br /><br />
 
         Check out the <a href="examples.html">examples</a> page for
         information on creating programs that utilize HIPI.<br /><br />
@@ -102,7 +102,7 @@
 
 		  A good way to ensure your system is configured properly
 		  is to build HIPI library/examples/tool on your own computer. Try to run
-		  "ant" at the root directory. You probably need to change hadoop.classpath, hadoop.version,
+		  "ant" at the root directory. You probably need to change hadoop.version
 		  and hadoop.home in build.xml to build HIPI successfully.<br /><br />
 
 		  To confirm that everything has compiled properly after running the ant command above, run:

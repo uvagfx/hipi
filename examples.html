@@ -5,24 +5,19 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     
     <link rel="stylesheet" type="text/css" href="include/main.css" />
-    <title>HIPI - Hadoop Image Processing Interface :: Examples</title>
+    <title>HIPI - Hadoop Image Processing Interface :: Tools and Examples</title>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-23539446-1']);
-      _gaq.push(['_trackPageview']);
-  
-  (function() {
+      _gaq.push(['_trackPageview']);  
+      (function() {
       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-  
+      })();
     </script>
 
-    <style type="text/css">
-      .title { width:600px; border-bottom:1px solid #eee; padding-bottom:4px; }
-    </style>
   </head>
   
   <body>
@@ -34,7 +29,7 @@
 	<li><a href="index.html">Introduction</a></li>
 	<li><a href="gettingstarted.html">Getting Started</a></li>
 	<li><a href="documentation.html">Documentation</a></li>
-	<li><a href="examples.html">Examples</a></li>
+	<li><a href="examples.html">Tools and Examples</a></li>
 	<li><a href="downloads.html">Downloads</a></li>
 	<li><a href="about.html">About</a></li>
       </ul>
@@ -42,51 +37,41 @@
     
     <!-- Begin Content -->
     <div class="content">
-      <h2 class="title">HIPI Example Programs</h2>
+      <h2 class="title">HIPI Tools and Example Programs</h2>
 
-      <h3><a class="external_link" href="examples/downloader.html">The Distributed Downloader</a></h3>
+      The HIPI distribution includes a number of useful tools and example programs that are a great way to learn how to create your own HIPI programs. We suggest reading the description of each program listed below in the order that they appear.
+
+      <h3><a class="external_link" href="tools/hibimport.html">hibimport</a></h3>
       <div class="section">
-	This is the first example you will probably want to inspect
-	because it will create a <a
-	href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
-	that you can use to run the other examples or create your own
-	programs. Although the details of this program are rather
-	intricate, they relate primarily to Hadoop and not to HIPI so
-	they can be safely ignored if need be.
+	This is a simple tool and a good place to start exploring HIPI. <b>hibimport</b> creates a <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) from a folder of images on your local file system. A HIB is the key input file to the HIPI framework and represents a collection of images stored on the Hadoop Distributed File System (HDFS).
       </div>
 
-      <h3><a class="external_link" href="examples/dumphib.html">DumpHIB</a></h3>
+      <h3><a class="external_link" href="examples/dumphib.html">dumphib</a></h3>
       <div class="section">
-	This example is a good introduction to the HIPI API. It uses a
-	user-defined Mapper to output information about the images in
-	a <a
-	href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
-	(such as one created from the <a
-	href="examples/downloader.html">Distributed Downloader</a>).
+	This example is a good introduction to the HIPI API. It is a full MapReduce program that collects basic information about the individual images in a <a
+	href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) within multiple parallel map tasks (one mapper for each image in the HIB), consolidates this information during the shuffle phase, and writes this consolidated information to a text file on the HDFS within a single reduce task. (You can use the <a href="tools/hibimport.html">hibimport</a> tool or the <a href="examples/downloader.html">Distributed Downloader</a> example program to create a HIB.)
       </div>
-        
-    <h3><a class="external_link" href="examples/jpegfromhib.html">JpegFromHib</a></h3>
+
+      <h3><a class="external_link" href="examples/downloader.html">DistributedDownloader</a></h3>
+      <div class="section">
+	This is a MapReduce program that uses HIPI to create a <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) by performing a distributed download of a list of images located on the Internet.
+      </div>
+
+    <h3><a class="external_link" href="examples/jpegfromhib.html">JPEGFromHib</a></h3>
     <div class="section">
-        This example will generate a set of jpeg files from an input <a
-	href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB). It both illustrates how to parse data
-        from a HIB, and provides visual confirmation that a hib is storing images as
-        expected.
+      This is a MapReduce program that uses HIPI to extract the images within a <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) as individual JPEG images.
+      It both illustrates how to parse the individual images in a HIB and can serve as a useful "sanity test" that a HIB is properly formatted.
     </div>
         
     <h3><a class="external_link" href="examples/createSequenceFile.html">CreateSequenceFile</a></h3>
     <div class="section">
-        This example will generate a sequence file from an input hib. It provides example usage of the
-        <a href="doc/api/hipi/image/io/JPEGImageUtil.html">JPEGImageUtil</a> class, and it provides access to the image
-        data as a <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/SequenceFile.html">SequenceFile</a>,         which may be useful in other applications of HIPI.
+        This is a MapReduce program that uses HIPI to generate a Hadoop <a href="https://hadoop.apache.org/docs/current/api/org/apache/hadoop/io/SequenceFile.html">Sequence File</a> (a flat file of binary key/value pairs) from a HIB. It demonstrates how to use the <a href="doc/api/hipi/image/io/JPEGImageUtil.html">JPEGImageUtil</a> class and shows how to provice access to a set of images in another format.
     </div>
 
       <h3><a class="external_link" href="examples/pca.html">The Principle Components of Patches</a></h3>
       <div class="section">
-	This is a more complicated example program that illustrates
-	HIPI's effectiveness at computing the Principle Components of
-	natural image patches in a distributed environment.
+	This is a MapReduce program that uses HIPI to implement the famous experiment described in the paper <i><a href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">The Principal Components of Natural Images</a></i>, written by Hancock et al. in 1992. This program computes the principal components (eigenvectors of the covariance matrix computed over a large set of small image patches). Although the original paper only used 15 grayscale images, HIPI makes it easy to perform this analysis over much larger image sets. This is a more involved example program that is a good starting place for building other distributed image processing and computer vision MapReduce/HIPI programs.
       </div>
-        
 
     </div>
     <!-- End Content -->

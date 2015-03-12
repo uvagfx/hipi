@@ -38,7 +38,7 @@
     <mkdir dir="bin" />
     
     <!-- Compile -->
-    <javac nowarn="on" includeantruntime="no" srcdir="${srcdir}" destdir="./bin" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar">
+    <javac nowarn="on" debug="yes" includeantruntime="no" srcdir="${srcdir}" destdir="./bin" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar">
       <compilerarg value="-Xlint:deprecation" />
     </javac>
     

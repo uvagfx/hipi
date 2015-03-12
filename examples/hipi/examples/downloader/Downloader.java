@@ -3,6 +3,9 @@ package hipi.examples.downloader;
 import hipi.image.ImageHeader.ImageType;
 import hipi.imagebundle.HipiImageBundle;
 
+import hipi.image.ImageHeader;
+import hipi.image.io.JPEGImageUtil;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -52,21 +55,25 @@ public class Downloader extends Configured implements Tool {
       this.conf = context.getConfiguration();
     }
 
-    //Downloads images from the input URLs and stores them in temporary HipiImageBundles to be passed to reducer
+    // Download images at the list of input URLs and store them in a temporary HIB.
     @Override
-    public void map(IntWritable key, Text value, Context context) throws IOException,
-        InterruptedException {
+    public void map(IntWritable key, Text value, Context context) throws IOException, InterruptedException {
+
+      // Create path for temporary HIB file
       String temp_path = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
       HipiImageBundle hib = new HipiImageBundle(new Path(temp_path), conf);
       hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 
-      String word = value.toString();
-      BufferedReader reader = new BufferedReader(new StringReader(word));
+      // The value argument contains a list of image URLs delimited by \n. Setup buffered reader to allow processing this string line by line.
+      BufferedReader reader = new BufferedReader(new StringReader(value.toString()));
       String uri;
       int i = key.get();
       int iprev = i;
 
+      // Iterate through URLs
       while ((uri = reader.readLine()) != null) {
+
+	// Put at most 100 images in a temporary HIB
         if (i >= iprev + 100) {
           hib.close();
           context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
@@ -75,14 +82,19 @@ public class Downloader extends Configured implements Tool {
           hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
           iprev = i;
         }
+
+	// Setup to time download
         long startT = 0;
         long stopT = 0;
         startT = System.currentTimeMillis();
 
-        //actual download occurs here
+        // Perform download and update HIB
         try {
+
           String type = "";
           URLConnection conn;
+
+	  // Attempt to download image at URL using java.net.URL
           try {
             URL link = new URL(uri);
             System.err.println("Downloading " + link.toString());
@@ -90,18 +102,26 @@ public class Downloader extends Configured implements Tool {
             conn.connect();
             type = conn.getContentType();
           } catch (Exception e) {
-            System.err.println("Connection error to image: " + uri);
+            System.err.println("Connection error while trying to download: " + uri);
             continue;
           }
-          if (type == null || type.compareTo("image/gif") == 0) {
-            continue;
-          }
-          if (type != null && type.compareTo("image/jpeg") == 0) {
-            hib.addImage(conn.getInputStream(), ImageType.JPEG_IMAGE);
-          }
+
+	  // Check that image format is supported, header is parsable, and add to HIB if so
+          if (type != null && (type.compareTo("image/jpeg") == 0 || type.compareTo("image/png") == 0)) {
+	    ImageHeader header = JPEGImageUtil.getInstance().decodeImageHeader(conn.getInputStream());
+	    if (header == null)  {
+	      System.err.println("Failed to parse header, not added to HIB: " + uri);
+	    } else {
+	      hib.addImage(conn.getInputStream(), type.compareTo("image/jpeg") == 0 ? ImageType.JPEG_IMAGE : ImageType.PNG_IMAGE);
+	      System.err.println("Added to HIB: " + uri);
+	    }
+          } else {
+	    System.err.println("Unrecognized HTTP content type or unsupported image format [" + type + "], not added to HIB: " + uri);
+	  }
+
         } catch (Exception e) {
           e.printStackTrace();
-          System.err.println("Error... probably cluster downtime");
+          System.err.println("Encountered network error while trying to download: " + uri);
           try {
             Thread.sleep(1000);
           } catch (InterruptedException ie) {
@@ -111,20 +131,26 @@ public class Downloader extends Configured implements Tool {
 
         i++;
 
-        // Emit success
+        // Report success and elapsed time
         stopT = System.currentTimeMillis();
         float el = (float) (stopT - startT) / 1000.0f;
-        System.err.println("> Took " + el + " seconds\n");
+        System.err.println("> Time elapsed " + el + " seconds");
       }
 
       try {
+
+	// Output key/value pair to reduce layer consisting of boolean and path to HIB
         context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
+
+	// Cleanup
         reader.close();
         hib.close();
+
       } catch (Exception e) {
         e.printStackTrace();
       }
     }
+    
   }
 
   public static class DownloaderReducer extends

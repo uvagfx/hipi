@@ -34,12 +34,10 @@ public class HipiImageBundle extends AbstractImageBundle {
 
   /**
    * 
-   * The reader class provides a simple interface for reading images from a
-   * {@link hipi.imagebundle.HipiImageBundle} so that the HipiImageBundle can be split into multiple
-   * sections and be read in parallel. This It is used heavily by
+   * This FileReader class provides an interface for reading individual images from a
+   * {@link hipi.imagebundle.HipiImageBundle}. This class is used by the 
    * {@link hipi.imagebundle.mapreduce.ImageBundleInputFormat} and
-   * {@link hipi.imagebundle.mapreduce.ImageBundleRecordReader} for MapReduce jobs because of this
-   * parallelism.
+   * {@link hipi.imagebundle.mapreduce.ImageBundleRecordReader}.
    *
    */
   public static class FileReader {
@@ -61,20 +59,22 @@ public class HipiImageBundle extends AbstractImageBundle {
      * @return The progress of reading through the HipiImageBundle according to the start and end
      *         specified in the constructor
      */
-    public float getProgress() {
-      float retVal = (_end - _start) > 0 ? (float) (_countingOffset - _start) / (_end - _start) : 0;
+    public float getProgress() 
+    {
+	float retVal = (_end - _start + 1) > 0 ? (float) (_countingOffset - _start) / (float) (_end - _start + 1) : 0;
 
-      // clamping for floating point rounding errors
-      if (retVal > 1.0) {
-        retVal = 1.0f;
-      }
-
-      if (retVal < 0.0) {
-        retVal = 0.0f;
-      }
-
-      return retVal;
-
+	// clamping for floating point rounding errors
+	if (retVal > 1.0) 
+	    {
+		retVal = 1.0f;
+	    }
+	
+	if (retVal < 0.0) 
+	    {
+		retVal = 0.0f;
+	    }
+	
+	return retVal;
     }
 
     /**
@@ -86,25 +86,29 @@ public class HipiImageBundle extends AbstractImageBundle {
      * @param end The offset position to stop reading the HipiImageBundle
      * @throws IOException
      */
-    public FileReader(FileSystem fs, Path path, Configuration conf, long start, long end)
-        throws IOException {
-      _data_input_stream = new DataInputStream(fs.open(path));
-      _start = start;
-      while (start > 0) {
-        long skipped = _data_input_stream.skip((long) start);
-        if (skipped <= 0) {
-          break;
-        }
-        start -= skipped;
-      }
-      _countingOffset = _start;
-      _end = end;
+    public FileReader(FileSystem fs, Path path, Configuration conf, long start, long end) throws IOException 
+    {
+	_data_input_stream = new DataInputStream(fs.open(path));
+	_start = start;
+	while (start > 0) 
+	    {
+		long skipped = _data_input_stream.skip(start);
+		if (skipped <= 0) 
+		    {
+			break;
+		    }
+		start -= skipped;
+	    }
+	_countingOffset = _start;
+	_end = end;
     }
 
-    public void close() throws IOException {
-      if (_data_input_stream != null) {
-        _data_input_stream.close();
-      }
+    public void close() throws IOException 
+    {
+      if (_data_input_stream != null) 
+	  {
+	      _data_input_stream.close();
+	  }
     }
 
     /**
@@ -115,66 +119,79 @@ public class HipiImageBundle extends AbstractImageBundle {
      * @return True if the reader could get the next image from the HipiImageBundle. False if there
      *         are no more images or an error occurred.
      */
-    public boolean nextKeyValue() {
-      try {
-        if (_end > 0 && _countingOffset > _end) {
-          System.out.println("CountingOffset: " + _countingOffset);
-          _cacheLength = _cacheType = 0;
-          return false;
-        }
+    public boolean nextKeyValue() 
+    {
+	try {
+	    
+	    if (_end > 0 && _countingOffset > _end)
+		{
+		    System.out.println("CountingOffset: " + _countingOffset);
+		    _cacheLength = _cacheType = 0;
+		    return false;
+		}
 
-        int readOff = 0;
-        int byteRead = _data_input_stream.read(_sig);
-        // even only 8-byte, it requires to retry
-        while (byteRead < 8 - readOff && byteRead > 0) {
-          readOff += byteRead;
-          byteRead = _data_input_stream.read(_sig, readOff, 8 - readOff);
-        }
-        if (byteRead <= 0) {
-          System.out.println("ByteRead: " + byteRead);
-          _cacheLength = _cacheType = 0;
-          return false;
-        }
-        if (byteRead < 8) {
-          System.out.println("lacking of " + byteRead);
-        }
-        _cacheLength =
-            ((_sig[0] & 0xff) << 24) | ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8)
-                | (_sig[3] & 0xff);
-        _cacheType =
-            ((_sig[4] & 0xff) << 24) | ((_sig[5] & 0xff) << 16) | ((_sig[6] & 0xff) << 8)
-                | (_sig[7] & 0xff);
+	    int readOff = 0;
+	    int byteRead = _data_input_stream.read(_sig);
 
-        _image = null;
-        _header = null;
-        if (_cacheLength < 0) {
-          System.out.println("corrupted HipiImageBundle at offset: " + _countingOffset
-              + ", exiting ...");
-          _cacheLength = _cacheType = 0;
-          return false;
-        }
-        _byte_array_data = new byte[_cacheLength];
-        readOff = 0;
-        // it may requires several round-trip in order for this to work
-        byteRead = _data_input_stream.read(_byte_array_data);
-        while (byteRead < _byte_array_data.length - readOff && byteRead > 0) {
-          readOff += byteRead;
-          byteRead =
-              _data_input_stream.read(_byte_array_data, readOff, _byte_array_data.length - readOff);
-        }
-        if (byteRead <= 0) {
-          System.out.println("ByteRead: " + byteRead);
-          _cacheLength = _cacheType = 0;
-          return false;
-        }
-        // the total skip is cache length plus 8 (4 for cache length, 4 for cache type)
-        _countingOffset += _cacheLength + 8;
-        return true;
-      } catch (IOException e) {
-        System.out.println("EXCEPTION");
-        System.out.println(e);
-        return false;
-      }
+	    // even only 8-byte, it requires to retry
+	    while (byteRead < 8 - readOff && byteRead > 0) 
+		{
+		    readOff += byteRead;
+		    byteRead = _data_input_stream.read(_sig, readOff, 8 - readOff);
+		}
+
+	    if (byteRead <= 0) 
+		{
+		    System.out.println("ByteRead: " + byteRead);
+		    _cacheLength = _cacheType = 0;
+		    return false;
+		}
+
+	    if (byteRead < 8) 
+		{
+		    System.out.println("lacking of " + byteRead);
+		}
+
+	    _cacheLength = ((_sig[0] & 0xff) << 24) | ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8) | (_sig[3] & 0xff);
+	    _cacheType = ((_sig[4] & 0xff) << 24) | ((_sig[5] & 0xff) << 16) | ((_sig[6] & 0xff) << 8) | (_sig[7] & 0xff);
+
+	    _image = null;
+	    _header = null;
+	    if (_cacheLength < 0) 
+		{
+		    System.out.println("corrupted HipiImageBundle at offset: " + _countingOffset + ", exiting ...");
+		    _cacheLength = _cacheType = 0;
+		    return false;
+		}
+
+	    _byte_array_data = new byte[_cacheLength];
+	    readOff = 0;
+
+	    // it may requires several round-trip in order for this to work
+	    byteRead = _data_input_stream.read(_byte_array_data);
+	    while (byteRead < _byte_array_data.length - readOff && byteRead > 0) 
+		{
+		    readOff += byteRead;
+		    byteRead = _data_input_stream.read(_byte_array_data, readOff, _byte_array_data.length - readOff);
+		}
+
+	    if (byteRead <= 0) 
+		{
+		    System.out.println("ByteRead: " + byteRead);
+		    _cacheLength = _cacheType = 0;
+		    return false;
+		}
+
+	    // the total skip is cache length plus 8 (4 for cache length, 4 for cache type)
+	    _countingOffset += _cacheLength + 8;
+
+	    return true;
+
+	} catch (IOException e) {
+	    System.out.println("EXCEPTION");
+	    System.out.println(e);
+	    return false;
+	}
     }
 
     /**
@@ -184,11 +201,13 @@ public class HipiImageBundle extends AbstractImageBundle {
      * 
      * @throws IOException
      */
-    public byte[] getRawBytes() throws IOException {
-      if (_cacheLength > 0) {
-        return _byte_array_data;
-      }
-      return null;
+    public byte[] getRawBytes() throws IOException 
+    {
+	if (_cacheLength > 0) 
+	    {
+		return _byte_array_data;
+	    }
+	return null;
     }
 
     /**
@@ -196,27 +215,33 @@ public class HipiImageBundle extends AbstractImageBundle {
      * @return ImageHeader of the current image, as retrieved by {@link #nextKeyValue()}
      * @throws IOException
      */
-    public ImageHeader getCurrentKey() throws IOException {
-      if (_header != null) {
-        return _header;
-      }
-      if (_cacheLength > 0) {
-        ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
-        if (decoder == null) {
-          System.out.println("decoder is null");
-          return null;
-        }
-        ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
-        try {
-          _header = decoder.decodeImageHeader(_byte_array_input_stream);
-        } catch (Exception e) {
-          e.printStackTrace();
-          _header = null;
-        }
-        return _header;
-      }
-      System.out.println("final case - null");
-      return null;
+    public ImageHeader getCurrentKey() throws IOException 
+    {
+	if (_header != null) 
+	    {
+		return _header;
+	    }
+
+	if (_cacheLength > 0) 
+	    {
+		ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
+		if (decoder == null) 
+		    {
+			System.out.println("decoder is null");
+			return null;
+		    }
+		ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
+		try {
+		    _header = decoder.decodeImageHeader(_byte_array_input_stream);
+		} catch (Exception e) {
+		    e.printStackTrace();
+		    _header = null;
+		}
+		return _header;
+	    }
+
+	System.out.println("final case - null");
+	return null;
     }
 
     /**
@@ -224,28 +249,32 @@ public class HipiImageBundle extends AbstractImageBundle {
      * @return Decoded image as a {@link FloatImage}, as retrieved by {@link #nextKeyValue()}
      * @throws IOException
      */
-    public FloatImage getCurrentValue() throws IOException {
-      if (_image != null) {
-        return _image;
-      }
-      if (_cacheLength > 0) {
-        ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
-        if (decoder == null) {
-          return null;
-        }
-        ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
-        try {
-          _image = decoder.decodeImage(_byte_array_input_stream);
-        } catch (Exception e) {
-          e.printStackTrace();
-          _image = null;
-        }
-        return _image;
-      }
-      return null;
+    public FloatImage getCurrentValue() throws IOException 
+    {
+	if (_image != null) 
+	    {
+		return _image;
+	    }
+	if (_cacheLength > 0) 
+	    {
+		ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
+		if (decoder == null) 
+		    {
+			return null;
+		    }
+		ByteArrayInputStream _byte_array_input_stream = new ByteArrayInputStream(_byte_array_data);
+		try {
+		    _image = decoder.decodeImage(_byte_array_input_stream);
+		} catch (Exception e) {
+		    e.printStackTrace();
+		    _image = null;
+		}
+		return _image;
+	    }
+	return null;
     }
 
-  }
+  } // public static class FileReader
 
   private DataInputStream _index_input_stream = null;
   private DataOutputStream _index_output_stream = null;
@@ -264,50 +293,56 @@ public class HipiImageBundle extends AbstractImageBundle {
 
   /**
    * 
-   * @param file_path The {@link Path} indicating where the image bundle is (or should be written
-   *        to)
+   * @param file_path The {@link Path} indicating where the image bundle is (or should be written to)
    * @param conf {@link Configuration} that determines the {@link FileSystem} for the image bundle
    */
-  public HipiImageBundle(Path file_path, Configuration conf) {
-    super(file_path, conf);
+  public HipiImageBundle(Path file_path, Configuration conf) 
+  {
+      super(file_path, conf);
   }
 
-  public HipiImageBundle(Path file_path, Configuration conf, short replication) {
-    super(file_path, conf);
-    _replication = replication;
+  public HipiImageBundle(Path file_path, Configuration conf, short replication) 
+  {
+      super(file_path, conf);
+      _replication = replication;
   }
 
-  public HipiImageBundle(Path file_path, Configuration conf, long blockSize) {
-    super(file_path, conf);
-    _blockSize = blockSize;
+  public HipiImageBundle(Path file_path, Configuration conf, long blockSize) 
+  {
+      super(file_path, conf);
+      _blockSize = blockSize;
   }
 
-  public HipiImageBundle(Path file_path, Configuration conf, short replication, long blockSize) {
-    super(file_path, conf);
-    _replication = replication;
-    _blockSize = blockSize;
+  public HipiImageBundle(Path file_path, Configuration conf, short replication, long blockSize) 
+  {
+      super(file_path, conf);
+      _replication = replication;
+      _blockSize = blockSize;
   }
 
-  private void writeBundleHeader() throws IOException {
-    // the index file header designed like this:
-    // 4-byte magic signature (0x81911618) for "HIPIIbIH"
-    // 2-byte (short int) to denote the length of data file name
-    // variable bytes of data file name
-    // 8-byte of image count (not mandated)
-    // 16-byte of reserved field
-    // 4-byte points to how much to skip in order to reach the start of
-    // offsets (default 0)
-    // 8-byte of offsets (of the end position) starts from here until EOF
-    _index_output_stream.writeInt(0x81911b18);
-    String data_name = _data_file.getName();
-    // write out filename in UTF-8 encoding
-    byte[] name_byte = data_name.getBytes("UTF-8");
-    _index_output_stream.writeShort(name_byte.length);
-    _index_output_stream.write(name_byte);
-    // write out image count (default -1 (unknown count))
-    _index_output_stream.writeLong(-1);
-    // write out reserved field
-    _index_output_stream.writeLong(0);
+    /**
+     * the index file header designed like this:
+     * 4-byte magic signature (0x81911618) for "HIPIIbIH"
+     * 2-byte (short int) to denote the length of data file name
+     * variable bytes of data file name
+     * 8-byte of image count (not mandated)
+     * 16-byte of reserved field
+     * 4-byte points to how much to skip in order to reach the start of
+     * offsets (default 0)
+     * 8-byte of offsets (of the end position) starts from here until EOF
+     */
+  private void writeBundleHeader() throws IOException 
+  {
+      _index_output_stream.writeInt(0x81911b18);
+      String data_name = _data_file.getName();
+      // write out filename in UTF-8 encoding
+      byte[] name_byte = data_name.getBytes("UTF-8");
+      _index_output_stream.writeShort(name_byte.length);
+      _index_output_stream.write(name_byte);
+      // write out image count (default -1 (unknown count))
+      _index_output_stream.writeLong(-1);
+      // write out reserved field
+      _index_output_stream.writeLong(0);
     _index_output_stream.writeLong(0);
     // skip 0 to reach start offset (potentially, you could put some
     // metadata in between
@@ -425,28 +460,31 @@ public class HipiImageBundle extends AbstractImageBundle {
    * adding the image offset to the index file.
    */
   @Override
-  public void addImage(InputStream image_stream, ImageType type) throws IOException {
-    byte data[] = readBytes(image_stream);
-    _cacheLength = data.length;
-    _cacheType = type.toValue();
-    _sig[0] = (byte) (_cacheLength >> 24);
-    _sig[1] = (byte) ((_cacheLength >> 16) & 0xff);
-    _sig[2] = (byte) ((_cacheLength >> 8) & 0xff);
-    _sig[3] = (byte) (_cacheLength & 0xff);
-    _sig[4] = (byte) (_cacheType >> 24);
-    _sig[5] = (byte) ((_cacheType >> 16) & 0xff);
-    _sig[6] = (byte) ((_cacheType >> 8) & 0xff);
-    _sig[7] = (byte) (_cacheType & 0xff);
-    _data_output_stream.write(_sig);
-    _data_output_stream.write(data);
-    _countingOffset += 8 + data.length;
-    _index_output_stream.writeLong(_countingOffset);
+  public void addImage(InputStream image_stream, ImageType type) throws IOException 
+  {
+      byte data[] = readBytes(image_stream);
+      _cacheLength = data.length;
+      _cacheType = type.toValue();
+      _sig[0] = (byte) (_cacheLength >> 24);
+      _sig[1] = (byte) ((_cacheLength >> 16) & 0xff);
+      _sig[2] = (byte) ((_cacheLength >> 8) & 0xff);
+      _sig[3] = (byte) (_cacheLength & 0xff);
+      _sig[4] = (byte) (_cacheType >> 24);
+      _sig[5] = (byte) ((_cacheType >> 16) & 0xff);
+      _sig[6] = (byte) ((_cacheType >> 8) & 0xff);
+      _sig[7] = (byte) (_cacheType & 0xff);
+      _data_output_stream.write(_sig);
+      _data_output_stream.write(data);
+      _countingOffset += 8 + data.length;
+      _index_output_stream.writeLong(_countingOffset);
   }
 
-  private byte[] readBytes(InputStream stream) throws IOException {
-    if (stream == null) {
-      return new byte[] {};
-    }
+  private byte[] readBytes(InputStream stream) throws IOException 
+  {
+      if (stream == null) 
+	  {
+	      return new byte[] {};
+	  }
     byte[] buffer = new byte[1024];
     ByteArrayOutputStream output = new ByteArrayOutputStream();
     boolean error = false;

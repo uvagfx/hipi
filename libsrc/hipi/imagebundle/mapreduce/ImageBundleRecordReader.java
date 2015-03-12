@@ -26,47 +26,48 @@ public class ImageBundleRecordReader extends RecordReader<ImageHeader, FloatImag
   private Configuration conf;
   private HipiImageBundle.FileReader reader;
 
-
   @Override
-  public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
+  public void initialize(InputSplit split, TaskAttemptContext context) throws IOException 
+  {
+      FileSplit bundleSplit = (FileSplit)split;
+      conf = context.getConfiguration();
 
-    FileSplit bundleSplit = (FileSplit) split;
-    conf = context.getConfiguration();
-    Path path = bundleSplit.getPath();
-    FileSystem fs = path.getFileSystem(conf);
+      Path path = bundleSplit.getPath();
+      FileSystem fs = path.getFileSystem(conf);
 
-    // reader specifies start and end, for which start + length would be the beginning of a new
-    // file, which is undesirable to reader, -1 must be applied.
-    System.out.println("record start from " + bundleSplit.getStart() + " end at "
-        + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
+      // report locations of first and last byte in image segment
+      System.out.println("record start from " + bundleSplit.getStart() + " end at " + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
 
-    reader =
-        new HipiImageBundle.FileReader(fs, path, conf, bundleSplit.getStart(),
-            bundleSplit.getStart() + bundleSplit.getLength() - 1);
+      reader = new HipiImageBundle.FileReader(fs, path, conf, bundleSplit.getStart(), bundleSplit.getStart() + bundleSplit.getLength() - 1);
   }
 
   @Override
-  public void close() throws IOException {
-    reader.close();
+  public void close() throws IOException 
+  {
+      reader.close();
   }
 
   @Override
-  public ImageHeader getCurrentKey() throws IOException, InterruptedException {
-    return reader.getCurrentKey();
+  public ImageHeader getCurrentKey() throws IOException, InterruptedException 
+  {
+      return reader.getCurrentKey();
   }
 
   @Override
-  public FloatImage getCurrentValue() throws IOException, InterruptedException {
-    return reader.getCurrentValue();
+  public FloatImage getCurrentValue() throws IOException, InterruptedException 
+  {
+      return reader.getCurrentValue();
   }
 
   @Override
-  public float getProgress() throws IOException {
-    return reader.getProgress();
+  public float getProgress() throws IOException 
+  {
+      return reader.getProgress();
   }
 
   @Override
-  public boolean nextKeyValue() throws IOException, InterruptedException {
-    return reader.nextKeyValue();
+  public boolean nextKeyValue() throws IOException, InterruptedException 
+  {
+      return reader.nextKeyValue();
   }
 }

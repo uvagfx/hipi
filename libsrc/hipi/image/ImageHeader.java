@@ -14,10 +14,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
 /**
- * Base class for ImageHeaders. An ImageHeader is a way to store header and metadata of images,
- * including EXIF information.
- * 
- * 
+ * Base class for HIPI ImageHeader objectss. An ImageHeader encapsulates basic
+ * information (width, height, etc.) and EXIF information of images.
  */
 public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 
@@ -57,6 +55,7 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    * 2.2 specification and the value is the corresponding information for that field.
    */
   private Map<String, String> _exif_information = new HashMap<String, String>();
+
   /**
    * The image type of this image. Usually read from the image file's first few bytes.
    */

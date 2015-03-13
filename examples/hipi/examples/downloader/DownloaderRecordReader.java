@@ -21,28 +21,37 @@ public class DownloaderRecordReader extends RecordReader<IntWritable, Text> {
 
   private boolean singletonEmit;
   private String urls;
-  private long start_line;
+  private long startLine;
 
   @Override
   public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
-    FileSplit fileSplit = (FileSplit) split;
+
+    // Obtain path to input list of image URLs
+    FileSplit fileSplit = (FileSplit)split;
     Path path = fileSplit.getPath();
     FileSystem fileSystem = path.getFileSystem(context.getConfiguration());
 
-    start_line = fileSplit.getStart();
-    long num_lines = fileSplit.getLength();
+    // Note the start and length fields in the FileSplit object are being used to convey a
+    // range of lines in the input list of image URLs
+    startLine = fileSplit.getStart();
+    long numLines = fileSplit.getLength();
 
+    // Flag to enable emitting only one key/value pair
     singletonEmit = false;
 
+    // Created buffered reader for input list of image URLs
     BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(path)));
+
+    // Advance reader to startLine
     int i = 0;
-    while (i < start_line && reader.readLine() != null) {
+    while (i < startLine && reader.readLine() != null) {
       i++;
     }
 
+    // Build numLines length list of image URLs delimited by newline character \n
     urls = "";
     String line;
-    for (i = 0; i < num_lines && (line = reader.readLine()) != null; i++) {
+    for (i = 0; i < numLines && (line = reader.readLine()) != null; i++) {
       urls += line + '\n';
     }
 
@@ -69,7 +78,7 @@ public class DownloaderRecordReader extends RecordReader<IntWritable, Text> {
 
   @Override
   public IntWritable getCurrentKey() throws IOException, InterruptedException {
-    return new IntWritable((int) start_line);
+    return new IntWritable((int) startLine);
   }
 
 
@@ -77,7 +86,7 @@ public class DownloaderRecordReader extends RecordReader<IntWritable, Text> {
   public Text getCurrentValue() throws IOException, InterruptedException {
     return new Text(urls);
   }
-
+  
   @Override
   public boolean nextKeyValue() throws IOException, InterruptedException {
     if (singletonEmit == false) {

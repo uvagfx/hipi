@@ -102,12 +102,11 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> {
     reader.close();
 
     // Determine download schedule (number of images per node)
-    int span = (int) Math.ceil(((float) (numImages)) / ((float) uniqueNodes.size()));
+    int span = (int) Math.ceil(((float) numImages) / ((float) uniqueNodes.size()));
     int last = numImages - span * (uniqueNodes.size() - 1);
 
-    // Report schedule to stdout
     if (uniqueNodes.size() > 1) {
-      System.out.println("First n-1 nodes will each download " + span + " images");
+      System.out.println("First " + (uniqueNodes.size() - 1) + " nodes will each download " + span + " images");
       System.out.println("Last node will download " + last + " images");
     } else {
       System.out.println("Single node will download " + last + " images");
@@ -115,7 +114,7 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> {
 
     // Produce file splits according to download schedule
     FileSplit[] f = new FileSplit[uniqueNodes.size()];
-    for (int j=0; j<f.length; j++) {
+    for (int j = 0; j < f.length; j++) {
       String[] node = new String[1];
       node[0] = uniqueNodes.get(j);
       if (j < f.length - 1) {

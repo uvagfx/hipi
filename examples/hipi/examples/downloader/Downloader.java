@@ -2,9 +2,9 @@ package hipi.examples.downloader;
 
 import hipi.image.ImageHeader.ImageType;
 import hipi.imagebundle.HipiImageBundle;
-
 import hipi.image.ImageHeader;
 import hipi.image.io.JPEGImageUtil;
+import hipi.image.io.PNGImageUtil;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -23,6 +23,8 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.InputStream;
+import java.io.BufferedInputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
@@ -60,8 +62,8 @@ public class Downloader extends Configured implements Tool {
     public void map(IntWritable key, Text value, Context context) throws IOException, InterruptedException {
 
       // Create path for temporary HIB file
-      String temp_path = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
-      HipiImageBundle hib = new HipiImageBundle(new Path(temp_path), conf);
+      String tempPath = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
+      HipiImageBundle hib = new HipiImageBundle(new Path(tempPath), conf);
       hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
 
       // The value argument contains a list of image URLs delimited by \n. Setup buffered reader to allow processing this string line by line.
@@ -77,8 +79,8 @@ public class Downloader extends Configured implements Tool {
         if (i >= iprev + 100) {
           hib.close();
           context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
-          temp_path = conf.get("downloader.outpath") + i + ".hib.tmp";
-          hib = new HipiImageBundle(new Path(temp_path), conf);
+          tempPath = conf.get("downloader.outpath") + i + ".hib.tmp";
+          hib = new HipiImageBundle(new Path(tempPath), conf);
           hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
           iprev = i;
         }
@@ -94,7 +96,7 @@ public class Downloader extends Configured implements Tool {
           String type = "";
           URLConnection conn;
 
-	  // Attempt to download image at URL using java.net.URL
+	  // Attempt to download image at URL using java.net
           try {
             URL link = new URL(uri);
             System.err.println("Downloading " + link.toString());
@@ -108,12 +110,28 @@ public class Downloader extends Configured implements Tool {
 
 	  // Check that image format is supported, header is parsable, and add to HIB if so
           if (type != null && (type.compareTo("image/jpeg") == 0 || type.compareTo("image/png") == 0)) {
-	    ImageHeader header = JPEGImageUtil.getInstance().decodeImageHeader(conn.getInputStream());
+
+	    // Get input stream for URL connection
+	    InputStream bis = new BufferedInputStream(conn.getInputStream());
+
+	    // Mark current location in stream for later reset
+	    bis.mark(Integer.MAX_VALUE);
+
+	    // Attempt to decode the image header
+	    ImageHeader header = (type.compareTo("image/jpeg") == 0 ? JPEGImageUtil.getInstance().decodeImageHeader(bis) : PNGImageUtil.getInstance().decodeImageHeader(bis));
+
 	    if (header == null)  {
 	      System.err.println("Failed to parse header, not added to HIB: " + uri);
 	    } else {
-	      hib.addImage(conn.getInputStream(), type.compareTo("image/jpeg") == 0 ? ImageType.JPEG_IMAGE : ImageType.PNG_IMAGE);
+
+	      // Passed header decode test, so reset to beginning of stream
+	      bis.reset();
+
+	      // Add image to HIB
+	      hib.addImage(bis, type.compareTo("image/jpeg") == 0 ? ImageType.JPEG_IMAGE : ImageType.PNG_IMAGE);
+
 	      System.err.println("Added to HIB: " + uri);
+
 	    }
           } else {
 	    System.err.println("Unrecognized HTTP content type or unsupported image format [" + type + "], not added to HIB: " + uri);
@@ -163,28 +181,44 @@ public class Downloader extends Configured implements Tool {
       this.conf = context.getConfiguration();
     }
 
-    //combine mapper HipiImageBundles into single HipiImageBundle
+    // Combine HIBs produced by the map tasks into a single HIB
     @Override
     public void reduce(BooleanWritable key, Iterable<Text> values, Context context)
-        throws IOException, InterruptedException {
+      throws IOException, InterruptedException {
       
       if (key.get()) {
+
+	// Get path to output HIB
         FileSystem fileSystem = FileSystem.get(conf);
         Path outputHibPath = new Path(conf.get("downloader.outfile"));
+
+	// Create HIB for writing
         HipiImageBundle hib = new HipiImageBundle(outputHibPath, conf);
         hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
-        for (Text temp_string : values) {
-          Path temp_path = new Path(temp_string.toString());
-          HipiImageBundle input_bundle = new HipiImageBundle(temp_path, conf);
-          hib.append(input_bundle);
-          Path index_path = input_bundle.getPath();
-          Path data_path = new Path(index_path.toString() + ".dat");
-          fileSystem.delete(index_path, false);
-          fileSystem.delete(data_path, false);
-          Text outputPath = new Text(input_bundle.getPath().toString());
+
+	// Iterate over the temporary HIB files created by map tasks
+        for (Text tempString : values) {
+
+	  // Open the temporary HIB file
+          Path tempPath = new Path(tempString.toString());
+          HipiImageBundle inputBundle = new HipiImageBundle(tempPath, conf);
+
+	  // Append temporary HIB file to output HIB (this is fast)
+          hib.append(inputBundle);
+
+	  // Remove temporary HIB (both .hib and .hib.dat files)
+          Path indexPath = inputBundle.getPath();
+          Path dataPath = new Path(indexPath.toString() + ".dat");
+          fileSystem.delete(indexPath, false);
+          fileSystem.delete(dataPath, false);
+
+	  // Emit output key/value pair indicating temporary HIB has been processed
+          Text outputPath = new Text(inputBundle.getPath().toString());
           context.write(new BooleanWritable(true), outputPath);
           context.progress();
         }
+
+	// Finalize output HIB
         hib.close();
       }
     }
@@ -194,7 +228,7 @@ public class Downloader extends Configured implements Tool {
   public int run(String[] args) throws Exception {
 
     if (args.length != 3) {
-      System.out.println("Usage: downloader <input file> <output file> <nodes>");
+      System.out.println("Usage: downloader <input text file with list of URLs> <output HIB> <number of download nodes>");
       System.exit(0);
     }
 

@@ -48,9 +48,7 @@ import java.util.zip.InflaterInputStream;
  * However, if you add GPL Version 2 code and therefore, elected the GPL Version 2 license, then the
  * option applies only if the new code is made subject to such option by the copyright holder.
  * 
- * 
- * 
- * Heavy modifications were made to the original library by Chris Sweeney
+ * Heavy modifications were made to the original library by Chris Sweeney.
  */
 
 /**
@@ -59,18 +57,21 @@ import java.util.zip.InflaterInputStream;
  */
 public class PNGImageUtil implements ImageDecoder, ImageEncoder {
 
-
-  private static final PNGImageUtil static_object = new PNGImageUtil();
+  private static final PNGImageUtil staticObject = new PNGImageUtil();
+  
   /** black and white image mode. */
   private static final byte BW_MODE = 0;
+
   /** grey scale image mode. */
   private static final byte GREYSCALE_MODE = 1;
+
   /** full color image mode. */
   private static final byte COLOR_MODE = 2;
+  
   private CRC32 crc;
 
   public static PNGImageUtil getInstance() {
-    return static_object;
+    return staticObject;
   }
 
   /**
@@ -82,7 +83,9 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder {
    * @return The {@link ImageHeader} found in the input stream
    */
   public ImageHeader decodeImageHeader(InputStream is) throws IOException {
-    ImageHeader header = new ImageHeader();
+
+    ImageHeader header = new ImageHeader(ImageType.PNG_IMAGE);
+
     DataInputStream in = new DataInputStream(is);
     readSignature(in);
 
@@ -102,12 +105,10 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder {
           byte[] data = new byte[length];
           in.readFully(data);
           // Read the CRC.
-          long crc = in.readInt() & 0x00000000ffffffffL; // Make it
-          // unsigned.
+          long crc = in.readInt() & 0x00000000ffffffffL; // Make it unsigned.
           if (verifyCRC(typeBytes, data, crc) == false)
             throw new IOException("That file appears to be corrupted.");
-
-          PNGChunk chunk = static_object.new PNGChunk(typeBytes, data);
+          PNGChunk chunk = staticObject.new PNGChunk(typeBytes, data);
           header.width = (int) chunk.getUnsignedInt(0);
           header.height = (int) chunk.getUnsignedInt(4);
           header.bitDepth = chunk.getUnsignedByte(8);
@@ -159,7 +160,7 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder {
   }
 
   protected static PNGData readChunks(DataInputStream in) throws IOException {
-    PNGData chunks = static_object.new PNGData();
+    PNGData chunks = staticObject.new PNGData();
 
     boolean trucking = true;
     while (trucking) {
@@ -180,7 +181,7 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder {
         if (verifyCRC(typeBytes, data, crc) == false)
           throw new IOException("That file appears to be corrupted.");
 
-        PNGChunk chunk = static_object.new PNGChunk(typeBytes, data);
+        PNGChunk chunk = staticObject.new PNGChunk(typeBytes, data);
         chunks.add(chunk);
       } catch (EOFException eofe) {
         trucking = false;
@@ -196,7 +197,6 @@ public class PNGImageUtil implements ImageDecoder, ImageEncoder {
     long calculated = crc32.getValue();
     return (calculated == crc);
   }
-
 
   class PNGData {
     private int mNumberOfChunks;

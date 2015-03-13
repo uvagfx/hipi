@@ -11,15 +11,15 @@
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-23539446-1']);
       _gaq.push(['_trackPageview']);
-  
-  (function() {
+      (function() {
       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-  
+      })();
     </script>
-  
+
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+
   </head>
   
   <body>
@@ -44,7 +44,7 @@
 
       <div class="section">
 	
-	The HIPI Distributed Downloader is a MapReduce/HIPI program that creates a <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html"><tt>HipiImageBundle</tt></a> (HIB) from a list of image URLs. This list can be generated in many different ways. For example, you might create a list of image URLs by scraping a website that contains photo collections like <a class="external_link" href="https://www.flickr.com/services/developer/api/">Flickr</a>, <a class="external_link" href="https://developers.google.com/custom-search/json-api/v1/overview">Google Images</a>, or <a class="external_link" href="http://www.bing.com/dev/en-us/dev-center">Bing</a>.
+	The HIPI Distributed Downloader is a MapReduce/HIPI program that creates a <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) from a set of images downloaded over the Internet. This set is specified as a list of URLs and it can be generated in many different ways. For example, you might create a list of image URLs by scraping a website that contains photo collections like <a class="external_link" href="https://www.flickr.com/services/developer/api/">Flickr</a>, <a class="external_link" href="https://developers.google.com/custom-search/json-api/v1/overview">Google Images</a>, <a class="external_link" href="http://www.bing.com/dev/en-us/dev-center">Bing</a>, or <a class="external_link" href="https://instagram.com/developer/">Instagram</a>.
 	
 	<h3>Compiling</h3>
 
@@ -62,7 +62,16 @@
    $> hadoop jar examples/downloader.jar &#60;input text file with list of URLs&#62; &#60;output HIB&#62; &#60;number of download nodes&#62;
 	</pre>
 	
-	This program requires three arguments. The first argument is the path to the input text file located on the HDFS. This text file should contain a list of valid ASCII URLs to images (either JPG or PNG). The second argument is the HDFS path to the output HIB that will contain this set of images once they are downloaded. The third argument is the number of nodes (technically map tasks) that you wish to use to download the images. Specifying more than one download node causes this task to be distributed over multiple machines and may speed up the process.<br /><br />
+	There is also a convenience script located in the examples directory:
+
+	<pre id="Current">
+   $> cd examples
+   $> ./runDownloader.sh &#60;input text file with list of URLs&#62; &#60;output HIB&#62; &#60;number of download nodes&#62;
+	</pre>
+
+	<b>downloader</b> takes three arguments. The first argument is the path to an input text file located on the HDFS. This file should contain a list of valid ASCII URLs to images (either JPG or PNG), each URL on a separate line. The second argument is the HDFS path to the output HIB that will contain this set of images once they are downloaded. The third argument is the number of nodes on your Hadoop cluster that you wish to use to download the images. Specifying more than one download node causes this task to be distributed over multiple machines and may speed up the process.<br /><br />
+
+	<h3>Example</h3>
 
 	We will walk you through an example using the sample test images provided in the HIPI distribution. The commands below assume you are in the HIPI root directory. The first step is to copy the text file with the list of image URLs to the HDFS:
 
@@ -84,10 +93,11 @@
    http://hipi.cs.virginia.edu/examples/testimages/08.jpg
    http://hipi.cs.virginia.edu/examples/testimages/09.jpg
    http://hipi.cs.virginia.edu/examples/testimages/10.jpg
-   http://hipi.cs.virginia.edu/examples/testimages/11.jpg	
+   http://hipi.cs.virginia.edu/examples/testimages/11.jpg
+   http://hipi.cs.virginia.edu/examples/testimages/12.png
 	</pre>
 	
-	Note that <tt>testimages.txt</tt> lists 11 URLs to images located on the main HIPI website (these images are all in the public domain).<br /><br />
+	Note that <tt>testimages.txt</tt> contains 12 URLs to images located on the HIPI project website (these images are all in the public domain).<br /><br />
 
 	Next, run the <b>downloader</b>:
 
@@ -101,7 +111,7 @@
    ...
 	</pre>
 
-	In this case, we specified 10 download nodes. If we were using a cluster with more than 10 nodes this would cause the download operation to be distributed over this many nodes.  After <b>downloader</b> finishes, we verify that it created the HIB on the HDFS:
+	In this case, we specified 10 download nodes. If we were using a cluster with at least 10 nodes this would cause the download operation to be distributed over this many nodes.  After <b>downloader</b> finishes, we verify that it created the desired HIB on the HDFS:
 
 	<pre id="Current">
    $> hadoop fs -ls
@@ -112,49 +122,54 @@
    -rw-r--r--   1 user group        605 2015-03-12 12:07 testimages.txt
 	</pre>
 
-	You can use other tools like <a href="../examples/dumphib.html"><b>dumphib</b></a> and <a href="../examples/jpegfromhib.html"><b>JPEGfromhib</b></a> to do a deeper inspection of the <tt>testimages.hib</tt> and <tt>testimages.hib.dat</tt> files.
+	You can use tools like <a href="../examples/dumphib.html"><b>dumphib</b></a> and <a href="../examples/jpegfromhib.html"><b>JpegFromHib</b></a> to do a deeper inspection of the <tt>testimages.hib</tt> and <tt>testimages.hib.dat</tt> files.
       
-	<h3>How downloader works</h3>
+	<h2 class="title">How downloader works</h2>
 	
-	The HIPI Distributed Downloader attempts to download a list of images located at URLs that are specified in an input ASCII text file with one URL per line. Because downloading a large set of images from a single computer can be slow and because typical cluster setups can support more bandwidth than an individual node, the downloader is designed to distribute this task to multiple nodes in a Hadoop cluster. In the following discussion, we assume that <b>downloader</b> is attempting to download <strong>k</strong> images using <strong>n</strong> download nodes and that the underlying Hadoop cluster is comprised of <strong>m</strong> compute nodes. Note that the number of download nodes requested by the user <strong>n</strong> is not necessarily equal to the number of compute nodes <strong>m</strong> though one would not expect any speed improvements after <strong>n</strong> exceeds <strong>m</strong> (i.e., full cluster utilization). <br /><br />
+	The HIPI Distributed Downloader attempts to download a list of images located at URLs that are specified in an input ASCII text file with one URL per line. Because downloading a large set of images from a single computer can be slow and because typical cluster setups can support more bandwidth than an individual node, the downloader is designed to distribute this task to multiple nodes in a Hadoop cluster. In the following discussion, we assume that <b>downloader</b> is attempting to download <strong>k</strong> images using <strong>n</strong> download nodes and that the underlying Hadoop cluster is comprised of <strong>m</strong> compute nodes. Note that the number of download nodes requested by the user <strong>n</strong> is not necessarily equal to the number of compute nodes <strong>m</strong> though one would not expect any speed improvements after <strong>n</strong> exceeds <strong>m</strong> (i.e., once full cluster utilization is achieved). <br /><br />
 
-	To begin, let's study the class <tt>DownloaderInputFormat</tt> located in <tt>examples/hipi/examples/downloader/DownloaderInputFormat.java</tt>. This class extends the <a class="external_link" href="https://hadoop.apache.org/docs/r2.6.0/api/org/apache/hadoop/mapreduce/lib/input/FileInputFormat.html"><tt>FileInputFormat</tt></a> Hadoop class and is responsible for parsing the input text file and initiating a map task for each image that is to be downloaded (each line in the input text file). In particular, the <tt>getSplits()</tt> method in this class causes <strong>n</strong> map tasks to each download (<strong>k</strong> / <strong>n</strong>) images into separate local <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html"><tt>HipiImageBundle</tt></a> (HIBs). After these map tasks have completed, a single reduce task merges these HIBs into one HIB located at the output path specified by the user. This diagram illustrates the process:
+	To begin, let's study the class DownloaderInputFormat located in <tt>examples/hipi/examples/downloader/DownloaderInputFormat.java</tt>. This class extends the <a class="external_link" href="https://hadoop.apache.org/docs/r2.6.0/api/org/apache/hadoop/mapreduce/lib/input/FileInputFormat.html">FileInputFormat</a> Hadoop class and is responsible for parsing the input text file and initiating the map tasks that download the images. In particular, the <tt>getSplits()</tt> method in this class causes <strong>n</strong> map tasks to each download (<strong>k</strong> / <strong>n</strong>) images into separate <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIBs). After these map tasks have completed, a single reduce task merges these HIBs into one HIB located at the output path specified by the user. This diagram illustrates the process:
 
 	<img class="centered_image" src="downloader.png" width="500" alt="" />
 	
-	<h3><tt>DownloaderInputFormat</tt></h3> 
+	<h3>DownloaderInputFormat class</h3>
 
 	Under normal operation, Hadoop attempts to execute each map task on whichever compute node in the cluster is &#39;closest&#39; to the input data for that task (keep in mind that the machines in a Hadoop cluster share the task of managing the distributed file system and performing distributed MapReduce computations). In the case of <b>downloader</b>, this is problematic because the input data is a small text file with a list of URLs, which will most likely be stored on a single physical machine in the cluster. Without taking steps to avoid the default behavior, Hadoop would download all of the images in serial using this one machine even if the cluster contained many nodes with separate fast connections to the Internet. In other words, Hadoop must be coerced into behaving differently in this case to fully utilize the cluster. <br /><br />
 
-	<span class="important">Important Note:</span> This discussion is more related to how Hadoop works than HIPI, but you may still find it informative. If you're not familiar with how Hadoop works you may want to first read <a href="http://hadoop.apache.org/docs/stable/">some documentation</a>.<br /><br />
+	<span class="important">Important Note:</span> This discussion is more related to how Hadoop works than HIPI, but you may still find it informative. If you're not familiar with the basics of how Hadoop works you may want to first read <a href="http://hadoop.apache.org/docs/stable/">some documentation</a>.<br /><br />
 
-	In order to cause Hadoop to spawn <strong>n</strong> map tasks that each run on different nodes in the cluster (bear in mind this is only possible if <strong>m</strong> is greater than or equal to <strong>n</strong>), the <tt>getSplits()</tt> method in <tt>DownloaderInputFormat</tt> creates <strong>n</strong> temporary files on the HDFS. Due to Hadoop's effort to uniformly distribute data over the cluster, each new file has a high probability of being created on a different machine. Based on these observations, our process of spawning <strong>n</strong> map tasks on different machines is as follows:<br /><br />
+	In order to cause Hadoop to spawn <strong>n</strong> map tasks that each run on different nodes in the cluster (bear in mind this is only possible if <strong>m</strong> is greater than or equal to <strong>n</strong>), the <tt>getSplits()</tt> method in DownloaderInputFormat creates <strong>n</strong> temporary files on the HDFS. Due to Hadoop's effort to uniformly distribute data over the cluster, each new file has a high probability of being created on a different machine. Based on these observations, our process of spawning <strong>n</strong> map tasks on different machines is as follows:<br /><br />
 
 	1. Create up to <strong>2n</strong> temporary files on the HDFS in the pursuit of identifying <strong>n</strong> unique compute nodes:
 
-	    <pre id="Current">
-   Configuration conf = job.getConfiguration();
-
+	<pre class="prettyprint"> 
    // Use a default value of 10 if 'downloader.nodes' is not explicitly set
-   int nodes = conf.getInt("downloader.nodes", 10);
+   int numDownloadNodes = conf.getInt("downloader.nodes", 10);
 
-   ArrayList&lt;String&gt; hosts = <font id="New">new</font> ArrayList&lt;String&gt;(<font id="IntegerLiteral">0</font>);
-   List&lt;InputSplit&gt; splits = <font id="New">new</font> ArrayList&lt;InputSplit&gt;();
-  
+   // Initialize list to store unique nodes in cluster
+   ArrayList<String> uniqueNodes = new ArrayList<String>(0);
+
+   // Initialize list to store InputSplits
+   List<InputSplit> splits = new ArrayList<InputSplit>();
+
+   // Create stub for temporary HIB files
    FileSystem fileSystem = FileSystem.get(conf);
-   String tempOutputPath = conf.get(<font id="StringLiteral">"downloader.outpath"</font>) + <font id="StringLiteral">"_tmp"</font>;
-   Path tempOutputDir = <font id="New">new</font> Path(tempOutputPath);
-  
-   // Ensure getSplits runs with a clean output directory
-   <font id="If">if</font> (fileSystem.exists(tempOutputDir)) {
-      fileSystem.delete(tempOutputDir, <font id="True">true</font>);
+   String tempOutputPath = conf.get("downloader.outpath") + "_tmp";
+   Path tempOutputDir = new Path(tempOutputPath);
+
+   // Ensure clean temporary directory
+   if (fileSystem.exists(tempOutputDir)) {
+      fileSystem.delete(tempOutputDir, true);
    }
    fileSystem.mkdirs(tempOutputDir);
-  
-   <font id="Int">int</font> i = <font id="IntegerLiteral">0</font>;
-   <font id="While">while</font>( hosts.size() &lt; nodes &amp;&amp; i &lt; <font id="IntegerLiteral">2</font>*nodes) {
-      String tempFileString = tempOutputPath + <font id="StringLiteral">"/"</font> + i;
-      Path tempFile = <font id="New">new</font> Path(tempFileString);
+
+   // Search for up to numDownloadNodes unique nodes on the cluster
+   int i = 0;
+   while (uniqueNodes.size() < numDownloadNodes && i < 2*numDownloadNodes) {
+
+      // Create temporary file
+      String tempFileString = tempOutputPath + "/" + i;
+      Path tempFile = new Path(tempFileString);
       FSDataOutputStream os = fileSystem.create(tempFile);
       os.write(i);
       os.close();
@@ -162,249 +177,245 @@
 
 	    2. Determine which cluster node(s) each temporary file is stored on:
 
-	    <pre id="Current">
+	<pre class="prettyprint"> 
       FileStatus match = fileSystem.getFileStatus(tempFile);
-      <font id="Long">long</font> length = match.getLen();
-      BlockLocation[] blocks = fileSystem.getFileBlockLocations(match, <font id="IntegerLiteral">0</font>, length);
-	    </pre>
+      long length = match.getLen();
+      BlockLocation[] blocks = fileSystem.getFileBlockLocations(match, 0, length);
+	</pre>
 
-	    3. Ensure this node is unique in the current list of compute nodes (variable named <tt>hosts</tt> in the code), otherwise start over:
-	    <pre id="Current">
-      <font id="Boolean">boolean</font> save = <font id="True">true</font>;
-      <font id="For">for</font> (<font id="Int">int</font> j = <font id="IntegerLiteral">0</font>; j &lt; hosts.size(); j++) {
-         <font id="If">if</font> (blocks[<font id="IntegerLiteral">0</font>].getHosts()[<font id="IntegerLiteral">0</font>].compareTo(hosts.get(j)) == <font id="IntegerLiteral">0</font>) {
-            save = <font id="False">false</font>;
-            System.out.println(<font id="StringLiteral">"Repeated Host: "</font> + i);
-            <font id="Break">break</font>;
-         }
+	    3. Ensure this node is not already in the current list of compute nodes, otherwise try again:
+
+	    <pre class="prettyprint"> 
+      // Check if the first node used to store this temporary file is not yet on our list
+      boolean save = true;
+      for (int j=0; j&#60;uniqueNodes.size(); j++) {
+        if (blocks[0].getHosts()[0].compareTo(uniqueNodes.get(j)) == 0) {
+          save = false;
+          System.out.println("Repeated host: " + i);
+          break;
+        }
       }
 	    </pre>
 
-	    4. If the node was unique, save it in the list of unique nodes and repeat until the list contains <strong>n</strong> nodes or we have created <strong>2n</strong> temporary files, whichever comes first:
-	    <pre id="Current">
-      <font id="If">if</font> (save) {
-         System.out.println(<font id="StringLiteral">"Host Found Successfully: "</font> + i);
-         hosts.add(blocks[<font id="IntegerLiteral">0</font>].getHosts()[<font id="IntegerLiteral">0</font>]);
+	    4. If the node is new, save it in the list of unique nodes and repeat until the list contains <strong>n</strong> nodes or we have created <strong>2n</strong> temporary files, whichever comes first:
+	    <pre class="prettyprint"> 
+      // If unique, add it to list of unique nodes
+      if (save) {
+        uniqueNodes.add(blocks[0].getHosts()[0]);
+        System.out.println("Found unique host: " + i);
       }
       i++;
-   } // while( hosts.size() < nodes && i < 2*nodes)
-	    </pre>
-	  </li>
-	</ol>
+    } // while( hosts.size() < nodes && i < 2*nodes)
+					   </pre>
 
-	The resulting list of hosts can be used to generate a <a
-	class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/lib/input/FileSplit.html">FileSplit</a>
-	for each node. The FileSplit in this case is utilized in an
-	unorthodox way to indicate to each Map node which portion of
-	the URLs it will be responsible for. The constructor for the
-	FileSplit normally takes four arguments: the path to the file,
-	the starting byte offset for the split, the byte length of the
-	split, and the list of hosts where the split resides. Instead
-	of using this convention, the start offset and length
-	parameters are substituted with the line offset and number of
-	lines to be processed:
-	<pre id="Current">
-  <font id="Int">int</font> span = (<font id="Int">int</font>) Math.ceil(((<font id="Float">float</font>) (num_lines)) / ((<font id="Float">float</font>) hosts.size()));
-  <font id="Int">int</font> last = num_lines - span * (hosts.size()-<font id="IntegerLiteral">1</font>);
-  System.out.println(<span id="StringLiteral">"First n-1 nodes responsible for "</span> + span + <span id="StringLiteral">" images"</span>);
-  System.out.println(<span id="StringLiteral">"Last node responsible for "</span> + last + <span id="StringLiteral">" images"</span>);
-  
-  FileSplit[] f = <font id="New">new</font> FileSplit[hosts.size()];
-  <font id="For">for</font> (<font id="Int">int</font> j = <font id="IntegerLiteral">0</font>; j &lt; f.length; j++) {
-      String[] host = <font id="New">new</font> String[<font id="IntegerLiteral">1</font>];
-      host[<font id="IntegerLiteral">0</font>] = hosts.get(j);
-      <font id="If">if</font> (j &lt; f.length - <font id="IntegerLiteral">1</font>) {
-          splits.add( <font id="New">new</font> FileSplit(path , (j*span) , span, host));
-      } <font id="Else">else</font> {
-          splits.add( <font id="New">new</font> FileSplit(path , (j*span) , last, host));
+	    After the list of unique hosts has been created, the next step is to generate a <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/lib/input/FileSplit.html">FileSplit</a> object for each map task. The FileSplit class is used in a slightly unorthodox way here in order to provide each map task with the subset of the URL list that it will be responsible for downloading. The constructor for the FileSplit class normally takes four arguments: the path to the file to split, the starting byte offset for the split, the byte length of the split, and the list of hosts where the split resides. Instead of following this convention, we replace the start offset and length parameters with the line offset and number of lines in the input image URL list that are to be processed by each map task:
+
+	<pre class="prettyprint"> 
+    // Determine download schedule (number of images per node)
+    int span = (int) Math.ceil((float)numImages / (float)uniqueNodes.size());
+    int last = numImages - span * (uniqueNodes.size() - 1);
+
+    if (uniqueNodes.size() &#62; 1) {
+      System.out.println("First " + (uniqueNodes.size() - 1) + " nodes will each download " + span + " images");
+      System.out.println("Last node will download " + last + " images");
+    } else {
+      System.out.println("Single node will download " + last + " images");
+    }
+
+    // Produce file splits according to download schedule
+    FileSplit[] f = new FileSplit[uniqueNodes.size()];
+    for (int j = 0; j &#60; f.length; j++) {
+      String[] node = new String[1];
+      node[0] = uniqueNodes.get(j);
+      if (j < f.length - 1) {
+        splits.add(new FileSplit(path, (j * span), span, node));
+      } else {
+        splits.add(new FileSplit(path, (j * span), last, node));
       }
-  }
+    }
 	</pre>
 
-	<h3>DownloaderRecordReader</h3>
+	At this point, the DownloaderInputFormat class has produced FileSplits that divide the list of image URLs across the map tasks.
 
-	The <a class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/RecordReader.html">RecordReader</a>
-	is normally tasked with emitting a set of records for each <a
-	class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/InputSplit.html">InputSplit</a>
-	it receives from a specified <a class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/InputFormat.html">InputFormat</a>. In
-	the case of the Downloader, the DownloaderRecordReader is
-	responsible for communicating the to the Map task which lines
-	in the input list of URLs it is responsible for
-	downloading. As mentioned above, the DownloaderInputFormat
-	class uses the <a class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/lib/input/FileSplit.html">FileSplit</a>
-	object to hold this information.<br /><br />
+	<h3>DownloaderRecordReader class</h3>
 
-	For each FileSplit, the DownloaderRecordReader emits exactly
-	one record whose key indicates the starting line number and
-	whose value contains the list of URLs to be processed. The
-	DownloaderRecordReader first determines the starting line
-	number for the FileSplit and the number of lines that will be
-	processed:
-	<pre id="Current">
-  ...
-  <font id="Public">public</font> <font id="Void">void</font> initialize(InputSplit split, TaskAttemptContext context) <font id="Throws">throws</font> IOException, InterruptedException {
-    FileSplit fileSplit = (FileSplit) split;
+	The Hadoop <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/RecordReader.html">RecordReader</a> class is responsible for emitting a set of key/value pairs (also known as records) for each <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/InputSplit.html">InputSplit</a> object that it receives from the <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/InputFormat.html">InputFormat</a> class. This is accomplished by having the map tasks repeatedly call the methods <tt>RecordReader::nextKeyValue()</tt>, <tt>RecordReader::getCurrentKey()</tt>, and <tt>RecordReader::getCurrentValue()</tt>. <br /><br />
+
+	In the case of <b>downloader</b>, the DownloaderRecordReader is responsible for sending to each map task the set of lines in the input list of image URLs that it is responsible for downloading. As mentioned above, the DownloaderInputFormat class uses the <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/lib/input/FileSplit.html">FileSplit</a> object to hold this information. The <tt>initialize()</tt> method in DownloaderRecordReader is where these InputSplit objects are parsed to determine the subset of image URLs for each map task:
+
+	<pre class="prettyprint"> 
+  public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
+
+    // Obtain path to input list of image URLs
+    FileSplit fileSplit = (FileSplit)split;
     Path path = fileSplit.getPath();
     FileSystem fileSystem = path.getFileSystem(context.getConfiguration());
-  
-    start_line = f.getStart();
-    <font id="Long">long</font> num_lines = f.getLength();
-	</pre>
 
-	The corresponding URLs are determined by reading
-	<strong>num_lines</strong> from the input file starting at
-	line <strong>start_line</strong>:
-	<pre id="Current">
-  BufferedReader reader = <font id="New">new</font> BufferedReader(<font id="New">new</font> InputStreamReader(fileSystem.open(path)));
-  <font id="Int">int</font> i = <font id="IntegerLiteral">0</font>;
-  <font id="While">while</font>(i &lt; start_line &amp;&amp; reader.readLine() != <font id="Null">null</font>) {
-    i++;
-  }
-  
-  urls = <font id="StringLiteral">""</font>;
-  String line;
-  <font id="For">for</font>(i = <font id="IntegerLiteral">0</font>; i &lt; num_lines &amp;&amp; (line = reader.readLine()) != <font id="Null">null</font>; i++) {
-    urls += line + <font id="CharacerLiteral">'\n'</font>;
-  }
-  reader.close();
-	</pre>
+    // Note the start and length fields in the FileSplit object are being used to convey a
+    // range of lines in the input list of image URLs
+    startLine = fileSplit.getStart();
+    long numLines = fileSplit.getLength();
 
-	Map tasks receive their records by repeatedly calling <a
-	class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/RecordReader.html#nextKeyValue()">RecordReader::nextKeyValue()</a>,
-	<a class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/RecordReader.html#getCurrentKey()">RecordReader::getCurrentKey()</a>,
-	and <a class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/RecordReader.html#getCurrentValue()">RecordReader::getCurrentValue()</a>. Thus,
-	in this case, there is only one record whose key and value are
-	just the starting line number and the list of URLs
-	respectively:
-	<pre id="Current">
-  <font id="Public">public</font> IntWritable getCurrentKey() <font id="Throws">throws</font> IOException, InterruptedException {
-      <font id="Return">return</font> <font id="New">new</font> IntWritable((<font id="Int">int</font>)start_line);
-  }
+    // Flag to enable emitting only one key/value pair
+    singletonEmit = false;
 
-  <font id="Public">public</font> Text getCurrentValue() <font id="Throws">throws</font> IOException, InterruptedException {
-      <font id="Return">return</font> <font id="New">new</font> Text(urls);
-  }
+    // Created buffered reader for input list of image URLs
+    BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(path)));
 
-  <font id="Public">public</font> <font id="Boolean">boolean</font> nextKeyValue() <font id="Throws">throws</font> IOException, InterruptedException {
-      <font id="If">if</font>(singletonEmit == <font id="False">false</font>) {
-          singletonEmit = <font id="True">true</font>;
-          <font id="Return">return</font> <font id="True">true</font>;
-      } <font id="Else">else</font> {
-          <font id="Return">return</font> <font id="False">false</font>;
-      }
+    // Advance reader to startLine
+    int i = 0;
+    while (i < startLine && reader.readLine() != null) {
+      i++;
+    }
+
+    // Build numLines length list of image URLs delimited by newline character \n
+    urls = "";
+    String line;
+    for (i = 0; i < numLines && (line = reader.readLine()) != null; i++) {
+      urls += line + '\n';
+    }
+
+    reader.close();
   }
 	</pre>
 
-	<h3>The Mapper</h3>
+	And, finally, DownloadRecordReader must also implement the functions that are called by the map tasks to obtain their input key/value pairs. In this case, there is only one record whose key and value are the starting line number and the list of URLs respectively:
+
+	<pre class="prettyprint"> 
+  public IntWritable getCurrentKey() throws IOException, InterruptedException {
+    return new IntWritable((int)startLine);
+  }
+
+  public Text getCurrentValue() throws IOException, InterruptedException {
+    return new Text(urls);
+  }
+
+  public boolean nextKeyValue() throws IOException, InterruptedException {
+    if (singletonEmit == false) {
+      singletonEmit = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
+	</pre>
+
+	Note that <tt>nextKeyValue()</tt> will return <tt>true</tt> only once and so one record (and one associated map task) will be generated for each InputSplit.
+
+	<h3>DownloaderMapper class</h3>
 
 	The <a class="external_link"
 	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/RecordReader.html">RecordReader</a>
-	emits records to the <a class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Mapper.html">Mapper</a>
-	task where the keys are the starting line in the input list of
-	URLs and the values are the URLs to be downloaded (separated
-	again by newline characters). The Mapper's task is to download
-	each of the URLs to a local <a
-	href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
-	(HIB), which will then be sent to the <a class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Reducer.html">Reducer</a>
-	so it can be combined with the other HIB's. A temporary HIB is
-	created on each of the map nodes to hold the set of images it
-	is responsible for downloading:
-	<pre id="Current">
-  <font id="Public">public</font> <font id="Void">void</font> map(IntWritable key, Text value, Context context) <font id="Throws">throws</font> IOException, InterruptedException
-  {
-    String temp_path = conf.get(<font id="StringLiteral">"downloader.outpath"</font>) + key.get() + <font id="StringLiteral">".hib.tmp"</font>;
-    HipiImageBundle hib = <font id="New">new</font> HipiImageBundle(<font id="New">new</font> Path(temp_path), conf);
-    hib.open(HipiImageBundle.FILE_MODE_WRITE, <font id="True">true</font>);
-    ...
+	emits records to the DownloaderMapper where the keys are the starting line in the input list of
+	URLs and the values are the URLs to be downloaded (a single Text object delimited by newline characters). Within the <tt>map()</tt> method in DownloaderMapper, the task is to download
+	this list of images to a <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB). These HIBs are subsequently concatenated into a single HIB in the reduce task.<br /><br /> 
+
+	First, a temporary HIB is created to hold the set of images downloaded by the map task:
+
+	<pre class="prettyprint"> 
+   public void map(IntWritable key, Text value, Context context) throws IOException, InterruptedException {
+      // Create path for temporary HIB file
+      String tempPath = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
+      HipiImageBundle hib = new HipiImageBundle(new Path(tempPath), conf);
+      hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
+      ...
 	</pre>
 
-	Each of the Mapper's then proceeds to iterate through its set
-	of URLs (contained in the value). To perform the actual
-	download, the <a class="external_link"
-	href="http://docs.oracle.com/javase/7/docs/api/java/net/URLConnection.html">URLConnection</a>
-	is used to create a stream that can be written directly to the
-	local HIB:
-	<pre id="Current">
-    String word = value.toString();
-    BufferedReader reader = <font id="New">new</font> BufferedReader(<font id="New">new</font> StringReader(word));
-    String uri;
+	Next, the <tt>map()</tt> method iterates over the list of URLs (contained in <tt>value</tt>). To perform the actual download, the <a class="external_link" href="http://docs.oracle.com/javase/7/docs/api/java/net/URLConnection.html">URLConnection</a> is used to create a stream that can be written directly to the HDFS:
 
-    <font id="While">while</font>((uri = reader.readLine()) != <font id="Null">null</font>)            
-    {
+	<pre class="prettyprint"> 
+      BufferedReader reader = new BufferedReader(new StringReader(value.toString()));
+      String uri;
       ...
-      String type = <font id="StringLiteral">""</font>;
-      URLConnection conn;
+      // Iterate through URLs
+      while ((uri = reader.readLine()) != null) {
+         ...
+          String type = "";
+          URLConnection conn;
 
-      <font id="Try">try</font> {
-        URL link = <font id="New">new</font> URL(uri);
-        System.err.println(<font id="StringLiteral">"Downloading "</font> + link.toString());
-	conn = link.openConnection();
-	conn.connect();
-	type = conn.getContentType();
-      } <font id="Catch">catch</font> (Exception e) {
-        System.err.println(<font id="StringLiteral">"Connection error to image: "</font> + uri);
-        <font id="Continue">continue</font>;
-      }
-      ...
-      <font id="If">if</font> (type != <font id="Null">null</font> &amp;&amp; type.compareTo(<font id="StringLiteral">"image/jpeg"</font>) == <font id="IntegerLiteral">0</font>) {
-	hib.addImage(conn.getInputStream(), ImageType.JPEG_IMAGE);
-      }
-      ...
-    }
+	  // Attempt to download image at URL using java.net
+          try {
+            URL link = new URL(uri);
+            System.err.println("Downloading " + link.toString());
+            conn = link.openConnection();
+            conn.connect();
+            type = conn.getContentType();
+          } catch (Exception e) {
+            System.err.println("Connection error while trying to download: " + uri);
+            continue;
+          }
+          ...
+	  // Check that image format is supported, header is parsable, and add to HIB if so
+          if (type != null && (type.compareTo("image/jpeg") == 0 || type.compareTo("image/png") == 0)) {
+              ...
+	      // Add image to HIB
+	      hib.addImage(bis, type.compareTo("image/jpeg") == 0 ? ImageType.JPEG_IMAGE : ImageType.PNG_IMAGE);
+	      System.err.println("Added to HIB: " + uri);
+	    }
+            ...
+        }
 	</pre>
 
-	Once all of the URLs have been processed, the HIB must be
-	closed and a record indicating its location on the filesystem
-	is sent to the Reducer:
-	<pre id="Current">
-  context.write(<font id="New">new</font> BooleanWritable(<font id="True">true</font>), <font id="New">new</font> Text(hib.getPath().toString()));
-  reader.close();
-  hib.close();
-  </pre>
-
-	<h3>The Reducer</h3>
-
-	The <a class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Reducer.html">Reducer's</a>
-	job is relatively straighforward. It loads each of the <a
-	href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundles</a>
-	(HIB) from the <a class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Mapper.html">Mappers</a>
-	and merges them into one large HIB:
-	<pre id="Current">
-  <font id="Public">public</font> <font id="Void">void</font> reduce(BooleanWritable key, Iterable&lt;Text&gt; values, Context context) 
-      <font id="Throws">throws</font> IOException, InterruptedException {
-    <font id="If">if</font>(key.get()) {
-      FileSystem fileSystem = FileSystem.get(conf);
-      Path outputHibPath = <font id="New">new</font> Path(conf.get(<font id="StringLiteral">"downloader.outfile"</font>));
-      HipiImageBundle hib = <font id="New">new</font> HipiImageBundle(outputHibPath, conf);
-      hib.open(HipiImageBundle.FILE_MODE_WRITE, <font id="True">true</font>);
-      <font id="For">for</font> (Text temp_string : values) {
-        Path temp_path = <font id="New">new</font> Path(temp_string.toString());
-	HipiImageBundle input_bundle = <font id="New">new</font> HipiImageBundle(temp_path, conf);
-	hib.append(input_bundle);
-	Path index_path = input_bundle.getPath();
-	Path data_path = <font id="New">new</font> Path(index_path.toString() + <font id="StringLiteral">".dat"</font>);
-        fileSystem.delete(index_path, false);
-        fileSystem.delete(data_path, false);
-	Text outputPath = <font id="New">new</font> Text(input_bundle.getPath().toString());
-	context.write(<font id="New">new</font> BooleanWritable(<font id="True">true</font>), outputPath);
-	context.progress();
-      }
-      hib.close();
-    }
-  }
+	After all of the URLs have been processed, the HIB is finalized and a record indicating its location on the filesystem is sent to the reduce task:
+	<pre class="prettyprint"> 
+	// Output key/value pair to reduce layer consisting of boolean and path to HIB
+        context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
+	// Cleanup
+        reader.close();
+        hib.close();
 	</pre>
+
+	<h3>DownloaderReducer class</h3>
+
+	The DownloaderReducer class extends the Hadoop <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Reducer.html">Reducer</a> class and implements the <tt>reduce()</tt> method. In this case, it's job is pretty straightforward: it simply appends each of the HIBs produced by the map tasks into a single HIB at the path specified by the user:
+
+	<pre class="prettyprint"> 
+    public void reduce(BooleanWritable key, Iterable<Text> values, Context context) 
+      throws IOException, InterruptedException {
+      
+      if (key.get()) {
+
+	// Get path to output HIB
+        FileSystem fileSystem = FileSystem.get(conf);
+        Path outputHibPath = new Path(conf.get("downloader.outfile"));
+
+	// Create HIB for writing
+        HipiImageBundle hib = new HipiImageBundle(outputHibPath, conf);
+        hib.open(HipiImageBundle.FILE_MODE_WRITE, true);
+
+	// Iterate over the temporary HIB files created by map tasks
+        for (Text tempString : values) {
+
+	  // Open the temporary HIB file
+          Path tempPath = new Path(tempString.toString());
+          HipiImageBundle inputBundle = new HipiImageBundle(tempPath, conf);
+
+	  // Append temporary HIB file to output HIB (this is fast)
+          hib.append(inputBundle);
+
+	  // Remove temporary HIB (both .hib and .hib.dat files)
+          Path indexPath = inputBundle.getPath();
+          Path dataPath = new Path(indexPath.toString() + ".dat");
+          fileSystem.delete(indexPath, false);
+          fileSystem.delete(dataPath, false);
+
+	  // Emit output key/value pair indicating temporary HIB has been processed
+          Text outputPath = new Text(inputBundle.getPath().toString());
+          context.write(new BooleanWritable(true), outputPath);
+          context.progress();
+        }
+
+	// Finalize output HIB
+        hib.close();
+      }
+	</pre>
+
+	And that's that! We encourage you to play around with these examples and consider using them as starting points for your own MapReduce/HIPI programs.
+
+	<h3>Next</h3>
+
+	Learn about the <a href="../examples/jpegfromhib.html">JpegFromHib example program</a> that extracts the images in a HIB as individual JPEGs.
+
       </div>
     </div>
     <!-- End Content -->

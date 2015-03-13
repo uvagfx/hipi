@@ -39,7 +39,7 @@
     <div class="content">
       <h2 class="title">HIPI Tools and Example Programs</h2>
 
-      The HIPI distribution includes a number of useful tools and example programs that are a great way to learn how to create your own HIPI programs. We suggest reading the description of each program listed below in the order that they appear.
+      The HIPI distribution includes a number of useful tools and example programs that are a great way to learn how to create your own HIPI programs.
 
       <h3><a class="external_link" href="tools/hibimport.html">hibimport</a></h3>
       <div class="section">
@@ -48,29 +48,27 @@
 
       <h3><a class="external_link" href="examples/dumphib.html">dumphib</a></h3>
       <div class="section">
-	This example is a good introduction to the HIPI API. It is a full MapReduce program that collects basic information about the individual images in a <a
-	href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) within multiple parallel map tasks (one mapper for each image in the HIB), consolidates this information during the shuffle phase, and writes this consolidated information to a text file on the HDFS within a single reduce task. (You can use the <a href="tools/hibimport.html">hibimport</a> tool or the <a href="examples/downloader.html">Distributed Downloader</a> example program to create a HIB.)
+	This example program is a good introduction to the HIPI API. It is a full MapReduce/HIPI program that collects basic information about the images in a HIB. It does this using multiple parallel map tasks (one mapper for each image in the HIB) and writes this information to a text file on the HDFS in a single reduce task. (You can use the <a href="tools/hibimport.html">hibimport</a> tool or the <a href="examples/downloader.html">Distributed Downloader</a> example program to create a HIB.)
       </div>
 
       <h3><a class="external_link" href="examples/downloader.html">DistributedDownloader</a></h3>
       <div class="section">
-	This is a MapReduce program that uses HIPI to create a <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) by performing a distributed download of a list of images located on the Internet.
+	This is a more advanced MapReduce/HIPI program that allows creating a <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) by performing a distributed download of a list of images located on the Internet. This program highlights some of the more subtle parts of the Hadoop framework and will be a valuable tool for setting up your Hadoop cluster with a large image collection.
       </div>
 
-    <h3><a class="external_link" href="examples/jpegfromhib.html">JPEGFromHib</a></h3>
+    <h3><a class="external_link" href="examples/jpegfromhib.html">JpegFromHib</a></h3>
     <div class="section">
-      This is a MapReduce program that uses HIPI to extract the images within a <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) as individual JPEG images.
-      It both illustrates how to parse the individual images in a HIB and can serve as a useful "sanity test" that a HIB is properly formatted.
+      This is a MapReduce/HIPI program that extracts the images within a <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) as individual files. This program illustrates many important features of the HIPI API (e.g., how to process the images in a HIB according to the MapReduce parallel programming model). It is also a useful tool to verify that a HIB has been properly created.
     </div>
         
     <h3><a class="external_link" href="examples/createSequenceFile.html">CreateSequenceFile</a></h3>
     <div class="section">
-        This is a MapReduce program that uses HIPI to generate a Hadoop <a href="https://hadoop.apache.org/docs/current/api/org/apache/hadoop/io/SequenceFile.html">Sequence File</a> (a flat file of binary key/value pairs) from a HIB. It demonstrates how to use the <a href="doc/api/hipi/image/io/JPEGImageUtil.html">JPEGImageUtil</a> class and shows how to provice access to a set of images in another format.
+        This is a MapReduce/HIPI program that generates a Hadoop <a href="https://hadoop.apache.org/docs/current/api/org/apache/hadoop/io/SequenceFile.html">Sequence File</a> (a flat binary file of key/value pairs) from a HIB. It demonstrates how to use the <a href="doc/api/hipi/image/io/JPEGImageUtil.html">JPEGImageUtil</a> class that is part of HIPI and shows how to provice access to a set of images in another format. This program was used for some <a href="file:///Users/jason/work/proj/hipi-web/experiments.html">performance experiments</a>.
     </div>
 
       <h3><a class="external_link" href="examples/pca.html">The Principle Components of Patches</a></h3>
       <div class="section">
-	This is a MapReduce program that uses HIPI to implement the famous experiment described in the paper <i><a href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">The Principal Components of Natural Images</a></i>, written by Hancock et al. in 1992. This program computes the principal components (eigenvectors of the covariance matrix computed over a large set of small image patches). Although the original paper only used 15 grayscale images, HIPI makes it easy to perform this analysis over much larger image sets. This is a more involved example program that is a good starting place for building other distributed image processing and computer vision MapReduce/HIPI programs.
+	This is a MapReduce/HIPI program that implements the famous experiment described in the paper <i><a href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">The Principal Components of Natural Images</a></i>, written by Hancock et al. in 1992. This program computes the principal components of natural image patches (eigenvectors of the covariance matrix computed over a large set of small image patches). Although the original paper only used 15 grayscale images, HIPI makes it easy to perform this analysis over much larger image sets. This is a more advanced program and a good starting point for building more complex distributed image processing and computer vision MapReduce/HIPI programs.
       </div>
 
     </div>

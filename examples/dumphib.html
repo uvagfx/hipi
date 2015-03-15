@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="../include/main.css" />
     <link rel="stylesheet" type="text/css" href="../include/javasyntax.css" />
-    <title>HIPI - Hadoop Image Processing Interface :: dumphib</title>
+    <title>HIPI - Hadoop Image Processing Interface :: DumpHib</title>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -17,7 +17,9 @@
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
     </script>
-  
+
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>  
+
   </head>
   
   <body>
@@ -38,10 +40,10 @@
     <!-- Begin Content -->
     <div class="content">
       
-      <h2 class="title">dumphib</h2>
+      <h2 class="title">DumpHib</h2>
 
       <div class="section">
-	<b>dumphib</b> is a simple MapReduce program designed to illustrate the fundamentals of HIPI. It takes as input a <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) and writes a single text file to the HDFS that contains various properties (width, height, hash of the image data, and capture device) about the images contained in the HIB.
+	DumpHib is a simple MapReduce program designed to illustrate the fundamentals of HIPI. It takes as input a <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) and writes a single text file to the HDFS that contains various properties (width, height, hash of the image data, and capture device) about the images contained in the HIB.
 
 	<h3>Compiling</h3>
 
@@ -59,7 +61,18 @@
    $> hadoop jar examples/dumphib.jar &#60;input HIB&#62; &#60;output directory&#62;
 	</pre>
 
-	For example, if the file <tt>tigers.hib</tt> exists in the current working directory on the HDFS then the following command would produce a text file at <tt>tigers/part-r-00000</tt> that contains basic information about its contents:
+	There is also a convenience script located in the examples directory:
+
+	<pre id="Current">
+   $> cd examples
+   $> ./runDumpHib.sh &#60;input HIB&#62; &#60;output directory&#62;
+	</pre>
+
+	<b>dumphib</b> takes two arguments. The first argument is the path to a HIB on the HDFS. The second argument is the HDFS path to the output directory that will be created once the program has finished. The resulting image data will be stored as a text file named <tt>part-r-00000</tt> in this directory.
+
+	<h3>Example</h3>
+
+	If the file <tt>tigers.hib</tt> exists in the current working directory on the HDFS, then the following command would produce a text file at <tt>tigers/part-r-00000</tt> that contains basic information about its contents:
 
 	<pre id="Current">
    $> hadoop jar examples/dumphib.jar tigers.hib tigers
@@ -79,130 +92,129 @@
 	
 	The text file part-r-00000 contains four lines, one for each image found in tigers.hib. The first column is always 1, the second column reports the resolution of each image as width x height, the third column is a hash of the image data, and the fourth column lists the camera model stored in the image metadata, when available.
 	
-	<h3>How dumphib works</h3>
+	<h2 class="title">How DumpHib works</h2>
 	
-	  The <b>dumphib</b> program is implemented in the file <tt>examples/hipi/examples/dumphib/DumpHib.java</tt> (relative to the HIPI root directory). As with any MapReduce program this class defines a <i>driver</i> class, a <i>mapper</i> class, and a <i>reducer</i> class.<br /><br />
+	<b>dumphib</b> is implemented in the file <tt>examples/hipi/examples/dumphib/DumpHib.java</tt> (relative to the HIPI root directory). As with any MapReduce program this file defines a <i>driver</i> class, a <i>mapper</i> class, and a <i>reducer</i> class.<br /><br />
 	  
-	  The <tt>DumpHib</tt> class is the <i>driver</i> class. This class is responsible for setting up the MapReduce job (e.g., specifying configuration parameters) and launching the job.<br /><br />
+	The DumpHib class is the <i>driver</i> class. This class is responsible for setting up the MapReduce job (e.g., specifying configuration parameters) and launching the job. The DumpHibMapper class defined within the DumpHib class is the <i>mapper</i> class. This class is responsible for defining the operation of the map tasks which are executed in parallel to process the input HIB file. As in any MapReduce program, this class must define a <tt>map()</tt> method that receives key/value pairs from the underlying <i>record reader</i>. This is often where the bulk of the interesting work is performed in a HIPI program and so it's well worth studying the definition of this method:
 
-	  The <tt>DumpHibMapper</tt> class defined within the <tt>DumpHib</tt> class is the <i>mapper</i> class. This class is responsible for defining the operation of the map tasks which are executed in parallel to process the input HIB file. As in any MapReduce program, this class must define a <tt>map()</tt> method that receives key/value pairs from the underlying <i>record reader</i>. This is often where the bulk of the interesting work is performed in a HIPI program and so it's well worth studying the definition of this method:
-
-	  <pre id="Current">
-   <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException 
+	  <pre class="prettyprint"> 
+  public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException  {
 	  </pre>
 
-	  Note that the key/value pair received by this method is a HIPI <a href="../doc/api/hipi/image/ImageHeader.html">ImageHeader</a> object and a HIPI <a href="../doc/api/hipi/image/FloatImage.html">FloatImage</a> object. HIPI takes care of all the low-level (but very important) details of how to retrieve and decode the image data stored in a HIB and delivers the image metadata and decoded pixel data to the map task in the form of these high-level Java objects. In the case of <b>dumphib</b>, the map task queries these objects to produce a <tt>Text</tt> object containing the width, height, image data hash, and camera model information for the associated image. (More details below.)<br /><br />
+	  Note that the key/value pair received by this method is a HIPI <a href="../doc/api/hipi/image/ImageHeader.html">ImageHeader</a> object and a HIPI <a href="../doc/api/hipi/image/FloatImage.html">FloatImage</a> object. HIPI takes care of all the low-level (but very important) details of how to retrieve and decode the image data stored in a HIB and delivers the image metadata and decoded pixel data to the map task in the form of these high-level Java objects. In the case of <b>dumphib</b>, the map task queries these objects to produce a Text object containing the width, height, image data hash, and camera model information for the associated image. (More details below.)<br /><br />
 
-	  Finally, the <tt>DumpHibReducer</tt> class is the <i>reducer</i> class. This class is responsible for defining the operation of the reduce tasks which receive their input from the map tasks and often (though not always) consolidate this data before it is written to the HDFS by the underlying MapReduce framework.<br /><br />
+	  Finally, the DumpHibReducer class is the <i>reducer</i> class. This class is responsible for defining the operation of the reduce tasks which receive their input from the map tasks and often (though not always) consolidate this data before it is written to the HDFS by the underlying MapReduce framework.<br /><br />
 
 	  Now let's look at each of these key classes in detail.
 	  
-	  <h3>The Driver Class: <tt>DumpHib</tt></h3> 
+	  <h3>The Driver Class: DumpHib</h3> 
 
-	  This class defines a <tt>main()</tt> method which is the entry point of the MapReduce program. This method simply calls the <tt>run()</tt> method in the <tt>DumpHib</tt> driver class using the standard <tt>ToolRunner</tt> Hadoop class:
+	  This class defines a <tt>main()</tt> method which is the entry point of the MapReduce program. This method simply calls the <tt>run()</tt> method in the DumpHib driver class using the standard ToolRunner Hadoop class:
 
-	<pre id="Current">
-   <font id="Public">public</font> <font id="Static">static</font> <font id="Void">void</font> main(String[] args) <font id="Throws">throws</font> Exception {
-      <font id="Int">int</font> res = ToolRunner.run(<font id="New">new</font> DumpHib(), args);
-      System.exit(res);
-   }
+	<pre class="prettyprint"> 
+  public static void main(String[] args) throws Exception {
+    int res = ToolRunner.run(new DumpHib(), args);
+    System.exit(res);
+  }
 	</pre>
 
 	The <tt>run()</tt> method is important to understand as it is responsible for configuring the MapReduce program. It first specifies the driver, mapper, and reducer classes:
 
-	<pre id="Current">
-   <font id="Public">public</font> <font id="Int">int</font> run(String[] args) <font id="Throws">throws</font> Exception {
-      ...
-      Configuration conf = <font id="New">new</font> Configuration();
+	<pre class="prettyprint"> 
+  public int run(String[] args) throws Exception {
+    ...
+    Configuration conf = new Configuration();
 
-      Job job = Job.getInstance(conf, <font id="StringLiteral">"dumphib"</font>);
-      job.setJarByClass(DumpHib.<font id="Class">class</font>);
-      job.setMapperClass(DumpHibMapper.<font id="Class">class</font>);
-      job.setReducerClass(DumpHibReducer.<font id="Class">class</font>);
-      ...
+    Job job = Job.getInstance(conf, "dumphib");
+    job.setJarByClass(DumpHib.class);
+    job.setMapperClass(DumpHibMapper.class);
+    job.setReducerClass(DumpHibReducer.class);
 	</pre>
 
-	These lines create the Hadoop job object and set the driver class as <tt>DumpHib</tt>, the mapper class as <tt>DumpHibMapper</tt>, and the reducer class as <tt>DumpHibReducer</tt>.<br /><br />
+	These lines create the Hadoop job object and set the driver class as DumpHib, the mapper class as DumpHibMapper, and the reducer class as DumpHibReducer. Next, the <tt>run()</tt> method specifies the types of objects that will be passed to and from the map and reduce tasks:
 
-	Next, the <tt>run()</tt> method specifies the types of objects that will be passed to and from the map and reduce tasks:
-
-	<pre id="Current">
-      ...
-      job.setInputFormatClass(ImageBundleInputFormat.<font id="Class">class</font>);
-      job.setOutputKeyClass(IntWritable.<font id="Class">class</font>);
-      job.setOutputValueClass(Text.<font id="Class">class</font>);
-      ...
+	<pre class="prettyprint"> 
+    ...
+    job.setInputFormatClass(ImageBundleInputFormat.class);
+    job.setOutputKeyClass(IntWritable.class);
+    job.setOutputValueClass(Text.class);
+    ...
 	</pre>
 
-	The first line of code above indicates that the process of constructing well-defined key/value objects for the mapper will be handled by the <a href="../doc/api/hipi/imagebundle/mapreduce/ImageBundleInputFormat.html">ImageBundleInputFormat</a> class, which is part of HIPI. The second and third lines of code specify that the output of this MapReduce program (as well as the output of the individual map tasks) will be key/value pairs consisting of <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/IntWritable.html">IntWritable</a> objects and <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/Text.html">Text</a> objects, respectively. The reason these objects are used in place of the native Java types <tt>int</tt> and <tt>String</tt> is because Hadoop requires that these objects be serializable and comparable. The <tt>IntWritable</tt> and <tt>Text</tt> Hadoop classes encapsulate these native types while providing this added functionality.<br /><br />
+	The first line indicates that the process of constructing well-defined key/value objects for the mapper will be handled by the <a href="../doc/api/hipi/imagebundle/mapreduce/ImageBundleInputFormat.html">ImageBundleInputFormat</a> class, which is part of HIPI. The second and third lines of code specify that the output of this MapReduce program (as well as the output of the individual map tasks) will be key/value pairs consisting of <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/IntWritable.html">IntWritable</a> objects and <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/io/Text.html">Text</a> objects, respectively. The reason these objects are used in place of the native Java types int and String is because Hadoop requires that these objects be serializable and comparable. The IntWritable and Text Hadoop classes encapsulate these native types while providing this added functionality.<br /><br />
 
 	<span class="important">Important Note:</span> If your mapper's output is different from your job's output then you must specify two additional classes:
-	<pre id="Current">
-      ...
-      job.setMapOutputKeyClass(SomeClass.<font id="Class">class</font>);
-      job.setMapOutputValueClass(SomeClass.<font id="Class">class</font>);
-      ...
+	<pre class="prettyprint"> 
+    ...
+    job.setMapOutputKeyClass(SomeClass.class);
+    job.setMapOutputValueClass(SomeClass.class);
+    ...
 	</pre>
 
 	The last few lines of code in the <tt>run()</tt> method set the input and output paths, set the number of reduce tasks (in this case only one), and execute the job:
 
-	<pre id="Current">
-      ...
-      FileInputFormat.setInputPaths(job, <font id="New">new</font> Path(inputPath));    
-      FileOutputFormat.setOutputPath(job, <font id="New">new</font> Path(outputPath));
+	<pre class="prettyprint"> 
+    ...
+    FileInputFormat.setInputPaths(job, new Path(inputPath));
+    FileOutputFormat.setOutputPath(job, new Path(outputPath));
 
-      job.setNumReduceTasks(<font id="IntegerLiteral">1</font>);
+    job.setNumReduceTasks(1);
 
-      <font id="Return">return</font> job.waitForCompletion(<font id="True">true</font>) ? 0 : 1;
-   }
+    return job.waitForCompletion(true) ? 0 : 1;
+
+  }
 	</pre>
 	
 	Having only one reduce task forces the output to be written to a single file.
 
-	<h3>The Mapper Class: <tt>DumpHibMapper</tt></h3>
+	<h3>The Mapper Class: DumpHibMapper</h3>
 
-	The <tt>map()</tt> method in this class is normally where the "real work" happens. Recall that HIPI, through the <tt>ImageBundleInputFormat</tt> class, delivers parsed and decoded <tt>ImageHeader</tt> and <tt>FloatImage</tt> objects that are read from the input HIB to this method as arguments:
+	Recall from above that HIPI, through the <a href="../doc/api/hipi/imagebundle/mapreduce/ImageBundleInputFormat.html">ImageBundleInputFormat</a> class, delivers parsed and decoded <a href="../doc/api/hipi/image/ImageHeader.html">ImageHeader</a> and <a href="../doc/api/hipi/image/FloatImage.html">FloatImage</a> objects as arguments to the <tt>map()</tt> method. In <b>dumphib</b>, the <tt>map()</tt> method is pretty simple. It queries these objects to obtain the spatial dimensions of the image, a string with the camera model from the image EXIF data (if available), and a hash of the pixel values represented as an array of floats. These values are then assembled into a string.
 
-	<pre id="Current">
-   <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> DumpHibMapper <font id="Extends">extends</font> Mapper&lt;ImageHeader, FloatImage, IntWritable, Text&gt; {
-   <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
-      ...
-	</pre>
+	<pre class="prettyprint"> 
+  public static class DumpHibMapper extends Mapper<ImageHeader, FloatImage, IntWritable, Text> {
 
-	In <b>dumphib</b> this method is pretty simple. It queries these objects to obtain the spatial dimensions of the image, a string with the camera model from the image EXIF data (if available), and a hash of the pixel values represented as an array of floats. These values are then assembled into a single string.
+    public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException  {
 
-	<pre id="Current">
-      ...
       int imageWidth = value.getWidth();
       int imageHeight = value.getHeight();
 
-      String cameraModel = key.getEXIFInformation("Model");
-
-      String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
-
-      String outputStr = imageWidth + "x" + imageHeight + "\t(" + hexHash + ")\t  " + cameraModel;
+      String outputStr = null;
+      if (key == null) {
+	outputStr = "Failed to read image header.";
+      } else if (value == null) {
+	outputStr = "Failed to decode image data.";
+      } else {
+	String camera = key.getEXIFInformation("Model");
+	String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
+	outputStr = imageWidth + "x" + imageHeight + "\t(" + hexHash + ")\t  " + camera;
+      }
       ...
 	</pre>
 
-	The final step in <tt>map()</tt> is to emit this string at which point it becomes input to one of the reduce tasks. As with any MapReduce program, the <tt>map()</tt> method technically emits a key/value pair by calling the <tt>write()</tt> method on the <tt>context</tt> object. In <b>dumphib</b>, the key is simply an <tt>IntWritable</tt> that is always set to 1 and the value is a <tt>Text</tt> object that wraps the <tt>outputStr</tt>. Always assigning the same value to the key ensures that all of the records are sent to the same reduce task. Since there is only one reduce task in this job, this ensures that a single output file will be produced that contains all of the image information:
+	The final step in <tt>map()</tt> is to emit this string at which point it becomes input to one of the reduce tasks. As with any MapReduce program, the <tt>map()</tt> method technically emits a key/value pair (or record) by calling the <tt>write()</tt> method on the <tt>context</tt> object. In <b>dumphib</b>, the key is simply an <tt>IntWritable</tt> that is always set to 1 and the value is a <tt>Text</tt> object that wraps the <tt>outputStr</tt>. Always assigning the same value to the key ensures that all of the records are sent to the same reduce task. Since there is only one reduce task in this job, this ensures that a single output file will be produced that contains all of the image information:
 
-	<pre id="Current">
-      context.write(<font id="New">new</font> IntWritable(<font id="IntegerLiteral">1</font>), <font id="New">new</font> Text(outputStr));
-   }
+	<pre class="prettyprint"> 
+      context.write(new IntWritable(1), new Text(outputStr));
+    }
 	</pre>
 
-	<h3>The Reducer Class: <tt>DumpHibReducer</tt></h3>
+	<h3>The Reducer Class: DumpHibReducer</h3>
 
-	The reducer class must implement the <tt>reduce()</tt> method. In <b>dumphib</b> this method is very simple and essentially passes the key/value pair it receives from the map task onto the output list of the job. The underlying MapReduce framework, accessed inside of these methods via the <tt>context</tt> object, handles the final step of writing the list of key/value pairs returned by each reduce task to the HDFS.
+	The reducer class must implement the <tt>reduce()</tt> method. In <b>dumphib</b> this method is very simple and essentially passes the key/value pair it receives from the map task onto the output list of the job. The underlying MapReduce framework handles the final step of writing the list of key/value pairs returned by each reduce task to the HDFS.
 
-	<pre id="Current">
-   <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> DumpHibReducer <font id="Extends">extends</font> Reducer&lt;IntWritable, Text, IntWritable, Text&gt; {
-      <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable&lt;Text&gt; values, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
-         <font id="For">for</font> (Text value : values) {
-            context.write(key, value);
-         }
+	<pre class="prettyprint"> 
+  public static class DumpHibReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
+    
+    @Override
+    public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+      for (Text value : values) {
+	context.write(key, value);
       }
-   }
+    }
+    
+  }
 	</pre>
 
 	Here is an example output file produced by running <b>dumphib</b> on a set of ten images downloaded from <a class="external_link" href="http://www.flickr.com">Flickr</a>:

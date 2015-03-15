@@ -5,21 +5,21 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="../include/main.css" />
     <link rel="stylesheet" type="text/css" href="../include/javasyntax.css" />
-    <title>HIPI - Hadoop Image Processing Interface :: PCA Example</title>
+    <title>HIPI - Hadoop Image Processing Interface :: Principal Components of Natural Image Patches</title>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-23539446-1']);
       _gaq.push(['_trackPageview']);
-  
-  (function() {
+      (function() {
       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-  
+      })();
     </script>
-    
+   
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+ 
     <style type="text/css">
       .math { font-size:110%; font-weight:bold; }
     </style>
@@ -34,7 +34,7 @@
 	<li><a href="../index.html">Introduction</a></li>
 	<li><a href="../gettingstarted.html">Getting Started</a></li>
 	<li><a href="../documentation.html">Documentation</a></li>
-	<li><a href="../examples.html">Examples</a></li>
+	<li><a href="../examples.html">Tools and Examples</a></li>
 	<li><a href="../downloads.html">Downloads</a></li>
 	<li><a href="../about.html">About</a></li>
       </ul>
@@ -43,68 +43,38 @@
     <!-- Begin Content -->
     <div class="content">
 
-      <h2>Covariance</h2>
+      <h2 class="title">The Principal Components of Natural Images</h2>
+
       <div class="section">
+
+	<!--
 	The Covariance program is the main computation routine used
 	when computing the Principle Components of a dataset of
 	images. For information on how to generate a dataset of
 	images, please see our <a href="downloader.html">Distributed
 	Downloader Example</a>. If you are new to HIPI, you should
 	also work through the <a href="dumphib.html">DumpHIB</a>
-	example before proceeding.<br /><br />
+	example before proceeding.
+	<h3>Introduction</h3>
+-->
 
-      </div>
+	This example program reproduces the key result in the seminal 1992 computer vision paper <a class="external_link" href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">The Principal Components of Natural Images</a> by Hancock et al. We perform the same experiment described in that paper using HIPI, which enables analyzing a much larger collection of images than the 15 used in the original paper. To understand this program, we need to first review a bit of linear algebra.<br /><br />
 
-      <h2>Introduction</h2>
-      <div class="section">
-      This example will run through a non-trivial application based on
-      <a class="external_link"
-      href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">&#34;The
-      Principal Components of Natural Images&#34;</a> by Hancock et
-      al. Using HIPI, we run the same experiment described in the
-      paper on a massive data set (as opposed to 15 images in the
-      original paper) and compare our results for the first 15
-      principal components of randomly sampled images. To do this, we
-      calculate the covariance matrix for 100 random samples from each
-      image, then perform Singluar Value Decomposition (SVD) on the
-      covariance matrix to recover the principal components. Recall
-      that the covariance of a set of points <span
-      class="math">x<sub>i</sub></span> is calculated according to the
-      following formula:
+	Our goal is to reveal statistical properties of the pixel values in small patches of the types of images we often capture (e.g., snapshots, selfies, landscape photos, etc.). Why would this be useful? Well, this would tell us something about the structure of <i>natural images</i> and would provide a basis for certain image processing and compression algorithms. Specifically, we are interested in computing the second-order statistics, also called the <i>covariance</i>, which gives the expected value of the squared deviation across <i>all pairs of pixels</i> in a patch. It turns out that the eigenvectors of the covariance matrix reveal the <i>dominant modes of variance</i> across the set of input patches. Because these are so useful for many data analysis and compression tasks they are given the name <i>principal components</i> and this process is often called <i>Principal Component Analysis</i>. <br /><br />
 
-      <img class="centered_image" src="../images/pca/cov_formula.png" alt="" />
+	Following Hancock et al. we will be using image patches that are <i>48 x 48</i> in size. Let's assume that we have collected <b>n</b> such patches by randmoly sampling them from a set of images downloaded from the Internet. If we denote a single image patch by the vector <b>x</b> then the <i>sample covariance</i> computed from these <b>n</b> patches is given by the following formula:
 
-      In our case, each <span class="math">x<sub>i</sub></span> is a
-      randomly sampled patch of pixels from our image set, and <span
-      class="math">x&#772;</span> is the mean of the random
-      samples. Notice the sum of products can be rewritten using
-      matrix notation where <span class="math">x&#770;</span> are the
-      mean-centered patches (<span class="math">x<sub>i</sub> -
-      x&#772;</span>).Computing this quantity can be formulated in a
-      parallel context by noting that the covariance matrix is
-      decomposable into the sum of products of smaller matrices:
+      <img class="centered_image" src="../images/pca/cov_formula.png" alt="" /><br />
 
-      <img class="centered_image" src="../images/pca/cov_parallel.png" alt="" />
+      where the subscript 'i' indexes the set of <b>n</b> images and <span class="math">x&#772;</span> is the average, or mean, image patch. Next, let's rewrite this expression in matrix form using <span class="math">x&#770;</span> to denote mean-centered patches (<span class="math">x<sub>i</sub> - x&#772;</span>):
 
-      Thus, each of the matrix products can be computed independently
-      in a Mapper's task and then summed together in a single
-      Reducer. Note that in order to compute the covariance matrix in
-      this case, the mean must be known a priori. This is not strictly
-      true in general as the mean can be computed inline with the
-      covariance matrix, however we choose to compute it in a separate
-      program to illustrate the use of the <a class="external_link" 
-      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">
-      Job::addCacheFile()</a> and
-      <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">
-      Job::getCacheFiles()</a> methods.<br /><br />
+      <img class="centered_image" src="../images/pca/cov_parallel.png" alt="" /><br />
 
-      Once the covariance matrix is computed, a simple MATLAB routine
-      is used to compute the first 15 eigenvectors using the SVD
-      algorithm. Here is a comparison of the output of our algorithm
-      running on HIPI and drawing 100 randomly sampled patches from a
-      sets of images of various sizes compared to the seminal result
-      of Hancock et al. using only 15 images:
+      Writing the expression in this way makes it a bit easier to see how to compute the covariance matrix C using MapReduce. Our approach is to have each map task compute the product of a different submatrix (e.g., one map task will compute <span class="math">AA<sup>T</sup></span>, another will compute <span class="math">BB<sup>T</sup></span>, and so on) and the reduce task will perform the final aggregation to obtain C. Note, however, that the mean must be known ahead of time. Although there is a way to rewrite this computation that allows computing the mean and covariance with just one pass through the data, we chose this formulation for simplicity and because it illustates the use of the very handy MapReduce job cache file. Specifically, our program consists of two MapReduce jobs, the first computes the mean and the second uses this mean to compute the covariance. Our program makes use of the <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">Job::addCacheFile()</a> and <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">Job::getCacheFiles()</a> methods to distribute the mean patch to all of the covariance map tasks.<br /><br />
 
+      After the covariance matrix is computed, you can use a variety of tools like MATLAB or Python to compute its eigenvectors and obtain the principal components. The HIPI distribution includes MATLAB and Python scripts for doing this in <tt>util/readFloatImage.m</tt> and <tt>util/showCovarianceOutput.py</tt>, respectively.<br /><br />
+
+      Below are the first 15 principal components reproduced from Hancock et al., which were computed using 20,000 patches, compared to the first 15 principal components obtained with our HIPI program for different values of <b>n</b> up to 10,000,000 patches (we used a random mix of images downloaded from <a class="external_link" href="https://www.flickr.com/services/developer/api/">Flickr</a>): 
       <table class="centered_table">
 	<tr>
 	  <td><img src="../images/pca/hancock.png" alt="" /></td>
@@ -138,245 +108,146 @@
 	</tr>
       </table>
 
-      As expected, the principle components do not <em>perfectly</em>
-      correlate, although in most cases they are off by a rotation. It
-      should be noted that whereas we use the Singular Value
-      Decomposition (SVD) to compute the eigenvalues of the covariance
-      matrix, the method od Hancock et al. uses an
-      <em>approximation</em> strategy for computing the principle
-      components which does not require explicitly constructing the
-      covariance matrix.
+      Note that the principle components computed using the HIPI program do not perfectly correlate with the ones reported by Hancock et al., although in most cases they are off by a rotation. We attribute the remaining differences to differences in some parameters like the standard deviation of the Gaussian weighting function (more on this below). These differences may also be due in part to the fact that Hancock et al. used an approximation strategy for computing the principal components which avoids explicit construction of the full covariance matrix. Also, note that the principal components become much better resolved when going from 10,000 patches to 100,000 patches, but don't noticeably improve beyond that number of patches. Finally, note that these components resemble the Fourier or Discrete Cosine Transform basis, which is a central concept in many image compression algorithms such as JPEG.
 
-     <h3>Compiling the Example</h3>
-          Before you can compile this (or any other example) you must configure the compiling script so that it knows where your Hadoop 
-          installation resides. Open up the build.xml file in the root directory of your HIPI installation. At the top of this file are 
-          two important properties named <strong>hadoop.home</strong> and <strong>hadoop.version</strong>. 
-          Fill in the value attributes of these properties with the location of your Hadoop installation and your Hadoop version. 
-          For instance, if you downloaded Hadoop 2.5.1 and unpacked it to /usr/local/Cellar/hadoop/2.5.1/libexec/share/hadoop on OS X 
-          using <a class="external_link" href="http://brew.sh/">Homebrew</a>, then you would have the following build.xml file:
-
-        <pre id="Current">
-        &#60;project basedir="." default="all"&#62;
-          &#60;echo message="Setting properties for build task..."/&#62;
-
-          &#60;!-- TODO: update the following two variables according to your local installation of Hadoop --&#62;
-          &#60;!-- &#60;property name="hadoop.home" value="/opt/hadoop-2.5.1/share/hadoop" /&#62; --&#62; &#60;!-- Linux --&#62;
-          &#60;property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.5.1/libexec/share/hadoop" /&#62; &#60;!-- Mac OS X / Homebrew --&#62;
-          &#60;property name="hadoop.version" value="2.5.1" /&#62;
-          ...
-        </pre>
-
-        <div class="important">Important Troubleshooting Note:</div>
-          Hadoop 2.5.1 requires five jars on its classpath (hadoop-common, hadoop-mapreduce-client-core, 
-          commons-cli, hadoop-hdfs, and hadoop-nfs). Ensure that these jar files are referenced in the hadoop.classpath property 
-          (these jars should already be on the classpath).</br>
-        </br>
-
-        You can compile this example by executing the following command in the root directory where you unpacked HIPI:
-        <pre id="Current">
-          $> ant covariance
-        </pre>
-
-        <div class="important">Important Note:</div>
-          You must be using Java JDK version 1.8 in order to ensure that HIPI will compile correctly. Although earlier versions
-          <em>may</em> work, we have not fully tested them.
-        </br>
-      <h3>Running the Example</h3> 
-	    
-      We have provided a script in the <tt>examples</tt> directory of
-      the HIPI installation that will automatically compile the
-      covariance program, upload the resulting jar to the 
-      <a class="external_link" 
-      href="http://hadoop.apache.org/docs/r2.5.1/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html">
-        Hadoop Distributed Filesystem (HDFS) </a>, and run the covariance job. <br
-      /><br />
-
-      The covariance program takes three command line parameters,
-      which you can specify directly to the <tt>runCovariance.sh</tt>
-      script. For example:
-      <pre id="Current">
-  $> ./runCovariance.sh /hdfs/path/to/input.hib /hdfs/path/to/output hib
-      </pre>
-      <div class="important">Important Note:</div> It is important to
-      keep the last parameter to this script <tt>hib</tt> or the
-      script will not function properly. This parameter controls what
-      input type is used, and although in our experiments we needed to
-      keep these a paramter, for your purposes this should remain
-      <tt>hib</tt>.<br /><br />
-
-      Running this script will cause the Covariance job to be compiled and executed. The Covariance job has two phases:
-      <ol>
-	<li>Compute the mean of 100 randomly sampled patches in each of the images in the <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB)</li>
-	<li>Compute the covariance of the same 100 patches per image, using the pre-calculated mean</li>
-      </ol>
-
-      Since both the mean and covariance operations are
-      parallelizable, these steps happen independently in all of the
-      Mapper's <tt>map()</tt> method, and then are combined to produce
-      to global mean or covariance in the Reducer. The output for this
-      job will be contained in the directory
-      <tt>/hdfs/path/to/output</tt>, also on the HDFS, and will
-      contain the covariance of all of the patches in the HIB.
-    </div>
-
-    <h2>Understanding the Covariance Program</h2>
-    <div class="section">
+      <h3>Compiling</h3>
       
-      The Covariance program is unique in that it actually chains two
-      jobs together and communicates the output of the first job to
-      the second via the <a class="external_link" 
-      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">
-      Job::addCacheFile()</a> and
-      <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">
-      Job::getCacheFiles()</a> methods.
-
-      <h3>The Two Drivers</h3>
-
-      Computing the covariance of a set of points requires first
-      computing the mean. Although technically this is not true, and
-      the mean can be computed in tandem with the covariance, we chose
-      to compute it in a different job to illustrate chaining multiple
-      jobs and using the <a class="external_link" 
-      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">
-      Job::addCacheFile()</a> and
-      <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">
-      Job::getCacheFiles()</a> methods. Thus,
-      the <tt>main()</tt> method of the Covariance.java class calls a
-      <tt>run()</tt> that spawns these two tasks in separate, serial
-      jobs:
+      Compile <b>covariance</b> by executing the following command in the HIPI root directory (see our <a href="../gettingstarted.html">general notes</a> on setting up HIPI on your system and using Ant for compilation):
+	
       <pre id="Current">
-  <font id="Public">public</font> <font id="Static">static</font> <font id="Void">void</font> main(String[] args) <font id="Throws">throws</font> Exception {
-    ToolRunner.run(<font id="New">new</font> Covariance(), args);
-    System.exit(<font id="IntegerLiteral">0</font>);
+   $> ant covariance
+      </pre>
+
+      <h3>Usage</h3>
+
+      Run <b>covariance</b> by executing the following command in the HIPI root directory:
+
+      <pre id="Current">
+   $> hadoop jar examples/covariance.jar &#60;input HIB&#62; &#60;output directory&#62;
+      </pre>
+	
+	There is also a convenience script located in the examples directory:
+
+	<pre id="Current">
+   $> cd examples
+   $> ./runCovariance.sh &#60;input HIB&#62; &#60;output directory&#62;
+	</pre>
+
+	<b>covariance</b> takes two arguments. The first argument is the path to a HIB on the HDFS. This HIB will provide the source of image patches used to compute the mean and covariance. The second argument is the HDFS path to the output directory that will be created once the program has finished. The resulting mean patch and covariance matrix will be stored in this directory in a raw binary format readable by the scripts in the <tt>util</tt> directory.
+
+        <h2 class="title">How covariance works</h2>
+
+	<b>covariance</b> consists of two phases:
+	<ol>
+	  <li>Compute the average (mean) of 100 randomly sampled patches taken from each image in the input HIB.</li>
+	  <li>Compute the covariance matrix using the same set of 100 patches per image along with the mean computed in the previous step.</li>
+	</ol>
+
+	The output of the first phase is transfered to the second phase using the <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">Job::addCacheFile()</a> and <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">Job::getCacheFiles()</a> MapReduce methods.
+
+      <h3>The Two MapReduce Driver Classes</h3>
+
+      Every MapReduce job must specify a driver class that configures and executes the job (e.g., specifies the various key/value object types, etc.). The driver classes for <b>covariance</b> are defined in <tt>examples/hipi/examples/covariance/Covariance.java</tt>. First, take a look at the <tt>main()</tt> and <tt>run()</tt> methods defined in the Covariance class:
+
+      <pre class="prettyprint"> 
+  public static void main(String[] args) throws Exception {
+    int res = ToolRunner.run(new Covariance(), args);
+    System.exit(res);
   }
 
-  <font id="Public">public</font> <font id="Int">int</font> run(String[] args) <font id="Throws">throws</font> Exception {
-    <font id="Int">int</font> success = runMeanCompute(args)
-    <font id="If">if</font> (success == <font id="IntegerLiteral">1</font>)
-      <font id="Return">return</font> <font id="IntegerLiteral">1</font>;
-    <font id="Return">return</font> runCovariance(args);
+  public int run(String[] args) throws Exception {
+    if (args.length !=2) {
+      System.out.println("Usage: covariance &#60;input HIB&#62; &#60;output directory&#62;");
+      System.exit(0);
+    }
+    if (!runComputeMean(args)) {
+      return 1;
+    }
+    if (!runCovariance(args)) {
+      return 1;
+    }
+    // Indicate success
+    return 0;
   }
       </pre>
 
-      The <tt>runMeanCompute()</tt> method is responsible for
-      computing the mean of 10 randomly sampled patches in each of the
-      images in the input <a
-      href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
-      (HIB). Its contents are rather standard so we will forego a
-      detailed explanation of it here. Please see the <a
-      href="dumphib.html">DumpHIB</a> example for an explanation of
-      setting up a standard HIPI job.<br /><br />
+      <tt>main()</tt> is the entry point of the program and it simply calls the <tt>run()</tt> method which performs the two MapReduce jobs described above only if the first one succeeds. Because the operation of the <tt>runComputeMean()</tt> method is pretty standard so we will forego a detailed explanation here. Please see the <a href="dumphib.html">DumpHIB</a> example program to learn how to setup a standard HIPI job.<br /><br />
 
-      The <tt>runCovariance()</tt> method is slightly more
-      complicated. It makes use of the <a class="external_link" 
-      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">
-      Job::addCacheFile()</a> and
-      <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">
-      Job::getCacheFiles()</a> methods
-      to distribute the precomputed mean to all of the Mapper's:
-      <pre id="Current">
-  <font id="Public">public</font> <font id="Int">int</font> runCovariance(String[] args) <font id="Throws">throws</font> Exception {
-    ...
-    job.addCacheFile(<font id="New">new</font> URI(<font id="StringLiteral">"hdfs:///path/to/mean_output/part-r-00000"</font>));
-    ...
-      </pre>
+      The <tt>runCovariance()</tt> method is slightly more complicated and interesting. Note how it calls <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">Job::addCacheFile()</a> to distribute the previously computed mean patch to the covariance map tasks:
 
-      Note that this must correspond to where the output of the
-      <tt>runMeanCompute()</tt> method was specified to be produced
-      via the <a class="external_link"
-      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapred/FileOutputFormat.html#setOutputPath(org.apache.hadoop.mapred.JobConf, org.apache.hadoop.fs.Path)">FileOutputFormat:setOutputPath()</a>
-      method:
-      <pre id="Current">
-  <font id="Public">public</font> <font id="Int">int</font> runMeanCompute(String[] args) <font id="Throws">throws</font> Exception {
+      <pre class="prettyprint"> 
+  public boolean runCovariance(String[] args) throws Exception {
     ...
-    FileOutputFormat.setOutputPath(job, <font id="New">new</font> Path(<font id="StringLiteral">"/path/to/mean_output"</font>));
+    job.addCacheFile(new URI("hdfs://" + args[1] + "/mean-output/part-r-00000"));
     ...
       </pre>
 
       <h3>The Mean Mapper</h3>
 
-      The Mapper for the Mean job computes the mean of the 100
-      randomly sampled patches in each of the images in the input <a
-      href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
-      (HIB):
-      <pre id="Current">
-  <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
-    @Override
-    public void map(ImageHeader key, FloatImage value, Context context) throws IOException,
-        InterruptedException {
+      Here is the <tt>map()</tt> method in the MeanMapper class along with the helper method <tt>generateMeanImage()</tt>:
+
+      <pre class="prettyprint"> 
+    public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException {
       if (value != null && value.getWidth() > N && value.getHeight() > N) {
-        context.write(new IntWritable(0), generateMeanImage(value, 10, 10));
+        context.write(new IntWritable(0), generateMeanImage(value, 100, 100));
       }
     }
 
-    <font id="Comment">//computes the mean of the 100 randomly sampled patches in each image, returns a FloatImage storing this mean</font>
-    <font id="Private">private</font> FloatImage generateMeanImage(FloatImage input, int xPatchCount, int yPatchCount) {
+    // Compute the mean of (xPatchCount * yPatchCount) patches within the input image
+    private FloatImage generateMeanImage(FloatImage input, int xPatchCount, int yPatchCount) {
       FloatImage mean = new FloatImage(N, N, 1);
-      <font id="For">for</font> (<font id="Int">int</font> i = 0; i < xPatchCount; i++) {
-        <font id="Int">int</font> x = (input.getWidth() - N) * i / xPatchCount;
-        <font id="For">for</font> (<font id="Int">int</font> j = 0; j < yPatchCount; j++) {
-        <font id="Int">int</font> y = (input.getHeight() - N) * j / yPatchCount;
+      for (int i = 0; i < xPatchCount; i++) {
+        int x = (input.getWidth() - N) * i / xPatchCount;
+        for (int j = 0; j < yPatchCount; j++) {
+          int y = (input.getHeight() - N) * j / yPatchCount;
           FloatImage patch = input.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
           mean.add(patch);
         }
       }
       mean.scale((float) (1.0 / (xPatchCount * yPatchCount)));
-      <font id="Return">return</font> mean;
+      return mean;
     }
   }
       </pre>
 
-      In our experiments, we use a patch size of <tt>N=48</tt>. Note
-      that the output key is <tt>0</tt>, ensuring that all of the
-      means will be sent to the same Reducer.
+      This code makes use of several methods in the <a href="../doc/api/hipi/image/FloatImage.html">FloatImage</a> class such as <tt>crop()</tt> and <tt>convert()</tt>. The program uses a fixed patch size of <tt>N=48</tt> and a fixed 100 x 100 subsampling procedure. Also, note that the output key is always <tt>0</tt>, ensuring that all of the partial means will be sent to the same reduce task.
 
       <h3>The Mean Reducer</h3>
 
-      The Mean Reducer sums all of the partial means from the Mapper's
-      and then takes their average. Since each of the Mapper's means
-      have the same number of elements contributing to their partial
-      mean, there is no need to weight the partial means
-      differently. The output of the Reducer is simply the mean
-      represented as a <a
-      href="../doc/api/hipi/image/FloatImage.html">FloatImage</a>:
-      <pre id="Current">
-  <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable&lt;FloatImage&gt; values, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
-    FloatImage mean = <font id="New">new</font> FloatImage(N, N, <font id="IntegerLiteral">1</font>);
-    <font id="Int">int</font> total = <font id="IntegerLiteral">0</font>;
-    <font id="For">for</font> (FloatImage val : values) {
-      mean.add(val);
-      total++;
-    }
-    <font id="If">if</font> (total &gt; <font id="IntegerLiteral">0</font>) {
-      mean.scale(<font id="FloatPointLiteral">1.0f</font> / total);
-      context.write(key, mean);
+      Here is the <tt>reduce()</tt> method in the MeanReducer class:
+
+      <pre class="prettyprint"> 
+    public void reduce(IntWritable key, Iterable<FloatImage> values, Context context) throws IOException, InterruptedException {
+      FloatImage mean = new FloatImage(N, N, 1);
+      int total = 0;
+      for (FloatImage val : values) {
+        mean.add(val);
+        total++;
+      }
+      if (total > 0) {
+        mean.scale(1.0f / total);
+        context.write(key, mean);
+      }
     }
   }
       </pre>
 
+    Since each of the partial means output by the map tasks were computed using the same number of patches, there is no need to weight these partial means differently in the final sum.
+
       <h3>The Covariance Mapper</h3>
 
-      The Covariance Mapper computes the partial covariance of the
-      same 100 patches that were used to compute the mean in each of
-      the images in the input <a
-      href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a>
-      (HIB). In doing this, it needs to be able to access the precomputed mean through the <a class="external_link" 
-      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">
-      Job::addCacheFile()</a> and
-      <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">
-      Job::getCacheFiles()</a> methods. This operation happens in
-      the <a class="external_link"
-      href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a>
-      method:
-      <pre id="Current">
-        URI[] files = <font id="New">new</font> URI[1];
-        <font id="If">if</font> (job.getCacheFiles() != <font id="Null">null</font>) {
+      Recall that the covariance calculation requires the average image patch. This object is accessed inside the <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a> method defined in CovarianceMapper with the following lines:
+
+      <pre class="prettyprint"> 
+	// Access the job cache
+        URI[] files = new URI[1];
+        if (job.getCacheFiles() != null) {
           files = job.getCacheFiles();
-        } <font id="Else">else</font> {
-          System.err.println("cache files null...");
+        } else {
+          System.err.println("Job cache files is null!");
         }
 
-        <font id="Comment">//get mean from previously run mean job</font>
+        // Read mean from previously run mean job
         Path cacheFilePath = new Path(files[0].toString());
         FSDataInputStream dis = FileSystem.get(job.getConfiguration()).open(cacheFilePath);
         dis.skip(4);
@@ -385,84 +256,74 @@
         mean = image.getData();
       </pre>
 
-      Note the <tt>dis.skip</tt> function call. This is needed to
-      discard the key that was written to the output of the job
-      computing the mean.<br /><br />
+      The <tt>dis.skip(4)</tt> function call is needed to discard the key (4 bytes long) that was written to the output of the MeanReducer.<br /><br />
 
-      The <tt>map()</tt> method uses this <tt>mean</tt> member
-      variable (passed in to the method as <tt>value</tt>) 
-      to compute the partial covariance for each image. The
-      100 patches used in the mean computation are first converted to
-      grayscale and then Gaussian weighted:
-      <pre id="Current">
-    @Override
-    <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException,
-        InterruptedException {
-      <font id="If">if</font> (value != null && value.getWidth() > N && value.getHeight() > N) {
-        //holds 100 patches as they are collected from the image
+      The <tt>map()</tt> method defined in the CovarianceMapper class uses this <tt>mean</tt> member variable to compute the sample covariance over 100 patches from within one image. In the code below, you may notice that these patches are first converted to grayscale and then Gaussian weighted during the covariance calculation:
+
+      <pre class="prettyprint"> 
+    public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException {
+      if (value != null && value.getWidth() &#62; N && value.getHeight() &#62; N) {
+        // Holds 100 patches as they are collected from the image
         float[][] patchArray = new float[100][N * N];
-        
-        //generates pre-processed patches and stores them in patchArray (same patches used to calculate mean)
-        <font id="For">for</font> (<font id="Int">int</font> i = 0; i < 10; i++) {
-          <font id="Int">int</font> x = (value.getWidth() - N) * i / 10;
-          <font id="For">for</font> (<font id="Int">int</font> j = 0; j < 10; j++) {
-            <font id="Int">int</font> y = (value.getHeight() - N) * j / 10;
+        // Generate mean-subtracted (whitened) and Gaussian weighted patches and stores them in patchArray
+        for (int i = 0; i &#60; 10; i++) {
+          int x = (value.getWidth() - N) * i / 10;
+          for (int j = 0; j &#60; 10; j++) {
+            int y = (value.getHeight() - N) * j / 10;
             FloatImage patch = value.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
-            <font id="Float">float</font>[] pels = patch.getData();
-            <font id="For">for</font> (<font id="Int">int</font> k = 0; k < N * N; k++) {
-              //subtract average grey level from pixels, mask with gaussian value
+            float[] pels = patch.getData();
+            for (int k = 0; k &#60; N * N; k++) {
+              // Subtract mean and weight using Gaussian mask
               patchArray[i * 10 + j][k] = (pels[k] - mean[k]) * gaussianArray[k];
             }
           }
         }
         ...
- 
       }
     }
-      </pre>
+				</pre>
 
-      The Guassian weighting is done to be consistent with the
-      approach of Hancock et al. This effectively gives higher weight
-      to the center pixels in a patch. The covariance is computed
-      directly from the preprocessed patches:
-      <pre id="Current">
-      //stores covariance
-      <font id="Float">float</font>[] covarianceArray = <font id="New">new</font> <font id="Float">float</font>[N * N * N * N];
-      <font id="For">for</font> (<font id="Int">int</font> i = 0; i < N * N; i++) {
-        <font id="For">for</font> (<font id="Int">int</font> j = 0; j < N * N; j++) {
-          covarianceArray[i * N * N + j] = 0;
-          <font id="For">for</font> (<font id="Int">int</font> k = 0; k < 100; k++) {
-            //covariance function - generate covariance from patches
-            covarianceArray[i * N * N + j] += patchArray[k][i] * patchArray[k][j];
+      The Gaussian weighting effectively gives higher weight to the center pixels in a patch (see <a class="external_link" href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">Hancock et al.</a> for details). Finally, the covariance is computed from the <tt>patchArray</tt>:
+
+      <pre class="prettyprint"> 
+        ...
+        // Stores the (N^2 x N^2) covariance matrix AAt
+        float[] covarianceArray = new float[N * N * N * N];
+        for (int i = 0; i &#60; N * N; i++) {
+          for (int j = 0; j &#60; N * N; j++) {
+            covarianceArray[i * N * N + j] = 0;
+            for (int k = 0; k &#60; 10; k++) {
+              covarianceArray[i * N * N + j] += patchArray[k][i] * patchArray[k][j];
+            }
           }
         }
+        context.write(new IntWritable(0), new FloatImage(N * N, N * N, 1, covarianceArray));
       }
-      context.write(new IntWritable(0), new FloatImage(N * N, N * N, 1, covarianceArray));
-      </pre>
+    }
+				</pre>
+
+      The resulting covariance matrix is represented as a <a href="../doc/api/hipi/image/FloatImage.html">FloatImage</a> and emitted to the reduce task with a call to <tt>context.write()</tt>.
 
       <h3>The Covariance Reducer</h3>
 
-      The Covariance Reducer combines the partial covariances output
-      by the Mapper's into the global covariance. Since each Mapper
-      processes exactly the same number of patches, there is no need
-      to weight the partial covariances differently. The output of the
-      Reducer is the final covariance encoded as a FloatImage:
-      <pre id="Current">
-  <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable&lt;FloatImage&gt; values, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
-    //combine partial covariances from patches into global covariance
-    FloatImage cov = <font id="New">new</font> FloatImage(N * N, N * N, <font id="IntegerLiteral">1</font>);
-    <font id="For">for</font> (FloatImage val : values) {
-      cov.add(val);
+      The <tt>reduce()</tt> method in the CovarianceReducer class combines the partial covariances emitted by the map tasks into the final covariance. As with the reducer method for the mean program, each map task processes the same number of patches so there is no need to weight the partial covariances differently. The output of <tt>reduce</tt> is simply the sum of these input covariances, again represented as a FloatImage:
+
+      <pre class="prettyprint"> 
+    public void reduce(IntWritable key, Iterable<FloatImage> values, Context context) throws IOException, InterruptedException {
+      // Aggregate sub-matrices in full covariance calculation
+      FloatImage cov = new FloatImage(N * N, N * N, 1);
+      for (FloatImage val : values) {
+        cov.add(val);
+      }
+      context.write(key, cov);
     }
-    context.write(key, cov);
-  }      
+  }
       </pre>
     
-      This output can then be loaded into an external program (MATLAB
-      for example) to compute its eigenvalues. The following MATLAB
-      script will read a FloatImage in directly to a MATLAB matrix:
-      <pre id="Current">
-  function [ y ] = read_hipi_output( file )
+    The output of <b>covariance</b> consists of two files named <tt>&#60;output directory&#62;/mean-output/part-r-00000</tt> and <tt>&#60;output directory&#62;/covariance-output/part-r-00000</tt>. These binary files can be viewed using a simple MATLAB or Python program. The HIPI distribution includes sample programs in each of these languages. Here is the MATLAB function that reads a FloatImage into a MATLAB matrix:
+
+      <pre class="prettyprint"> 
+  function [ y ] = readFloatImage( file )
     fid = fopen(file);
     if fid ~= 0
       fread(fid, 1, 'int32', 0, 'b');
@@ -475,27 +336,31 @@
     end
   end
       </pre>
-    An extension of the previous function will generate the output images displayed above:
-        <pre>
-         function [ y ] = read_hipi_output_generate_images( file )
-            fid = fopen(file);
-            if fid ~= 0
-                fread(fid, 1, 'int32', 0, 'b');
-                width = fread(fid, 1, 'int32', 0, 'b');
-                height = fread(fid, 1, 'int32', 0, 'b');
-                band = fread(fid, 1, 'int32', 0, 'b');
-                y = reshape(fread(fid, width * height * band, 'float32', 0, 'b'), width, height, band);
-                [V,d] = princomp(y);
-                for n = 1:15
-                    column_data = V(:,n);
-                    I = mat2gray(vec2mat(column_data, 48));
-                    figure, imshow(I)
-                end
-            else
-                y = [];
-            end
-        hend
+
+      An extended version of this function was used to generate the result images displayed above:
+
+      <pre class="prettyprint"> 
+  function [ y ] = readCovarianceOutputAndGenerateImages( file )
+    fid = fopen(file);
+    if fid ~= 0
+      fread(fid, 1, 'int32', 0, 'b');
+      width = fread(fid, 1, 'int32', 0, 'b');
+      height = fread(fid, 1, 'int32', 0, 'b');
+      band = fread(fid, 1, 'int32', 0, 'b');
+      y = reshape(fread(fid, width * height * band, 'float32', 0, 'b'), width, height, band);
+      [V,d] = princomp(y);
+      for n = 1:15
+        column_data = V(:,n);
+        I = mat2gray(vec2mat(column_data, 48));
+        figure, imshow(I)
+      end
+    else
+      y = [];
+    end
+  end
    </pre>     
+
+      If you'd like to learn more about Principal Component Analysis, Singular Value Decomposition, and related topics from linear algebra, we recommend the excellent book <a href="http://www.amazon.com/Computations-Hopkins-Studies-Mathematical-Sciences/dp/0801854148">Matrix Computations</a> by Gene Golub.
 
     </div>
     

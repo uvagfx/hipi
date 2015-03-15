@@ -25,46 +25,43 @@ import java.util.Iterator;
 public class DumpHib extends Configured implements Tool {
 
   public static class DumpHibMapper extends Mapper<ImageHeader, FloatImage, IntWritable, Text> {
-
+    
     @Override
-    public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException 
-    {
-	int imageWidth = value.getWidth();
-	int imageHeight = value.getHeight();
+    public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException  {
 
-	String outputStr = null;
+      int imageWidth = value.getWidth();
+      int imageHeight = value.getHeight();
 
-	if (key == null) {
-	  outputStr = "Failed to read image header.";
-	} else if (value == null) {
-	  outputStr = "Failed to decode image data.";
-	} else {
-	  String camera = key.getEXIFInformation("Model");
-	  String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
-	  outputStr = imageWidth + "x" + imageHeight + "\t(" + hexHash + ")\t  " + camera;
-	}
-
-	context.write(new IntWritable(1), new Text(outputStr));
+      String outputStr = null;
+      
+      if (key == null) {
+	outputStr = "Failed to read image header.";
+      } else if (value == null) {
+	outputStr = "Failed to decode image data.";
+      } else {
+	String camera = key.getEXIFInformation("Model");
+	String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
+	outputStr = imageWidth + "x" + imageHeight + "\t(" + hexHash + ")\t  " + camera;
+      }
+      
+      context.write(new IntWritable(1), new Text(outputStr));
     }
-
+    
   }
-
+  
   public static class DumpHibReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
-
+    
     @Override
-    public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException 
-    {
-	//outputs previously collected data
-	for (Text value : values) 
-	    {
-		context.write(key, value);
-	    }
+    public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+      for (Text value : values) {
+	context.write(key, value);
+      }
     }
-
+    
   }
 
   public int run(String[] args) throws Exception {
-
+    
     if (args.length < 2) {
       System.out.println("Usage: dumphib <input HIB> <output directory>");
       System.exit(0);

@@ -1,4 +1,4 @@
-function [ y ] = read_hipi_output( file )
+function [ y ] = readFloatImage( file )
     fid = fopen(file);
     if fid ~= 0
         fread(fid, 1, 'int32', 0, 'b');

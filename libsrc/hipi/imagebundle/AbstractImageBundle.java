@@ -117,11 +117,9 @@ public abstract class AbstractImageBundle {
   }
 
   public final void addImage(FloatImage image, ImageEncoder encoder, ImageHeader header)
-      throws IOException {
+    throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
     encoder.encodeImage(image, header, baos);
-
     addImage(new ByteArrayInputStream(baos.toByteArray()), header.getImageType());
   }
 

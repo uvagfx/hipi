@@ -1,10 +1,5 @@
-/**
- * 
- */
 package hipi.unittest;
 
-import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
 import hipi.image.io.ImageDecoder;
@@ -12,18 +7,16 @@ import hipi.image.io.ImageEncoder;
 import hipi.image.io.JPEGImageUtil;
 import hipi.image.io.PPMImageUtil;
 
+import static org.junit.Assert.*;
+import static org.junit.Assume.*;
+import org.junit.Test;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
-import org.junit.Test;
-
-/**
- * @author liu
- *
- */
 public class JPEGImageUtilTestCase {
 
   /**
@@ -38,23 +31,24 @@ public class JPEGImageUtilTestCase {
     ImageHeader header;
     String[] fileName =
         {"canon-ixus", "fujifilm-dx10", "fujifilm-finepix40i", "fujifilm-mx1700", "kodak-dc210",
-            "kodak-dc240", "nikon-e950", "olympus-c960", "ricoh-rdc5300", "sanyo-vpcg250",
-            "sanyo-vpcsx550", "sony-cybershot", "sony-d700"};
+	 "kodak-dc240", "nikon-e950", "olympus-c960", "ricoh-rdc5300", "sanyo-vpcg250",
+	 "sanyo-vpcsx550", "sony-cybershot", "sony-d700", "fujifilm-x100s"};
     String[] model =
         {"Canon DIGITAL IXUS", "DX-10", "FinePix40i", "MX-1700ZOOM", "DC210 Zoom (V05.00)",
             "KODAK DC240 ZOOM DIGITAL CAMERA", "E950", "C960Z,D460Z", "RDC-5300", "SR6", "SX113",
-            "CYBERSHOT", "DSC-D700"};
-    int[] width = {640, 1024, 600, 640, 640, 640, 800, 640, 896, 640, 640, 640, 672};
-    int[] height = {480, 768, 450, 480, 480, 480, 600, 480, 600, 480, 480, 480, 512};
-    int[] bit_depth = {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8};
+	 "CYBERSHOT", "DSC-D700", "X100S"};
+    int[] width = {640, 1024, 600, 640, 640, 640, 800, 640, 896, 640, 640, 640, 672, 3456};
+    int[] height = {480, 768, 450, 480, 480, 480, 600, 480, 600, 480, 480, 480, 512, 2304};
+    int[] bit_depth = {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8};
     for (int i = 0; i < fileName.length; i++) {
-      fis = new FileInputStream("data/test/JPEGImageUtilTestCase/exif/" + fileName[i] + ".jpg");
+      String fname = "data/test/JPEGImageUtilTestCase/exif/" + fileName[i] + ".jpg";
+      fis = new FileInputStream(fname);
       header = decoder.decodeImageHeader(fis);
-      assertEquals("exif model not correct", model[i].trim(), header.getEXIFInformation("Model")
-          .trim());
-      assertEquals("width not correct", width[i], header.width);
-      assertEquals("height not correct", height[i], header.height);
-      assertEquals("bit depth not correct", bit_depth[i], header.bitDepth);
+      assertNotNull("failed to decode header: " + fname, header);
+      assertEquals("exif model not correct: " + fname, model[i].trim(), header.getEXIFInformation("Model").trim());
+      assertEquals("width not correct: " + fname, width[i], header.width);
+      assertEquals("height not correct: " + fname, height[i], header.height);
+      assertEquals("bit depth not correct: " + fname, bit_depth[i], header.bitDepth);
     }
   }
 

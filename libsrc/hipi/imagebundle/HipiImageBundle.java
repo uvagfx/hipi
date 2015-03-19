@@ -114,7 +114,7 @@ public class HipiImageBundle extends AbstractImageBundle {
       try {
 	    
 	if (_end > 0 && _countingOffset > _end) {
-	  System.out.println("CountingOffset: " + _countingOffset);
+	  // Already past end of file
 	  _cacheLength = _cacheType = 0;
 	  return false;
 	}
@@ -122,20 +122,21 @@ public class HipiImageBundle extends AbstractImageBundle {
 	int readOff = 0;
 	int byteRead = _data_input_stream.read(_sig);
 
-	// even only 8-byte, it requires to retry
-	while (byteRead < 8 - readOff && byteRead > 0) {
+	// Even reading only 8 bytes might require a retry
+	while (byteRead < (8 - readOff) && byteRead > 0) {
 	  readOff += byteRead;
 	  byteRead = _data_input_stream.read(_sig, readOff, 8 - readOff);
 	}
 
 	if (byteRead <= 0) {
-	  System.out.println("ByteRead: " + byteRead);
+	  // Reached end of file
 	  _cacheLength = _cacheType = 0;
 	  return false;
 	}
 
 	if (byteRead < 8) {
-	  System.out.println("lacking of " + byteRead);
+	  // Failed to read signature (first 8 bytes), indicates corrupted HIB
+	  throw new IOException("Failed to read HIB image signature (8 bytes).");
 	}
 
 	_cacheLength = ((_sig[0] & 0xff) << 24) | ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8) | (_sig[3] & 0xff);
@@ -144,15 +145,15 @@ public class HipiImageBundle extends AbstractImageBundle {
 	_image = null;
 	_header = null;
 	if (_cacheLength < 0) {
-	  System.out.println("corrupted HipiImageBundle at offset: " + _countingOffset + ", exiting ...");
+	  // Nonsensical file length, report corrupted HIB
 	  _cacheLength = _cacheType = 0;
-	  return false;
+	  throw new IOException("Corrupted HIB at offset: " + _countingOffset);
 	}
 
 	_byte_array_data = new byte[_cacheLength];
 	readOff = 0;
 
-	// it may requires several round-trip in order for this to work
+	// It may require several trips for this to work
 	byteRead = _data_input_stream.read(_byte_array_data);
 	while (byteRead < _byte_array_data.length - readOff && byteRead > 0) {
 	  readOff += byteRead;
@@ -160,17 +161,18 @@ public class HipiImageBundle extends AbstractImageBundle {
 	}
 
 	if (byteRead <= 0) {
-	  System.out.println("ByteRead: " + byteRead);
+	  // Reached end of file
 	  _cacheLength = _cacheType = 0;
 	  return false;
 	}
 
-	// the total skip is cache length plus 8 (4 for cache length, 4 for cache type)
+	// Advance byte offset by cache length plus 8 (4 for cache length, 4 for cache type)
 	_countingOffset += _cacheLength + 8;
 
 	return true;
 
       } catch (IOException e) {
+	// Catch IOException and print to stderr to keep error from brining down entire MapReduce job
 	System.out.println("EXCEPTION");
 	System.out.println(e);
 	return false;

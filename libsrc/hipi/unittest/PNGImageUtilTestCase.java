@@ -59,7 +59,9 @@ public class PNGImageUtilTestCase {
     ImageDecoder pngDecoder, ppmDecoder;
     pngDecoder = PNGImageUtil.getInstance();
     ppmDecoder = PPMImageUtil.getInstance();
+    ImageEncoder ppmEncoder = PPMImageUtil.getInstance();
     FileInputStream fis;
+    FileOutputStream fos;
     FloatImage ppmImage, pngImage;
     String[] fileName = {"canon-ixus", "cmyk-jpeg-format"};
     for (int i = 0; i < fileName.length; i++) {
@@ -68,6 +70,8 @@ public class PNGImageUtilTestCase {
       assumeNotNull(ppmImage);
       fis = new FileInputStream("data/test/PNGImageUtilTestCase/decode/" + fileName[i] + ".png");
       pngImage = pngDecoder.decodeImage(fis);
+      fos = new FileOutputStream("/tmp/testpngdecode_" + fileName[i] + ".ppm");
+      ppmEncoder.encodeImage(pngImage, null, fos);
       assumeNotNull(pngImage);
       assertEquals(fileName[i] + " decoding fails for " + fileName[i], ppmImage, pngImage);
     }

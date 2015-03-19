@@ -9,15 +9,18 @@ import hipi.image.ImageHeader;
 import hipi.image.io.ImageDecoder;
 import hipi.image.io.ImageEncoder;
 
+/**
+ * This class provides a single static function for converting between different image encodings.
+ */
 public class ImageConverter {
 
   /**
-   * Convert between two different image types
+   * Convert between two different image formats.
    * 
-   * @param image_in an InputStream containing the image to convert
-   * @param image_out an OutputStream where the converted image will be written
-   * @param decoder_in the decoder for decoding the image_in
-   * @param encoder_out the encoder for encoding image_out
+   * @param imageIn an InputStream containing the image to convert
+   * @param imageOut an OutputStream where the converted image will be written
+   * @param decoderIn the decoder for decoding the image_in
+   * @param encoderOut the encoder for encoding image_out
    * 
    * @throws IOException
    * 
@@ -25,11 +28,10 @@ public class ImageConverter {
    * @see hipi.image.io.PNGImageUtil
    * @see hipi.image.io.PPMImageUtil
    */
-  public static void convert(InputStream image_in, OutputStream image_out, ImageDecoder decoder_in,
-      ImageEncoder encoder_out) throws IOException {
-
-    ImageHeader header = decoder_in.decodeImageHeader(image_in);
-    FloatImage float_image = decoder_in.decodeImage(image_in);
-    encoder_out.encodeImage(float_image, header, image_out);
+  public static void convert(InputStream imageIn, OutputStream imageOut, ImageDecoder decoderIn,
+      ImageEncoder encoderOut) throws IOException {
+    ImageHeader header = decoderIn.decodeImageHeader(imageIn);
+    FloatImage image = decoderIn.decodeImage(imageIn);
+    encoderOut.encodeImage(image, header, imageOut);
   }
 }

@@ -11,9 +11,10 @@
 
     <property name="hipi.version" value="2.0" />
 
+    <!-- Hadoop dependencies -->
     <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-${hadoop.version}.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/common/lib/hadoop-auth-${hadoop.version}.jar:${hadoop.home}/hdfs/hadoop-hdfs-${hadoop.version}.jar:${hadoop.home}/common/hadoop-nfs-${hadoop.version}.jar" />
 
-    <!-- Unit test dependencies -->
+    <!-- External dependencies -->
     <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
     <property name="hamcrest.jar" value="${hadoop.home}/common/lib/hamcrest-core-1.3.jar" />
     <property name="commons.logging.jar" value="${hadoop.home}/common/lib/commons-logging-1.1.3.jar" />
@@ -24,6 +25,9 @@
     <property name="slf4j.api.jar" value="${hadoop.home}/common/lib/slf4j-api-1.7.5.jar" />
     <property name="log4j.jar" value="${hadoop.home}/common/lib/log4j-1.2.17.jar" />
     <property name="avro.jar" value="${hadoop.home}/common/lib/avro-1.7.4.jar" />
+    <!-- https://drewnoakes.com/code/exif/ -->    
+    <property name="xmpcore.jar" value="./3rdparty/xmpcore-5.1.2.jar" />
+    <property name="metadata.jar" value="./3rdparty/metadata-extractor-2.7.2.jar" />
 
     <echo message="Properties set."/>
   </target>
@@ -62,9 +66,9 @@
       <property name="hadoop.version" value="${hadoop.version}" />
       <property name="hadoop.classpath" value="${hadoop.classpath}" />
       
-       <!-- https://github.com/drewnoakes/metadata-extractor -->
-      <property name="xmpcore.jar" value="../3rdparty/xmpcore.jar" />  <!-- metadata extractor dependency -->
-      <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.6.4.jar" />
+       <!-- https://drewnoakes.com/code/exif/ -->
+      <property name="xmpcore.jar" value="../3rdparty/xmpcore-5.1.2.jar" />
+      <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.7.2.jar" />
       
       <!-- Unit test dependencies -->
       <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
@@ -151,16 +155,38 @@
       <arg value="hipi.unittest.AllTests"/>
     </java>
   </target>
+
+  <!-- Produces HIPI javadoc documentation for HIPI -->
+   <target name="doc" depends="setup,test_settings,hipi">
+
+    <!-- Delete existing version of docs -->
+    <delete dir = "./doc/api" />
+    <mkdir dir="./doc/api" />
+
+     <javadoc packagenames="hipi.*"
+	      excludepackagenames="hipi.container"
+	      sourcepath="./libsrc"
+	      destdir="./doc/api"
+	      windowtitle="HIPI - Hadoop Image Processing Interface"
+	      classpath="${hadoop.classpath}:${junit.jar}:${xmpcore.jar}:${metadata.jar}">
+       <doctitle><![CDATA[<h1>HIPI - Hadoop Image Processing Interface</h1>]]></doctitle>
+       <bottom><![CDATA[<i>Copyright &#169; 2014 <a target="_blank" href="http://www.virginia.edu/">University of Virginia</a>. All Rights Reserved.</i>]]></bottom>
+       <link href="http://docs.oracle.com/javase/6/docs/api/"/>
+       <link href="http://hadoop.apache.org/docs/stable/api/"/>
+       <link href="http://javadoc.metadata-extractor.googlecode.com/git/2.7.0/"/>
+     </javadoc>
+    
+   </target>
   
-  <target name="all" depends="hipi,hibimport,downloader,dumphib,jpegfromhib,createsequencefile,covariance" />
+   <target name="all" depends="hipi,hibimport,downloader,dumphib,jpegfromhib,createsequencefile,covariance" />
 
-  <!-- Clean -->
-  <target name="clean">
-    <delete dir="lib" />
-    <delete dir="bin" />
-    <delete>
-      <fileset dir="." includes="examples/*.jar,experiments/*.jar" />
-    </delete>
-  </target>
-
-</project>
+   <!-- Clean -->
+   <target name="clean">
+     <delete dir="lib" />
+     <delete dir="bin" />
+     <delete>
+       <fileset dir="." includes="examples/*.jar,experiments/*.jar" />
+     </delete>
+   </target>
+   
+ </project>

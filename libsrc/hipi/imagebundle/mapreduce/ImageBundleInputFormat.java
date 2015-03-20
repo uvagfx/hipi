@@ -27,8 +27,10 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 /**
- * Takes multiple HipiImageBundles as input and generates InputSplits for a MapReduce
- * job along with the corresponding RecordReaders.
+ * Inherits from {@link FileInputFormat} and processes multiple {@link
+ * HipiImageBundle} (HIB) files as input and generates {@link
+ * InputSplit} objects for a MapReduce job along with the
+ * corresponding {@link RecordReader} class.
  */
 
 public class ImageBundleInputFormat extends FileInputFormat<ImageHeader, FloatImage> {

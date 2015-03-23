@@ -31,7 +31,7 @@ import java.util.List;
  *
  */
 
-public class HipiImageBundle extends AbstractImageBundle {
+public class HipiImageBundle<ImageType> extends AbstractImageBundle {
 
   /**
    * 
@@ -43,101 +43,115 @@ public class HipiImageBundle extends AbstractImageBundle {
    */
   public static class FileReader {
 
-    private DataInputStream _data_input_stream = null;
+    private DataInputStream hibDataFileInputStream = null;
+    private byte segmentLength[] = new byte[4];
+    private int lengthOfNextRecord = 0;
+    private long currentOffset = 0;
+    private long startOffset = 0;
+    private long endOffset = 0;
 
-    private byte _sig[] = new byte[8];
-    private int _cacheLength = 0;
-    private int _cacheType = 0;
-    private long _countingOffset = 0;
-    private long _start = 0;
-    private long _end = 0;
-    private ImageHeader _header;
-    private FloatImage _image;
-    private byte[] _byte_array_data;
-
-    /**
-     * 
-     * @return Compute progress of reading through the HipiImageBundle according to the start and end
-     *         specified in the constructor
-     */
-    public float getProgress()  {
-      float retVal = (_end - _start + 1) > 0 ? (float) (_countingOffset - _start) / (float) (_end - _start + 1) : 0;
-      // Clamp to handle rounding errors
-      if (retVal > 1.0) {
-	retVal = 1.0f;
-      }
-      if (retVal < 0.0) {
-	retVal = 0.0f;
-      }
-      return retVal;
-    }
+    // Current image record, accessed with calls to getCurrentKey and
+    // getCurrentValue
+    private JSONObject rawHeader = null;
+    private byte[] rawImageData = null;
+    private ImageHeader header = null;
+    private ImageType image = null;
 
     /**
+     * Creates a FileReader to read records (image headers / image
+     * bodies) from a segment of a HIB data file. The segment is
+     * specified with a start and end byte offset.
      * 
-     * @param fs The {@link FileSystem} where the HipiImageBundle resides
-     * @param path The {@link Path} to the HipiImageBundle
-     * @param conf {@link Configuration} for the HipiImageBundle
-     * @param start The offset position to start reading the HipiImageBundle
-     * @param end The offset position to stop reading the HipiImageBundle
+     * @param fs The {@link FileSystem} where the HIB data file resides
+     * @param path The {@link Path} to the HIB data file
+     * @param conf The {@link Configuration} for the associted MapReduce job
+     * @param start The byte offset to beginning of segment
+     * @param end The byte offset to end of segment
      * @throws IOException
      */
-    public FileReader(FileSystem fs, Path path, Configuration conf, long start, long end) throws IOException  {
-      _data_input_stream = new DataInputStream(fs.open(path));
-      _start = start;
+    public FileReader(FileSystem fs, Path path, Configuration conf, 
+        long start, long end) throws IOException  {
+
+      // Create input stream for HIB data file
+      hibDataFileInputStream = new DataInputStream(fs.open(path));
+
+      // Advance input stream to requested start byte offset. This may
+      // take several calls to the DataInputStream.skip() method.
+      startOffset = start;
       while (start > 0) {
-	long skipped = _data_input_stream.skip(start);
+	long skipped = hibDataFileInputStream.skip(start);
 	if (skipped <= 0) {
 	  break;
 	}
 	start -= skipped;
       }
-      _countingOffset = _start;
-      _end = end;
+      // Store current offset into HIB data file and requested
+      // endOffset
+      currentOffset = startOffset;
+      endOffset = end;
     }
 
+    /**
+     * Computes amount of progress made reading HIB data file.
+     * 
+     * @return Measure of progress from 0.0 (no progress) to 1.0
+     * (finished).
+     */
+    public float getProgress()  {
+      float progress = (endOffset - startOffset + 1) > 0 ? (float) (currentOffset - startOffset) / (float) (endOffset - startOffset + 1) : 0;
+      // Clamp to handle rounding errors
+      if (progress > 1.0) {
+	return 1.0;
+      } else if (progress < 0.0) {
+	return 0.0;
+      }
+      return progress;
+    }
+
+    /**
+     * Closes any open objects used to read the HIB data file (e.g.,
+     * DataInputStream).
+     *
+     * @throws IOException
+     */
     public void close() throws IOException {
-      if (_data_input_stream != null) {
-	_data_input_stream.close();
+      if (hibDataFileInputStream != null) {
+	hibDataFileInputStream.close();
       }
     }
 
     /**
-     * Reads the next image in the HipiImageBundle into a cache. Images are not decoded in this
-     * method. To get the corresponding {@link FloatImage} and {@link ImageHeader} you must call
-     * {@link #getCurrentValue()} and {@link #getCurrentKey()} respectively.
+     * Reads the next image header and image body into memory. Note
+     * that the image header is decoded in this method, but the image
+     * pixel data is not. To obtain the corresponding {@link
+     * ImageHeader} and ImageType (template parameter) object call
+     * {@link #getCurrentKey()} and {@link #getCurrentValue()}
+     * respectively.
      * 
-     * @return True if the reader could get the next image from the HipiImageBundle. False if there
-     *         are no more images or an error occurred.
+     * @return True if the reader could get the next image from the
+     *         HIB. False if there are no more images to read or if an
+     *         error occurs.
      */
     public boolean nextKeyValue() {
       
       try {
 	    
-	if (_end > 0 && _countingOffset > _end) {
-	  // Already past end of file
-	  _cacheLength = _cacheType = 0;
+	// A value of endOffset = 0 indicates "read to the end of
+	// file", otherwise check segment boundary
+	if (endOffset > 0 && currentOffset > endOffset) {
+	  // Already past end of file segment
+	  header = null;
+	  rawImageData = null;
+	  image = null;
 	  return false;
 	}
 
-	int readOff = 0;
-	int byteRead = _data_input_stream.read(_sig);
+	rawHeader = new JSONObject(new JSONTokener(hibDataFileInputStream)); // Throws JSONException
 
-	// Even reading only 8 bytes might require a retry
-	while (byteRead < (8 - readOff) && byteRead > 0) {
-	  readOff += byteRead;
-	  byteRead = _data_input_stream.read(_sig, readOff, 8 - readOff);
-	}
+	// expects two objects in header (__HIB_recordLength and __HIB_imageType)
 
-	if (byteRead <= 0) {
-	  // Reached end of file
-	  _cacheLength = _cacheType = 0;
-	  return false;
-	}
+	
 
-	if (byteRead < 8) {
-	  // Failed to read signature (first 8 bytes), indicates corrupted HIB
-	  throw new IOException("Failed to read HIB image signature (8 bytes).");
-	}
 
 	_cacheLength = ((_sig[0] & 0xff) << 24) | ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8) | (_sig[3] & 0xff);
 	_cacheType = ((_sig[4] & 0xff) << 24) | ((_sig[5] & 0xff) << 16) | ((_sig[6] & 0xff) << 8) | (_sig[7] & 0xff);

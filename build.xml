@@ -25,9 +25,14 @@
     <property name="slf4j.api.jar" value="${hadoop.home}/common/lib/slf4j-api-1.7.5.jar" />
     <property name="log4j.jar" value="${hadoop.home}/common/lib/log4j-1.2.17.jar" />
     <property name="avro.jar" value="${hadoop.home}/common/lib/avro-1.7.4.jar" />
+
     <!-- https://drewnoakes.com/code/exif/ -->    
     <property name="xmpcore.jar" value="./3rdparty/xmpcore-5.1.2.jar" />
     <property name="metadata.jar" value="./3rdparty/metadata-extractor-2.7.2.jar" />
+
+    <!-- http://www.json.org/java/ -->
+    <!-- JAR built from source at https://github.com/douglascrockford/JSON-java on 3/19/2015 -->
+    <property name="json.jar" value="./3rdparty/json.jar"/>
 
     <echo message="Properties set."/>
   </target>
@@ -70,6 +75,10 @@
       <property name="xmpcore.jar" value="../3rdparty/xmpcore-5.1.2.jar" />
       <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.7.2.jar" />
       
+      <!-- http://www.json.org/java/ -->
+      <!-- JAR built from source at https://github.com/douglascrockford/JSON-java on 3/19/2015 -->
+      <property name="json.jar" value="../3rdparty/json.jar"/>
+
       <!-- Unit test dependencies -->
       <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
     </ant>
@@ -174,6 +183,7 @@
        <link href="http://docs.oracle.com/javase/6/docs/api/"/>
        <link href="http://hadoop.apache.org/docs/stable/api/"/>
        <link href="http://javadoc.metadata-extractor.googlecode.com/git/2.7.0/"/>
+       <link href="http://www.json.org/javadoc/"/>
      </javadoc>
     
    </target>

@@ -33,20 +33,21 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
  * corresponding {@link RecordReader} class.
  */
 
-public class ImageBundleInputFormat extends FileInputFormat<ImageHeader, FloatImage> {
+public class ImageBundleInputFormat<ImageType> extends FileInputFormat<ImageHeader, ImageType> {
 
   /**
    * Creates an {@link ImageBundleRecordReader}
    */
   @Override
-  public RecordReader<ImageHeader, FloatImage> createRecordReader(InputSplit split, TaskAttemptContext context) 
+  public RecordReader<ImageHeader, ImageType> createRecordReader(InputSplit split, TaskAttemptContext context) 
     throws IOException, InterruptedException {
-    return new ImageBundleRecordReader();
+    return new ImageBundleRecordReader<ImageType>();
   }
 
   /**
-   * Replacement for non-static protected getBlockIndex which is part of Hadoop and, if used,
-   * would prevent computeSplits from being static.
+   * Replacement for non-static protected getBlockIndex which is part
+   * of Hadoop and, if used, would prevent computeSplits from being
+   * static.
    */
   static protected int staticGetBlockIndex(BlockLocation[] blkLocations, 
 					   long offset) {
@@ -81,7 +82,6 @@ public class ImageBundleInputFormat extends FileInputFormat<ImageHeader, FloatIm
     List<InputSplit> splits = new ArrayList<InputSplit>();
 
     // Iterate over head input HIB
-    //    for (FileStatus file : listStatus(job)) {
     for (FileStatus file : inputFiles) {
 
       // Get path to file and file system object on HDFS

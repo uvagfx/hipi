@@ -1,5 +1,14 @@
 package hipi.image;
 
+import org.apache.hadoop.io.BinaryComparable;
+import org.apache.hadoop.io.RawComparator;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
+
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import org.json.JSONException;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -7,11 +16,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.apache.hadoop.io.BinaryComparable;
-import org.apache.hadoop.io.RawComparator;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
 
 /**
  * The header information for a 2D image. ImageHeader encapsulates
@@ -24,15 +28,11 @@ import org.apache.hadoop.io.Writable;
  */
 public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 
-  public int width;
-  public int height;
-  public int bitDepth;
-
   /**
    * Image types supported in HIPI.
    */
   public enum ImageType {
-    UNSUPPORTED_IMAGE(0x0), JPEG_IMAGE(0x1), PNG_IMAGE(0x2), PPM_IMAGE(0x3);
+    UNSUPPORTED_IMAGE(0x0), JPEG_IMAGE(0x1), PNG_IMAGE(0x2), UCHAR_IMAGE(0x3), FLOAT_IMAGE(0x4);
 
     private int _val;
 
@@ -70,6 +70,26 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
       return _val;
     }
 
+    /** 
+     * Indicates whether or not image is decoded and ready to access
+     * pixel data.
+     *
+     * @return true if image has been decoded, false otherwise
+     */
+    public boolean isDecoded() {
+      switch (_val) {
+      case UCHAR_IMAGE:
+      case FLOAT_IMAGE:
+	return true;
+      case JPEG_IMAGE:
+      case PNG_IMAGE:
+      case UNSUPPORTED_IMAGE:
+      default:
+	break;
+      }
+      return false;
+    }
+
     /**
      * Default ImageType. Currently UNSUPPORTED_IMAGE.
      *
@@ -80,64 +100,27 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
     }
   }
 
-  /**
-   * Private map object for EXIF image metadata.
-   */
-  private Map<String, String> _exif_information = new HashMap<String, String>();
+  private ImageType imageType;
+  private int width;          // width of image
+  private int height;         // height of image
+  private int bitDepth;       // bits per channel
+  private int numChannels;    // color channels / planes
+  private JSONObject records; // metadata stored as collection of key/value pairs
 
   /**
-   * Private field that stores type of image. Usually determined from
-   * the first few bytes of image file.
+   * Creates an ImageHeader.
    */
-  private ImageType _image_type;
-
-  /**
-   * Adds an EXIF key/value pair to the ImageHeader object. The key
-   * corresponds to the "field name" in the <a target="_blank"
-   * href="http://www.kodak.com/global/plugins/acrobat/en/service/digCam/exifStandard2.pdf">EXIF
-   * 2.2 specification</a>.
-   * 
-   * @param key Key or "field name" of the EXIF record.
-   * @param value Value of the EXIF record.
-   */
-  public void addEXIFInformation(String key, String value) {
-    _exif_information.put(key, value);
-  }
-
-  /**
-   * Get EXIF value associated with key, if present.
-   * 
-   * @param key Key or "field name" of the desired EXIF record.
-   *
-   * @return Value corresponding to key if present or the empty string if not.
-   *
-   * @see #addEXIFInformation
-   */
-  public String getEXIFInformation(String key) {
-    String value = _exif_information.get(key);
-
-    if (value == null) {
-      return "";
-    } else {
-      return value;
+  public ImageHeader(ImageType _imageType, int _width, int _height, 
+		     int _bitDepth, int _numChannels) 
+    throws IllegalArgumentException {
+    if (_width < 0 || _height < 0 || _bitDepth < 1 || _numChannels < 1) {
+      throw new IllegalArgumentException(String.format("Invalid dimensions or bit depth or num channels: (%d,%d,%d,%d)", _width, _height, _bitDepth, _numChannels));
     }
-  }
-
-  /**
-   * Creates an ImageHeader initialized with type.
-   *
-   * @param type ImageType of new ImageHeader.
-   */
-  public ImageHeader(ImageType type) {
-    _image_type = type;
-  }
-
-  /**
-   * Creates an ImageHeader initialized with the default type.
-   *
-   */
-  public ImageHeader() {
-    _image_type = ImageType.getDefault();
+    imageType = _imageType;
+    width = _width;
+    height = _height;
+    bitDepth = _bitDepth;
+    numChannels = _numChannels;
   }
 
   /**
@@ -146,7 +129,67 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    * @return Current image type.
    */
   public ImageType getImageType() {
-    return _image_type;
+    return imageType;
+  }
+
+  /**
+   * Get width of image.
+   *
+   * @return Width of image.
+   */
+  public int getWidth() {
+    return width;
+  }
+
+  /**
+   * Get height of image.
+   *
+   * @return Height of image.
+   */
+  public int getHeight() {
+    return height;
+  }
+
+  /**
+   * Get bit depth of image.
+   *
+   * @return Bit depth of image.
+   */
+  public int getBitDepth() {
+    return bitDepth;
+  }
+
+  /**
+   * Get number of color channels.
+   *
+   * @return Number of channels.
+   */
+  public int getNumChannels() {
+    return numChannels;
+  }
+
+  /**
+   * Get JSONObject with collection of image metadata key/value pairs.
+   *
+   * @return JSONObject with metadata key/value pairs.
+   */
+  public JSONObject getRecords() {
+    return records;
+  }
+
+  /**
+   * Sets the current object to be equal to another
+   * ImageHeader. Performs shallow copy of EXIF record hash map.
+   *
+   * @param header Target image header.
+   */
+  public void set(ImageHeader header) {
+    imageType = header.getImageType();
+    width = header.getWidth();
+    height = header.getHeight();
+    bitDepth = header.getBitDepth();
+    numChannels = header.getNumChannels();
+    records = header.getRecords();
   }
 
   /**
@@ -178,16 +221,13 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    * @param input Interface for reading bytes from a binary stream.
    * @throws IOException
    */
-  public void readFields(DataInput input) throws IOException {
-    bitDepth = input.readInt();
-    height = input.readInt();
+  public void readFields(DataInput input) throws IOException, JSONException {
+    imageType = ImageType.fromValue(input.readInt());
     width = input.readInt();
-    int size = input.readInt();
-    for (int i = 0; i < size; i++) {
-      String key = Text.readString(input);
-      String value = Text.readString(input);
-      _exif_information.put(key, value);
-    }
+    height = input.readInt();
+    bitDepth = input.readInt();
+    numChannels = input.readInt();
+    records = new JSONObject(new JSONTokener(input));
   }
 
   /**
@@ -197,56 +237,12 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    * @throws IOException
    * @see #readFields
    */
-  public void write(DataOutput output) throws IOException {
-    output.writeInt(bitDepth);
-    output.writeInt(height);
+  public void write(DataOutput output) throws IOException, JSONException {
+    output.writeInt(imageType.toValue());
     output.writeInt(width);
-    output.writeInt(_exif_information.size());
-    Iterator<Entry<String, String>> it = _exif_information.entrySet().iterator();
-    while (it.hasNext()) {
-      Entry<String, String> entry = it.next();
-      Text.writeString(output, entry.getKey());
-      Text.writeString(output, entry.getValue());
-    }
-  }
-
-  /**
-   * Get width of image.
-   *
-   * @return Width of image.
-   */
-  public int getWidth() {
-    return this.width;
-  }
-
-  /**
-   * Get height of image.
-   *
-   * @return Height of image.
-   */
-  public int getHeight() {
-    return this.height;
-  }
-
-  /**
-   * Get map containing EXIF metadata key/value records.
-   *
-   * @return Map of EXIF records.
-   */
-  public Map<String, String> getEXIFInformation() {
-    return this._exif_information;
-  }
-
-  /**
-   * Sets the current object to be equal to another
-   * ImageHeader. Performs shallow copy of EXIF record hash map.
-   *
-   * @param header Target image header.
-   */
-  public void set(ImageHeader header) {
-    this.width = header.getWidth();
-    this.height = header.getHeight();
-    this._image_type = header.getImageType();
-    this._exif_information = header.getEXIFInformation();
+    output.writeInt(height);
+    output.writeInt(bitDepth);
+    output.writeInt(numChannels);
+    output.writeString(records.toString());
   }
 }

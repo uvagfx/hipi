@@ -21,7 +21,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
  * 
  *
  */
-public class ImageBundleRecordReader extends RecordReader<ImageHeader, FloatImage> {
+public class ImageBundleRecordReader<ImageType> extends RecordReader<ImageHeader, ImageType> {
 
   private Configuration conf;
   private HipiImageBundle.FileReader reader;
@@ -38,7 +38,7 @@ public class ImageBundleRecordReader extends RecordReader<ImageHeader, FloatImag
     // Report locations of first and last byte in image segment
     System.out.println("Record starts at byte " + bundleSplit.getStart() + " and ends at byte " + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
     
-    reader = new HipiImageBundle.FileReader(fs, path, conf, bundleSplit.getStart(), bundleSplit.getStart() + bundleSplit.getLength() - 1);
+    reader = new HipiImageBundle<ImageType>.FileReader(fs, path, conf, bundleSplit.getStart(), bundleSplit.getStart() + bundleSplit.getLength() - 1);
   }
   
   @Override

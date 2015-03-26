@@ -78,7 +78,7 @@ $> ./runDownloader.sh &#60;input text file with list of URLs&#62; &#60;output HI
 	We will walk you through an example using the sample test images provided in the HIPI distribution. The commands below assume you are in the HIPI root directory. The first step is to copy the text file with the list of image URLs to the HDFS:
 
 	<pre class="console">
-$> hadoop fs -copyFromLocal examples/testimages/testimages.txt testimages.txt
+$> hadoop fs -copyFromLocal examples/testimages.txt testimages.txt
 	</pre>
 
 	To make sure things worked as expected, we can inspect the contents of the text file now on the HDFS using the <tt>hadoop fs -cat</tt> command:

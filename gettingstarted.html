@@ -1,8 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
   <head>
     <meta name="Description" content="HIPI - Hadoop Image Processing Interface getting started page tells you what you need to know to start using HIPI on Hadoop MapReduce." />
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta charset="UTF-8">
     
     <link rel="stylesheet" type="text/css" href="include/main.css" />
     <link rel="stylesheet" type="text/css" href="include/javasyntax.css" />
@@ -12,15 +12,16 @@
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-23539446-1']);
       _gaq.push(['_trackPageview']);
-  
-  (function() {
+      (function() {
       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-  
-    </script>
-  
+      })();
+      </script>
+
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+    <style> pre.prettyprint {padding:20px 20px 0px 20px;} </style>
+
   </head>
   
   <body>
@@ -29,243 +30,537 @@
     </div>
     <div class="navigation_menu">
       <ul>
-	<li><a href="index.html">Introduction</a></li>
+	<li><a href="index.html">Overview</a></li>
 	<li><a href="gettingstarted.html">Getting Started</a></li>
 	<li><a href="documentation.html">Documentation</a></li>
-	<li><a href="examples.html">Examples</a></li>
+	<li><a href="examples.html">Tools and Examples</a></li>
 	<li><a href="downloads.html">Downloads</a></li>
+	<li><a href="contribute.html">Contribute</a></li>
 	<li><a href="about.html">About</a></li>
       </ul>
     </div>
     
     <!-- Begin Content -->
     <div class="content">
-      
-      <h2>Setting up the Hadoop Framework</h2>
-      <h3>Getting Hadoop</h3>
-      <div class="section">
-	You must first download the Hadoop MapReduce framework from <a
-	class="external_link"
-	href="http://hadoop.apache.org/mapreduce/">Apache's
-	website</a>.<br /><br />
-      
-	<h3>Configuring Hadoop</h3> 
 
-	Please refer to the Hadoop documentation pages listed below
-	for specifics on how to configure your installation:
+      <h2 class="title">Getting Started</h2>
+
+      This page provides a quick start guide to setting up HIPI on your system and writing your first MapReduce/HIPI program.
+
+      <div class="section">
+      
+	<h3>1. Setup Hadoop</h3>
+
+        HIPI works with a standard installation of the Apache Hadoop Distributed File System (HDFS) and MapReduce. HIPI has been tested with Hadoop version 2.6.0.<br /><br />
+	
+        If you haven't already done so, download and install Hadoop by following the instructions on the official <a class="external_link" href="http://hadoop.apache.org/">Apache Hadoop website</a>. A very useful resource is their <a class="external_link" href="http://wiki.apache.org/hadoop/QuickStart">Quickstart Guide</a>, in particular, the <a class="external_link" href="http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html">Single Cluster Setup</a> for first-time users.<br /><br />
+
+        Ensure that the Hadoop bin directory is in your system path. You can verify that this is the case with the Unix program <tt>which</tt>:
+
+	<pre class="console">
+$> which hadoop
+/usr/local/bin/hadoop
+	</pre>
+
+	The <a href="examples.html">example programs</a> assume that the main hadoop script is in the system path.
+
+        <h3>2. Install Apache Ant</h3>
+
+	The HIPI distribution uses <a class="external_link" href="http://ant.apache.org/">Apache Ant</a> for code compilation. HIPI has been tested with Apache Ant version 1.9.4.<br /><br />
+
+	Install ant on your system and verify that it is in your path as well:
+
+	<pre class="console">
+$> which ant
+/usr/local/bin/ant
+	</pre>	
+
+	<h3>3. Install HIPI</h3>
+
+	There are two ways to install HIPI on your system:
+	<ol>
+	  <li> Clone the latest HIPI distribution from GitHub and build from source. <span class="important">(Recommended)</span> </li>
+	  <li> Download a precompiled JAR from the <a href="downloads.html">downloads</a> page.</li>
+	</ol>
+
+	<h3>Clone the HIPI GitHub Repository</h3>
+
+	The best way to get the latest version of HIPI is by cloning the <a class="external_link" href="https://github.com/uvagfx/hipi">official GitHub repository</a> and building it along with all of the tools and example programs yourself. This only takes a second and verifies that your system is properly setup and you are ready to begin developing your own HIPI applications:
+
+	<pre class="console">
+$> git clone git@github.com:uvagfx/hipi.git
+	</pre>	
+
+	<span class="important">Important</span> After the repository has been cloned, you must edit two lines in the <tt>build.xml</tt> file in the HIPI root directory to indicate the path to your Hadoop installation and the version of Hadoop you are using:
+
+	<pre class="prettyprint">
+build.xml:
+  ...
+  &#60;property name="hadoop.home" value="/opt/hadoop-2.6.0/share/hadoop" /&#62;
+  &#60;property name="hadoop.version" value="2.6.0" /&#62;
+  ...
+	</pre>
+
+	The correct value of <tt>hadoop.home</tt> and <tt>hadoop.version</tt> may differ on your system from what is shown above. For example, Hadoop version 2.5.1 on a Mac OS X system installed using homebrew might have the following:
+
+	<pre class="prettyprint">
+build.xml:
+  ...
+  &#60;property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.5.1/libexec/share/hadoop" /&#62;
+  &#60;property name="hadoop.version" value="2.5.1" /&#62;
+  ...
+	</pre>
+
+	<h3>Build the HIPI Library and Example Programs</h3>
+
+	From the HIPI root directory, simply run <tt>ant</tt> to build the HIPI library along with all of the tools and example programs:
+
+	<pre class="console">
+$> ant
+...
+hipi:
+    [javac] Compiling 30 source files to /users/horton/hipi/lib
+      [jar] Building jar: /users/horton/hipi/lib/hipi-2.0.jar
+     [echo] Hipi library built.
+
+compile:
+    [javac] Compiling 1 source file to /users/horton/hipi/bin
+      [jar] Building jar: /users/horton/hipi/examples/covariance.jar
+     [echo] Covariance built.
+
+all:
+
+BUILD SUCCESSFUL
+Total time: 3 seconds
+	</pre>
+
+	If the build fails, first carefully review the steps above. If you are convinced that you are doing everything correctly and that you've found an issue with the HIPI distribution or documentation please post a question to the <a class="external_link" href="https://groups.google.com/forum/#!forum/hipi-users">HIPI Users Group</a> or <a class="external_link" href="https://github.com/uvagfx/hipi/issues">file a bug report</a>.<br /><br />
+
+	After the build successfully finishes, open the <tt>build.xml</tt> file in a text editor and have a look at the various build tasks. They should be straightforward. For example, to build only the <a href="examples/dumphib.html">DumpHib example program</a> you would execute:
+
+	<pre class="console">
+$> ant dumphib
+Buildfile: /users/horton/hipi/build.xml
+
+dumphib:
+     [echo] Building dumphib example...
+...
+compile:
+    [javac] Compiling 1 source file to /users/horton/hipi/bin
+      [jar] Building jar: /users/horton/hipi/examples/dumphib.jar
+     [echo] Dumphib built.
+
+BUILD SUCCESSFUL
+Total time: 1 second
+	</pre>
+
+	HIPI is now installed on your system. To learn about future updates to the HIPI distribution you should join the <a class="external_link" href="https://groups.google.com/forum/#!forum/hipi-users">HIPI Users Group</a> and <a class="external_link" href="https://github.com/uvagfx/hipi">watch the HIPI GitHub repository</a>. You can always obtain the latest version of HIPI on the release branch with the following <tt>git pull</tt> command:
+
+	<pre class="console">
+$> git pull origin release
+From github.com:uvagfx/hipi
+ * branch            release    -> FETCH_HEAD
+Already up-to-date.
+	</pre>
+
+	Also, you can experiment with the <tt>development</tt> branch, which contains the latest features that have not yet been integrated into the main release branch. Note that the <tt>development</tt> branch is generally less stable than the <tt>release</tt> branch.<br /><br />
+
+	Next, we walk you through the process of writing your first HIPI program. Be sure to also check out the <a href="examples.html">tools and examples page</a> to learn much more about HIPI.
+
+      </div>
+
+      <h3>A Quick Overview of HIPI: The Three Main Classes</h3>
+
+      <div class="section">
+
+	The classes most frequently used in HIPI are <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) for representing a collection of images on the HDFS, <a href="doc/api/hipi/image/FloatImage.html">FloatImage</a> for representing a decoded image in memory, and the <a href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html">CullMapper</a> class. The full API for HIPI can be found on our <a href="documentation.html">documentation</a> page.
+	
+	<h3>HIPI Image Bundle (HIB)</h3> 
+	
+	A HIPI Image Bundle (HIB) is a collection of images that are stored together in one file, somewhat analagous to .tar files in UNIX. HIBs are implemented via the <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> class and can be used directly in the Hadoop MapReduce framework. HIBs support several useful operations, including:
 	<ul>
-	  <li>For the most current Hadoop version use this <a class="external_link" href="http://hadoop.apache.org/common/#Getting+Started">Quickstart Guide</a></li>
-	  <li>To setup a single node on your computer, check out <a class="external_link" href="http://hadoop.apache.org/common/docs/stable/single_node_setup.html">Single Node Setup</a></li>
+	  <li>
+	    Create a HIB
+	    <pre class="prettyprint">
+Configuration conf = new Configuration();
+HipiImageBundle hib = new HipiImageBundle(new Path("/path/to/file.hib"), conf);
+hib.open(AbstractImageBundle.FILE_MODE_WRITE, true);
+	    </pre>
+	  </li>
+	  <li>
+	    Add images to a HIB
+	    <pre class="prettyprint">
+File file = new File("/path/to/file.jpg");
+FileInputStream fis = new FileInputStream(file);
+hib.addImage(fis, ImageType.JPEG_IMAGE);
+	    </pre>
+	  </li>
+	  <li>
+	    Merge two HIBs
+	    <pre class="prettyprint">
+Path path = new Path("path/to/file.hib");
+HipiImageBundle hib2 = new HipiImageBundle(path, conf);
+hib.append(hib2);
+	    </pre>
+	  </li>
+	  <li>
+	    Iterate over the images in a HIB
+	    <pre class="prettyprint">
+while (hib.hasNext()) {
+  ImageHeader imageHeader = hib.readHeader();
+  FloatImage image = hib.readImage();
+}
+hib.close();
+	    </pre>
+	  </li>
+	</ul>
+	<span class="important">Important</span> HIBs must be opened in either FILE_MODE_READ or FILE_MODE_WRITE mode (see
+	<a href="doc/api/hipi/imagebundle/AbstractImageBundle.html#open(int)">AbstractImageBundle::open</a>). Once a HIB has been opened in one mode this cannot be changed.<br/><br/>
+
+	<span class="important">Important</span> When creating a HIB using the <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle::create</a> method, you can specify an optional parameter called <tt>blockSize</tt>. This parameter is very important as it controls the way a HIB will be distributed to the map tasks. The <a href="doc/api/hipi/imagebundle/mapreduce/ImageBundleInputFormat.html">ImageBundleInputFormat</a> splits a HIB into sections based on the block size of the HIB itself in order to most effectively distribute the job. If the block size is set too large, then a small number of machines will be processing all of the images in the HIB. Therefore, it is advisable to set the block size so that the number of blocks the entire HIB spans is roughly equivalent to the number of nodes in the cluster.<br /><br />
+
+	The <a href="examples.html">tools and examples</a> page describes a few programs for creating HIBs. Also, see the <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle class documentation</a> for more details and the <a href="experiments.html">experiments</a> page for information regarding the performance of HIBs versus common alterantives like Hadoop Sequence Files or Hadoop Archive Files.
+	
+	<h3>Float Image</h3>
+	
+	After each image in a HIB is decompressed and decoded it is presented to the map tasks as a <a href="doc/api/hipi/image/FloatImage.html">FloatImage</a> object. This is a simple representation of the image pixel data as an array of floating point values. The FloatImage class supports several common operations:
+	<ul>
+	  <li>
+	    Create a FloatImage from a file (see <a href="doc/api/hipi/image/io/JPEGImageUtil.html">JPEGImageUtil</a>)
+	    <pre class="prettyprint">
+FileInputStream file = new FileInputStream("/path/to/image.jpg");
+FloatImage image = JPEGImageUtil.getInstance().decodeImage(file);
+	    </pre>
+	  </li>
+	  <li>
+	    Get/set pixels values
+	    <pre class="prettyprint">
+float red = image.getPixel(0, 0, 0);
+float grn = image.getPixel(0, 0, 1);
+float blu = image.getPixel(0, 0, 2);
+image.setPixel(0, 0, 0, red/2.0);
+image.setPixel(0, 0, 1, grn/2.0);
+image.setPixel(0, 0, 2, blu/2.0);
+	    </pre>
+	  </li>
+	  <li>
+	    Convert to grayscale
+	    <pre class="prettyprint">
+FloatImage grayImage = image.convert(FloatImage.RGB2GRAY);
+	    </pre>
+	  </li>
+	  <li>
+	    Add and scale
+	    <pre class="prettyprint">
+FloatImage image2 = new FloatImage(image.getWidth(), image.getHeight(), image.getBands());
+image2.add(2.0f);
+image.scale(image2);
+image.scale(2.0f);
+image.add(image2);
+image.add(2.0f);
+	    </pre>
+	  </li>
+	  <li>
+	    Crop
+	    <pre class="prettyprint">
+FloatImage crop = image.crop(0, 0, 20, 20);
+	    </pre>
+	  </li>
 	</ul>
 
-	It is a good idea to add the bin directory to your PATH
-	environment variable to avoid having to type the absolute path
-	to Hadoop for every command. For example, if you downloaded
-	and unpacked Hadoop to
-	/opt/hadoop/, then you would add the following to
-	your .bashrc (or equivalent):
-	<pre id="Current">
-  export PATH=$PATH:/opt/hadoop/bin
-	</pre>		
+	The function <a href="doc/api/hipi/image/FloatImage.html#getData()">FloatImage::getData</a> provides access to the underlying floating point array and can be used directly with matrix libraries such as the BLAS/LAPACK Java implementation <a class="external_link" href="http://icl.cs.utk.edu/f2j/">f2j</a>. Creating a FloatImage from an array of floats is possible with <a href="doc/api/hipi/image/FloatImage.html#FloatImage(int, int, int, float[])">this FloatImage constructor</a>. <br /><br /> 
+	
+	<h3>Cull Mapper</h3>
+	
+	Another important feature of HIPI is a culling step that takes place before the images in a HIB are distributed to map tasks for parallel processing. The <a href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html">CullMapper class</a> defines a special type of Hadoop Mapper that contains the method <a href="file:///Users/jason/work/proj/hipi-web/doc/api/hipi/imagebundle/mapreduce/CullMapper.html#cull(KEYIN)">CullMapper::cull</a> that allows using an <a href="doc/api/hipi/image/ImageHeader.html">ImageHeader</a> object to decide whether the image should be processed or not <i>before the image pixel data is decompressed and decoded</i>.<br /><br />
+
+	In the example below, the CullMapper is used to process only those images in a HIB that were taken with a Canon PowerShot S500 digital camera and have a resolution above some minimum threshold. The <tt>cull()</tt> method returns a boolean indicating whether the image should be culled (true) or sent to the <tt>map()</tt> method for processing (false).
+
+	<pre class="prettyprint">
+public static class MyMapper extends CullMapper&lt;ImageHeader, FloatImage, NullWritable, FloatImage&gt; {       
+
+  public boolean cull(ImageHeader key) throws IOException, InterruptedException {
+    if (key.getEXIFInformation("Model").equals("Canon PowerShot S500") &amp;&amp; key.width >= 1024 &amp;&amp; key.height >= 1024) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+        
+  public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException {
+     ...
+  }
+
+}
+	</pre>
+
       </div>
 
-      <h2>Downloading the HIPI API</h2>
+      <h3>Your First HIPI Program</h3>
+
       <div class="section">
-	Now that you have Hadoop installed and working, you'll need to
-	download the HIPI API from our <a
-	href="downloads.html">downloads</a> page. We have three
-	separate versions available to download: developer, src, and
-	release. The developer version contains our entire source
-	code, including example programs and experimental programs
-	that we used to take quantitative measurements of HIPI. The
-	src version features the entire HIPI source code tree, but
-	does not contain the experiments. Finally, the release version
-	contains just the necessary class files needed to use HIPI
-	along with the source code for the example programs.<br /><br
-	/>
 
-	In order to use the HIPI API, you must add the jar file you
-	downloaded above to the build path. The way you achieve this
-	varies from setup to setup. In Eclipse you will have to add
-	the jar file to the Java Build Path in your Project
-	Settings. In ANT you will specify the jar file in the
-	classpath attribute of the Javac Task along with any other
-	libraries you may need (such as Hadoop).<br /><br />
+      This section will walk you through the process of creating a very simple HIPI program that computes the average pixel color over a set of images. First, we need a set of images to work with. The primary input type to a HIPI program is a <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB), which stores a collection of images on the Hadoop Distributed File System (HDFS). Use the <b>hibimport</b> tool to create a HIB from a collection of images on your local file system located in the directory <tt>~/SampleImages</tt> by executing the following command from the HIPI root directory:
 
-	You can find sample ANT build tasks in the main directory of
-	HIPI in the build.xml file. <br /><br />
-      	
-	Check out the <a href="examples.html">examples</a> page for
-	information on creating programs that utilize HIPI.<br /><br />
-      </div>
-
-      <h2>Checking What You Have</h2>
-      <div class="section">
-		  The "Getting Started" tutorial will assume that you have Hadoop
-		  installed locally, and have downloaded the hipi-0.1.0.jar package.
-		  If you are not at this point, please do so in order to proceed.<br /><br />
-
-		  A good way to make sure you have all Hadoop and HIPI environment setup
-		  is to build HIPI library/examples/tool on your own computer. Try to run
-		  "ant" at the root directory. You probably need to change hadoop.classpath
-		  and hadoop.home in build.xml to build HIPI successfully.<br /><br />
-
-		  If everything goes right, you should have tool/hibimport.jar file ready
-		  by now. Run
-		<pre id="Classes">
-  hadoop jar tool/hibimport.jar ~/Pictures picture.hib
+	<pre class="console">
+$> hadoop jar tool/hibimport.jar ~/SampleImages sampleimages.hib
+** added: 1.jpg
+** added: 2.jpg
+** added: 3.jpg
+Created: sampleimages.hib and sampleimages.hib.dat
         </pre>
-		~/Pictures represents a directory that contains images, this command will
-		create two files: picture.hib and picture.hib.dat. Keep them around, they
-		will be useful later.<br /><br />
-      </div>
 
-	  <h2>Writing the First HIPI Program</h2>
-	  <div class="section">
-		  HIPI is a library based on Hadoop that you can easily integrated into
-		  your current Hadoop project. However, the best way to setup your first
-		  HIPI program is to create one in place.<br /></br />
+	<b>dumphib</b> creates two files in the current working directory of the HDFS: <tt>sampleimages.hib</tt> and <tt>sampleimages.hib.dat</tt>. You can verify that this is the case with the command: <tt>hadoop fs -ls</tt> (Learn how the <b>hibimport</b> tool works <a href="tools/hibimport.html">here</a> after finishing this tutorial.)<br /><br />
 
-		  Open ./build.xml file, and add a new entry to it:
-		  <pre id="Classes">
-  &lt;target name="firstprog"&gt;
-    &lt;antcall target="compile"&gt;
-      &lt;param name="srcdir" value="firstprog" /&gt;
-      &lt;param name="jarfilename" value="firstprog.jar" /&gt;
-      &lt;param name="jardir" value="firstprog" /&gt;
-      &lt;param name="mainclass" value="FirstProgram" /&gt;
-    &lt;/antcall&gt;
-  &lt;/target&gt;
-		  </pre>
-		  Thus, you also need to create a directory ./firstprog, and create a new
-		  Java file ./firstprog/FirstProgram.java.<br /><br />
+	Next, we will add an Ant build rule for our new program by modifying the <tt>build.xml</tt> file in the HIPI root directory. Open <tt>build.xml</tt> file in a text editor and add a new target:
 
-		  This file can be as simple as:
-		  <pre id="Classes">
-  <font id="Public">public</font> <font id="Class">class</font> FirstProgram <font id="Extends">extends</font> Configured <font id="Implements">implements</font> Tool {
-	<font id="Public">public</font> <font id="Static">static</font> <font id="Void">void</font> main(String[] args) <font id="Throws">throws</font> Exception {
-      System.exit(0);
+	<pre class="prettyprint">
+...
+&#60;target name="firstprog"&#62;
+  &#60;antcall target="compile"&#62;
+    &#60;param name="srcdir" value="firstprog" /&#62;
+    &#60;param name="jarfilename" value="firstprog.jar" /&#62;
+    &#60;param name="jardir" value="firstprog" /&#62;
+    &#60;param name="mainclass" value="FirstProgram" /&#62;
+  &#60;/antcall&#62;
+&#60;/target&#62;
+...
+	</pre>
+		  
+	Next, create the directory <tt>firstprog</tt> in the root HIPI directory along with a new Java file named <tt>firstprog/FirstProgram.java</tt> that contains the following code:
+
+	<pre class="prettyprint">
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+
+public class FirstProgram extends Configured implements Tool {
+
+  public int run(String[] args) throws Exception {
+    System.out.println("Hello HIPI!");
+    return 0;
+  }
+
+  public static void main(String[] args) throws Exception {
+    ToolRunner.run(new FirstProgram(), args);
+    System.exit(0);
+  }
+
+}
+	</pre>
+
+	The entry point of every Java program is the <tt>public static void main()</tt> method. As in most MapReduce applications, it uses the <tt>ToolRunner</tt> Hadoop object to call the <tt>run()</tt> method in this driver class.<br /><br />
+	
+	Build this very simple program by running <tt>ant firstprog</tt>. If the compilation succeeds, the file <tt>firstprog.jar</tt> will be located in the <tt>firstprog</tt> directory. Run this program using the following command:
+
+	<pre id="Current">
+  $> hadoop jar firstprog/firstprog.jar
+  Hello HIPI!
+        </pre>
+
+	Congratulations! You just created a very simple MapReduce program. Now let's make our program do some image processing with HIPI.<br /><br />
+
+	<h3>MapReduce</h3>
+
+	Hadoop's MapReduce parallel programming framework is a very powerful (and very popular) tool for large-scale distributed computing. If this is your first experience with MapReduce, we recommend reading the official <a class="external_link" href="http://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html">Apache MapReduce tutorial</a>, which gives a nice introduction to this programming model. Another great read is the paper written by Jeffrey Dean and Sanjay Ghemawat at Google titled <a class="external_link" href="http://research.google.com/archive/mapreduce.html">MapReduce: Simplified Data Processing on Large Clusters</a>.<br /><br />
+
+	Next, let's extend the <tt>run()</tt> method in <tt>FirstProgram.java</tt> to initialize and execute a MapReduce job and create stubs for our Mapper and Reducer classes:
+
+	<pre class="prettyprint">
+import hipi.image.FloatImage;
+import hipi.image.ImageHeader;
+import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
+
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+import java.io.IOException;
+
+public class FirstProgram extends Configured implements Tool {
+  
+  public static class FirstProgramMapper extends Mapper&#60;ImageHeader, FloatImage, IntWritable, FloatImage&#62; {
+    public void map(ImageHeader key, FloatImage value, Context context) 
+      throws IOException, InterruptedException {
     }
   }
-		  </pre>
-
-		  Try to build again as suggested in "Checking What you Have", if it
-		  builds, you should have firstprog.jar file in ./firstprog directory.
-		  OK, this is your first dummy program.<br /><br />
-	  </div>
-
-	  <h2>Mapper and Reducer</h2>
-	  <div class="section">
-		  One thing that makes Hadoop so powerful is its MapReduce mechanism.
-		  If you learned Hadoop from its <a href="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html">official tutorial</a>
-		  You should be able to immediately add Mapper and Reducer to our
-		  dummy program, as following
-		  <pre id="Classes">
-  <font id="Public">public</font> <font id="Class">class</font> FirstProgram <font id="Extends">extends</font> Configured <font id="Implements">implements</font> Tool {
-    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyMap <font id="Extends">extends</font> Mapper&lt;ImageHeader, FloatImage, IntWritable, FloatImage&gt; {
-      <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context)
-        <font id="Throws">throws</font> IOException, InterruptedException {
-      }
-    }
-    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyReduce <font id="Extends">extends</font> Reducer&lt;IntWritable, FloatImage, IntWritable, FloatImage&gt; {
-      <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable<FloatImage> values, Context context)
-        <font id="Throws">throws</font> IOException, InterruptedException {
-      }
-    }
-
-    <font id="Public">public</font> int run(String[] args) <font id="Throws">throws</font> Exception {
-      HipiJob job = new HipiJob(getConf(), <font id="StringLiteral">"FirstProgram"</font>);
-      job.setJarByClass(FirstProgram.class);
-      job.setOutputKeyClass(IntWritable.class);
-      job.setOutputValueClass(FloatImage.class);
-
-      job.setMapperClass(MyMap.class);
-      job.setCombinerClass(MyReduce.class);
-      job.setReducerClass(MyReduce.class);
-
-      String inputFileType = args[2];
-      job.setOutputFormatClass(BinaryOutputFormat.class);
-
-      FileInputFormat.setInputPaths(job, new Path(args[0]));
-      FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
-      boolean success = job.waitForCompletion(true);
-      return success ? 0 : 1;
-    }
-
-    <font id="Public">public</font> <font id="Static">static</font> <font id="Void">void</font> main(String[] args) <font id="Throws">throws</font> Exception {
-      ToolRunner.run(new FirstProgram(), args);
-      System.exit(0);
+  
+  public static class FirstProgramReducer extends Reducer&#60;IntWritable, FloatImage, IntWritable, Text&#62; {
+    public void reduce(IntWritable key, Iterable&#60;FloatImage&#62; values, Context context) 
+      throws IOException, InterruptedException {
     }
   }
-		  </pre>
-		  This is a lot! But most of them just to setup the job, as what every Hadoop program
-		  does. The core part (Mapper/Reducer) is still empty.<br /><br />
+  
+  public int run(String[] args) throws Exception {
+    // Check input arguments
+    if (args.length != 2) {
+      System.out.println("Usage: firstprog &#60;input HIB&#62; &#60;output directory&#62;");
+      System.exit(0);
+    }
+    
+    // Initialize and configure MapReduce job
+    Job job = Job.getInstance();
+    // Set input format class which parses the input HIB and spawns map tasks
+    job.setInputFormatClass(ImageBundleInputFormat.class);
+    // Set the driver, mapper, and reducer classes which express the computation
+    job.setJarByClass(FirstProgram.class);
+    job.setMapperClass(FirstProgramMapper.class);
+    job.setReducerClass(FirstProgramReducer.class);
+    // Set the types for the key/value pairs passed to/from map and reduce layers
+    job.setMapOutputKeyClass(IntWritable.class);
+    job.setMapOutputValueClass(FloatImage.class);
+    job.setOutputKeyClass(IntWritable.class);
+    job.setOutputValueClass(Text.class);
+    
+    // Set the input and output paths on the HDFS
+    FileInputFormat.setInputPaths(job, new Path(args[0]));
+    FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
-		  Make sure you have everything here by compling it!<br /><br />
-	  </div>
+    // Execute the MapReduce job and block until it complets
+    boolean success = job.waitForCompletion(true);
+    
+    // Return success or failure
+    return success ? 0 : 1;
+  }
+  
+  public static void main(String[] args) throws Exception {
+    ToolRunner.run(new FirstProgram(), args);
+    System.exit(0);
+  }
+  
+}
+	</pre>
+	
+	Most of this code imports necessary Hadoop and HIPI libraries and configures and launches the MapReduce <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapred/jobcontrol/Job.html">Job</a>. This type of code will become somewhat boilerplate across the MapReduce/HIPI programs you develop, but it's still important to understand what is going on. The first lines of code in the <tt>run()</tt> method validate the arguments passed to the program, create the Hadoop Job object and call setter methods on this object to specify the classes that implement the map and reduce tasks along with the types of objects that are passed to and from these processing stages. The remaining lines of code setup the path to the input file and the output directory and launch the program. The descriptions in the <a href="examples.html">example programs page</a> provide much more detail about these parts of a HIPI program, which we will skip for now. Instead we will focus on the more interesting bits of the program that will appear in the <tt>map()</tt> and <tt>reduce()</tt> methods.<br /><br />
 
-	  <h2>Computing Average Color</h2>
-	  <div class="section">
-		  Now is a good time to figure out what we want to do with this dummy program.
-		  Computing average color of images seems to be a good practice. In the map
-		  phase, we compute average color of an image, and in the reduce phase, we sum
-		  up the average color to compute the total average image color.<br /><br />
+	Before proceeding further, test that your code still compiles and runs, but don't expect it to do anything yet.
 
-		  Here is how I will do it in MyMap:
-		  <pre id="Classes">
-    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyMap <font id="Extends">extends</font> Mapper&lt;ImageHeader, FloatImage, IntWritable, FloatImage&gt; {
-      <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context)
-        <font id="Throws">throws</font> IOException, InterruptedException {
-        if (value != null && value.getWidth() > 1 && value.getHeight() > 1 && value.getBands() == 3) {
-          FloatImage avg = new FloatImage(1, 1, 3);
-          float[] avgData = avg.getData();
-          float[] valData = value.getData();
-          for (int i = 0; i < value.getWidth(); i++) {
-            for (int j = 0; j < value.getHeight(); j++) {
-              avgData[0] += valData[i * value.getHeight() * 3 + j * 3];
-              avgData[1] += valData[i * value.getHeight() * 3 + j * 3 + 1];
-              avgData[2] += valData[i * value.getHeight() * 3 + j * 3 + 2];
-            }
+	<h3>Computing The Average Pixel Color</h3>
+
+	Now let's add some actual HIPI image processing code to our program. For this example, we will be computing the average RGB value of the pixels in the images in our input HIB. Our mapper will compute the average pixel color over a single image and the reducer will add these averages together and divide by their count to compute the total average pixel color. Because the map tasks are executed in parallel, if our Hadoop cluster has more than one compute node we will perform this entire operation faster than if we were using a single machine. This is the key idea behind parallel computing with MapReduce.<br /><br />
+
+	Here is what our <tt>map()</tt> method looks like:
+
+	<pre class="prettyprint">
+  public static class FirstProgramMapper extends Mapper&#60;ImageHeader, FloatImage, IntWritable, FloatImage&#62; {
+    
+    public void map(ImageHeader key, FloatImage value, Context context) 
+        throws IOException, InterruptedException {
+
+      // Verify that image was properly decoded, is of sufficient size, and has three color channels (RGB)
+      if (value != null && value.getWidth() &#62; 1 && value.getHeight() &#62; 1 && value.getBands() == 3) {
+
+        // Get dimensions of image
+        int w = value.getWidth();
+        int h = value.getHeight();
+
+        // Get pointer to image data
+        float[] valData = value.getData();
+
+        // Initialize 3 element array to hold RGB pixel average
+        float[] avgData = {0,0,0};
+
+        // Traverse image pixel data in raster-scan order and update running average
+        for (int j = 0; j < h; j++) {
+          for (int i = 0; i < w; i++) {
+            avgData[0] += valData[(j*w+i)*3+0]; // R
+            avgData[1] += valData[(j*w+i)*3+1]; // G
+            avgData[2] += valData[(j*w+i)*3+2]; // B
           }
-          avg.scale(1.0f / (value.getWidth() * value.getHeight()));
-          context.write(new IntWritable(0), avg);
         }
-      }
-    }
-	</pre>
-		  The code emits a 1x1 FloatImage for reducer to process, and here is my reducer:
-		  <pre id="Classes">
-    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyReduce <font id="Extends">extends</font> Reducer&lt;IntWritable, FloatImage, IntWritable, FloatImage&gt; {
-      <font id="Public">public</font> <font id="Void">void</font> reduce(IntWritable key, Iterable<FloatImage> values, Context context)
-        <font id="Throws">throws</font> IOException, InterruptedException {
-        FloatImage avg = new FloatImage(1, 1, 3);
-        int total = 0;
-        for (FloatImage val : values) {
-          avg.add(val);
-          total++;
-        }
-        if (total > 0) {
-          avg.scale(1.0f / total);
-          context.write(key, avg);
-        }
-      }
-	</pre>
-	If you did everything right, it should compile.<br /><br />
-	  </div>
 
-	  <h2>Run the First Program</h2>
-	  <div class="section">
-		  The compiled jar file should be in ./firstprog/firstprog.jar, and you can run
-		  this program now with your local file picture.hib. Try this command:
-		  <pre id="Classes">
-  hadoop jar firstprog/firstprog.jar picture.hib .
-		  </pre>
-		  According to plan, you should have a binary file sitting there by now.<br /><br />
+        // Create a FloatImage to store the average value
+        FloatImage avg = new FloatImage(1, 1, 3, avgData);
 
-		  HIPI does more. It basically extends Hadoop so that it can handle image files
-		  seamlessly. You can checkout more sophisticated <a href="examples.html">examples</a> now.<br /><br />
-	  </div>
+        // Divide by number of pixels in image
+        avg.scale(1.0f/(float)(w*h));
+
+        // Emit record to reducer
+        context.write(new IntWritable(1), avg);
+
+      } // If (value != null...
+      
+    } // map()
+
+  } // FirstProgramMapper
+	</pre>
+
+	This <tt>map()</tt> method creates one key/value pair (called a "record" in MapReduce terminology) for each image in the HIB consisting of an IntWritable always equal to 1 and a HIPI FloatImage object that contains the image's computed average pixel value, respectively. These records are combined by the MapReduce framework and presented to the <tt>reduce()</tt> method as an Iterable list of FloatImage objects where they are added together and normalized to obtain the final result:
+
+	<pre class="prettyprint">
+  public static class FirstProgramReducer extends Reducer&#60;IntWritable, FloatImage, IntWritable, Text&#62; {
+
+    public void reduce(IntWritable key, Iterable&#60;FloatImage&#62; values, Context context)
+        throws IOException, InterruptedException {
+
+      // Create FloatImage object to hold final result
+      FloatImage avg = new FloatImage(1, 1, 3);
+
+      // Initialize a counter and iterate over IntWritable/FloatImage records from mapper
+      int total = 0;
+      for (FloatImage val : values) {
+        avg.add(val);
+        total++;
+      }
+
+      if (total > 0) {
+        // Normalize sum to obtain average
+        avg.scale(1.0f / total);
+        // Assemble final output as string
+	float[] avgData = avg.getData();
+        String result = String.format("Average pixel value: %f %f %f", avgData[0], avgData[1], avgData[2]);
+        // Emit output of job which will be written to HDFS
+        context.write(key, new Text(result));
+      }
+
+    } // reduce()
+
+  } // FirstProgramReducer
+	</pre>
+
+	Compile your program and run it on the HIB we created at the beginning:
+
+	<pre class="console">
+$> ant firstprog
+...
+BUILD SUCCESSFUL
+Total time: 1 second
+$> hadoop jar firstprog/firstprog.jar sampleimages.hib sampleimages_average
+...
+        </pre>
+
+	If everything goes as planned the directory <tt>sampleimages_average</tt> will contain two files:
+
+	<pre class="console">
+$> hadoop fs -ls sampleimages_average
+Found 2 items
+-rw-r--r--   1 user group        0 2015-03-13 09:52 sampleimages_average/_SUCCESS
+-rw-r--r--   1 user group       50 2015-03-13 09:52 sampleimages_average/part-r-00000
+        </pre>
+
+	Whenever a MapReduce program successfully finishes, it creates the file <tt>_SUCCESS</tt> in the output directory along with a <tt>part-r-XXXXX</tt> file for each reduce task. The average pixel value can be retrieved using the <tt>cat</tt> command:
+
+	<pre class="console">
+$> hadoop fs -cat sampleimages_average/part-r-00000
+1	Average pixel value: 0.555262 0.487656 0.366019
+        </pre>
+
+	Play around with different image sets and see how it affects the average pixel color. (Note: you will need to remove the output directory before running the program a second time with the command: <tt>hadoop fs -rm -R sampleimages_average</tt>.
+
+	<h3>Next</h3>
+
+        Read the descriptions of the other <a href="examples.html">tools and example programs</a> or jump into the <a href="documentation.html">documentation</a> to learn more about HIPI.
+
     </div>
     <!-- End Content -->
   </body>

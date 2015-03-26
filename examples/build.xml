@@ -1,0 +1,81 @@
+<project basedir="." default="all">
+
+  <target name="setup">
+    <property name="hadoop.home" value="/opt/hadoop/" />
+    <property name="hadoop.version" value="0.20.1+152" />
+    <property name="hadoop.classpath" value="${hadoop.home}/hadoop-${hadoop.version}-core.jar" />
+  </target>
+
+  <target name="test_settings">
+    <fail unless="hadoop.home" message="The property hadoop.home was not specified. You must specify the home directory for Hadoop in the build.xml file." />
+    <fail unless="hadoop.version" message="The property hadoop.version was not specified. You must specify version of Hadoop you are using in the build.xml file." />
+  </target>
+
+  <!-- compute covariance from images -->
+  <target name="covariance" depends="setup, test_settings">
+    <mkdir dir="bin" />
+    <!-- Compile -->
+    <javac nowarn="on" includeantruntime="no" srcdir="./hipi/examples/covariance" destdir="./bin" classpath="${hadoop.classpath}:../src/hipi.jar" />
+    <!-- Create the jar -->
+    <jar destfile="./covariance.jar" basedir="./bin">
+	  <zipfileset src="../src/hipi.jar" />
+      <manifest>
+	    <attribute name="Main-Class" value="hipi.examples.covariance.Covariance" />
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- download images from the Internet -->
+  <target name="downloader" depends="setup, test_settings">
+    <mkdir dir="bin" />
+    <!-- Compile -->
+    <javac nowarn="on" includeantruntime="no" srcdir="./hipi/examples/downloader" destdir="./bin" classpath="${hadoop.classpath}:../src/hipi.jar" />
+    <!-- Create the jar -->
+    <jar destfile="./downloader.jar" basedir="./bin">
+	  <zipfileset src="../src/hipi.jar" />
+      <manifest>
+	    <attribute name="Main-Class" value="hipi.examples.downloader.Downloader" />
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- create hib file from jpeg files -->
+  <target name="dumphib" depends="setup, test_settings">
+    <mkdir dir="bin" />
+    <!-- Compile -->
+    <javac nowarn="on" includeantruntime="no" srcdir="./hipi/examples/dumphib" destdir="./bin" classpath="${hadoop.classpath}:../src/hipi.jar" />
+    <!-- Create the jar -->
+    <jar destfile="./dumphib.jar" basedir="./bin">
+	  <zipfileset src="../src/hipi.jar" />
+      <manifest>
+	    <attribute name="Main-Class" value="hipi.examples.dumphib.DumpHib" />
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- create hib file from jpeg files -->
+  <target name="hib2jpg" depends="setup, test_settings">
+    <mkdir dir="bin" />
+    <!-- Compile -->
+    <javac nowarn="on" includeantruntime="no" srcdir="./hipi/examples/jpegfromhib" destdir="./bin" classpath="${hadoop.classpath}:../src/hipi.jar" />
+    <!-- Create the jar -->
+    <jar destfile="./hib2jpg.jar" basedir="./bin">
+	  <zipfileset src="../src/hipi.jar" />
+      <manifest>
+	    <attribute name="Main-Class" value="hipi.examples.jpegfromhib.JpegFromHib" />
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="all" depends="covariance, downloader, dumphib, hib2jpg">
+  </target>
+
+  <!-- Clean -->
+  <target name="clean">    
+    <delete dir="bin" />
+    <delete>
+      <fileset dir="." includes="./*.jar" />
+    </delete>
+  </target>
+
+</project>

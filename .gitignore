@@ -1,0 +1,7 @@
+.classpath
+.project
+.gitignore
+/bin
+/trash
+*.class
+*.jar

@@ -1,0 +1,87 @@
+<project basedir="." default="all">
+
+  <target name="setup">
+    <property name="hadoop.home" value="/opt/hadoop/" />
+    <property name="hadoop.version" value="0.20.1+152" />
+    <property name="hadoop.classpath" value="${hadoop.home}/hadoop-${hadoop.version}-core.jar" />
+    <property name="metadata.jar" value="3rdparty/metadata-extractor-2.3.1.jar" />
+  </target>
+
+  <target name="test_settings">
+    <fail unless="hadoop.home" message="The property hadoop.home was not specified. You must specify the home directory for Hadoop in the build.xml file." />
+    <fail unless="hadoop.version" message="The property hadoop.version was not specified. You must specify version of Hadoop you are using in the build.xml file." />
+  </target>
+
+  <target name="compile" depends="setup, test_settings">
+    <mkdir dir="bin" />
+    <!-- Compile -->
+    <javac nowarn="on" includeantruntime="no" srcdir="${srcdir}" destdir="./bin" classpath="${hadoop.classpath}:./src/hipi.jar" />
+    <!-- Create the jar -->
+    <jar destfile="${jardir}/${jarfilename}" basedir="./bin">
+	  <zipfileset src="./src/hipi.jar" />
+      <manifest>
+	    <attribute name="Main-Class" value="${mainclass}" />
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="hibimport">
+    <antcall target="compile">
+      <param name="srcdir" value="src/hipi/tool" />
+      <param name="jarfilename" value="hibimport.jar" />
+      <param name="jardir" value="tool" />
+      <param name="mainclass" value="hipi.tool.CreateHipiImageBundle" />
+    </antcall>
+  </target>
+
+  <!-- Create a sequence file from a HIB-->
+  <target name="covariance">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/covariance" />
+      <param name="jarfilename" value="covariance.jar" />
+      <param name="jardir" value="examples" />
+      <param name="mainclass" value="hipi.examples.covariance.Covariance" />
+    </antcall>
+  </target>
+
+  <!-- The distributed downloader, which takes a database of URL's and creates a HIB -->
+  <target name="downloader">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/downloader" />
+      <param name="jarfilename" value="downloader.jar" />
+      <param name="jardir" value="examples" />
+      <param name="mainclass" value="hipi.examples.downloader.Downloader" />
+    </antcall>
+  </target>
+
+  <!-- Extract a HIB into a folder and a sequence file of its constituent images -->
+  <target name="hib2jpg">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/jpegfromhib" />
+      <param name="jarfilename" value="hib2jpg.jar" />
+      <param name="jardir" value="examples" />
+      <param name="mainclass" value="hipi.examples.jpegfromhib.JpegFromHib" />
+    </antcall>
+  </target>
+
+  <!-- Dump some information about all of the information in a HIB -->
+  <target name="dumphib">
+    <antcall target="compile">
+      <param name="srcdir" value="examples/hipi/examples/dumphib" />
+      <param name="jarfilename" value="dumphib.jar" />
+      <param name="jardir" value="examples" />
+      <param name="mainclass" value="hipi.examples.dumphib.DumpHib" />
+    </antcall>
+  </target>
+
+  <target name="all" depends="hibimport, covariance, downloader, hib2jpg, dumphib" />
+
+  <!-- Clean -->
+  <target name="clean">    
+    <delete dir="bin" />
+    <delete>
+      <fileset dir="." includes="examples/*.jar,experiments/*.jar" />
+    </delete>
+  </target>
+
+</project>

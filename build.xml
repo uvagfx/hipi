@@ -5,8 +5,8 @@
     <echo message="Setting properties for build task..."/>
 
     <!-- IMPORTANT: You must update the following two properties according to your Hadoop setup -->
-    <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" />
-    <property name="hadoop.version" value="2.6.0" />
+    <!-- <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" /> -->
+    <!-- <property name="hadoop.version" value="2.6.0" /> -->
 
     <property name="hipi.version" value="2.0" />
 
@@ -24,6 +24,7 @@
     <property name="slf4j.api.jar" value="${hadoop.home}/common/lib/slf4j-api-1.7.5.jar" />
     <property name="log4j.jar" value="${hadoop.home}/common/lib/log4j-1.2.17.jar" />
     <property name="avro.jar" value="${hadoop.home}/common/lib/avro-1.7.4.jar" />
+
     <!-- https://drewnoakes.com/code/exif/ -->    
     <property name="xmpcore.jar" value="./3rdparty/xmpcore-5.1.2.jar" />
     <property name="metadata.jar" value="./3rdparty/metadata-extractor-2.7.2.jar" />
@@ -33,8 +34,8 @@
 
   <target name="test_settings">
     <echo message="Confirming that hadoop settings are set..."/>
-    <fail unless="hadoop.home" message="The property hadoop.home was not specified. You must specify the home directory for Hadoop in the build.xml file." />
-    <fail unless="hadoop.version" message="The property hadoop.version was not specified. You must specify version of Hadoop you are using in the build.xml file." />
+    <fail unless="hadoop.home" message="The property hadoop.home was not specified.${line.separator}You must specify the home directory for Hadoop in the build.xml file.${line.separator}See http://hipi.cs.virginia.edu/gettingstarted.html for details."/>
+    <fail unless="hadoop.version" message="The property hadoop.version was not specified.${line.separator}You must specify the version of Hadoop you are using in the build.xml file.${line.separator}See http://hipi.cs.virginia.edu/gettingstarted.html for details."/>
     <echo message="Properties are specified properly."/>
   </target>
 

@@ -272,7 +272,7 @@ FloatImage crop = image.crop(0, 0, 20, 20);
 	
 	<h3>Cull Mapper</h3>
 	
-	Another important feature of HIPI is a culling step that takes place before the images in a HIB are distributed to map tasks for parallel processing. The <a href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html">CullMapper class</a> defines a special type of Hadoop Mapper that contains the method <a href="file:///Users/jason/work/proj/hipi-web/doc/api/hipi/imagebundle/mapreduce/CullMapper.html#cull(KEYIN)">CullMapper::cull</a> that allows using an <a href="doc/api/hipi/image/ImageHeader.html">ImageHeader</a> object to decide whether the image should be processed or not <i>before the image pixel data is decompressed and decoded</i>.<br /><br />
+	Another important feature of HIPI is a culling step that takes place before the images in a HIB are distributed to map tasks for parallel processing. The <a href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html">CullMapper class</a> defines a special type of Hadoop Mapper that contains the method <a href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html#cull(KEYIN)">CullMapper::cull</a> that allows using an <a href="doc/api/hipi/image/ImageHeader.html">ImageHeader</a> object to decide whether the image should be processed or not <i>before the image pixel data is decompressed and decoded</i>.<br /><br />
 
 	In the example below, the CullMapper is used to process only those images in a HIB that were taken with a Canon PowerShot S500 digital camera and have a resolution above some minimum threshold. The <tt>cull()</tt> method returns a boolean indicating whether the image should be culled (true) or sent to the <tt>map()</tt> method for processing (false).
 

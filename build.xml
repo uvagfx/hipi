@@ -4,9 +4,8 @@
 
     <echo message="Setting properties for build task..."/>
 
-    <!-- TODO: update the following two variables according to your local installation of Hadoop -->
-    <!-- <property name="hadoop.home" value="/opt/hadoop-2.6.0/share/hadoop" /> --> <!-- Linux -->
-    <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" /> <!-- Mac OS X / Homebrew -->
+    <!-- IMPORTANT: You must update the following two properties according to your Hadoop setup -->
+    <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" />
     <property name="hadoop.version" value="2.6.0" />
 
     <property name="hipi.version" value="2.0" />
@@ -65,11 +64,9 @@
       <property name="hadoop.home" value="${hadoop.home}" />
       <property name="hadoop.version" value="${hadoop.version}" />
       <property name="hadoop.classpath" value="${hadoop.classpath}" />
-      
        <!-- https://drewnoakes.com/code/exif/ -->
       <property name="xmpcore.jar" value="../3rdparty/xmpcore-5.1.2.jar" />
       <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.7.2.jar" />
-      
       <!-- Unit test dependencies -->
       <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
     </ant>

@@ -5,8 +5,8 @@
     <echo message="Setting properties for build task..."/>
 
     <!-- IMPORTANT: You must update the following two properties according to your Hadoop setup -->
-    <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" />
-    <property name="hadoop.version" value="2.6.0" />
+    <!-- <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" /> -->
+    <!-- <property name="hadoop.version" value="2.6.0" /> -->
 
     <property name="hipi.version" value="2.0" />
 

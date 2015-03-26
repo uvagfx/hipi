@@ -19,6 +19,7 @@
     </script>
    
     <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+    <style> pre.prettyprint {padding:20px 20px 0px 20px;} </style>
  
     <style type="text/css">
       .math { font-size:110%; font-weight:bold; }
@@ -31,11 +32,12 @@
     </div>
     <div class="navigation_menu">
       <ul>
-	<li><a href="../index.html">Introduction</a></li>
+	<li><a href="../index.html">Overview</a></li>
 	<li><a href="../gettingstarted.html">Getting Started</a></li>
 	<li><a href="../documentation.html">Documentation</a></li>
 	<li><a href="../examples.html">Tools and Examples</a></li>
 	<li><a href="../downloads.html">Downloads</a></li>
+	<li><a href="../contribute.html">Contribute</a></li>
 	<li><a href="../about.html">About</a></li>
       </ul>
     </div>
@@ -114,23 +116,23 @@
       
       Compile <b>covariance</b> by executing the following command in the HIPI root directory (see our <a href="../gettingstarted.html">general notes</a> on setting up HIPI on your system and using Ant for compilation):
 	
-      <pre id="Current">
-   $> ant covariance
+      <pre class="console">
+$> ant covariance
       </pre>
 
       <h3>Usage</h3>
 
       Run <b>covariance</b> by executing the following command in the HIPI root directory:
 
-      <pre id="Current">
-   $> hadoop jar examples/covariance.jar &#60;input HIB&#62; &#60;output directory&#62;
+      <pre class="console">
+$> hadoop jar examples/covariance.jar &#60;input HIB&#62; &#60;output directory&#62;
       </pre>
 	
 	There is also a convenience script located in the examples directory:
 
-	<pre id="Current">
-   $> cd examples
-   $> ./runCovariance.sh &#60;input HIB&#62; &#60;output directory&#62;
+	<pre class="console">
+$> cd examples
+$> ./runCovariance.sh &#60;input HIB&#62; &#60;output directory&#62;
 	</pre>
 
 	<b>covariance</b> takes two arguments. The first argument is the path to a HIB on the HDFS. This HIB will provide the source of image patches used to compute the mean and covariance. The second argument is the HDFS path to the output directory that will be created once the program has finished. The resulting mean patch and covariance matrix will be stored in this directory in a raw binary format readable by the scripts in the <tt>util</tt> directory.
@@ -149,7 +151,7 @@
 
       Every MapReduce job must specify a driver class that configures and executes the job (e.g., specifies the various key/value object types, etc.). The driver classes for <b>covariance</b> are defined in <tt>examples/hipi/examples/covariance/Covariance.java</tt>. First, take a look at the <tt>main()</tt> and <tt>run()</tt> methods defined in the Covariance class:
 
-      <pre class="prettyprint"> 
+      <pre class="prettyprint">
   public static void main(String[] args) throws Exception {
     int res = ToolRunner.run(new Covariance(), args);
     System.exit(res);
@@ -175,7 +177,7 @@
 
       The <tt>runCovariance()</tt> method is slightly more complicated and interesting. Note how it calls <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">Job::addCacheFile()</a> to distribute the previously computed mean patch to the covariance map tasks:
 
-      <pre class="prettyprint"> 
+      <pre class="prettyprint">
   public boolean runCovariance(String[] args) throws Exception {
     ...
     job.addCacheFile(new URI("hdfs://" + args[1] + "/mean-output/part-r-00000"));
@@ -186,9 +188,9 @@
 
       Here is the <tt>map()</tt> method in the MeanMapper class along with the helper method <tt>generateMeanImage()</tt>:
 
-      <pre class="prettyprint"> 
+      <pre class="prettyprint">
     public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException {
-      if (value != null && value.getWidth() > N && value.getHeight() > N) {
+      if (value != null && value.getWidth() &#62; N && value.getHeight() &#62; N) {
         context.write(new IntWritable(0), generateMeanImage(value, 100, 100));
       }
     }
@@ -196,9 +198,9 @@
     // Compute the mean of (xPatchCount * yPatchCount) patches within the input image
     private FloatImage generateMeanImage(FloatImage input, int xPatchCount, int yPatchCount) {
       FloatImage mean = new FloatImage(N, N, 1);
-      for (int i = 0; i < xPatchCount; i++) {
+      for (int i = 0; i &#60; xPatchCount; i++) {
         int x = (input.getWidth() - N) * i / xPatchCount;
-        for (int j = 0; j < yPatchCount; j++) {
+        for (int j = 0; j &#60; yPatchCount; j++) {
           int y = (input.getHeight() - N) * j / yPatchCount;
           FloatImage patch = input.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
           mean.add(patch);
@@ -216,15 +218,16 @@
 
       Here is the <tt>reduce()</tt> method in the MeanReducer class:
 
-      <pre class="prettyprint"> 
-    public void reduce(IntWritable key, Iterable<FloatImage> values, Context context) throws IOException, InterruptedException {
+      <pre class="prettyprint">
+    public void reduce(IntWritable key, Iterable&#60;FloatImage&#62; values, Context context) 
+        throws IOException, InterruptedException {
       FloatImage mean = new FloatImage(N, N, 1);
       int total = 0;
       for (FloatImage val : values) {
         mean.add(val);
         total++;
       }
-      if (total > 0) {
+      if (total &#62; 0) {
         mean.scale(1.0f / total);
         context.write(key, mean);
       }
@@ -238,7 +241,7 @@
 
       Recall that the covariance calculation requires the average image patch. This object is accessed inside the <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a> method defined in CovarianceMapper with the following lines:
 
-      <pre class="prettyprint"> 
+      <pre class="prettyprint">
 	// Access the job cache
         URI[] files = new URI[1];
         if (job.getCacheFiles() != null) {
@@ -260,7 +263,7 @@
 
       The <tt>map()</tt> method defined in the CovarianceMapper class uses this <tt>mean</tt> member variable to compute the sample covariance over 100 patches from within one image. In the code below, you may notice that these patches are first converted to grayscale and then Gaussian weighted during the covariance calculation:
 
-      <pre class="prettyprint"> 
+      <pre class="prettyprint">
     public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException {
       if (value != null && value.getWidth() &#62; N && value.getHeight() &#62; N) {
         // Holds 100 patches as they are collected from the image
@@ -281,11 +284,11 @@
         ...
       }
     }
-				</pre>
+      </pre>
 
       The Gaussian weighting effectively gives higher weight to the center pixels in a patch (see <a class="external_link" href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">Hancock et al.</a> for details). Finally, the covariance is computed from the <tt>patchArray</tt>:
 
-      <pre class="prettyprint"> 
+      <pre class="prettyprint">
         ...
         // Stores the (N^2 x N^2) covariance matrix AAt
         float[] covarianceArray = new float[N * N * N * N];
@@ -300,7 +303,7 @@
         context.write(new IntWritable(0), new FloatImage(N * N, N * N, 1, covarianceArray));
       }
     }
-				</pre>
+      </pre>
 
       The resulting covariance matrix is represented as a <a href="../doc/api/hipi/image/FloatImage.html">FloatImage</a> and emitted to the reduce task with a call to <tt>context.write()</tt>.
 
@@ -308,8 +311,8 @@
 
       The <tt>reduce()</tt> method in the CovarianceReducer class combines the partial covariances emitted by the map tasks into the final covariance. As with the reducer method for the mean program, each map task processes the same number of patches so there is no need to weight the partial covariances differently. The output of <tt>reduce</tt> is simply the sum of these input covariances, again represented as a FloatImage:
 
-      <pre class="prettyprint"> 
-    public void reduce(IntWritable key, Iterable<FloatImage> values, Context context) throws IOException, InterruptedException {
+      <pre class="prettyprint">
+    public void reduce(IntWritable key, Iterable&#60;FloatImage&#62; values, Context context) throws IOException, InterruptedException {
       // Aggregate sub-matrices in full covariance calculation
       FloatImage cov = new FloatImage(N * N, N * N, 1);
       for (FloatImage val : values) {
@@ -322,7 +325,7 @@
     
     The output of <b>covariance</b> consists of two files named <tt>&#60;output directory&#62;/mean-output/part-r-00000</tt> and <tt>&#60;output directory&#62;/covariance-output/part-r-00000</tt>. These binary files can be viewed using a simple MATLAB or Python program. The HIPI distribution includes sample programs in each of these languages. Here is the MATLAB function that reads a FloatImage into a MATLAB matrix:
 
-      <pre class="prettyprint"> 
+      <pre class="prettyprint">
   function [ y ] = readFloatImage( file )
     fid = fopen(file);
     if fid ~= 0
@@ -339,7 +342,7 @@
 
       An extended version of this function was used to generate the result images displayed above:
 
-      <pre class="prettyprint"> 
+      <pre class="prettyprint">
   function [ y ] = readCovarianceOutputAndGenerateImages( file )
     fid = fopen(file);
     if fid ~= 0

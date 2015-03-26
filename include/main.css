@@ -44,7 +44,8 @@ pre.console { border:1px dashed #E1E1E1; color:#333344; background:#FAFAFA; font
 .centered_image { display:block; margin-left:auto; margin-right:auto; }
 
 table { margin-top:10px; margin-bottom:20px; }
-.centered_table { margin-left:auto; margin-right:auto; }
+.centered_table { margin-left:auto; margin-right:auto; margin-bottom:0px; }
+.centered_table td { padding-bottom: 30px }
 .caption td { background-color:#ddf; text-align:center; font-size:90%; }
 
 .important { color:#c33; font-weight:bold; }

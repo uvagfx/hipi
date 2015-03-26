@@ -23,30 +23,24 @@
     </script>
 
     <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+    <style> pre.prettyprint {padding:20px 20px 0px 20px;} </style>
 
 </head>
 
-<body>
-    
-    <div class="header">
+    <body>
+      <div class="header">
         <h1>HIPI - Hadoop Image Processing Framework</h1>
-    </div>
-    
+      </div>
     <div class="navigation_menu">
-        <ul>
-            <li><a href="../index.html">Introduction</a>
-            </li>
-            <li><a href="../gettingstarted.html">Getting Started</a>
-            </li>
-            <li><a href="../documentation.html">Documentation</a>
-            </li>
-            <li><a href="../examples.html">Tools and Examples</a>
-            </li>
-            <li><a href="../downloads.html">Downloads</a>
-            </li>
-            <li><a href="../about.html">About</a>
-            </li>
-        </ul>
+      <ul>
+	<li><a href="../index.html">Overview</a></li>
+	<li><a href="../gettingstarted.html">Getting Started</a></li>
+	<li><a href="../documentation.html">Documentation</a></li>
+	<li><a href="../examples.html">Tools and Examples</a></li>
+	<li><a href="../downloads.html">Downloads</a></li>
+	<li><a href="../contribute.html">Contribute</a></li>
+	<li><a href="../about.html">About</a></li>
+      </ul>
     </div>
 
     <!-- Begin Content -->
@@ -62,23 +56,23 @@
 
 	Compile <b>jpegfromhib</b> by executing the following command in the HIPI root directory (see our <a href="../gettingstarted.html">general notes</a> on setting up HIPI on your system and using Ant for compilation):
 	
-	<pre id="Current">
-  $> ant jpegfromhib
+	<pre class="console">
+$> ant jpegfromhib
 	</pre>
        
         <h3>Usage</h3>
 
 	Run <b>jpegfromhib</b> by executing the following command in the HIPI root directory:
 
-	<pre id="Current">
-  $> hadoop jar examples/jpegfromhib.jar &#60;input HIB&#62; &#60;output directory&#62;
+	<pre class="console">
+$> hadoop jar examples/jpegfromhib.jar &#60;input HIB&#62; &#60;output directory&#62;
 	</pre>
 	
 	There is also a convenience script located in the examples directory:
 
-	<pre id="Current">
-  $> cd examples
-  $> ./runJpegFromHib.sh &#60;input HIB&#62; &#60;output directory&#62;
+	<pre class="console">
+$> cd examples
+$> ./runJpegFromHib.sh &#60;input HIB&#62; &#60;output directory&#62;
 	</pre>
 
 	<b>jpegfromhib</b> takes two arguments. The first argument is the path to a HIB on the HDFS. The second argument is the HDFS path to the output directory that will be created once the program has finished. The resulting JPEG files will be stored in this directory.
@@ -87,28 +81,28 @@
 
 	    We will walk you through an example using the <tt>testimages.hib</tt> file that was created during the example for the <a href="../examples/downloader.html">Distributed Downloader</a>:
 
-	<pre id="Current">
-  $> hadoop jar examples/jpegfromhib.jar testimages.hib testimages_extract
+	<pre class="console">
+$> hadoop jar examples/jpegfromhib.jar testimages.hib testimages_extract
 	</pre>
 
 	After the program successfully finishes, we can inspect the <tt>testimages_extract</tt> directory on the HDFS:
 
-	<pre id="Current">
-  $> hadoop fs -ls testimages_extract
-  Found 13 items
-  -rw-r--r--   1 user group    2175025 2015-03-13 09:52 testimages_extract/16f1a871fe51bd44883f68192ee5a1d5863413.jpg
-  -rw-r--r--   1 user group    2096360 2015-03-13 09:52 testimages_extract/46a57217d3c35980f5b636297c453e417da5854.jpg
-  -rw-r--r--   1 user group    2485871 2015-03-13 09:52 testimages_extract/61a089366c66fbfb2127a215cc66a393cf7114.jpg
-  -rw-r--r--   1 user group     880460 2015-03-13 09:52 testimages_extract/62c43cc0c822b91da2bd126de5c6f6f96ba1cef0.jpg
-  -rw-r--r--   1 user group    1798873 2015-03-13 09:52 testimages_extract/79661b90eb93e081e457ca2b8ce96f6a7f8312ac.jpg
-  -rw-r--r--   1 user group     196282 2015-03-13 09:52 testimages_extract/81d849118e4cb75eb39ded9eff4a4d16bb0a3a3.jpg
-  -rw-r--r--   1 user group          0 2015-03-13 09:52 testimages_extract/_SUCCESS
-  -rw-r--r--   1 user group    5009807 2015-03-13 09:52 testimages_extract/abab15f4fa55ce4cbb9ac212825ffffb2c8d731.jpg
-  -rw-r--r--   1 user group     239803 2015-03-13 09:52 testimages_extract/b99f45e7d338957b5501476de346ad91e37264d.jpg
-  -rw-r--r--   1 user group    4648460 2015-03-13 09:52 testimages_extract/c17b2dfd3a151e964aec3920315e42c89366cbca.jpg
-  -rw-r--r--   1 user group    3039805 2015-03-13 09:52 testimages_extract/e795c0118de27e675331114bb389894c7c95ca3.jpg
-  -rw-r--r--   1 user group    1182389 2015-03-13 09:52 testimages_extract/ebfaec6a0ea6eb66328d8807fcdc47de317061.png
-  -rw-r--r--   1 user group        495 2015-03-13 09:52 testimages_extract/part-r-00000
+	<pre class="console">
+$> hadoop fs -ls testimages_extract
+Found 13 items
+-rw-r--r--   1 user group    2175025 2015-03-13 09:52 testimages_extract/16f1a871fe51bd44883f68192ee5a1d5863413.jpg
+-rw-r--r--   1 user group    2096360 2015-03-13 09:52 testimages_extract/46a57217d3c35980f5b636297c453e417da5854.jpg
+-rw-r--r--   1 user group    2485871 2015-03-13 09:52 testimages_extract/61a089366c66fbfb2127a215cc66a393cf7114.jpg
+-rw-r--r--   1 user group     880460 2015-03-13 09:52 testimages_extract/62c43cc0c822b91da2bd126de5c6f6f96ba1cef0.jpg
+-rw-r--r--   1 user group    1798873 2015-03-13 09:52 testimages_extract/79661b90eb93e081e457ca2b8ce96f6a7f8312ac.jpg
+-rw-r--r--   1 user group     196282 2015-03-13 09:52 testimages_extract/81d849118e4cb75eb39ded9eff4a4d16bb0a3a3.jpg
+-rw-r--r--   1 user group          0 2015-03-13 09:52 testimages_extract/_SUCCESS
+-rw-r--r--   1 user group    5009807 2015-03-13 09:52 testimages_extract/abab15f4fa55ce4cbb9ac212825ffffb2c8d731.jpg
+-rw-r--r--   1 user group     239803 2015-03-13 09:52 testimages_extract/b99f45e7d338957b5501476de346ad91e37264d.jpg
+-rw-r--r--   1 user group    4648460 2015-03-13 09:52 testimages_extract/c17b2dfd3a151e964aec3920315e42c89366cbca.jpg
+-rw-r--r--   1 user group    3039805 2015-03-13 09:52 testimages_extract/e795c0118de27e675331114bb389894c7c95ca3.jpg
+-rw-r--r--   1 user group    1182389 2015-03-13 09:52 testimages_extract/ebfaec6a0ea6eb66328d8807fcdc47de317061.png
+-rw-r--r--   1 user group        495 2015-03-13 09:52 testimages_extract/part-r-00000
 	</pre>
 
 	Note that the correct file extensions are preserved (11 JPEGs and 1 PNG). Copy these images to your local file system using <tt>hadoop fs -copyToLocal</tt> and open them using an image viewer. This is what <tt>62c43cc0c822b91da2bd126de5c6f6f96ba1cef0.jpg</tt> should look like:<br /><br />

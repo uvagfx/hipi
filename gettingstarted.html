@@ -62,7 +62,7 @@ $> which hadoop
 /usr/local/bin/hadoop
 	</pre>
 
-	The <a href="examples.html">example programs</a> section of this website assumes that the main hadoop script is in the system path.
+	The <a href="examples.html">example programs</a> assume that the main hadoop script is in the system path.
 
         <h3>2. Install Apache Ant</h3>
 
@@ -88,7 +88,7 @@ $> which ant
 	The best way to get the latest version of HIPI is by cloning the <a class="external_link" href="https://github.com/uvagfx/hipi">official GitHub repository</a> and building it along with all of the tools and example programs yourself. This only takes a second and verifies that your system is properly setup and you are ready to begin developing your own HIPI applications:
 
 	<pre class="console">
-git clone git@github.com:uvagfx/hipi.git
+$> git clone git@github.com:uvagfx/hipi.git
 	</pre>	
 
 	<span class="important">Important</span> After the repository has been cloned, you must edit two lines in the <tt>build.xml</tt> file in the HIPI root directory to indicate the path to your Hadoop installation and the version of Hadoop you are using:
@@ -177,183 +177,122 @@ Already up-to-date.
 	
 	<h3>HIPI Image Bundle (HIB)</h3> 
 	
-	A HIPI Image Bundle (HIB) is a collection of images that are stored together in one file, somewhat analagous to .tar files in UNIX. HIBs are implemented via the <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> class and can be used directly in the Hadoop MapReduce framework. Several common operations can be performed on HIBs, ncluding:
+	A HIPI Image Bundle (HIB) is a collection of images that are stored together in one file, somewhat analagous to .tar files in UNIX. HIBs are implemented via the <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> class and can be used directly in the Hadoop MapReduce framework. HIBs support several useful operations, including:
 	<ul>
 	  <li>
 	    Create a HIB
 	    <pre class="prettyprint">
-Configuration conf = <font id="New">new</font> Configuration();
-HipiImageBundle hib = <font id="New">new</font> HipiImageBundle(<font id="New">new</font> Path(<font id="StringLiteral">"/path/to/file.hib"</font>), conf);
-hib.open(AbstractImageBundle.FILE_MODE_WRITE, <font id="True">true</font>);
+Configuration conf = new Configuration();
+HipiImageBundle hib = new HipiImageBundle(new Path("/path/to/file.hib"), conf);
+hib.open(AbstractImageBundle.FILE_MODE_WRITE, true);
 	    </pre>
 	  </li>
 	  <li>
 	    Add images to a HIB
-	    <pre id="Classes">
-  File file = <font id="New">new</font> File(<font id="StringLiteral">"/path/to/file.jpg"</font>);
-  FileInputStream fis = <font id="New">new</font> FileInputStream(file);
-  hib.addImage(fis, ImageType.JPEG_IMAGE);
+	    <pre class="prettyprint">
+File file = new File("/path/to/file.jpg");
+FileInputStream fis = new FileInputStream(file);
+hib.addImage(fis, ImageType.JPEG_IMAGE);
 	    </pre>
 	  </li>
 	  <li>
 	    Merge two HIBs
-	    <pre id="Classes">
-  Path temp_path = <font id="New">new</font> Path(<font id="StringLiteral">"/path/to/file.hib"</font>);
-  HipiImageBundle input_bundle = <font id="New">new</font> HipiImageBundle(temp_path, conf);
-  hib.append(input_bundle);
+	    <pre class="prettyprint">
+Path path = new Path("path/to/file.hib");
+HipiImageBundle hib2 = new HipiImageBundle(path, conf);
+hib.append(hib2);
 	    </pre>
 	  </li>
 	  <li>
-	    Read the images from a HIB (random access is permitted
-	    through <a
-	    href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle.FileReader</a>)
-	    <pre id="Classes">
-  <font id="While">while</font> (hib.hasNext()) {
-  	ImageHeader imageHeader = hib.readHeader();
-	FloatImage image = hib.readImage();
-  }
-  hib.close();
+	    Iterate over the images in a HIB
+	    <pre class="prettyprint">
+while (hib.hasNext()) {
+  ImageHeader imageHeader = hib.readHeader();
+  FloatImage image = hib.readImage();
+}
+hib.close();
 	    </pre>
 	  </li>
 	</ul>
-	<div class="important">Important Note:</div> HIBs must be
-	opened in either FILE_MODE_READ or FILE_MODE_WRITE mode (see
-	<a
-	href="doc/api/hipi/imagebundle/AbstractImageBundle.html#open(int)">AbstractImageBundle::open</a>),
-	and once they have been opened in one mode, the mode cannot be
-	switched.  <br /><br />
+	<span class="important">Important</span> HIBs must be opened in either FILE_MODE_READ or FILE_MODE_WRITE mode (see
+	<a href="doc/api/hipi/imagebundle/AbstractImageBundle.html#open(int)">AbstractImageBundle::open</a>). Once a HIB has been opened in one mode this cannot be changed.<br/><br/>
 
-	<div class="important">Important Note:</div> When creating a
-	HIB through the <a
-	href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle::create</a>
-	method, you can specify an optional parameter called
-	blockSize. This parameter is very important as it controls the
-	way a HIB will be distributed to the map tasks. The <a
-	href="doc/api/hipi/imagebundle/mapreduce/ImageBundleInputFormat.html">ImageBundleInputFormat</a>
-	splits a HIB into sections based on the block size of the HIB
-	itself in order to most effectively distribute the
-	job. If the block size is set too large, then a small
-	number of machines will be processing all of the images in the
-	HIB. Therefore, it is advised that the block size be set so
-	that the number of blocks the entire HIB spans is roughly equivalent
-    to the number of nodes in the cluster.<br /><br />
+	<span class="important">Important</span> When creating a HIB using the <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle::create</a> method, you can specify an optional parameter called <tt>blockSize</tt>. This parameter is very important as it controls the way a HIB will be distributed to the map tasks. The <a href="doc/api/hipi/imagebundle/mapreduce/ImageBundleInputFormat.html">ImageBundleInputFormat</a> splits a HIB into sections based on the block size of the HIB itself in order to most effectively distribute the job. If the block size is set too large, then a small number of machines will be processing all of the images in the HIB. Therefore, it is advisable to set the block size so that the number of blocks the entire HIB spans is roughly equivalent to the number of nodes in the cluster.<br /><br />
 
-	You can create a HIPI Image Bundle from a set of files using
-	the operations listed above, or via some external source
-	(e.g. Flickr). Our <a
-	href="examples/downloader.html">Distributed Downloader</a>
-	example provides a good example of this. Please see the <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HIB
-	javadoc page</a> for more details on all of the HIB
-	operations, and the <a href="experiments.html">experiments</a>
-	page for information regarding the design of HIBs.
+	The <a href="examples.html">tools and examples</a> page describes a few programs for creating HIBs. Also, see the <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle class documentation</a> for more details and the <a href="experiments.html">experiments</a> page for information regarding the performance of HIBs versus common alterantives like Hadoop Sequence Files or Hadoop Archive Files.
 	
 	<h3>Float Image</h3>
 	
-	The primary input to Map tasks in HIPI is the <a
-	href="doc/api/hipi/image/FloatImage.html">FloatImage</a>
-	class. It is a simple representation of an image file as a set
-	of pixels specified with single floating-point
-	precision. Several common operations can be performed on a
-	FloatImage:
+	After each image in a HIB is decompressed and decoded it is presented to the map tasks as a <a href="doc/api/hipi/image/FloatImage.html">FloatImage</a> object. This is a simple representation of the image pixel data as an array of floating point values. The FloatImage class supports several common operations:
 	<ul>
 	  <li>
-	    Create a float image from a file (see <a
-	    href="doc/api/hipi/image/io/JPEGImageUtil.html">JPEGImageUtil</a>)
-	    <pre id="Classes">
-  FileInputStream file = <font id="New">new</font> FileInputStream(<font id="StringLiteral">"/path/to/image.jpg"</font>);
-  FloatImage image = JPEGImageUtil.getInstance().decodeImage(file);
+	    Create a FloatImage from a file (see <a href="doc/api/hipi/image/io/JPEGImageUtil.html">JPEGImageUtil</a>)
+	    <pre class="prettyprint">
+FileInputStream file = new FileInputStream("/path/to/image.jpg");
+FloatImage image = JPEGImageUtil.getInstance().decodeImage(file);
 	    </pre>
 	  </li>
 	  <li>
 	    Get/set pixels values
-	    <pre id="Classes">
-  <font id="Float">float</font> red = image.getPixel(0, 0, 0);
-  <font id="Float">float</font> green = image.getPixel(0, 0, 1);
-  <font id="Float">float</font> blue = image.getPixel(0, 0, 2);
-  image.setPixel(0, 0, 0, red / 2);
-  image.setPixel(0, 0, 1, green / 2);
-  image.setPixel(0, 0, 2, blue / 2);
+	    <pre class="prettyprint">
+float red = image.getPixel(0, 0, 0);
+float grn = image.getPixel(0, 0, 1);
+float blu = image.getPixel(0, 0, 2);
+image.setPixel(0, 0, 0, red/2.0);
+image.setPixel(0, 0, 1, grn/2.0);
+image.setPixel(0, 0, 2, blu/2.0);
 	    </pre>
 	  </li>
 	  <li>
 	    Convert to grayscale
-	    <pre id="Classes">
-  FloatImage gray_image = image.convert(FloatImage.RGB2GRAY);
+	    <pre class="prettyprint">
+FloatImage grayImage = image.convert(FloatImage.RGB2GRAY);
 	    </pre>
 	  </li>
 	  <li>
-	    Basic arithmetic
-	    <pre id="Classes">
-  FloatImage image2 = <font id="New">new</font> FloatImage(image.getWidth(), image.getHeight(), image.getBands());
-  image2.add(2.0f);
-  image.scale(image2);
-  image.scale(2.0f);
-  image.add(image2);
-  image.add(2.0f);
+	    Add and scale
+	    <pre class="prettyprint">
+FloatImage image2 = new FloatImage(image.getWidth(), image.getHeight(), image.getBands());
+image2.add(2.0f);
+image.scale(image2);
+image.scale(2.0f);
+image.add(image2);
+image.add(2.0f);
 	    </pre>
 	  </li>
 	  <li>
-	    Image cropping
-	    <pre id="Classes">
-  FloatImage crop = image.crop(0, 0, 20, 20);
+	    Crop
+	    <pre class="prettyprint">
+FloatImage crop = image.crop(0, 0, 20, 20);
 	    </pre>
 	  </li>
 	</ul>
 
-	A <a href="doc/api/hipi/image/FloatImage.html">FloatImage</a>
-	is actually just a three-dimensional set of floating-point
-	values. Thus it can also be treated as a matrix (or tensor)
-	and used accordingly. The function <a
-	href="doc/api/hipi/image/FloatImage.html#getData()">FloatImage::getData</a>
-	converts the FloatImage into its array representation and can
-	be used directly with the popular BLAS/LAPACK Java
-	implementation <a class="external_link"
-	href="http://icl.cs.utk.edu/f2j/">f2j</a> to perform standard
-	matrix operations. Creating a FloatImage from an array of
-	pixels can be performed via a special form of the <a
-	href="doc/api/hipi/image/FloatImage.html#FloatImage(int, int,
-	int, float[])">FloatImage constructor</a>. <br /><br />
-
-	As mentioned in the Overview section, HIPI takes as input a
-	HIPI Image Bundle and sends records (key-value pairs) to
-	user-specified Mapper functions with the key being an object
-	of type <a
-	href="doc/api/hipi/image/ImageHeader.html">ImageHeader</a> and
-	the value being an object of type <a
-	href="doc/api/hipi/image/FloatImage.html">FloatImage</a>. For
-	each image contained in the HIB that passes the optional
-	culling step one such record will be generated.
+	The function <a href="doc/api/hipi/image/FloatImage.html#getData()">FloatImage::getData</a> provides access to the underlying floating point array and can be used directly with matrix libraries such as the BLAS/LAPACK Java implementation <a class="external_link" href="http://icl.cs.utk.edu/f2j/">f2j</a>. Creating a FloatImage from an array of floats is possible with <a href="doc/api/hipi/image/FloatImage.html#FloatImage(int, int, int, float[])">this FloatImage constructor</a>. <br /><br /> 
 	
 	<h3>Cull Mapper</h3>
 	
-	HIPI provides a way for users to discard, or cull, images that
-	do not meet a set of criteria. The CullMapper class defines a
-	special type of Hadoop Mapper that contains an extra function
-	CullMapper::cull that can be used to test an ImageHeader
-	associated with a FloatImage for arbitrary
-	criteria. <br /><br />
+	Another important feature of HIPI is a culling step that takes place before the images in a HIB are distributed to map tasks for parallel processing. The <a href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html">CullMapper class</a> defines a special type of Hadoop Mapper that contains the method <a href="file:///Users/jason/work/proj/hipi-web/doc/api/hipi/imagebundle/mapreduce/CullMapper.html#cull(KEYIN)">CullMapper::cull</a> that allows using an <a href="doc/api/hipi/image/ImageHeader.html">ImageHeader</a> object to decide whether the image should be processed or not <i>before the image pixel data is decompressed and decoded</i>.<br /><br />
 
-	In the example below, the CullMapper is being used (which
-	inherits directly from Mapper) to process images taken with a
-	Canon PowerShot S500 digital camera and having dimensions 2592
-	by 1944. The function CullMapper::cull returns a boolean
-	indicating whether the image described by ImageHeader should
-	be discarded (true) or should be processed (false);
+	In the example below, the CullMapper is used to process only those images in a HIB that were taken with a Canon PowerShot S500 digital camera and have a resolution above some minimum threshold. The <tt>cull()</tt> method returns a boolean indicating whether the image should be culled (true) or sent to the <tt>map()</tt> method for processing (false).
 
-	<pre id="Classes">
-    <font id="Public">public</font> <font id="Static">static</font> <font id="Class">class</font> MyMapper <font id="Extends">extends</font> CullMapper&lt;ImageHeader, FloatImage, NullWritable, FloatImage&gt;
-    {       
-        <font id="Public">public</font> <font id="Boolean">boolean</font> cull(ImageHeader key) <font id="Throws">throws</font> IOException, InterruptedException {
-            <font id="If">if</font>(key.getEXIFInformation(<font id="StringLiteral">"Model"</font>).equals(<font id="StringLiteral">"Canon PowerShot S500"</font>) &amp;&amp; key.width == <font id="IntegerLiteral">2592</font> &amp;&amp; key.height == <font id="IntegerLiteral">1944</font>)
-                <font id="Return">return</font> <font id="False">false</font>;
-            <font id="Else">else</font>
-                <font id="Return">return</font> <font id="True">true</font>;
-        }
+	<pre class="prettyprint">
+public static class MyMapper extends CullMapper&lt;ImageHeader, FloatImage, NullWritable, FloatImage&gt; {       
+
+  public boolean cull(ImageHeader key) throws IOException, InterruptedException {
+    if (key.getEXIFInformation("Model").equals("Canon PowerShot S500") &amp;&amp; key.width >= 1024 &amp;&amp; key.height >= 1024) {
+      return false;
+    } else {
+      return true;
+    }
+  }
         
-        <font id="Public">public</font> <font id="Void">void</font> map(ImageHeader key, FloatImage value, Context context) <font id="Throws">throws</font> IOException, InterruptedException {
+  public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException {
+     ...
+  }
+
+}
 	</pre>
-
-
 
       </div>
 

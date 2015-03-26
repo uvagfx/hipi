@@ -47,11 +47,11 @@
 
 	<h2 class="title">Contribute</h2>
 
-	HIPI is an open-source project maintained by a group of dedicated researchers at the University of Virginia's Computer Graphics Lab. Please help us make HIPI better by <a class="external_link" href="https://github.com/uvagfx/hipi">forking the official HIPI repository</a>, fixing bugs, adding new features, creating more example programs, etc., creating unit tests to verify the accuracy of your new code, and issuing a <a class="external_link" href="https://help.github.com/articles/using-pull-requests/">pull request</a>.
+	HIPI is an open-source project maintained by a group of dedicated researchers and developers. Please help us make HIPI better by <a class="external_link" href="https://github.com/uvagfx/hipi">forking the official HIPI repository</a>, fixing bugs, adding new features, creating more example programs, etc., creating unit tests to verify the accuracy of your new code, and issuing a <a class="external_link" href="https://help.github.com/articles/using-pull-requests/">pull request</a>.
 
 	<h3>Bugs and Feature Requests</h3>
 
-	We use GitHub's <a class="external_link" href="https://github.com/uvagfx/hipi/issues">issue tracker</a> to manage bugs and feature requests. If you're unsure whether or not you've found a new bug post a question to the <a class="external_link" href="https://groups.google.com/forum/#!forum/hipi-users">HIPI Users Group</a>.
+	We use GitHub's <a class="external_link" href="https://github.com/uvagfx/hipi/issues">issue tracker</a> to keep up with bugs and feature requests. If you're unsure whether or not you've found a new bug please first post a question to the <a class="external_link" href="https://groups.google.com/forum/#!forum/hipi-users">HIPI Users Group</a>.
 
 	<h3>Code Style</h3>
 
@@ -59,7 +59,23 @@
 
 	<h3>Unit Tests</h3>
 
-	Any new features or fixes must be accompanied by a unit test.
+	Any new feature or bug fix must be accompanied by a comprehensive set of unit tests. You can run HIPI's suite of unit tests by executing the following <tt>ant</tt> build command in the HIPI root directory:
+
+	<pre class="console">
+$> ant test
+...
+test:
+     [java] JUnit version 4.11
+     [java] ..............
+     [java] Time: 3.439
+     [java] 
+     [java] OK (17 tests)
+     [java] 
+
+BUILD SUCCESSFUL
+Total time: 5 seconds
+	</pre>	
+	
 
     </div>
     <!-- End Content -->

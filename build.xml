@@ -1,35 +1,48 @@
 <project basedir="." default="all">
 
   <target name="setup">
+
     <echo message="Setting properties for build task..."/>
-    <!-- TODO: update the following two variables according to your local installation of Hadoop -->
-    <!-- <property name="hadoop.home" value="/opt/hadoop-2.6.0/share/hadoop" /> --> <!-- Linux -->
-    <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" /> <!-- Mac OS X / Homebrew -->
-    <property name="hadoop.version" value="2.6.0" />
+
+    <!-- IMPORTANT: You must update the following two properties according to your Hadoop setup -->
+    <!-- <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" /> -->
+    <!-- <property name="hadoop.version" value="2.6.0" /> -->
 
     <property name="hipi.version" value="2.0" />
 
-    <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-${hadoop.version}.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/hdfs/hadoop-hdfs-${hadoop.version}.jar:${hadoop.home}/common/hadoop-nfs-${hadoop.version}.jar" />
+    <!-- Hadoop dependencies -->
+    <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-${hadoop.version}.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/common/lib/hadoop-auth-${hadoop.version}.jar:${hadoop.home}/hdfs/hadoop-hdfs-${hadoop.version}.jar:${hadoop.home}/common/hadoop-nfs-${hadoop.version}.jar" />
 
-    <!-- jars for test suite -->
-    <property name="junit.jar" value="3rdparty/junit-4.12.jar" />
-    <property name="hamcrest.jar" value="3rdparty/hamcrest-core-1.3.jar" />
-    <property name="commons.logging.jar" value="3rdparty/commons-logging-1.1.2.jar" />
-    <property name="guava.jar" value="3rdparty/guava-18.0.jar" />
-    <property name="commons.collections.jar" value="3rdparty/commons-collections-3.2.1.jar" />
-    <property name="commons.lang.jar" value="3rdparty/commons-lang-2.6.jar" />
-    <property name="commons.configuration.jar" value="3rdparty/commons-configuration-1.10.jar" />
-    <property name="hadoop.auth.jar" value="3rdparty/hadoop-auth-2.5.1.jar" />
-    <property name="slf4j.api.jar" value="3rdparty/slf4j-api-1.7.10.jar" />
-    <property name="log4j.jar" value="3rdparty/log4j-1.2.17.jar" />
-    <property name="avro.jar" value="3rdparty/avro-1.7.7.jar" />
+    <!-- External dependencies -->
+    <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
+    <property name="hamcrest.jar" value="${hadoop.home}/common/lib/hamcrest-core-1.3.jar" />
+    <property name="commons.logging.jar" value="${hadoop.home}/common/lib/commons-logging-1.1.3.jar" />
+    <property name="guava.jar" value="${hadoop.home}/common/lib/guava-11.0.2.jar" />
+    <property name="commons.collections.jar" value="${hadoop.home}/common/lib/commons-collections-3.2.1.jar" />
+    <property name="commons.lang.jar" value="${hadoop.home}/common/lib/commons-lang-2.6.jar" />
+    <property name="commons.configuration.jar" value="${hadoop.home}/common/lib/commons-configuration-1.6.jar" />
+    <property name="slf4j.api.jar" value="${hadoop.home}/common/lib/slf4j-api-1.7.5.jar" />
+    <property name="log4j.jar" value="${hadoop.home}/common/lib/log4j-1.2.17.jar" />
+    <property name="avro.jar" value="${hadoop.home}/common/lib/avro-1.7.4.jar" />
+
+    <!-- https://drewnoakes.com/code/exif/ -->    
+    <property name="xmpcore.jar" value="./3rdparty/xmpcore-5.1.2.jar" />
+    <property name="metadata.jar" value="./3rdparty/metadata-extractor-2.7.2.jar" />
+
     <echo message="Properties set."/>
   </target>
 
   <target name="test_settings">
     <echo message="Confirming that hadoop settings are set..."/>
-    <fail unless="hadoop.home" message="The property hadoop.home was not specified. You must specify the home directory for Hadoop in the build.xml file." />
-    <fail unless="hadoop.version" message="The property hadoop.version was not specified. You must specify version of Hadoop you are using in the build.xml file." />
+    <fail unless="hadoop.home" message="The property hadoop.home was not specified.${line.separator}You must specify the home directory for Hadoop in the build.xml file.${line.separator}See http://hipi.cs.virginia.edu/gettingstarted.html for details."/>
+    <fail unless="hadoop.version" message="The property hadoop.version was not specified.${line.separator}You must specify the version of Hadoop you are using in the build.xml file.${line.separator}See http://hipi.cs.virginia.edu/gettingstarted.html for details."/>
+    <fail message="File does not exist: ${hadoop.home}/common/hadoop-common-${hadoop.version}.jar${line.separator}Check the hadoop.home and hadoop.version properties in build.xml.${line.separator}See http://hipi.cs.virginia.edu/gettingstarted.html for details.">
+      <condition>
+        <not>
+          <available file="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar" />
+        </not>
+      </condition>      
+    </fail>
     <echo message="Properties are specified properly."/>
   </target>
 
@@ -38,7 +51,7 @@
     <mkdir dir="bin" />
     
     <!-- Compile -->
-    <javac nowarn="on" includeantruntime="no" srcdir="${srcdir}" destdir="./bin" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar">
+    <javac debug="yes" nowarn="on" includeantruntime="no" srcdir="${srcdir}" destdir="./bin" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar">
       <compilerarg value="-Xlint:deprecation" />
     </javac>
     
@@ -59,13 +72,11 @@
       <property name="hadoop.home" value="${hadoop.home}" />
       <property name="hadoop.version" value="${hadoop.version}" />
       <property name="hadoop.classpath" value="${hadoop.classpath}" />
-      
-       <!-- https://github.com/drewnoakes/metadata-extractor -->
-      <property name="xmpcore.jar" value="../3rdparty/xmpcore.jar" />  <!-- metadata extractor dependency -->
-      <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.6.4.jar" />
-      
-      <!-- Unit Testing -->
-      <property name="junit.jar" value="../3rdparty/junit-4.12.jar" />
+       <!-- https://drewnoakes.com/code/exif/ -->
+      <property name="xmpcore.jar" value="../3rdparty/xmpcore-5.1.2.jar" />
+      <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.7.2.jar" />
+      <!-- Unit test dependencies -->
+      <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
     </ant>
     <echo message="Hipi library built."/>
   </target>
@@ -144,21 +155,43 @@
 
   <!-- Runs all of the HIPI unit tests -->
   <target name="test" depends="setup,test_settings,hipi">
-    <javac includeantruntime="false" fork="true" srcdir="src/hipi/unittest" destdir="lib/hipi/unittest" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:./3rdparty/junit-4.12.jar:./3rdparty/hamcrest-core-1.3.jar" debug="on"></javac>
-    <java fork="true" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${hadoop.auth.jar}:${slf4j.api.jar}:${log4j.jar}:${metadata.jar}:${avro.jar}:./lib/hipi-${hipi.version}.jar:./lib">
+    <javac includeantruntime="false" fork="true" srcdir="libsrc/hipi/unittest" destdir="lib/hipi/unittest" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
+    <java fork="true" maxmemory="2048m" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${slf4j.api.jar}:${log4j.jar}:${avro.jar}:./lib/hipi-${hipi.version}.jar">
       <arg value="hipi.unittest.AllTests"/>
     </java>
   </target>
+
+  <!-- Produces HIPI javadoc documentation for HIPI -->
+   <target name="doc" depends="setup,test_settings,hipi">
+
+    <!-- Delete existing version of docs -->
+    <delete dir = "./doc/api" />
+    <mkdir dir="./doc/api" />
+
+     <javadoc packagenames="hipi.*"
+	      excludepackagenames="hipi.container"
+	      sourcepath="./libsrc"
+	      destdir="./doc/api"
+	      windowtitle="HIPI - Hadoop Image Processing Interface"
+	      classpath="${hadoop.classpath}:${junit.jar}:${xmpcore.jar}:${metadata.jar}">
+       <doctitle><![CDATA[<h1>HIPI - Hadoop Image Processing Interface</h1>]]></doctitle>
+       <bottom><![CDATA[<i>Copyright &#169; 2014 <a target="_blank" href="http://www.virginia.edu/">University of Virginia</a>. All Rights Reserved.</i>]]></bottom>
+       <link href="http://docs.oracle.com/javase/6/docs/api/"/>
+       <link href="http://hadoop.apache.org/docs/stable/api/"/>
+       <link href="http://javadoc.metadata-extractor.googlecode.com/git/2.7.0/"/>
+     </javadoc>
+    
+   </target>
   
-  <target name="all" depends="hipi,hibimport,downloader,dumphib,jpegfromhib,createsequencefile,covariance" />
+   <target name="all" depends="hipi,hibimport,downloader,dumphib,jpegfromhib,createsequencefile,covariance" />
 
-  <!-- Clean -->
-  <target name="clean">
-    <delete dir="lib" />
-    <delete dir="bin" />
-    <delete>
-      <fileset dir="." includes="examples/*.jar,experiments/*.jar" />
-    </delete>
-  </target>
-
-</project>
+   <!-- Clean -->
+   <target name="clean">
+     <delete dir="lib" />
+     <delete dir="bin" />
+     <delete>
+       <fileset dir="." includes="examples/*.jar,experiments/*.jar" />
+     </delete>
+   </target>
+   
+ </project>

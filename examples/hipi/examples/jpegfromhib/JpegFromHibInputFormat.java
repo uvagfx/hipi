@@ -1,7 +1,10 @@
 package hipi.examples.jpegfromhib;
 
+import hipi.image.ImageHeader;
+import hipi.image.FloatImage;
 import hipi.imagebundle.AbstractImageBundle;
 import hipi.imagebundle.HipiImageBundle;
+import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
@@ -23,90 +26,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-public class JpegFromHibInputFormat extends FileInputFormat<NullWritable, BytesWritable> {
+public class JpegFromHibInputFormat extends FileInputFormat<ImageHeader, BytesWritable> {
 
   @Override
-  public RecordReader<NullWritable, BytesWritable> createRecordReader(InputSplit split,
+  public RecordReader<ImageHeader, BytesWritable> createRecordReader(InputSplit split,
       TaskAttemptContext context) throws IOException, InterruptedException {
     return new JpegFromHibRecordReader();
   }
-  //pulls data from HipiImageBundle, which is then read as BytesWritable objects by the RecordReader
+
   @Override
   public List<InputSplit> getSplits(JobContext jobContext) throws IOException {
-    Configuration conf = jobContext.getConfiguration();
-    int numMapTasks = conf.getInt("hipi.map.tasks", 0);
-    List<InputSplit> splits = new ArrayList<InputSplit>();
-    for (FileStatus file : listStatus(jobContext)) {
-      Path path = file.getPath();
-      FileSystem fileSystem = path.getFileSystem(conf);
-      HipiImageBundle hib = new HipiImageBundle(path, conf);
-      hib.open(AbstractImageBundle.FILE_MODE_READ);
-      // offset should be guaranteed to be in order
-      List<Long> offsets = hib.getOffsets();
-      BlockLocation[] blkLocations =
-          fileSystem.getFileBlockLocations(hib.getDataFile(), 0, offsets.get(offsets.size() - 1));
-      if (numMapTasks == 0) {
-        int i = 0, b = 0;
-        long lastOffset = 0, currentOffset = 0;
-        for (; (b < blkLocations.length) && (i < offsets.size()); b++) {
-          long next = blkLocations[b].getOffset() + blkLocations[b].getLength();
-          while (currentOffset < next && i < offsets.size()) {
-            currentOffset = offsets.get(i);
-            i++;
-          }
-          String[] hosts = null;
-          if (currentOffset > next) {
-            Set<String> hostSet = new HashSet<String>();
-            int endIndex = getBlockIndex(blkLocations, currentOffset - 1);
-            for (int j = b; j < endIndex; j++) {
-              String[] blkHosts = blkLocations[j].getHosts();
-              for (int k = 0; k < blkHosts.length; k++) {
-                hostSet.add(blkHosts[k]);
-              }
-            }
-            hosts = (String[]) hostSet.toArray(new String[hostSet.size()]);
-          } else { // currentOffset == next
-            hosts = blkLocations[b].getHosts();
-          }
-          splits.add(new FileSplit(hib.getDataFile().getPath(), lastOffset, currentOffset
-              - lastOffset, hosts));
-          lastOffset = currentOffset;
-        }
-        System.out.println(b + " tasks spawned");
-      } else {
-        int imageRemaining = offsets.size();
-        int i = 0, taskRemaining = numMapTasks;
-        long lastOffset = 0, currentOffset;
-        while (imageRemaining > 0) {
-          int numImages = imageRemaining / taskRemaining;
-          if (imageRemaining % taskRemaining > 0) {
-            numImages++;
-          }
-          int next = Math.min(offsets.size() - i, numImages) - 1;
-          int startIndex = getBlockIndex(blkLocations, lastOffset);
-          currentOffset = offsets.get(i + next);
-          int endIndex = getBlockIndex(blkLocations, currentOffset - 1);
-          ArrayList<String> hosts = new ArrayList<String>();
-          // check getBlockIndex, and getBlockSize
-          for (int j = startIndex; j <= endIndex; j++) {
-            String[] blkHosts = blkLocations[j].getHosts();
-            for (int k = 0; k < blkHosts.length; k++) {
-              hosts.add(blkHosts[k]);
-            }
-          }
-          splits.add(new FileSplit(hib.getDataFile().getPath(), lastOffset, currentOffset
-              - lastOffset, hosts.toArray(new String[hosts.size()])));
-          lastOffset = currentOffset;
-          i += next + 1;
-          taskRemaining--;
-          imageRemaining -= numImages;
-          System.out.println("imageRemaining: " + imageRemaining + "\ttaskRemaining: "
-              + taskRemaining + "\tlastOffset: " + lastOffset + "\ti: " + i);
-        }
-      }
-      hib.close();
-    }
-    return splits;
+    // See ImageBundleInputFormat.java
+    return ImageBundleInputFormat.computeSplits(jobContext, listStatus(jobContext));
   }
+
 }

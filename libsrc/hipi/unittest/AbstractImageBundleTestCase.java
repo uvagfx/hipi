@@ -1,29 +1,28 @@
 package hipi.unittest;
 
-import static org.junit.Assert.*;
 import hipi.image.FloatImage;
+import hipi.image.ImageHeader;
 import hipi.image.ImageHeader.ImageType;
 import hipi.image.io.ImageDecoder;
 import hipi.image.io.JPEGImageUtil;
 import hipi.imagebundle.AbstractImageBundle;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public abstract class AbstractImageBundleTestCase {
 
   public abstract AbstractImageBundle createImageBundleAndOpen(int mode) throws IOException;
 
   @Before
-  public void setUp() throws IOException {
+  public void setup() throws IOException {
     AbstractImageBundle aib = createImageBundleAndOpen(AbstractImageBundle.FILE_MODE_WRITE);
-    aib.addImage(new FileInputStream("data/test/ImageBundleTestCase/read/0.jpg"),
-        ImageType.JPEG_IMAGE);
-    aib.addImage(new FileInputStream("data/test/ImageBundleTestCase/read/1.jpg"),
-        ImageType.JPEG_IMAGE);
+    aib.addImage(new FileInputStream("data/test/ImageBundleTestCase/read/0.jpg"), ImageType.JPEG_IMAGE);
+    aib.addImage(new FileInputStream("data/test/ImageBundleTestCase/read/1.jpg"), ImageType.JPEG_IMAGE);
     aib.close();
   }
 
@@ -31,13 +30,21 @@ public abstract class AbstractImageBundleTestCase {
   public void testIterator() throws IOException {
     AbstractImageBundle aib = createImageBundleAndOpen(AbstractImageBundle.FILE_MODE_READ);
     ImageDecoder decoder = JPEGImageUtil.getInstance();
+    int[] width = {640, 600};
+    int[] height = {480, 450};
+    int[] bands = {3, 3};
+    int[] depth = {8, 8};
     int count = 0;
     while (aib.hasNext()) {
-      aib.next();
+      ImageHeader header = aib.next();
       FloatImage image = aib.getCurrentImage();
-      FloatImage source =
-          decoder.decodeImage(new FileInputStream("data/test/ImageBundleTestCase/read/" + count
-              + ".jpg"));
+      FloatImage source = decoder.decodeImage(new FileInputStream("data/test/ImageBundleTestCase/read/" + count + ".jpg"));
+      assertEquals(count + " image header fails", width[count], header.width);
+      assertEquals(count + " image header fails", height[count], header.height);
+      assertEquals(count + " image header fails", depth[count], header.bitDepth);
+      assertEquals(count + " image fails", width[count], source.getWidth());
+      assertEquals(count + " image fails", height[count], source.getHeight());
+      assertEquals(count + " image fails", bands[count], source.getBands());
       assertEquals(count + " image fails", source, image);
       count++;
     }

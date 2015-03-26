@@ -8,11 +8,6 @@ import hipi.image.io.ImageDecoder;
 import hipi.container.HARIndexContainer;
 import hipi.util.HARIndexContainerSorter;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -20,6 +15,12 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.HarFileSystem;
 import org.apache.hadoop.fs.Path;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class HARImageBundle extends AbstractImageBundle {
   private HarFileSystem _harfs = null;
@@ -37,20 +38,13 @@ public class HARImageBundle extends AbstractImageBundle {
   private ArrayList<HARIndexContainer> indexHash;
 
   public HARImageBundle(Path file_path, Configuration conf) {
-
     super(file_path, conf);
-    System.out.println("1: " + file_path.toString());
-
-    System.out.println("2: " + _file_path.toString());
-
   }
 
   @Override
   protected void openForWrite() throws IOException {
     _imageCount = 0;
-
     indexHash = new ArrayList<HARIndexContainer>();
-    System.out.println("3: " + _file_path.toString());
     Path tmpOutputDir = new Path(_file_path.toUri().getPath());
     String partname = "part-0"; // TODO: temp solution... need to figure how to have multiple splits
     Path tmpOutput = new Path(tmpOutputDir, partname);
@@ -81,9 +75,9 @@ public class HARImageBundle extends AbstractImageBundle {
   protected void openForRead() throws IOException {
     _harfs = new HarFileSystem(FileSystem.get(_conf));
     Path qualifiedPath = new Path("har://", _file_path.toUri().getPath());
+    System.out.println("Initializing HARFS with qualified path: " + qualifiedPath.toUri().toString());
     _harfs.initialize(qualifiedPath.toUri(), _conf);
-    System.out.println("HARFS Initialized");
-
+    System.out.println("HARFS initialized");
     _filesInHar = _harfs.listStatus(qualifiedPath);
     _imageCount = _filesInHar.length;
     _current_image = 0;
@@ -107,8 +101,8 @@ public class HARImageBundle extends AbstractImageBundle {
     }
     Path relPath = new Path(src_path.toUri().getPath());
     String partname = "part-0";
-    String value =
-        relPath.toString() + " file " + partname + " " + writer_startPos + " " + filelen + " ";
+    String value = 
+      relPath.toString() + " file " + partname + " " + writer_startPos + " " + filelen + " ";
 
     String towrite = value + "\n";
     indexHash.add(new HARIndexContainer(hash, towrite));
@@ -189,7 +183,6 @@ public class HARImageBundle extends AbstractImageBundle {
     }
     toWrite += "\n";
     indexHash.add(new HARIndexContainer(HarFileSystem.getHarHash(relPath), toWrite));
-
 
     // try to create index files
     Path masterIndex = new Path(_file_path, "_masterindex");

@@ -29,7 +29,7 @@ public class MetadataReader {
     _ubis = new UnclosableBufferedInputStream(is);
   }
 
-  public Metadata extract() throws JpegProcessingException {
+  public Metadata extract() throws JpegProcessingException, IOException {
     return JpegMetadataReader.readMetadata(_ubis);
   }
 }

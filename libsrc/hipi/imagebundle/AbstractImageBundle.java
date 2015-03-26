@@ -19,7 +19,7 @@ import org.apache.hadoop.fs.Path;
  * Base class for all image bundles in HIPI. All subclasses must implement methods to open, read,
  * and close the image bundles.
  * 
- * This class can also be used to write an image bundle but image bundles have to read and written
+ * This class can also be used to write an image bundle but image bundles have to be read and written
  * sequentially. Thus, in order to create an image bundle, you have to open a new file and then
  * write the entire contents. Once you have opened the file you cannot read anything from the file
  * until you have closed it.
@@ -46,13 +46,15 @@ public abstract class AbstractImageBundle {
    *        to)
    * @param conf {@link Configuration} that determines the {@link FileSystem} for the image bundle
    */
-  public AbstractImageBundle(Path file_path, Configuration conf) {
-    _file_path = file_path;
-    _conf = conf;
+  public AbstractImageBundle(Path file_path, Configuration conf) 
+  {
+      _file_path = file_path;
+      _conf = conf;
   }
 
-  public final void open(int mode) throws IOException {
-    open(mode, false);
+  public final void open(int mode) throws IOException 
+  {
+      open(mode, false);
   }
 
   /**
@@ -115,11 +117,9 @@ public abstract class AbstractImageBundle {
   }
 
   public final void addImage(FloatImage image, ImageEncoder encoder, ImageHeader header)
-      throws IOException {
+    throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
     encoder.encodeImage(image, header, baos);
-
     addImage(new ByteArrayInputStream(baos.toByteArray()), header.getImageType());
   }
 

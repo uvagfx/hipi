@@ -1,4 +1,3 @@
-hipi.container
 hipi.image
 hipi.image.convert
 hipi.image.io
@@ -6,4 +5,5 @@ hipi.imagebundle
 hipi.imagebundle.mapreduce
 hipi.imagebundle.mapreduce.output
 hipi.tool
+hipi.unittest
 hipi.util

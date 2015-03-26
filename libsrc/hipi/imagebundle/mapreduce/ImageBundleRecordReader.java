@@ -26,47 +26,43 @@ public class ImageBundleRecordReader extends RecordReader<ImageHeader, FloatImag
   private Configuration conf;
   private HipiImageBundle.FileReader reader;
 
-
   @Override
   public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
 
-    FileSplit bundleSplit = (FileSplit) split;
+    FileSplit bundleSplit = (FileSplit)split;
     conf = context.getConfiguration();
+    
     Path path = bundleSplit.getPath();
     FileSystem fs = path.getFileSystem(conf);
-
-    // reader specifies start and end, for which start + length would be the beginning of a new
-    // file, which is undesirable to reader, -1 must be applied.
-    System.out.println("record start from " + bundleSplit.getStart() + " end at "
-        + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
-
-    reader =
-        new HipiImageBundle.FileReader(fs, path, conf, bundleSplit.getStart(),
-            bundleSplit.getStart() + bundleSplit.getLength() - 1);
+    
+    // Report locations of first and last byte in image segment
+    System.out.println("Record starts at byte " + bundleSplit.getStart() + " and ends at byte " + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
+    
+    reader = new HipiImageBundle.FileReader(fs, path, conf, bundleSplit.getStart(), bundleSplit.getStart() + bundleSplit.getLength() - 1);
   }
-
+  
   @Override
   public void close() throws IOException {
     reader.close();
   }
 
   @Override
-  public ImageHeader getCurrentKey() throws IOException, InterruptedException {
+  public ImageHeader getCurrentKey() throws IOException, InterruptedException  {
     return reader.getCurrentKey();
   }
 
   @Override
-  public FloatImage getCurrentValue() throws IOException, InterruptedException {
+  public FloatImage getCurrentValue() throws IOException, InterruptedException  {
     return reader.getCurrentValue();
   }
-
+  
   @Override
-  public float getProgress() throws IOException {
+  public float getProgress() throws IOException  {
     return reader.getProgress();
   }
-
+  
   @Override
-  public boolean nextKeyValue() throws IOException, InterruptedException {
+  public boolean nextKeyValue() throws IOException, InterruptedException  {
     return reader.nextKeyValue();
   }
 }

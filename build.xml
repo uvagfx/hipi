@@ -36,6 +36,13 @@
     <echo message="Confirming that hadoop settings are set..."/>
     <fail unless="hadoop.home" message="The property hadoop.home was not specified.${line.separator}You must specify the home directory for Hadoop in the build.xml file.${line.separator}See http://hipi.cs.virginia.edu/gettingstarted.html for details."/>
     <fail unless="hadoop.version" message="The property hadoop.version was not specified.${line.separator}You must specify the version of Hadoop you are using in the build.xml file.${line.separator}See http://hipi.cs.virginia.edu/gettingstarted.html for details."/>
+    <fail message="File does not exist: ${hadoop.home}/common/hadoop-common-${hadoop.version}.jar${line.separator}Check the hadoop.home and hadoop.version properties in build.xml.${line.separator}See http://hipi.cs.virginia.edu/gettingstarted.html for details.">
+      <condition>
+        <not>
+          <available file="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar" />
+        </not>
+      </condition>      
+    </fail>
     <echo message="Properties are specified properly."/>
   </target>
 

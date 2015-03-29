@@ -124,13 +124,13 @@ drwxr-xr-x   - user group          0 2015-03-12 12:15 testimages.hib_output
 -rw-r--r--   1 user group        605 2015-03-12 12:07 testimages.txt
 	</pre>
 
-	You can use tools like <a href="../examples/dumphib.html"><b>dumphib</b></a> and <a href="../examples/jpegfromhib.html"><b>JpegFromHib</b></a> to do a deeper inspection of the <tt>testimages.hib</tt> and <tt>testimages.hib.dat</tt> files.
+	You can use tools like <a href="../examples/dumphib.html"><b>DumpHib</b></a> and <a href="../examples/jpegfromhib.html"><b>JpegFromHib</b></a> to do a deeper inspection of the <tt>testimages.hib</tt> and <tt>testimages.hib.dat</tt> files.
       
 	<h2 class="title">How downloader works</h2>
 	
 	<b>downloader</b> attempts to download a list of images located at URLs that are specified in an input ASCII text file with one URL per line. Because downloading a large set of images from a single computer can be slow and because typical cluster setups can support more bandwidth than an individual node, the downloader is designed to distribute this task to multiple nodes in a Hadoop cluster. In the following discussion, we assume that <b>downloader</b> is attempting to download <strong>k</strong> images using <strong>n</strong> download nodes and that the underlying Hadoop cluster is comprised of <strong>m</strong> compute nodes. Note that the number of download nodes requested by the user <strong>n</strong> is not necessarily equal to the number of compute nodes <strong>m</strong> though one would not expect any speed improvements after <strong>n</strong> exceeds <strong>m</strong> (i.e., once full cluster utilization is achieved). <br /><br />
 
-	To begin, let's study the class DownloaderInputFormat located in <tt>examples/hipi/examples/downloader/DownloaderInputFormat.java</tt>. This class extends the <a class="external_link" href="https://hadoop.apache.org/docs/r2.6.0/api/org/apache/hadoop/mapreduce/lib/input/FileInputFormat.html">FileInputFormat</a> Hadoop class and is responsible for parsing the input text file and initiating the map tasks that download the images. In particular, the <tt>getSplits()</tt> method in this class causes <strong>n</strong> map tasks to each download (<strong>k</strong> / <strong>n</strong>) images into separate <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIBs). After these map tasks have completed, a single reduce task merges these HIBs into one HIB located at the output path specified by the user. This diagram illustrates the process:
+	To begin, let's study the class DownloaderInputFormat located in <tt>examples/hipi/examples/downloader/DownloaderInputFormat.java</tt>. This class extends the <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/lib/input/FileInputFormat.html">FileInputFormat</a> Hadoop class and is responsible for parsing the input text file and initiating the map tasks that download the images. In particular, the <tt>getSplits()</tt> method in this class causes <strong>n</strong> map tasks to each download (<strong>k</strong> / <strong>n</strong>) images into separate <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIBs). After these map tasks have completed, a single reduce task merges these HIBs into one HIB located at the output path specified by the user. This diagram illustrates the process:
 
 	<img class="centered_image" src="downloader.png" width="500" alt="" />
 	
@@ -211,7 +211,7 @@ drwxr-xr-x   - user group          0 2015-03-12 12:15 testimages.hib_output
   } // while( hosts.size() &#60; nodes && i &#60; 2*nodes)
 	</pre>
 
-	After the list of unique hosts has been created, the next step is to generate a <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/lib/input/FileSplit.html">FileSplit</a> object for each map task. The FileSplit class is used in a slightly unorthodox way here in order to provide each map task with the subset of the URL list that it will be responsible for downloading. The constructor for the FileSplit class normally takes four arguments: the path to the file to split, the starting byte offset for the split, the byte length of the split, and the list of hosts where the split resides. Instead of following this convention, we replace the start offset and length parameters with the line offset and number of lines in the input image URL list that are to be processed by each map task:
+	After the list of unique hosts has been created, the next step is to generate a <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/lib/input/FileSplit.html">FileSplit</a> object for each map task. The FileSplit class is used in a slightly unorthodox way here in order to provide each map task with the subset of the URL list that it will be responsible for downloading. The constructor for the FileSplit class normally takes four arguments: the path to the file to split, the starting byte offset for the split, the byte length of the split, and the list of hosts where the split resides. Instead of following this convention, we replace the start offset and length parameters with the line offset and number of lines in the input image URL list that are to be processed by each map task:
 
 	<pre class="prettyprint">
   // Determine download schedule (number of images per node)
@@ -242,9 +242,9 @@ drwxr-xr-x   - user group          0 2015-03-12 12:15 testimages.hib_output
 
 	<h3>DownloaderRecordReader class</h3>
 
-	The Hadoop <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/RecordReader.html">RecordReader</a> class is responsible for emitting a set of key/value pairs (also known as records) for each <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/InputSplit.html">InputSplit</a> object that it receives from the <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/InputFormat.html">InputFormat</a> class. This is accomplished by having the map tasks repeatedly call the methods <tt>RecordReader::nextKeyValue()</tt>, <tt>RecordReader::getCurrentKey()</tt>, and <tt>RecordReader::getCurrentValue()</tt>. <br /><br />
+	The Hadoop <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/RecordReader.html">RecordReader</a> class is responsible for emitting a set of key/value pairs (also known as records) for each <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/InputSplit.html">InputSplit</a> object that it receives from the <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/InputFormat.html">InputFormat</a> class. This is accomplished by having the map tasks repeatedly call the methods <tt>RecordReader::nextKeyValue()</tt>, <tt>RecordReader::getCurrentKey()</tt>, and <tt>RecordReader::getCurrentValue()</tt>. <br /><br />
 
-	In the case of <b>downloader</b>, the DownloaderRecordReader is responsible for sending to each map task the set of lines in the input list of image URLs that it is responsible for downloading. As mentioned above, the DownloaderInputFormat class uses the <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/lib/input/FileSplit.html">FileSplit</a> object to hold this information. The <tt>initialize()</tt> method in DownloaderRecordReader is where these InputSplit objects are parsed to determine the subset of image URLs for each map task:
+	In the case of <b>downloader</b>, the DownloaderRecordReader is responsible for sending to each map task the set of lines in the input list of image URLs that it is responsible for downloading. As mentioned above, the DownloaderInputFormat class uses the <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/lib/input/FileSplit.html">FileSplit</a> object to hold this information. The <tt>initialize()</tt> method in DownloaderRecordReader is where these InputSplit objects are parsed to determine the subset of image URLs for each map task:
 
 	<pre class="prettyprint">
   public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
@@ -308,7 +308,7 @@ drwxr-xr-x   - user group          0 2015-03-12 12:15 testimages.hib_output
 	<h3>DownloaderMapper class</h3>
 
 	The <a class="external_link"
-	href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/RecordReader.html">RecordReader</a>
+	href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/RecordReader.html">RecordReader</a>
 	emits records to the DownloaderMapper where the keys are the starting line in the input list of
 	URLs and the values are the URLs to be downloaded (a single Text object delimited by newline characters). Within the <tt>map()</tt> method in DownloaderMapper, the task is to download
 	this list of images to a <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB). These HIBs are subsequently concatenated into a single HIB in the reduce task.<br /><br /> 
@@ -370,7 +370,7 @@ drwxr-xr-x   - user group          0 2015-03-12 12:15 testimages.hib_output
 
 	<h3>DownloaderReducer class</h3>
 
-	The DownloaderReducer class extends the Hadoop <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Reducer.html">Reducer</a> class and implements the <tt>reduce()</tt> method. In this case, it's job is pretty straightforward: it simply appends each of the HIBs produced by the map tasks into a single HIB at the path specified by the user:
+	The DownloaderReducer class extends the Hadoop <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/Reducer.html">Reducer</a> class and implements the <tt>reduce()</tt> method. In this case, it's job is pretty straightforward: it simply appends each of the HIBs produced by the map tasks into a single HIB at the path specified by the user:
 
 	<pre class="prettyprint">
     public void reduce(BooleanWritable key, Iterable<Text> values, Context context) 

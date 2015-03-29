@@ -239,7 +239,7 @@ $> ./runCovariance.sh &#60;input HIB&#62; &#60;output directory&#62;
 
       <h3>The Covariance Mapper</h3>
 
-      Recall that the covariance calculation requires the average image patch. This object is accessed inside the <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a> method defined in CovarianceMapper with the following lines:
+      Recall that the covariance calculation requires the average image patch. This object is accessed inside the <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a> method defined in CovarianceMapper with the following lines:
 
       <pre class="prettyprint">
 	// Access the job cache

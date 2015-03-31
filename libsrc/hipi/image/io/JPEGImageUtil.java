@@ -59,19 +59,19 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 	if ((data[1] & 0xff) == 0x01 || ((data[1] & 0xff) >= 0xd0 && (data[1] & 0xff) <= 0xd7))
 	  continue;
 	long length = (((data[2] & 0xff) << 8) | (data[3] & 0xff)) - 2;
-	if ((data[1] & 0xff) != 0xc0) {
+	if ((data[1] & 0xff) == 0xc0 || (data[1] & 0xff) == 0xc2) {
+	  dis.read(data);
+	  header.height = ((data[1] & 0xff) << 8) | (data[2] & 0xff);
+	  header.width = ((data[3] & 0xff) << 8) | (data[4] & 0xff);
+	  header.bitDepth = data[0] & 0xff;
+	  break;
+	} else {
 	  while (length > 0) {
 	    long skipped = dis.skip(length);
 	    if (skipped == 0)
 	      break;
 	    length -= skipped;
 	  }
-	} else {
-	  dis.read(data);
-	  header.height = ((data[1] & 0xff) << 8) | (data[2] & 0xff);
-	  header.width = ((data[3] & 0xff) << 8) | (data[4] & 0xff);
-	  header.bitDepth = data[0] & 0xff;
-	  break;
 	}
       }
       

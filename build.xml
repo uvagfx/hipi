@@ -4,10 +4,9 @@
 
     <echo message="Setting properties for build task..."/>
 
-    <!-- TODO: update the following two variables according to your local installation of Hadoop -->
-    <!-- <property name="hadoop.home" value="/opt/hadoop-2.6.0/share/hadoop" /> --> <!-- Linux -->
-    <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" /> <!-- Mac OS X / Homebrew -->
-    <property name="hadoop.version" value="2.6.0" />
+    <!-- IMPORTANT: You must update the following two properties according to your Hadoop setup -->
+    <!-- <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" /> -->
+    <!-- <property name="hadoop.version" value="2.6.0" /> -->
 
     <property name="hipi.version" value="2.0" />
 
@@ -39,8 +38,15 @@
 
   <target name="test_settings">
     <echo message="Confirming that hadoop settings are set..."/>
-    <fail unless="hadoop.home" message="The property hadoop.home was not specified. You must specify the home directory for Hadoop in the build.xml file." />
-    <fail unless="hadoop.version" message="The property hadoop.version was not specified. You must specify version of Hadoop you are using in the build.xml file." />
+    <fail unless="hadoop.home" message="The property hadoop.home was not specified.${line.separator}You must specify the home directory for Hadoop in the build.xml file.${line.separator}See http://hipi.cs.virginia.edu/gettingstarted.html for details."/>
+    <fail unless="hadoop.version" message="The property hadoop.version was not specified.${line.separator}You must specify the version of Hadoop you are using in the build.xml file.${line.separator}See http://hipi.cs.virginia.edu/gettingstarted.html for details."/>
+    <fail message="File does not exist: ${hadoop.home}/common/hadoop-common-${hadoop.version}.jar${line.separator}Check the hadoop.home and hadoop.version properties in build.xml.${line.separator}See http://hipi.cs.virginia.edu/gettingstarted.html for details.">
+      <condition>
+        <not>
+          <available file="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar" />
+        </not>
+      </condition>      
+    </fail>
     <echo message="Properties are specified properly."/>
   </target>
 
@@ -70,15 +76,17 @@
       <property name="hadoop.home" value="${hadoop.home}" />
       <property name="hadoop.version" value="${hadoop.version}" />
       <property name="hadoop.classpath" value="${hadoop.classpath}" />
-      
        <!-- https://drewnoakes.com/code/exif/ -->
       <property name="xmpcore.jar" value="../3rdparty/xmpcore-5.1.2.jar" />
       <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.7.2.jar" />
+<<<<<<< HEAD
       
       <!-- http://www.json.org/java/ -->
       <!-- JAR built from source at https://github.com/douglascrockford/JSON-java on 3/19/2015 -->
       <property name="json.jar" value="../3rdparty/json.jar"/>
 
+=======
+>>>>>>> development
       <!-- Unit test dependencies -->
       <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
     </ant>

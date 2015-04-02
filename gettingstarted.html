@@ -165,13 +165,16 @@ Already up-to-date.
 
 	Also, you can experiment with the <tt>development</tt> branch, which contains the latest features that have not yet been integrated into the main release branch. Note that the <tt>development</tt> branch is generally less stable than the <tt>release</tt> branch.<br /><br />
 
+        <h3>4. Eclipse Setup (Optional)</h3>
+
+        If you would like to integrate HIPI into an <a class="external_link" href="https://eclipse.org/">Eclipse</a> project (useful for debugging), take a look at our brief <a href="eclipse.html">Eclipse Setup Tutorial</a>.<br /><br />
+
 	Next, we walk you through the process of writing your first HIPI program. Be sure to also check out the <a href="examples.html">tools and examples page</a> to learn much more about HIPI.
 
       </div>
 
       <h3>A Quick Overview of HIPI: The Three Main Classes</h3>
 
-      <div class="section">
 
 	The classes most frequently used in HIPI are <a href="doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) for representing a collection of images on the HDFS, <a href="doc/api/hipi/image/FloatImage.html">FloatImage</a> for representing a decoded image in memory, and the <a href="doc/api/hipi/imagebundle/mapreduce/CullMapper.html">CullMapper</a> class. The full API for HIPI can be found on our <a href="documentation.html">documentation</a> page.
 	
@@ -294,7 +297,6 @@ public static class MyMapper extends CullMapper&lt;ImageHeader, FloatImage, Null
 }
 	</pre>
 
-      </div>
 
       <h3>Your First HIPI Program</h3>
 
@@ -566,3 +568,4 @@ $> hadoop fs -cat sampleimages_average/part-r-00000
   </body>
 </html>
   
+ 

@@ -5,9 +5,8 @@ import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.json.JSONException;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -29,107 +28,160 @@ import java.util.Map.Entry;
 public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 
   /**
-   * Image types supported in HIPI.
+   * Image formats supported in HIPI.
    */
-  public enum ImageType {
-    UNSUPPORTED_IMAGE(0x0), JPEG_IMAGE(0x1), PNG_IMAGE(0x2), UCHAR_IMAGE(0x3), FLOAT_IMAGE(0x4);
+  public enum ImageFormat {
+    UNDEFINED(0x0), JPEG(0x1), PNG(0x2), PPM(0x3), RAW_UCHAR_RGB(0x4), RAW_FLOAT_RGB(0x5);
 
-    private int _val;
+    private int format;
 
     /**
-     * Creates an ImageType from an int.
+     * Creates an ImageFormat from an int.
      *
-     * @param val Integer representation of ImageType.
+     * @param format Integer representation of ImageFormat.
      */
-    ImageType(int val) {
-      _val = val;
+    ImageFormat(int format) {
+      this.format = format;
     }
 
     /**
-     * Creates an ImageType from an int.
+     * Creates an ImageFormat from an int.
      *
-     * @param val Integer representation of ImageType.
+     * @param val Integer representation of ImageFormat.
      *
-     * @return Associated ImageType.
+     * @return Associated ImageFormat.
      */
-    public static ImageType fromValue(int val) {
-      for (ImageType type : values()) {
-        if (type._val == val) {
-          return type;
+    public static ImageFormat fromInteger(int input) throws IllegalArgumentException {
+      int format = (input & 0xff);
+      for (ImageFormat fmt : values()) {
+        if (fmt.format == format) {
+          return fmt;
         }
       }
-      return getDefault();
+      throw new IllegalArgumentException(String.format("There is no ImageFormat enum value with an associated integer value of %d", input));
     }
 
     /** 
-     * Integer representation of ImageType.
+     * Integer representation of ImageFormat.
      *
-     * @return Integer representation of ImageType.
+     * @return Integer representation of ImageFormat.
      */
-    public int toValue() {
-      return _val;
-    }
-
-    /** 
-     * Indicates whether or not image is decoded and ready to access
-     * pixel data.
-     *
-     * @return true if image has been decoded, false otherwise
-     */
-    public boolean isDecoded() {
-      switch (_val) {
-      case UCHAR_IMAGE:
-      case FLOAT_IMAGE:
-	return true;
-      case JPEG_IMAGE:
-      case PNG_IMAGE:
-      case UNSUPPORTED_IMAGE:
-      default:
-	break;
-      }
-      return false;
+    public int toInteger() {
+      return format;
     }
 
     /**
-     * Default ImageType. Currently UNSUPPORTED_IMAGE.
+     * Default ImageFormat. Currently UNDEFINED.
      *
-     * @return Default ImageType enum value.
+     * @return Default ImageFormat enum value.
      */
-    public static ImageType getDefault() {
-      return UNSUPPORTED_IMAGE;
+    public static ImageFormat getDefault() {
+      return UNDEFINED;
     }
   }
 
-  private ImageType imageType;
-  private int width;          // width of image
-  private int height;         // height of image
-  private int bitDepth;       // bits per channel
-  private int numChannels;    // color channels / planes
-  private JSONObject records; // metadata stored as collection of key/value pairs
+  /**
+   * Color spaces supported in HIPI.
+   */
+  public enum ColorSpace {
+    UNDEFINED(0x0), RGB(0x1), LUM(0x2);
+
+    private int cspace;
+
+    /**
+     * Creates a ColorSpace from an int
+     *
+     * @param format Integer representation of ColorSpace.
+     */
+    ColorSpace(int cspace) {
+      this.cspace = cspace;
+    }
+
+    /**
+     * Creates a ColorSpace from an int.
+     *
+     * @param val Integer representation of ColorSpace.
+     *
+     * @return Associated ColorSpace.
+     */
+    public static ColorSpace fromInteger(int input) throws IllegalArgumentException {
+      int cspace = (input & 0xff);
+      for (ColorSpace cs : values()) {
+        if (cs.cspace == cspace) {
+	  return cs;
+        }
+      }
+      throw new IllegalArgumentException(String.format("There is no ColorSpace enum value with an associated integer value of %d", input));
+    }
+
+    /** 
+     * Integer representation of ColorSpace.
+     *
+     * @return Integer representation of ColorSpace.
+     */
+    public int toInteger() {
+      return cspace;
+    }
+
+    /**
+     * Default ColorSpace. Currently RGB.
+     *
+     * @return Default ColorSpace enum value.
+     */
+    public static ImageFormat getDefault() {
+      return RGB;
+    }
+
+  }
+
+  private ImageType storageType;     // format used to store image on HDFS
+  private ColorSpace colorSpace;     // color space of pixel data
+  private int width;                 // width of image
+  private int height;                // height of image
+  private int bands;                 // number of color bands (aka channels)
+
+  /**
+   * A map containing key/value pairs of meta/EXIF data associated
+   * with this image.
+   */
+  private Map<String, String> metaData = new HashMap<String,String>();
 
   /**
    * Creates an ImageHeader.
    */
-  public ImageHeader(ImageType _imageType, int _width, int _height, 
-		     int _bitDepth, int _numChannels) 
+  public ImageHeader(ImageType storageType, ColorSpace colorSpace, 
+		     int width, int height,
+		     int bands, byte[] metaDataBytes)
     throws IllegalArgumentException {
-    if (_width < 0 || _height < 0 || _bitDepth < 1 || _numChannels < 1) {
-      throw new IllegalArgumentException(String.format("Invalid dimensions or bit depth or num channels: (%d,%d,%d,%d)", _width, _height, _bitDepth, _numChannels));
+    if (width < 1 || height < 1 || bands < 1) {
+      throw new IllegalArgumentException(String.format("Invalid spatial dimensions or number of bands: (%d,%d,%d)", width, height, bands));
     }
-    imageType = _imageType;
-    width = _width;
-    height = _height;
-    bitDepth = _bitDepth;
-    numChannels = _numChannels;
+    this.storageType = storageType;
+    this.colorSpace = colorSpace;
+    this.width = width;
+    this.height = height;
+    this.bands = bands;
+    if (metaDataBytes != null) {
+      setMetaDataFromBytes(metaDataBytes);
+    }
   }
 
   /**
-   * Get the image type.
+   * Get the image storage type.
    *
-   * @return Current image type.
+   * @return Current image storage type.
    */
-  public ImageType getImageType() {
-    return imageType;
+  public ImageType getStorageType() {
+    return storageType;
+  }
+
+  /**
+   * Get the image color space.
+   *
+   * @return Image color space.
+   */
+  public ColorSpace getColorSpace() {
+    return colorSpace;
   }
 
   /**
@@ -151,83 +203,203 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
   }
 
   /**
-   * Get bit depth of image.
+   * Get number of color bands.
    *
-   * @return Bit depth of image.
+   * @return Number of image bands.
    */
-  public int getBitDepth() {
-    return bitDepth;
+  public int getNumBands() {
+    return bands;
   }
 
   /**
-   * Get number of color channels.
-   *
-   * @return Number of channels.
+   * Adds an metadata field to this header object. The information consists of a
+   * key-value pair where the key is an application-specific field name and the 
+   * value is the corresponding information for that field.
+   * 
+   * @param key
+   *            the metadata field name
+   * @param value
+   *            the metadata information
    */
-  public int getNumChannels() {
-    return numChannels;
+  public void addMetaData(String key, String value) {
+    metaData.put(key, value);
   }
 
   /**
-   * Get JSONObject with collection of image metadata key/value pairs.
+   * Adds a new map full of meta data, similar to addMetaData(String, String),
+   * but iterating through the input list overwriting any existing values.
    *
-   * @return JSONObject with metadata key/value pairs.
+   * @param input
+   *            the map containing the new meta data
    */
-  public JSONObject getRecords() {
-    return records;
+  public void addMetaData(Map<String, String> input) {
+    for (Map.Entry<String, String> entry : input.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      addMetaData(key, value);
+    }
+  }
+
+  /**
+   * Attempt to retrieve metadata value associated with key.
+   *
+   * @param key field name of the desired metadata record
+   * @return either the value corresponding to the key or the empty
+   *         string if the key was not found
+   */
+  public String getMetaData(String key) {
+    String value = metaData.get(key);
+    if (value == null) {
+      return "";
+    } else {
+      return value;
+    }
+  }
+
+  /**
+   * Get the entire list of all metadata that applications have
+   * associated with this image.
+   *
+   * @return a hash map containing the keys and values of the metadata
+   */
+  public HashMap<String, String> getAllMetaData() {
+    return new HashMap<String, String>(metaData);
+  }
+
+  /**
+   * Create a binary representation of the application-specific
+   * metadata, ready to be serialized into a HIB file.
+   *
+   * @return A byte array containing the serialized hash map
+   */
+  public byte[] getMetaDataAsBytes() {
+    try {
+      String jsonText = JSONValue.toJSONString(metaData);
+      final byte[] utf8Bytes = jsonText.getBytes("UTF-8");
+      return utf8Bytes;
+    } catch (java.io.UnsupportedEncodingException e) {
+      System.err.println("UTF-8 encoding exception in getMetaDataAsBytes()");
+      return null;
+    }
+  }
+
+  /**
+   * Recreates the general metadata from serialized bytes, usually
+   * from the beginning of a HIB file.
+   *
+   * @param utf8Bytes UTF-8-encoded bytes of a JSON object
+   * representing the data
+   */
+  public void setMetaDataFromBytes(byte[] utf8Bytes) {
+    try {
+      String jsonText = new String(utf8Bytes, "UTF-8");
+      JSONObject jsonObject = (JSONObject)JSONValue.parse(jsonText);
+      metaData = (HashMap)jsonObject;
+    } catch (java.io.UnsupportedEncodingException e) {
+      System.err.println("UTF-8 encoding exception in setMetaDataAsBytes()");
+    }
   }
 
   /**
    * Sets the current object to be equal to another
-   * ImageHeader. Performs shallow copy of EXIF record hash map.
+   * ImageHeader. Performs deep copy of meta data.
    *
    * @param header Target image header.
    */
   public void set(ImageHeader header) {
-    imageType = header.getImageType();
-    width = header.getWidth();
-    height = header.getHeight();
-    bitDepth = header.getBitDepth();
-    numChannels = header.getNumChannels();
-    records = header.getRecords();
+    this.storageType = header.getStorageType();
+    this.colorSpace = header.getColorSpace();
+    this.width = header.getWidth();
+    this.height = header.getHeight();
+    this.bands = header.getNumBands();
+    this.metaData = header.getAllMetaData();
+  }
+
+  /**
+   * Produces a string representation of the image header.
+   *
+   * @return String representation of image header.
+   */
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    result.append(storageType.toInteger() + " " +
+		  colorSpace.toInteger() + " " +
+		  width + " " +
+		  height + " " +
+		  bands);
+    return result.toString();
+  }  
+
+  /**
+   * Compare method from the {@link RawComparator} interface.
+   *
+   * @return An integer result of the comparison.
+   */
+  public int compare(byte[] byteArray1, int start1, int length1, 
+		     byte[] byteArray2, int start2, int length2) {
+
+    int st1 = ByteUtils.ByteArrayToInt(byteArray1, start1);
+    int st2 = ByteUtils.ByteArrayToInt(byteArray2, start2);
+
+    int cs1 = ByteUtils.ByteArrayToInt(byteArray1, start1 + 4);
+    int cs2 = ByteUtils.ByteArrayToInt(byteArray2, start2 + 4);
+
+    int w1  = ByteUtils.ByteArrayToInt(byteArray1, start1 +  8);
+    int w2  = ByteUtils.ByteArrayToInt(byteArray2, start2 +  8);
+
+    int h1  = ByteUtils.ByteArrayToInt(byteArray1, start1 + 12);
+    int h2  = ByteUtils.ByteArrayToInt(byteArray2, start2 + 12);
+
+    int b1  = ByteUtils.ByteArrayToInt(byteArray1, start1 + 16);
+    int b2  = ByteUtils.ByteArrayToInt(byteArray2, start2 + 16);
+
+    int size1 = w1 * h1 * b1;
+    int size2 = w2 * h2 * b2;
+
+    return (size1 - size2);
   }
 
   /**
    * Compare method from the {@link java.util.Comparator}
-   * interface. Currently unimplemented and always returns zero.
+   * interface. This method reads both {@link BinaryComparable}
+   * objects into byte arrays and calls {@link #compare}.
    *
-   * @return An integer result of the comparison. Currently always zero.
+   * @return An integer result of the comparison.
+   * @see #compare
    */
   public int compare(BinaryComparable o1, BinaryComparable o2) {
-    return 0;
-  }
 
-  /**
-   * Compare method from the {@link RawComparator}
-   * interface. Currently unimplemented and always returns zero.
-   *
-   * @return An integer result of the comparison. Currently always zero.
-   */
-  public int compare(byte[] arg0, int arg1, int arg2, byte[] arg3, int arg4, int arg5) {
-    return 0;
+    byte[] b1 = o1.getBytes();
+    byte[] b2 = o2.getBytes();
+    int length1 = o1.getLength();
+    int length2 = o2.getLength();
+
+    return compare(b1, 0, length1, b2, 0, length2);
   }
 
   /**
    * Reads an ImageHeader stored in a simple uncompressed binary
-   * format. The first four bytes are the bit depth, width, and
-   * height, and count of EXIF records, followed by the EXIF key/value
-   * records stored as strings.
+   * format. The first twenty bytes are the image type, width, height,
+   * bit depth, and number of color bands (aka channels), all stored
+   * as ints, followed by the meta data stored as a set of key/value
+   * pairs.
    *
    * @param input Interface for reading bytes from a binary stream.
    * @throws IOException
    */
-  public void readFields(DataInput input) throws IOException, JSONException {
-    imageType = ImageType.fromValue(input.readInt());
-    width = input.readInt();
-    height = input.readInt();
-    bitDepth = input.readInt();
-    numChannels = input.readInt();
-    records = new JSONObject(new JSONTokener(input));
+  public void readFields(DataInput input) throws IOException {
+    this.storageType = ImageType.fromValue(input.readInt());
+    this.colorSpace = ColorSpace.fromValue(input.readInt());
+    this.width = input.readInt();
+    this.height = input.readInt();
+    this.bands = input.readInt();
+    int len = in.readInt();
+    if (len > 0) {
+      byte[] metaDataBytes = new byte[len];
+      input.readFully(metaDataBytes, 0, len);
+      setMetaDataFromBytes(metaDataBytes);
+    }
   }
 
   /**
@@ -237,12 +409,19 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    * @throws IOException
    * @see #readFields
    */
-  public void write(DataOutput output) throws IOException, JSONException {
-    output.writeInt(imageType.toValue());
+  public void write(DataOutput output) throws IOException {
+    output.writeInt(storageType.toValue());
+    output.writeInt(colorSpace.toValue());
     output.writeInt(width);
     output.writeInt(height);
-    output.writeInt(bitDepth);
-    output.writeInt(numChannels);
-    output.writeString(records.toString());
+    output.writeInt(bands);
+    out.writeInt(metaData.size());
+    byte[] metaDataBytes = getMetaDataAsBytes();
+    if (metaDataBytes == null || metaDataBytes.length == 0) {
+      out.writeInt(0);
+    } else {
+      out.writeInt(metaDataBytes.length);
+      out.write(metaDataBytes);
+    }
   }
 }

@@ -1,8 +1,8 @@
 package hipi.imagebundle;
 
-import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
-import hipi.image.ImageHeader.ImageType;
+import hipi.image.ImageHeader.ImageFormat;
+import hipi.image.RasterImage;
 import hipi.image.io.CodecManager;
 import hipi.image.io.ImageDecoder;
 
@@ -21,20 +21,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * HipiImageBundle is HIPI's main way of storing collections of images. It takes advantage of the
- * fact that Hadoop's MapReduce works best with data locality and large files as opposed to small
- * files. This class provides methods for easily writing and reading to/from a HipiImageBundle.
- * HipiImageBundles are broken up into an index file containing image offsets and a data file. The
- * full implementation can be found at HIPI's main website.
+ * A HipiImageBundle (HIB) is HIPI's mechanism for storing a
+ * collection of images on the Hadoop Distributed File System
+ * (HDFS). It takes advantage of the fact that Hadoop MapReduce is
+ * designed to support efficient processing of large flat files. This
+ * class provides methods for writing, reading, and appending
+ * HIBs. HIBs consist of two files: an index file and a data file. The
+ * index file contains a list of byte offsets to the end of each image
+ * in the data file. Note that this class is templated with the T
+ * class. T is the type of object returned by the image accessor
+ * methods {@link HipiImageBundle.FileReader#getCurrentValue()} and
+ * {@link HipiImageBundle#readImage()}.
  * 
  * @see <a href="http://hipi.cs.virginia.edu/">HIPI Project Homepage</a>
- *
  */
 
-public class HipiImageBundle<ImageType> extends AbstractImageBundle {
+public class HipiImageBundle<S extends RasterImage<T>> extends AbstractImageBundle {
 
   /**
-   * 
    * This FileReader class provides an interface for reading individual images from a
    * {@link hipi.imagebundle.HipiImageBundle}. This class is used by the 
    * {@link hipi.imagebundle.mapreduce.ImageBundleInputFormat} and
@@ -43,19 +47,23 @@ public class HipiImageBundle<ImageType> extends AbstractImageBundle {
    */
   public static class FileReader {
 
-    private DataInputStream hibDataFileInputStream = null;
-    private byte segmentLength[] = new byte[4];
-    private int lengthOfNextRecord = 0;
+    // Input stream
+    private DataInputStream dataInputStream = null;
+
+    // Current position and start/end offsets in input stream
     private long currentOffset = 0;
     private long startOffset = 0;
     private long endOffset = 0;
 
-    // Current image record, accessed with calls to getCurrentKey and
+    // Variables used to read and parse each image record
+    private byte sig[] = new byte[8];
+    private ImageFormat imageFormat = UNDEFINED;
+
+    // Current image, accessed with calls to getCurrentKey and
     // getCurrentValue
-    private JSONObject rawHeader = null;
-    private byte[] rawImageData = null;
-    private ImageHeader header = null;
-    private ImageType image = null;
+    private byte[] imageBytes = null;
+    private ImageHeader imageHeader = null;
+    private S image = null;
 
     /**
      * Creates a FileReader to read records (image headers / image
@@ -73,26 +81,26 @@ public class HipiImageBundle<ImageType> extends AbstractImageBundle {
         long start, long end) throws IOException  {
 
       // Create input stream for HIB data file
-      hibDataFileInputStream = new DataInputStream(fs.open(path));
+      dataInputStream = new DataInputStream(fs.open(path));
 
       // Advance input stream to requested start byte offset. This may
       // take several calls to the DataInputStream.skip() method.
       startOffset = start;
       while (start > 0) {
-	long skipped = hibDataFileInputStream.skip(start);
+	long skipped = dataInputStream.skip(start);
 	if (skipped <= 0) {
 	  break;
 	}
 	start -= skipped;
       }
-      // Store current offset into HIB data file and requested
-      // endOffset
+
+      // Store current byte offset along with end byte offset
       currentOffset = startOffset;
       endOffset = end;
     }
 
     /**
-     * Computes amount of progress made reading HIB data file.
+     * Returns current amount of progress reading file.
      * 
      * @return Measure of progress from 0.0 (no progress) to 1.0
      * (finished).
@@ -115,8 +123,8 @@ public class HipiImageBundle<ImageType> extends AbstractImageBundle {
      * @throws IOException
      */
     public void close() throws IOException {
-      if (hibDataFileInputStream != null) {
-	hibDataFileInputStream.close();
+      if (dataInputStream != null) {
+	dataInputStream.close();
       }
     }
 
@@ -135,89 +143,92 @@ public class HipiImageBundle<ImageType> extends AbstractImageBundle {
     public boolean nextKeyValue() {
       
       try {
+
+	imageType = UNDEFINED;
+	imageBytes = null;
+	imageHeader = null;
+	image = null;
 	    
 	// A value of endOffset = 0 indicates "read to the end of
 	// file", otherwise check segment boundary
 	if (endOffset > 0 && currentOffset > endOffset) {
 	  // Already past end of file segment
-	  header = null;
-	  rawImageData = null;
-	  image = null;
 	  return false;
 	}
 
-	rawHeader = new JSONObject(new JSONTokener(hibDataFileInputStream)); // Throws JSONException
+	// Attempt to read eight-byte "signature" that contains length of image and format
+	dataInputStream.readFully(sig);
 
-	// expects two objects in header (__HIB_recordLength and __HIB_imageType)
-
-	
-
-
-	_cacheLength = ((_sig[0] & 0xff) << 24) | ((_sig[1] & 0xff) << 16) | ((_sig[2] & 0xff) << 8) | (_sig[3] & 0xff);
-	_cacheType = ((_sig[4] & 0xff) << 24) | ((_sig[5] & 0xff) << 16) | ((_sig[6] & 0xff) << 8) | (_sig[7] & 0xff);
-
-	_image = null;
-	_header = null;
-	if (_cacheLength < 0) {
-	  // Nonsensical file length, report corrupted HIB
-	  _cacheLength = _cacheType = 0;
-	  throw new IOException("Corrupted HIB at offset: " + _countingOffset);
+	// Parse and validate image length
+	int imageLength = ((sig[0] & 0xff) << 24) | ((sig[1] & 0xff) << 16) | ((sig[2] & 0xff) << 8) | (sig[3] & 0xff);
+	if (imageLength <= 0) {
+	  // Negative or zero file length, report corrupted HIB
+	  throw new IOException("Found image record length <= 0 in HIB at offset: " + countingOffset);
 	}
 
-	_byte_array_data = new byte[_cacheLength];
-	readOff = 0;
-
-	// It may require several trips for this to work
-	byteRead = _data_input_stream.read(_byte_array_data);
-	while (byteRead < _byte_array_data.length - readOff && byteRead > 0) {
-	  readOff += byteRead;
-	  byteRead = _data_input_stream.read(_byte_array_data, readOff, _byte_array_data.length - readOff);
+	// Parse and validate image format
+	int imageFormatInt = ((sig[4] & 0xff) << 24) | ((sig[5] & 0xff) << 16) | ((sig[6] & 0xff) << 8) | (sig[7] & 0xff);
+	try {
+	  imageFormat = ImageFormat.fromInteger(recordTypeInt);
+	} catch (IllegalArgumentException e) {
+	  throw new IOException("Found invalid image format in HIB at offset: " + currentOffset);
+	}
+	if (imageFormat == UNDEFINED) {
+	  throw new IOException("Found UNDEFINED image format in HIB at offset: " + currentOffset);
 	}
 
-	if (byteRead <= 0) {
-	  // Reached end of file
-	  _cacheLength = _cacheType = 0;
-	  return false;
-	}
+	// Allocate byte array to hold (possibly compressed and encoded) image data
+	imageBytes = new byte[imageLength];
 
-	// Advance byte offset by cache length plus 8 (4 for cache length, 4 for cache type)
-	_countingOffset += _cacheLength + 8;
+	// Read image bytes from input stream
+	dataInputStream.readFully(imageBytes);
+
+	// Advance byte offset by image length plus 8 bytes for signature
+	currentOffset += imageLength + 8;
 
 	return true;
 
       } catch (IOException e) {
-	// Catch IOException and print to stderr to keep error from brining down entire MapReduce job
-	System.out.println("EXCEPTION");
-	System.out.println(e);
+	System.err.println(String.format("Unexpected IO exception [%s] while reading HIB file at byte offset [%d]", 
+					 e.getMessage(), currentOffset));
+	imageLength = 0;
+	imageType = UNDEFINED;
+	imageBytes = null;
+	return false;
+      } catch (EOFException e) {
+	// Reached end of file
+	if (endOffset > 0) {
+	  System.err.println(String.format("Unexpected EOF exception [%s] while reading HIB file at byte offset [%d] with end byte offset [%d]", 
+					   e.getMessage(), currentOffset, endOffset));
+	}
+	imageLength = 0;
+	imageType = UNDEFINED;
+	imageBytes = null;
 	return false;
       }
     }
 
     /**
-     * 
-     * @return Raw byte array containing the image as stored in the HipiImageBundle. The image will
-     *         not be decoded into an {@link FloatImage}.
+     * @return Raw byte array containing the image as stored in the
+     *         HipiImageBundle.
      * 
      * @throws IOException
      */
-    public byte[] getRawBytes() throws IOException {
-      if (_cacheLength > 0) {
-	return _byte_array_data;
-      }
-      return null;
+    public byte[] getRawImageBytes() throws IOException {
+      return imageBytes;
     }
 
     /**
-     * 
      * @return ImageHeader of the current image, as retrieved by {@link #nextKeyValue()}
      * @throws IOException
      */
     public ImageHeader getCurrentKey() throws IOException {
-      if (_header != null) {
-	return _header;
+      // Check if it's already been decoded
+      if (imageHeader != null) {
+	return imageHeader;
       }
       
-      if (_cacheLength > 0) {
+      if (imageLength > 0) {
 	ImageDecoder decoder = CodecManager.getDecoder(ImageType.fromValue(_cacheType));
 	if (decoder == null) {
 	  System.out.println("decoder is null");
@@ -508,7 +519,7 @@ public class HipiImageBundle<ImageType> extends AbstractImageBundle {
    * Implemented with {@link HipiImageBundle.FileReader#getCurrentValue()}
    */
   @Override
-  protected FloatImage readImage() throws IOException {
+  protected T readImage() throws IOException {
     return _reader.getCurrentValue();
   }
 

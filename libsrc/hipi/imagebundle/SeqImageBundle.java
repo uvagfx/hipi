@@ -21,15 +21,15 @@ import org.apache.hadoop.io.SequenceFile.Reader;
 
 public class SeqImageBundle extends AbstractImageBundle {
 
-  public SeqImageBundle(Path file_path, Configuration conf) {
-    super(file_path, conf);
+  public SeqImageBundle(Path path, Configuration conf) {
+    super(path, conf);
   }
 
-  private SequenceFile.Writer _writer;
-  private SequenceFile.Reader _reader;
-  private long _total;
-  private byte _cacheData[];
-  private int _cacheType;
+  private SequenceFile.Writer writer;
+  private SequenceFile.Reader reader;
+  private long total;
+  private byte cacheData[];
+  private int cacheType;
 
   @Override
   protected void openForWrite() throws IOException {

@@ -27,11 +27,11 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
-public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
+public class JpegCodec implements ImageDecoder, ImageEncoder {
 
-  private static final JPEGImageUtil staticObject = new JPEGImageUtil();
+  private static final JpegCodec staticObject = new JpegCodec();
 
-  public static JPEGImageUtil getInstance() {
+  public static JpegCodec getInstance() {
     return staticObject;
   }
 
@@ -77,7 +77,8 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
       
       dis.reset();
       
-      ImageHeader header = new ImageHeader(JPEG_IMAGE, width, height, depth, 3, null);
+      ImageHeader header = new ImageHeader(ImageType.JPEG, ColorSpace.RGB, 
+					   width, height, depth, 3, null);
 
       MetadataReader reader = new MetadataReader(dis);
       Metadata metadata = reader.extract();
@@ -96,28 +97,7 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
     return header;
   }
 
-  //  public FloatImage decodeImage(InputStream is) throws IOException {
-  public AbstractImage decodeImage(InputStream is, ImageHeader header, Class imageclass) throws IllegalArgumentException, IOException {
-
-    if (!AbstractImage.class.isAssignableFrom(imageclass)) {
-      throw new IllegalArgumentException(String.format("Requested image class [%s] is not a subclass of HIPI.AbstractImage"),imageclass.toString());
-    }
-
-    Object img = null;
-
-    try {
-      img = imageclass.newInstance();
-
-    } catch (InstantiationException ex) {
-      throw new IllegalArgumentException(String.format("Failed to instantiate object of requested image class [%s]"),imageclass.toString());
-    } catch (IllegalAccessException ex) {
-      throw new IllegalArgumentException(String.format("Failed to instantiate object of requested image class [%s]"),imageclass.toString());
-    }
-    if (!img) {
-    }
-    
-
-    
+  public <T> void decodeImage(InputStream is, RasterImage<T> img) throws IllegalArgumentException, IOException {
 
     // Find suitable JPEG reader in javax.imageio.ImageReader
     Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("jpeg");
@@ -140,8 +120,13 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
     int w = raster.getWidth();
     int h = raster.getHeight();
 
-    // Convert to floating point RGB
-    float[] pels = new float[w * h * 3];
+    // Check that image dimensions in header match those in JPEG
+    if (w != img.getWidth() || h != img.getHeight()) {
+      throw new IllegalArgumentException("Image dimensions in header do not match those in JPEG.");
+    }
+
+    // Convert to desired pixel type
+    T[] pels = img.getData();
     if (raster.getNumBands() == 4) {
       for (int i = 0; i < h; i++) {
 	for (int j = 0; j < w; j++) {
@@ -153,9 +138,15 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 	  int m = (int) Math.min(Math.max(Y - 0.34414 * (Cb - 128) - 0.71414 * (Cr - 128), 0), 255);
 	  int y = (int) Math.min(Math.max(Y + 1.402 * (Cr - 128), 0), 255);
 	  int k = dataBuffer.getElem(i * w * 4 + j * 4 + 3);
+	  /*
 	  pels[i * w * 3 + j * 3 + 0] = (float) ((k - (c * k >> 8)) / 255.0);
 	  pels[i * w * 3 + j * 3 + 1] = (float) ((k - (m * k >> 8)) / 255.0);
 	  pels[i * w * 3 + j * 3 + 2] = (float) ((k - (y * k >> 8)) / 255.0);
+	  */
+	  pels[i * w * 3 + j * 3 + 0] = img.convertFromInt(k - (c * k >> 8));
+	  pels[i * w * 3 + j * 3 + 1] = img.convertFromInt(k - (m * k >> 8));
+	  pels[i * w * 3 + j * 3 + 2] = img.convertFromInt(k - (y * k >> 8));
+	  
 	}
       }
     } else if (raster.getNumBands() == 3) {
@@ -165,51 +156,73 @@ public class JPEGImageUtil implements ImageDecoder, ImageEncoder {
 	  int Y  = dataBuffer.getElem(i * w * 3 + j * 3 + 0);
 	  int Cr = dataBuffer.getElem(i * w * 3 + j * 3 + 1);
 	  int Cb = dataBuffer.getElem(i * w * 3 + j * 3 + 2);
+	  /*
 	  pels[i * w * 3 + j * 3 + 0] = (float) ((Math.min(Math.max(Y + 1.772f * (Cb - 128), 0), 255)) / 255.0);
 	  pels[i * w * 3 + j * 3 + 1] = (float) ((Math.min(Math.max(Y - 0.34414f * (Cb - 128) - 0.71414f * (Cr - 128), 0), 255)) / 255.0);
 	  pels[i * w * 3 + j * 3 + 2] = (float) ((Math.min(Math.max(Y + 1.402f * (Cr - 128), 0), 255)) / 255.0);
+	  */
+	  pels[i * w * 3 + j * 3 + 0] = img.convertFromInt(Math.min(Math.max(Y + 1.772f * (Cb - 128), 0), 255));
+	  pels[i * w * 3 + j * 3 + 1] = img.convertFromInt(Math.min(Math.max(Y - 0.34414f * (Cb - 128) - 0.71414f * (Cr - 128), 0), 255));
+	  pels[i * w * 3 + j * 3 + 2] = img.convertFromInt(Math.min(Math.max(Y + 1.402f * (Cr - 128), 0), 255));
 	}
       }
     } else if (raster.getNumBands() == 1) {
       for (int i = 0; i < h; i++) {
 	for (int j = 0; j < w; j++) {
 	  int Y = dataBuffer.getElem(i * w + j);
+	  /*
 	  pels[i * w * 3 + j * 3 + 0] = (float) (Y / 255.0);
 	  pels[i * w * 3 + j * 3 + 1] = (float) (Y / 255.0);
 	  pels[i * w * 3 + j * 3 + 2] = (float) (Y / 255.0);
+	  */
+	  pels[i * w * 3 + j * 3 + 0] = img.convertFromInt(Y);
+	  pels[i * w * 3 + j * 3 + 1] = img.convertFromInt(Y);
+	  pels[i * w * 3 + j * 3 + 2] = img.convertFromInt(Y);
 	}
       }
-    }
-    
-    FloatImage image = new FloatImage(w, h, 3, pels);
-    
-    return image;
+    }    
   }
 
-  public void encodeImage(FloatImage image, ImageHeader header, OutputStream os) throws IOException {
+  public <T> void encodeImage(OutputStream os, RasterImage<T> img) throws IllegalArgumentException, IOException {
+
+    if (img.getWidth() <= 0 || img.getHeight() <= 0) {
+      throw new IllegalArgumentException("Image must have non-zero size.");
+    }
+    if (img.getColorSpace() != ColorSpace.RGB) {
+      throw new IllegalArgumentException("Only RGB color space currently supported.");
+    }
+    if (img.getNumBands() != 3) {
+      throw new IllegalArgumentException("Only three band images currently supported.");
+    }
+
+    // Find suitable JPEG writer in javax.imageio.ImageReader
     ImageOutputStream ios = ImageIO.createImageOutputStream(os);
     Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpeg");
     ImageWriter writer = writers.next();
     writer.setOutput(ios);
-    BufferedImage bufferedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
-    float[] data = image.getData();
-    int[] rgb = new int[image.getWidth() * image.getHeight()];
-    int numPixels = (image.getWidth() * image.getHeight()) / (4 - image.getBands());
-    for (int i = 0; i < numPixels; i++) {
-      int r = Math.min(Math.max((int) (data[i * 3] * 255), 0), 255);
-      int g = Math.min(Math.max((int) (data[i * 3 + 1] * 255), 0), 255);
-      int b = Math.min(Math.max((int) (data[i * 3 + 2] * 255), 0), 255);
-      rgb[i] = r << 16 | g << 8 | b;
+
+    int w = img.getWidth();
+    int h = img.getHeight();
+
+    BufferedImage bufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+
+    T[] data = img.getData();
+    int[] rgb = new int[w*h];
+    for (int i=0; i<w*h; i++) {
+      /*
+      int r = Math.min(Math.max((int) (data[i*3+0] * 255), 0), 255);
+      int g = Math.min(Math.max((int) (data[i*3+1] * 255), 0), 255);
+      int b = Math.min(Math.max((int) (data[i*3+2] * 255), 0), 255);
+      */
+      int r = img.convertToInt(data[i*3+0]);
+      int g = img.convertToInt(data[i*3+1]);
+      int b = img.convertToInt(data[i*3+2]);
+      rgb[i] = (r << 16) | (g << 8) | b;
     }
-    bufferedImage.setRGB(0, 0, image.getWidth(), image.getHeight(), rgb, 0, image.getWidth());
+    bufferedImage.setRGB(0, 0, w, h, rgb, 0, w);
     IIOImage iioImage = new IIOImage(bufferedImage, null, null);
     ImageWriteParam param = writer.getDefaultWriteParam();
     writer.write(null, iioImage, param);
-  }
-
-  public ImageHeader createSimpleHeader(FloatImage image) 
-  {
-      return new ImageHeader(ImageType.JPEG_IMAGE);
   }
 
 }

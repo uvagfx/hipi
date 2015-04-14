@@ -25,13 +25,12 @@
     <property name="log4j.jar" value="${hadoop.home}/common/lib/log4j-1.2.17.jar" />
     <property name="avro.jar" value="${hadoop.home}/common/lib/avro-1.7.4.jar" />
 
-    <!-- https://drewnoakes.com/code/exif/ -->    
+    <!-- https://drewnoakes.com/code/exif/ -->
     <property name="xmpcore.jar" value="./3rdparty/xmpcore-5.1.2.jar" />
     <property name="metadata.jar" value="./3rdparty/metadata-extractor-2.7.2.jar" />
 
-    <!-- http://www.json.org/java/ -->
-    <!-- JAR built from source at https://github.com/douglascrockford/JSON-java on 3/19/2015 -->
-    <property name="json.jar" value="./3rdparty/json.jar"/>
+    <!-- https://code.google.com/p/json-simple -->
+    <property name="json.jar" value="./3rdparty/json-simple-1.1.1.jar"/>
 
     <echo message="Properties set."/>
   </target>
@@ -76,17 +75,14 @@
       <property name="hadoop.home" value="${hadoop.home}" />
       <property name="hadoop.version" value="${hadoop.version}" />
       <property name="hadoop.classpath" value="${hadoop.classpath}" />
+
        <!-- https://drewnoakes.com/code/exif/ -->
       <property name="xmpcore.jar" value="../3rdparty/xmpcore-5.1.2.jar" />
       <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.7.2.jar" />
-<<<<<<< HEAD
-      
-      <!-- http://www.json.org/java/ -->
-      <!-- JAR built from source at https://github.com/douglascrockford/JSON-java on 3/19/2015 -->
-      <property name="json.jar" value="../3rdparty/json.jar"/>
 
-=======
->>>>>>> development
+      <!-- https://code.google.com/p/json-simple -->
+      <property name="json.jar" value="../3rdparty/json-simple-1.1.1.jar"/>
+
       <!-- Unit test dependencies -->
       <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
     </ant>

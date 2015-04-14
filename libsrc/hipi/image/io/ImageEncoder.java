@@ -7,13 +7,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * This class provides the necessary functions for writing an image from a FloatImage to an
- * OutputStream.
- * 
+ * This class provides the necessary functions for encoding an image
+ * and writing to a {@link OutputStream}.  All subclasses must contain
+ * methods that know how to encode the image pixel data.
  */
 public interface ImageEncoder {
 
-  public ImageHeader createSimpleHeader(FloatImage image);
+  //  public ImageHeader createSimpleHeader(FloatImage image);
 
-  public void encodeImage(FloatImage image, ImageHeader header, OutputStream os) throws IOException;
+  public <T> void encodeImage(OutputStream os, RasterImage<T> img) throws IllegalArgumentException, IOException;
+
 }

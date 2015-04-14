@@ -1,44 +1,42 @@
 package hipi.image.io;
 
-import hipi.image.ImageHeader.ImageType;
+import hipi.image.ImageHeader.ImageFormat;
 
 /**
- * This class contains the decoder and encoder classes for converting between image types
- *
+ * This class manages choosing codecs for the different image formats.
  */
 public final class CodecManager {
 
-  static public ImageDecoder getDecoder(ImageType type) 
-  {
-      ImageDecoder decoder = null;
-      switch (type) {
-      case JPEG_IMAGE:
-	  decoder = JPEGImageUtil.getInstance();
-	  break;
-      case PPM_IMAGE:
-	  decoder = PPMImageUtil.getInstance();
-	  break;
-      case PNG_IMAGE:
-	  decoder = PNGImageUtil.getInstance();
-	  break;
-      }
-      return decoder;
+  static public ImageDecoder getDecoder(ImageFormat format) {
+    ImageDecoder decoder = null;
+    switch (format) {
+    case JPEG:
+      decoder = JpegCodec.getInstance();
+      break;
+    case PNG:
+      decoder = PngCodec.getInstance();
+      break;
+    case PPM:
+      decoder = PpmCodec.getInstance();
+      break;
+    }
+    return decoder;
   }
 
-  static public ImageEncoder getEncoder(ImageType type) 
-  {
-      ImageEncoder encoder = null;
-      switch (type) {
-      case JPEG_IMAGE:
-	  encoder = JPEGImageUtil.getInstance();
-	  break;
-      case PPM_IMAGE:
-	  encoder = PPMImageUtil.getInstance();
-	  break;
-      case PNG_IMAGE:
-	  encoder = PNGImageUtil.getInstance();
-	  break;
-      }
-      return encoder;
+  static public ImageEncoder getEncoder(ImageFormat format) {
+    ImageEncoder encoder = null;
+    switch (format) {
+    case JPEG:
+      encoder = JpegCodec.getInstance();
+      break;
+    case PNG:
+      encoder = PngCodec.getInstance();
+      break;
+    case PPM:
+      encoder = PpmCodec.getInstance();
+      break;
+    }
+    return encoder;
   }
+
 }

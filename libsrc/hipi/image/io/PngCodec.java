@@ -55,7 +55,7 @@ import java.util.zip.InflaterInputStream;
  * Currently, images can only be encoded and decoded with RGB encoding. That is, black and white,
  * and grayscale encoded images cannot be used.
  */
-public class PNGImageUtil implements ImageDecoder, ImageEncoder {
+public class PngCodec implements ImageDecoder, ImageEncoder {
 
   private static final PNGImageUtil staticObject = new PNGImageUtil();
   

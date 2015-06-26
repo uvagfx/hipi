@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.imageio.metadata.IIOMetadata;
+
 /**
  * The header information for a 2D image. ImageHeader encapsulates
  * universally available information about a 2D image (width, height,
@@ -28,10 +30,10 @@ import java.util.Map.Entry;
 public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 
   /**
-   * Image formats supported in HIPI.
+   * Image storage formats supported in HIPI.
    */
   public enum ImageFormat {
-    UNDEFINED(0x0), JPEG(0x1), PNG(0x2), PPM(0x3), RAW_UCHAR_RGB(0x4), RAW_FLOAT_RGB(0x5);
+    UNDEFINED(0x0), JPEG(0x1), PNG(0x2), PPM(0x3);
 
     private int format;
 
@@ -51,8 +53,7 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
      *
      * @return Associated ImageFormat.
      */
-    public static ImageFormat fromInteger(int input) throws IllegalArgumentException {
-      int format = (input & 0xff);
+    public static ImageFormat fromInteger(int format) throws IllegalArgumentException {
       for (ImageFormat fmt : values()) {
         if (fmt.format == format) {
           return fmt;
@@ -105,7 +106,6 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
      * @return Associated ColorSpace.
      */
     public static ColorSpace fromInteger(int input) throws IllegalArgumentException {
-      int cspace = (input & 0xff);
       for (ColorSpace cs : values()) {
         if (cs.cspace == cspace) {
 	  return cs;
@@ -128,35 +128,49 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
      *
      * @return Default ColorSpace enum value.
      */
-    public static ImageFormat getDefault() {
+    public static ColorSpace getDefault() {
       return RGB;
     }
 
   }
 
-  private ImageType storageType;     // format used to store image on HDFS
+  private ImageFormat storageFormat; // format used to store image on HDFS
   private ColorSpace colorSpace;     // color space of pixel data
   private int width;                 // width of image
   private int height;                // height of image
   private int bands;                 // number of color bands (aka channels)
 
   /**
-   * A map containing key/value pairs of meta/EXIF data associated
-   * with this image.
+   * A map containing key/value pairs of meta data associated with the
+   * image. These are (optionally) added during HIB construction and
+   * are distinct from the exif data that may be stored within the
+   * image file, which is accessed through the IIOMetadata object. For
+   * example, this would be the correct place to store the image tile
+   * offset and size if you were using a HIB to store a very large
+   * image as a collection of smaller image tiles. Another example
+   * would be using this dictionary to store the source url for an
+   * image downloaded from the Internet.
    */
   private Map<String, String> metaData = new HashMap<String,String>();
 
   /**
+   * EXIF data associated with the image represented as a
+   * javax.imageio.metadata.IIOMetadata object.
+   */
+  //  private Map<String, String> exifData = new HashMap<String,String>();
+  private IIOMetadata exifData;
+
+  /**
    * Creates an ImageHeader.
    */
-  public ImageHeader(ImageType storageType, ColorSpace colorSpace, 
+  public ImageHeader(ImageFormat storageFormat, ColorSpace colorSpace, 
 		     int width, int height,
-		     int bands, byte[] metaDataBytes)
+		     int bands, byte[] metaDataBytes, IIOMetadata exifData)
     throws IllegalArgumentException {
     if (width < 1 || height < 1 || bands < 1) {
       throw new IllegalArgumentException(String.format("Invalid spatial dimensions or number of bands: (%d,%d,%d)", width, height, bands));
     }
-    this.storageType = storageType;
+    this.storageFormat = storageFormat;
     this.colorSpace = colorSpace;
     this.width = width;
     this.height = height;
@@ -164,6 +178,16 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
     if (metaDataBytes != null) {
       setMetaDataFromBytes(metaDataBytes);
     }
+    this.exifData = exifData;
+  }
+
+  /**
+   * Creates an ImageHeader by calling #readFields on the data input
+   * object. Note that this function does not populate the exifData
+   * field. That must be done using a separate assignment.
+   */
+  public ImageHeader(DataInput input) throws IOException {
+    readFields(input);
   }
 
   /**
@@ -171,8 +195,8 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    *
    * @return Current image storage type.
    */
-  public ImageType getStorageType() {
-    return storageType;
+  public ImageType getStorageFormat() {
+    return storageFormat;
   }
 
   /**
@@ -223,21 +247,6 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    */
   public void addMetaData(String key, String value) {
     metaData.put(key, value);
-  }
-
-  /**
-   * Adds a new map full of meta data, similar to addMetaData(String, String),
-   * but iterating through the input list overwriting any existing values.
-   *
-   * @param input
-   *            the map containing the new meta data
-   */
-  public void addMetaData(Map<String, String> input) {
-    for (Map.Entry<String, String> entry : input.entrySet()) {
-      String key = entry.getKey();
-      String value = entry.getValue();
-      addMetaData(key, value);
-    }
   }
 
   /**
@@ -301,18 +310,37 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
   }
 
   /**
+   * Sets image EXIF data.
+   *
+   * @param exifData the metadata object to use in the assignment
+   */
+  public void setExifData(IIOMetadata exifData) {
+    this.exifData = exifData;
+  }
+
+  /**
+   * Access image EXIF data object.
+   *
+   * @return EXIF data object stored with this image header
+   */
+  public IIOMetadata getExifData() {
+    return exifData;
+  }
+
+  /**
    * Sets the current object to be equal to another
    * ImageHeader. Performs deep copy of meta data.
    *
    * @param header Target image header.
    */
   public void set(ImageHeader header) {
-    this.storageType = header.getStorageType();
+    this.storageFormat = header.getStorageFormat();
     this.colorSpace = header.getColorSpace();
     this.width = header.getWidth();
     this.height = header.getHeight();
     this.bands = header.getNumBands();
     this.metaData = header.getAllMetaData();
+    this.exifData = header.getExifData();
   }
 
   /**
@@ -323,7 +351,7 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
-    result.append(storageType.toInteger() + " " +
+    result.append(storageFormat.toInteger() + " " +
 		  colorSpace.toInteger() + " " +
 		  width + " " +
 		  height + " " +
@@ -389,12 +417,12 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    * @throws IOException
    */
   public void readFields(DataInput input) throws IOException {
-    this.storageType = ImageType.fromValue(input.readInt());
+    this.storageFormat = ImageFormat.fromValue(input.readInt());
     this.colorSpace = ColorSpace.fromValue(input.readInt());
     this.width = input.readInt();
     this.height = input.readInt();
     this.bands = input.readInt();
-    int len = in.readInt();
+    int len = input.readInt();
     if (len > 0) {
       byte[] metaDataBytes = new byte[len];
       input.readFully(metaDataBytes, 0, len);
@@ -410,7 +438,7 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    * @see #readFields
    */
   public void write(DataOutput output) throws IOException {
-    output.writeInt(storageType.toValue());
+    output.writeInt(storageFormat.toValue());
     output.writeInt(colorSpace.toValue());
     output.writeInt(width);
     output.writeInt(height);

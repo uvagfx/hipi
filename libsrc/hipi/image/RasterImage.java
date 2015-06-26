@@ -1,7 +1,9 @@
 package hipi.image;
 
+import hipi.image.PixelArray;
 import hipi.image.ImageHeader;
-import hipi.image.HipiImageException;
+import hipi.image.HipiImage;
+import hipi.image.PixelArray;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -12,37 +14,49 @@ import org.apache.hadoop.io.Writable;
 
 /**
  * A raster (uncompressed) 2D image in HIPI. A raster image consists
- * of an ImageHeader and a flat array of the image pixel data stored
- * in interleaved raster-scan order (e.g., RGBRGBRGB...).. This class
- * is templated based on the underlying pixel data type (e.g., byte,
- * float, etc.) and implements the {@link Writable} and {@link
- * RawComparator} interfaces.
+ * of an ImageHeader (inherited from the HipiImage abstract base
+ * class) and a flat array of uncompressed image pixel data stored in
+ * interleaved raster-scan order (e.g., RGBRGBRGB...).
  */
-public abstract class RasterImage<T> implements Writable, RawComparator<BinaryComparable> {
+public abstract class RasterImage<T extends PixelArray> extends HipiImage {
 
-  protected ImageHeader header;
-  protected T[] pels;
+  protected T pixelArray;
 
   /**
    * Creates a raster image with provided header and pixel data array.
    */
-  public RasterImage(ImageHeader header, T[] pels) throws IllegalArgumentException {
-    if (pels == null) {
-      throw new IllegalArgumentException("Pixel data array is null.");
-    }
-    if (pels.length != header.getWidth()*header.getHeight()*header.getNumChannels()) {
-      throw new IllegalArgumentException("Length of pixel data array does not match image dimensions in header.");
-    }
-    this.header = header;
-    this.pels = pels;
+  public RasterImage(ImageHeader header) throws IllegalArgumentException {
+    if (header.getWidth() <= 0 || header.getHeight() <= 0 || header.getNumBands() <= 0) {
+      throw new IllegalArgumentException("Invalid dimensions in image header.");
+    }      
+    super(header);
+    int size = header.getWidth()*header.getHeight()*header.getNumBands();
+    this.pixelArray = new T(size);
   }
 
   /**
    * Creates a raster image of specified size and allocates pixel array.
    */
   public RasterImage(int width, int height, int bands) throws IllegalArgumentException {
-    this.header = new Header(ImageFormat.UNDEFINED,ColorSpace.getDefault(), width, height, bands, null);
-    this.pels = new T[width*height*bands](0);
+    this.header = new Header(ImageFormat.UNDEFINED, ColorSpace.getDefault(), width, height, bands, null);
+    int size = width*height*bands;
+    this.pixelArray = new T(size);
+  }
+
+  /**
+   * Creates a raster image of specified size and allocates pixel array.
+   */
+  public RasterImage(int width, int height, int bands, T pixelArray) throws IllegalArgumentException {
+    int size = width*height*bands;
+    if (size != pixelArray.size) {
+      throw new IllegalArgumentException("Mismatch between pixelArray size and specified image dimensions.");
+    }
+    this.header = new Header(ImageFormat.UNDEFINED, ColorSpace.getDefault(), width, height, bands, null);
+    this.pixelArray = pixelArray;
+  }
+
+  public T getPixelArray() {
+    return pixelArray;
   }
 
   /**
@@ -83,13 +97,19 @@ public abstract class RasterImage<T> implements Writable, RawComparator<BinaryCo
 	y < 0 || height <= 0 || y+height > this.height) {
       throw new IllegalArgumentException("Invalid crop region.");
     }
-    int w = header.getWidth();
-    int b = header.getNumBands();
-    T[] pels = new T[width*height*b];
-    for (int i=y; i<y+height; i++)
-      for (int j =x*b; j<(x+width)*b; j++)
-        pels[(i-y)*width*b + j-x*b] = pels[i*w*b + j];
-    return new RasterImage<T>(width, height, b, pels);
+    int w = this.getWidth();
+    int b = this.getNumBands();
+    T pixelArrayCrop = new T(width*height*b);
+    //    T[] pels = new T[width*height*b];
+    for (int j=y; j<y+height; j++) {
+      for (int i=x; i<x+width; i++) {
+	for (int c=0; c<b; c++) {
+	  pixelArrayCrop.setElem(((j-y)*width+(i-x))*b+c) = pixelArray.getElem((j*w+i)*b+c);
+	}
+      }
+    }
+    
+    return new RasterImage<T>(width, height, b, pixelArrayCrop);
   }
 
   /**
@@ -118,6 +138,16 @@ public abstract class RasterImage<T> implements Writable, RawComparator<BinaryCo
     */
   }
 
+  /**
+   * Helper routine that verifies two images have compatible
+   * dimensions for common operations (addition, elementwise
+   * multiplication, etc.)
+   *
+   * @param image RasterImage to check
+   * 
+   * @throws IllegalArgumentException if the image do not have
+   * compatible dimensions. Otherwise has no effect.
+   */
   protected void checkCompatibleInputImage(RasterImage image) throws IllegalArgumentException {
     if (image.getColorSpace() != this.getColorSpace() || image.getWidth() != this.getWidth() || 
 	image.getHeight() != this.getHeight() || image.getBands() != this.getNumBands()) {
@@ -167,15 +197,17 @@ public abstract class RasterImage<T> implements Writable, RawComparator<BinaryCo
    * @throws IndexOutOfBoundsException - If pixel coordinates or band
    * is negative or exceeds image dimensions.
    */
+  /*
   public T getPixel(int x, int y, int b) throws IndexOutOfBoundsException {
-    int w = header.getWidth();
-    int h = header.getHeight();
-    int bands = header.getNumBands();
+    int w = this.getWidth();
+    int h = this.getHeight();
+    int bands = this.getNumBands();
     if (x < 0 || x >= w || y < 0 || y >= h || b < 0 || b >= bands) {
       throw new IndexOutOfBoundsException(String.format("Attempted to access pixel (%d,%d,%d) in image with dimensions (%d,%d,%d)",x,y,b,w,h,bands));
     }
-    return pels[b + (x + y * w) * bands]
+    return pels[b + (x + y * w) * bands];
   }
+  */
 
   /**
    * Set pixel value at specific location and band.
@@ -187,6 +219,7 @@ public abstract class RasterImage<T> implements Writable, RawComparator<BinaryCo
    * @throws IndexOutOfBoundsException - If pixel coordinates or band
    * is negative or exceeds image dimensions.
    */
+  /*
   public void setPixel(int x, int y, int b, T val) throws IndexOutOfBoundsException {
     int w = header.getWidth();
     int h = header.getHeight();
@@ -196,69 +229,18 @@ public abstract class RasterImage<T> implements Writable, RawComparator<BinaryCo
     }
     pels[b + (x + y * w) * bands] = val;
   }
-
-  /**
-   * Get storage type of image.
-   *
-   * @return Storage type of image.
-   */
-  public ImageType getStorageType() {
-    return header.getStorageType();
-  }
-
-  /**
-   * Get color space of image.
-   *
-   * @return Color space of image.
-   */
-  public int getColorSpace() {
-    return header.getColorSpace();
-  }
-
-  /**
-   * Get width of image.
-   *
-   * @return Width of image.
-   */
-  public int getWidth() {
-    return header.getWidth();
-  }
-
-  /**
-   * Get height of image.
-   *
-   * @return Height of image.
-   */
-  public int getHeight() {
-    return header.getHeight();
-  }
-
-  /**
-   * Get number of bands in image.
-   *
-   * @return Number of bands in image.
-   */
-  public int getNumBands() {
-    return header.getNumBands();
-  }
+  */
 
   /**
    * Get array of image pixel data.
    *
    * @return Pixel data array.
    */
+  /*
   public T[] getData() {
     return pels;
   }
-
-  /**
-   * Computes hash of array of image pixel data.
-   *
-   * @return Hash of pixel data represented as a string.
-   *
-   * @see ByteUtils#asHex is used to compute the hash.
-   */
-  public abstract String hex();
+  */
 
   /**
    * Produces a string representation of the image. Concatenates image
@@ -274,37 +256,16 @@ public abstract class RasterImage<T> implements Writable, RawComparator<BinaryCo
     int w = header.getWidth();
     int h = header.getHeight();
     int b = header.getNumBands();
-    for (int i = 0; i < h; i++) {
-      for (int j = 0; j < w * b; j++) {
-        result.append(pels[i * w * b + j]);
-        if (j < w * b - 1)
-          result.append(" ");
+    for (int j=0; j<h; j++) {
+      for (int i=0; i<w; i++) {
+	for (int c=0; c<b; c++) {
+        result.append(T.getElem[(j*w+i)*b+c]);
+	result.append(" ");
+	}
       }
       result.append("\n");
     }
     return result.toString();
-  }
-
-  /**
-   * Compare method from the {@link java.util.Comparator}
-   * interface. Currently calls the corresponding compare method in
-   * the {@link ImageHeader} class.
-   *
-   * @return An integer result of the comparison.
-   */
-  public int compare(BinaryComparable o1, BinaryComparable o2) {
-    return ImageHeader.compare(o1,o2);
-  }
-
-  /**
-   * Compare method from the {@link RawComparator}
-   * interface. Currently calls the corresponding compare method in
-   * the {@link ImageHeader} class.
-   *
-   * @return An integer result of the comparison.
-   */
-  public int compare(byte[] arg0, int arg1, int arg2, byte[] arg3, int arg4, int arg5) {
-    return ImageHeader.compare(arg0, arg1, arg2, arg3, arg4, arg5);
   }
 
   /**
@@ -314,9 +275,9 @@ public abstract class RasterImage<T> implements Writable, RawComparator<BinaryCo
    *
    * @param image Target image.
    */
-  public void set(FloatImage image) {
+  public void set(RasterImage<T> image) {
     this.header = image.header;
-    this.pels = image.pels;
+    this.pixelArray = image.pixelArray;
   }
 
 } // public abstract class RasterImage<T>...

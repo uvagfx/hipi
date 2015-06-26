@@ -1,6 +1,9 @@
 package hipi.image.io;
 
 import hipi.image.ImageHeader.ImageFormat;
+import hipi.image.io.JpegCodec;
+import hipi.image.io.PngCodec;
+import hipi.image.io.PpmCodec;
 
 /**
  * This class manages choosing codecs for the different image formats.

@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-public class PPMImageUtil implements ImageDecoder, ImageEncoder {
+public class PpmCodec implements ImageDecoder, ImageEncoder {
 
   private static final PPMImageUtil static_object = new PPMImageUtil();
 

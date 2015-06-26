@@ -16,6 +16,6 @@ public interface ImageDecoder {
 
   public ImageHeader decodeImageHeader(InputStream is) throws IOException;
 
-  public <T> void decodeImage(InputStream is, RasterImage<T> img) throws IllegalArgumentException, IOException;
+  public <T> boolean decodeImage(InputStream imageStream, RasterImage<T> image) throws IllegalArgumentException, IOException;
 
 }

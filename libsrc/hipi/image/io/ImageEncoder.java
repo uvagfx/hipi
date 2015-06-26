@@ -13,8 +13,6 @@ import java.io.OutputStream;
  */
 public interface ImageEncoder {
 
-  //  public ImageHeader createSimpleHeader(FloatImage image);
-
-  public <T> void encodeImage(OutputStream os, RasterImage<T> img) throws IllegalArgumentException, IOException;
+  public <T> void encodeImage(RasterImage<T> img, OutputStream outputStream) throws IllegalArgumentException, IOException;
 
 }

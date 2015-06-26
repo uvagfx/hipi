@@ -1,10 +1,14 @@
 package hipi.image;
 
+import hipi.image.ImageHeader;
+import hipi.image.RasterImage;
+
 import hipi.util.ByteUtils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
 import org.apache.hadoop.io.BinaryComparable;
 import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.Writable;
@@ -18,7 +22,16 @@ import org.apache.hadoop.io.Writable;
  * (decoding) and writing (encoding) FloatImage objects in various
  * compressed and uncompressed image formats such as JPEG.
  */
-public class FloatImage extends RasterImage<float> {
+public class FloatImage extends RasterImage<Float> {
+
+  public FloatImage(ImageHeader header) throws IllegalArgumentException {
+    if (header.getWidth() <= 0 || header.getHeight() <= 0 || header.getNumBands() <= 0) {
+      throw new IllegalArgumentException("Image dimensions and number of color bands specified in header must be positive.");
+    }
+    this.header = header;
+    //    this.pels = new float[header.getWidth()*header.getHeight()*header.getNumBands()];
+    this.pels = new Float[header.getWidth()*header.getHeight()*header.getNumBands()];
+  }
 
   /**
    * Helper routine that converts an integer in the range [0,255] to a
@@ -62,7 +75,7 @@ public class FloatImage extends RasterImage<float> {
     int h = this.getHeight();
     int b = this.getNumBands();
     if (this.getColorSpace() != thatImage.getColorSpace() ||
-	thatImage.getWidth() != w || thatImage.getHeight() != h || thatImage.getNumBands() != b || ) {
+	thatImage.getWidth() != w || thatImage.getHeight() != h || thatImage.getNumBands() != b) {
       return false;
     }
 

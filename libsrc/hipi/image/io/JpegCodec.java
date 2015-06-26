@@ -14,10 +14,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
-
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
@@ -37,6 +33,8 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
 
   @SuppressWarnings("rawtypes")
   public ImageHeader decodeImageHeader(InputStream is) throws IOException {
+
+    Image header = null;
 
     try {
       DataInputStream dis = new DataInputStream(new BufferedInputStream(is));
@@ -77,9 +75,10 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
       
       dis.reset();
       
-      ImageHeader header = new ImageHeader(ImageType.JPEG, ColorSpace.RGB, 
-					   width, height, depth, 3, null);
+      header = new ImageHeader(ImageType.JPEG, ColorSpace.RGB, 
+			       width, height, depth, 3, null);
 
+      /*
       MetadataReader reader = new MetadataReader(dis);
       Metadata metadata = reader.extract();
       Iterator directories = metadata.getDirectories().iterator();
@@ -92,12 +91,14 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
 	  header.addMetaData(tag.getTagName(), tag.getDescription());
 	}
       }
+      */
     } catch (Exception e) {
+      System.err.println("Exception while decoding image header.");
     }
     return header;
   }
 
-  public <T> void decodeImage(InputStream is, RasterImage<T> img) throws IllegalArgumentException, IOException {
+  public <T> boolean decodeImage(InputStream inputStream, RasterImage<T> image) throws IllegalArgumentException, IOException {
 
     // Find suitable JPEG reader in javax.imageio.ImageReader
     Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("jpeg");
@@ -111,8 +112,8 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
     }
 
     // Setup input stream for reader
-    ImageInputStream iis = ImageIO.createImageInputStream(is);
-    reader.setInput(iis);
+    ImageInputStream imageInputStream = ImageIO.createImageInputStream(inputStream);
+    reader.setInput(imageInputStream);
 
     // Decode JPEG and obtain pointer to raster image data
     Raster raster = reader.readRaster(0, new ImageReadParam());
@@ -121,12 +122,16 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
     int h = raster.getHeight();
 
     // Check that image dimensions in header match those in JPEG
-    if (w != img.getWidth() || h != img.getHeight()) {
+    if (w != image.getWidth() || h != image.getHeight()) {
       throw new IllegalArgumentException("Image dimensions in header do not match those in JPEG.");
     }
 
+    if (raster.numBands() != image.getNumBands()) {
+      throw new IllegalArgumentException("Number of image bands specified in header does not match number found in JPEG.");
+    }
+
     // Convert to desired pixel type
-    T[] pels = img.getData();
+    T pixelArray = image.getPixelArray();
     if (raster.getNumBands() == 4) {
       for (int i = 0; i < h; i++) {
 	for (int j = 0; j < w; j++) {
@@ -143,10 +148,14 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
 	  pels[i * w * 3 + j * 3 + 1] = (float) ((k - (m * k >> 8)) / 255.0);
 	  pels[i * w * 3 + j * 3 + 2] = (float) ((k - (y * k >> 8)) / 255.0);
 	  */
+	  /*
 	  pels[i * w * 3 + j * 3 + 0] = img.convertFromInt(k - (c * k >> 8));
 	  pels[i * w * 3 + j * 3 + 1] = img.convertFromInt(k - (m * k >> 8));
 	  pels[i * w * 3 + j * 3 + 2] = img.convertFromInt(k - (y * k >> 8));
-	  
+	  */
+	  pixelArray.setElem(i * w * 3 + j * 3 + 0, (k - (c * k >> 8)));
+	  pixelArray.setElem(i * w * 3 + j * 3 + 1, (k - (m * k >> 8)));
+	  pixelArray.setElem(i * w * 3 + j * 3 + 2, (k - (y * k >> 8)));
 	}
       }
     } else if (raster.getNumBands() == 3) {
@@ -161,9 +170,14 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
 	  pels[i * w * 3 + j * 3 + 1] = (float) ((Math.min(Math.max(Y - 0.34414f * (Cb - 128) - 0.71414f * (Cr - 128), 0), 255)) / 255.0);
 	  pels[i * w * 3 + j * 3 + 2] = (float) ((Math.min(Math.max(Y + 1.402f * (Cr - 128), 0), 255)) / 255.0);
 	  */
+	  /*
 	  pels[i * w * 3 + j * 3 + 0] = img.convertFromInt(Math.min(Math.max(Y + 1.772f * (Cb - 128), 0), 255));
 	  pels[i * w * 3 + j * 3 + 1] = img.convertFromInt(Math.min(Math.max(Y - 0.34414f * (Cb - 128) - 0.71414f * (Cr - 128), 0), 255));
 	  pels[i * w * 3 + j * 3 + 2] = img.convertFromInt(Math.min(Math.max(Y + 1.402f * (Cr - 128), 0), 255));
+	  */
+	  pixelArray.setElem(i * w * 3 + j * 3 + 0, Math.min(Math.max(Y + 1.772f * (Cb - 128), 0), 255));
+	  pixelArray.setElem(i * w * 3 + j * 3 + 1, Math.min(Math.max(Y - 0.34414f * (Cb - 128) - 0.71414f * (Cr - 128), 0), 255));
+	  pixelArray.setElem(i * w * 3 + j * 3 + 2, Math.min(Math.max(Y + 1.402f * (Cr - 128), 0), 255));
 	}
       }
     } else if (raster.getNumBands() == 1) {
@@ -175,15 +189,20 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
 	  pels[i * w * 3 + j * 3 + 1] = (float) (Y / 255.0);
 	  pels[i * w * 3 + j * 3 + 2] = (float) (Y / 255.0);
 	  */
+	  /*
 	  pels[i * w * 3 + j * 3 + 0] = img.convertFromInt(Y);
 	  pels[i * w * 3 + j * 3 + 1] = img.convertFromInt(Y);
 	  pels[i * w * 3 + j * 3 + 2] = img.convertFromInt(Y);
+	  */
+	  pixelArary.setElem(i * w * 3 + j * 3 + 0, Y);
+	  pixelArary.setElem(i * w * 3 + j * 3 + 1, Y);
+	  pixelArary.setElem(i * w * 3 + j * 3 + 2, Y);
 	}
       }
     }    
   }
 
-  public <T> void encodeImage(OutputStream os, RasterImage<T> img) throws IllegalArgumentException, IOException {
+  public <T> void encodeImage(RasterImage<T> img, OutputStream os) throws IllegalArgumentException, IOException {
 
     if (img.getWidth() <= 0 || img.getHeight() <= 0) {
       throw new IllegalArgumentException("Image must have non-zero size.");
@@ -206,7 +225,8 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
 
     BufferedImage bufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 
-    T[] data = img.getData();
+    //    T[] data = img.getData();
+    T pixelArray = img.getPixelArray();
     int[] rgb = new int[w*h];
     for (int i=0; i<w*h; i++) {
       /*
@@ -214,9 +234,14 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
       int g = Math.min(Math.max((int) (data[i*3+1] * 255), 0), 255);
       int b = Math.min(Math.max((int) (data[i*3+2] * 255), 0), 255);
       */
+      /*
       int r = img.convertToInt(data[i*3+0]);
       int g = img.convertToInt(data[i*3+1]);
       int b = img.convertToInt(data[i*3+2]);
+      */
+      int r = pixelArray.getElem(i*3+0);
+      int r = pixelArray.getElem(i*3+1);
+      int r = pixelArray.getElem(i*3+2);
       rgb[i] = (r << 16) | (g << 8) | b;
     }
     bufferedImage.setRGB(0, 0, w, h, rgb, 0, w);

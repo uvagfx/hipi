@@ -30,31 +30,33 @@ public abstract class AbstractImageBundle {
   public static final int FILE_MODE_READ = 1;
   public static final int FILE_MODE_WRITE = 2;
 
-  private int _fileMode = -1;
+  private int fileMode = -1;
 
-  protected Configuration _conf;
+  protected Configuration conf;
 
-  private boolean _hasNext;
-  private boolean _prepared;
-  private boolean _readHeader;
-  private FloatImage _readImage;
-  protected Path _file_path;
+  private boolean hasNext;
+  private boolean prepared;
+  private boolean readHeader;
+  private FloatImage readImage;
+  protected Path filePath;
 
   /**
    * 
-   * @param file_path The {@link Path} indicating where the image bundle is (or should be written
-   *        to)
-   * @param conf {@link Configuration} that determines the {@link FileSystem} for the image bundle
+   * @param filePath The {@link Path} indicating where the image
+   *        bundle is (or should be written to)
+   *
+   * @param conf {@link Configuration} that determines the {@link
+   * FileSystem} for the image bundle
    */
-  public AbstractImageBundle(Path file_path, Configuration conf) 
+  public AbstractImageBundle(Path filePath, Configuration conf) 
   {
-      _file_path = file_path;
-      _conf = conf;
+    this.filePath = filePath;
+    this.conf = conf;
   }
 
   public final void open(int mode) throws IOException 
   {
-      open(mode, false);
+    open(mode, false);
   }
 
   /**
@@ -68,27 +70,28 @@ public abstract class AbstractImageBundle {
    */
   public final void open(int mode, boolean overwrite) throws IOException {
 
-    if (_fileMode == -1 && mode == FILE_MODE_WRITE) {
+    if (fileMode == -1 && mode == FILE_MODE_WRITE) {
       // Check to see whether the file exists
-      if (FileSystem.get(_conf).exists(_file_path) && !overwrite) {
-        throw new IOException("File " + _file_path.getName() + " already exists");
+      if (FileSystem.get(conf).exists(filePath) && !overwrite) {
+        throw new IOException("File " + filePath.getName() + " already exists");
       }
-      _fileMode = FILE_MODE_WRITE;
+      fileMode = FILE_MODE_WRITE;
       openForWrite();
-    } else if (_fileMode == -1 && mode == FILE_MODE_READ) {
-      _fileMode = FILE_MODE_READ;
+    } else if (fileMode == -1 && mode == FILE_MODE_READ) {
+      fileMode = FILE_MODE_READ;
       openForRead();
     } else {
-      throw new IOException("File " + _file_path.getName() + " already opened for reading/writing");
+      throw new IOException("File " + filePath.getName() + " already opened");
     }
-    _prepared = false;
-    _readHeader = false;
-    _readImage = null;
+    prepared = false;
+    readHeader = false;
+    readImage = null;
   }
 
   /**
-   * Method for opening a file for the purposes of writing. The function {@link #open(int)} contains
-   * the necessary checks to determine whether a file can be opened for writing.
+   * Method for opening a file for the purposes of writing. The
+   * function {@link #open(int)} contains the necessary checks to
+   * determine whether a file can be opened for writing.
    * 
    * @throws IOException
    */
@@ -136,7 +139,7 @@ public abstract class AbstractImageBundle {
    * @return Path path to index file
    */
   public Path getPath() {
-    return _file_path;
+    return filePath;
   }
 
   /**
@@ -154,8 +157,9 @@ public abstract class AbstractImageBundle {
   protected abstract ImageHeader readHeader() throws IOException;
 
   /**
-   * @return the decoded FloatImage from the cache that has been prepared. Will not advance the
-   *         bundle to the next image upon return
+   * @return the decoded FloatImage from the cache that has been
+   *         prepared. Will not advance the bundle to the next image
+   *         upon return
    * 
    * @throws IOException
    */

@@ -75,7 +75,7 @@ public class DumpHib extends Configured implements Tool {
     job.setMapperClass(DumpHibMapper.class);
     job.setReducerClass(DumpHibReducer.class);
 
-    job.setInputFormatClass(ImageBundleInputFormat.class);
+    job.setInputFormatClass(HibInputFormat.class);
     job.setOutputKeyClass(IntWritable.class);
     job.setOutputValueClass(Text.class);
 

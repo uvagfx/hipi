@@ -1,10 +1,11 @@
 package hipi.image.io;
 
+import hipi.image.ImageHeader;
+import hipi.image.HipiImage;
+import hipi.image.HipiImageFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import hipi.image.ImageHeader;
-import hipi.image.RasterImage;
 
 /**
  * This class provides the necessary functions for decoding an image
@@ -14,8 +15,16 @@ import hipi.image.RasterImage;
  */
 public interface ImageDecoder {
 
-  public ImageHeader decodeImageHeader(InputStream is) throws IOException;
+  public ImageHeader decodeHeader(InputStream inputStream) throws IOException;
 
-  public <T> boolean decodeImage(InputStream imageStream, RasterImage<T> image) throws IllegalArgumentException, IOException;
+  public HipiImage decodeImage(InputStream inputStream, ImageHeader imageHeader, HipiImageFactory imageFactory) throws IllegalArgumentException, IOException;
+
+  //  public HipiImage decodeHeaderAndImage(InputStream imageStream, HipiImageFactory imageFactory) throws IOException, IllegalArgumentException;
+  public default HipiImage decodeHeaderAndImage(InputStream inputStream, HipiImageFactory imageFactory) 
+    throws IOException, IllegalArgumentException 
+  {
+    ImageHeader header = decodeHeader(inputStream);
+    return decodeImage(inputStream, header, imageFactory);
+  }
 
 }

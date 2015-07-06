@@ -1,16 +1,19 @@
 package hipi.image.convert;
 
+import hipi.image.ImageHeader;
+import hipi.image.ByteImage;
+import hipi.image.HipiImage;
+import hipi.image.HipiImageFactory;
+import hipi.image.io.ImageDecoder;
+import hipi.image.io.ImageEncoder;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import hipi.image.FloatImage;
-import hipi.image.ImageHeader;
-import hipi.image.io.ImageDecoder;
-import hipi.image.io.ImageEncoder;
-
 /**
- * This class provides a single static function for converting between different image encodings.
+ * This class provides a single static function for converting between
+ * different image encodings.
  */
 public class ImageConverter {
 
@@ -24,14 +27,14 @@ public class ImageConverter {
    * 
    * @throws IOException
    * 
-   * @see hipi.image.io.JPEGImageUtil
-   * @see hipi.image.io.PNGImageUtil
-   * @see hipi.image.io.PPMImageUtil
+   * @see hipi.image.io.JpegCodec
+   * @see hipi.image.io.PngCodec
+   * @see hipi.image.io.PpmCodec
    */
-  public static void convert(InputStream imageIn, OutputStream imageOut, ImageDecoder decoderIn,
-      ImageEncoder encoderOut) throws IOException {
-    ImageHeader header = decoderIn.decodeImageHeader(imageIn);
-    FloatImage image = decoderIn.decodeImage(imageIn);
-    encoderOut.encodeImage(image, header, imageOut);
+  public static void convert(InputStream inputStream, ImageDecoder decoder,
+			     OutputStream outputStream, ImageEncoder encoder) throws IOException {
+    ByteImage image = (ByteImage)decoder.decodeHeaderAndImage(inputStream, HipiImageFactory.getByteImageFactory());
+    encoder.encodeImage(image, outputStream);
   }
+
 }

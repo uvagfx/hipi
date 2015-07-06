@@ -1,7 +1,6 @@
 package hipi.image.io;
 
-import hipi.image.FloatImage;
-import hipi.image.ImageHeader;
+import hipi.image.HipiImage;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,6 +12,6 @@ import java.io.OutputStream;
  */
 public interface ImageEncoder {
 
-  public <T> void encodeImage(RasterImage<T> img, OutputStream outputStream) throws IllegalArgumentException, IOException;
+  public void encodeImage(HipiImage image, OutputStream outputStream) throws IllegalArgumentException, IOException;
 
 }

@@ -1,8 +1,13 @@
 package hipi.image.io;
 
-import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
-import hipi.image.ImageHeader.ImageType;
+import hipi.image.ImageHeader.ImageFormat;
+import hipi.image.ImageHeader.ColorSpace;
+import hipi.image.RasterImage;
+import hipi.image.HipiImage;
+import hipi.image.HipiImage.HipiImageType;
+import hipi.image.HipiImageFactory;
+import hipi.image.PixelArray;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -57,7 +62,7 @@ import java.util.zip.InflaterInputStream;
  */
 public class PngCodec implements ImageDecoder, ImageEncoder {
 
-  private static final PNGImageUtil staticObject = new PNGImageUtil();
+  private static final PngCodec staticObject = new PngCodec();
   
   /** black and white image mode. */
   private static final byte BW_MODE = 0;
@@ -70,7 +75,7 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
   
   private CRC32 crc;
 
-  public static PNGImageUtil getInstance() {
+  public static PngCodec getInstance() {
     return staticObject;
   }
 
@@ -82,46 +87,56 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
    * @param is The {@link InputStream} that contains the PNG image
    * @return The {@link ImageHeader} found in the input stream
    */
-  public ImageHeader decodeImageHeader(InputStream is) throws IOException {
-
-    ImageHeader header = new ImageHeader(ImageType.PNG_IMAGE);
+  public ImageHeader decodeHeader(InputStream is) throws IOException {
 
     DataInputStream in = new DataInputStream(is);
     readSignature(in);
 
+    int width = -1;
+    int height = -1;
+    
     boolean trucking = true;
     while (trucking) {
       try {
-        // Read the length.
-        int length = in.readInt();
-        if (length < 0)
-          throw new IOException("Sorry, that file is too long.");
-        // Read the type.
-        byte[] typeBytes = new byte[4];
-        in.readFully(typeBytes);
-        String typeString = new String(typeBytes, "UTF8");
-        if (typeString.equals("IHDR")) {
-          // Read the data.
-          byte[] data = new byte[length];
-          in.readFully(data);
-          // Read the CRC.
-          long crc = in.readInt() & 0x00000000ffffffffL; // Make it unsigned.
-          if (verifyCRC(typeBytes, data, crc) == false)
-            throw new IOException("That file appears to be corrupted.");
-          PNGChunk chunk = staticObject.new PNGChunk(typeBytes, data);
-          header.width = (int) chunk.getUnsignedInt(0);
-          header.height = (int) chunk.getUnsignedInt(4);
-          header.bitDepth = chunk.getUnsignedByte(8);
-          break;
-        } else {
-          // skip the data associated, plus the crc signature
-          in.skipBytes(length + 4);
-        }
+	// Read the length.
+	int length = in.readInt();
+	if (length < 0)
+	  throw new IOException("Sorry, that file is too long.");
+	// Read the type.
+	byte[] typeBytes = new byte[4];
+	in.readFully(typeBytes);
+	String typeString = new String(typeBytes, "UTF8");
+	if (typeString.equals("IHDR")) {
+	  // Read the data.
+	  byte[] data = new byte[length];
+	  in.readFully(data);
+	  // Read the CRC.
+	  long crc = in.readInt() & 0x00000000ffffffffL; // Make it unsigned.
+	  if (verifyCRC(typeBytes, data, crc) == false) {
+	    throw new IOException("That file appears to be corrupted.");
+	  }
+	  PNGChunk chunk = staticObject.new PNGChunk(typeBytes, data);
+	  //          header.width = (int)chunk.getUnsignedInt(0);
+	  width = (int)chunk.getUnsignedInt(0);
+	  //	    header.height = (int)chunk.getUnsignedInt(4);
+	  height = (int)chunk.getUnsignedInt(4);
+	  //          header.bitDepth = chunk.getUnsignedByte(8);
+	  break;
+	} else {
+	  // skip the data associated, plus the crc signature
+	  in.skipBytes(length + 4);
+	}
       } catch (EOFException eofe) {
-        trucking = false;
+	trucking = false;
       }
     }
-    return header;
+
+    if (width < 0 || height < 0) {
+      throw new IOException("Failed to decode PNG image header.");
+    }
+    
+    return new ImageHeader(ImageFormat.PNG, ColorSpace.RGB,
+			   width, height, 3, null, null);
   }
 
   /**
@@ -132,7 +147,13 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
    * @param is The {@link InputStream} that contains the PNG image
    * @return The {@link FloatImage} from the input stream
    */
-  public FloatImage decodeImage(InputStream is) throws IOException {
+  public HipiImage decodeImage(InputStream is, ImageHeader header, HipiImageFactory imageFactory) throws IllegalArgumentException, IOException {
+
+    // Verify image factory
+    if (!(imageFactory.getType() == HipiImageType.FLOAT || imageFactory.getType() == HipiImageType.BYTE)) {
+      throw new IllegalArgumentException("PNG decoder supports only FloatImage and ByteImage output types.");
+    }
+
     DataInputStream dataIn = new DataInputStream(is);
     readSignature(dataIn);
     PNGData chunks = readChunks(dataIn);
@@ -143,12 +164,25 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
       throw new IOException("That image is too wide or tall.");
     int width = (int) widthLong;
     int height = (int) heightLong;
-    float[] pels = new float[width * height * 3];
     byte[] image_bytes = chunks.getImageData();
 
-    for (int i = 0; i < image_bytes.length; i++)
-      pels[i] = (float) ((image_bytes[i] & 0xff) / 255.0);
-    FloatImage image = new FloatImage(width, height, 3, pels); // hard code 3
+    // Create output image
+    RasterImage image = null;
+    try {
+      image = (RasterImage)imageFactory.createImage(header);
+    } catch (Exception e) {
+      // TODO?!?
+      System.err.println("CRASH");
+      e.printStackTrace();
+      System.exit(1);
+    }
+
+    PixelArray pa = ((RasterImage)image).getPixelArray();
+
+    for (int i = 0; i < image_bytes.length; i++) {
+      //      pels[i] = (float) ((image_bytes[i] & 0xff) / 255.0);
+      pa.setElem(i,image_bytes[i]&0xff);
+    }
 
     return image;
   }
@@ -348,10 +382,6 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
     }
   }
 
-  public ImageHeader createSimpleHeader(FloatImage image) {
-    return new ImageHeader(ImageType.PNG_IMAGE);
-  }
-
   /**
    * Encodes an image into a PNG image
    * 
@@ -359,7 +389,22 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
    * @param header The {@link ImageHeader} for the image
    * @param os The {@link OutputStream} that the encoded image will write to
    */
-  public void encodeImage(FloatImage image, ImageHeader header, OutputStream os) throws IOException {
+  public void encodeImage(HipiImage image, OutputStream os) throws IllegalArgumentException, IOException {
+
+    if (!(RasterImage.class.isAssignableFrom(image.getClass()))) {
+      throw new IllegalArgumentException("PNG encoder supports only RasterImage input types.");
+    }    
+
+    if (image.getWidth() <= 0 || image.getHeight() <= 0) {
+      throw new IllegalArgumentException("Invalid image dimensions.");
+    }
+    if (image.getColorSpace() != ColorSpace.RGB) {
+      throw new IllegalArgumentException("PNG encoder supports only RGB color space.");
+    }
+    if (image.getNumBands() != 3) {
+      throw new IllegalArgumentException("PNG encoder supports only three band images.");
+    }
+
     crc = new CRC32();
     int width = image.getWidth();
     int height = image.getHeight();
@@ -388,17 +433,23 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
     ByteArrayOutputStream compressed = new ByteArrayOutputStream(65536);
     BufferedOutputStream bos =
         new BufferedOutputStream(new DeflaterOutputStream(compressed, new Deflater(9)));
+    PixelArray pa = ((RasterImage)image).getPixelArray();
     switch (mode) {
       case COLOR_MODE:
         for (int y = 0; y < height; y++) {
           bos.write(0);
           for (int x = 0; x < width; x++) {
+	    /*
             int r = Math.min(Math.max((int) (image.getPixel(x, y, 0) * 255), 0), 255);
             int g = Math.min(Math.max((int) (image.getPixel(x, y, 1) * 255), 0), 255);
             int b = Math.min(Math.max((int) (image.getPixel(x, y, 2) * 255), 0), 255);
-            bos.write((byte) r);
-            bos.write((byte) g);
-            bos.write((byte) b);
+	    */
+            int r = pa.getElem((y*width+x)*3+0);
+            int g = pa.getElem((y*width+x)*3+1);
+            int b = pa.getElem((y*width+x)*3+2);
+            bos.write((byte)r);
+            bos.write((byte)g);
+            bos.write((byte)b);
           }
         }
         break;

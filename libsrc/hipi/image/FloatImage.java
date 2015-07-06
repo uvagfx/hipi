@@ -2,6 +2,7 @@ package hipi.image;
 
 import hipi.image.ImageHeader;
 import hipi.image.RasterImage;
+import hipi.image.PixelArrayFloat;
 
 import hipi.util.ByteUtils;
 
@@ -22,35 +23,26 @@ import org.apache.hadoop.io.Writable;
  * (decoding) and writing (encoding) FloatImage objects in various
  * compressed and uncompressed image formats such as JPEG.
  */
-public class FloatImage extends RasterImage<Float> {
+public class FloatImage extends RasterImage {
 
-  public FloatImage(ImageHeader header) throws IllegalArgumentException {
-    if (header.getWidth() <= 0 || header.getHeight() <= 0 || header.getNumBands() <= 0) {
-      throw new IllegalArgumentException("Image dimensions and number of color bands specified in header must be positive.");
-    }
-    this.header = header;
-    //    this.pels = new float[header.getWidth()*header.getHeight()*header.getNumBands()];
-    this.pels = new Float[header.getWidth()*header.getHeight()*header.getNumBands()];
+  public FloatImage() {
+    super((PixelArray)(new PixelArrayFloat()));
   }
 
   /**
-   * Helper routine that converts an integer in the range [0,255] to a
-   * float in the range [0,1.0].
+   * Get object type identifier.
    *
-   * @return Converted value.
+   * @return Type of object.
    */
-  public float convertFromInt(int value) {
-    return ((float)value/255.0);
+  public HipiImageType getType() {
+    return HipiImageType.FLOAT;
   }
-  
+
   /**
-   * Helper routine that converts a value in the pixel data type to an
-   * integer in the range [0,255].
-   *
-   * @return Converted value.
+   * Provides direct access to underlying float array of pixel data.
    */
-  public abstract int convertToInt(float value) {
-    return Math.min(Math.max((int)(value*255.0),0),255);
+  public float[] getData() {
+    return ((PixelArrayFloat)this.pixelArray).getData();
   }
 
   /**
@@ -61,16 +53,17 @@ public class FloatImage extends RasterImage<Float> {
    */
   @Override
   public boolean equals(Object that) {
-    // Check for pointer equivalence.
+    // Check for pointer equivalence
     if (this == that)
       return true;
 
-    // Check that object types are equal.
+    // Verify object types are equal
     if (!(that instanceof FloatImage))
       return false;
+
     FloatImage thatImage = (FloatImage)that;
 
-    // Check that headers are equal.
+    // Verify dimensions in headers are equal
     int w = this.getWidth();
     int h = this.getHeight();
     int b = this.getNumBands();
@@ -79,38 +72,43 @@ public class FloatImage extends RasterImage<Float> {
       return false;
     }
 
+    // Get pointers to pixel arrays
+    float[] thisData = this.getData();
+    float[] thatData = thatImage.getData();
+
     // Check that pixel data is equal.
     float delta = 1.0f / 255.0f;
-    float[] pels = (float[])thatImage.getData();
     for (int i = 0; i < w*h*b; i++) {
-      if (Math.abs(pels[i] - pels[i]) > delta) {
+      if (Math.abs(thisData[i] - thatData[i]) > delta) {
 	return false;
       }
     }
 
-    // Passed all of our tests.
+    // Passed, declare equality
     return true;
   }
 
   /**
-   * Performs in-place addition of {@link FloatImage} and the current image.
+   * Performs in-place addition with another {@link FloatImage}.
    * 
    * @param image Target image to add to the current object.
    *
-   * @throws IllegalArgumentException If the image dimensions do not match.
+   * @throws IllegalArgumentException If the image dimensions do not
+   * match.
    */
-  @Override
-  public void add(FloatImage image) throws IllegalArgumentException {
+  public void add(FloatImage thatImage) throws IllegalArgumentException {
     // Verify input
-    checkCompatibleInputImage(image);
+    checkCompatibleInputImage(thatImage);
 
     // Perform in-place addition
     int w = this.getWidth();
     int h = this.getHeight();
-    int b = this.getBands();
-    float[] otherPels = image.getData();
+    int b = this.getNumBands();
+    float[] thisData = this.getData();
+    float[] thatData = thatImage.getData();
+    
     for (int i=0; i<w*h*b; i++) {
-      pels[i] += otherPels[i];
+      thisData[i] += thatData[i];
     }
   }
 
@@ -120,13 +118,13 @@ public class FloatImage extends RasterImage<Float> {
    * 
    * @param number Scalar to add to each band of each pixel.
    */
-  @Override
   public void add(float number) {
     int w = this.getWidth();
     int h = this.getHeight();
-    int b = this.getBands();
+    int b = this.getNumBands();
+    float[] thisData = this.getData();
     for (int i=0; i<w*h*b; i++) {
-      pels[i] += number;
+      thisData[i] += number;
     }
   }
 
@@ -136,19 +134,19 @@ public class FloatImage extends RasterImage<Float> {
    *
    * @param image Target image to use for  multiplication.
    */
-  @Override
-  public void multiply(FloatImage image) throws IllegalArgumentException {
+  public void multiply(FloatImage thatImage) throws IllegalArgumentException {
 
     // Verify input
-    checkCompatibleInputImage(image);
+    checkCompatibleInputImage(thatImage);
 
     // Perform in-place elementwise multiply
     int w = this.getWidth();
     int h = this.getHeight();
-    int b = this.getBands();
-    float[] otherPels = image.getData();
+    int b = this.getNumBands();
+    float[] thisData = this.getData();
+    float[] thatData = thatImage.getData();
     for (int i=0; i<w*h*b; i++) {
-      pels[i] *= otherPels[i];
+      thisData[i] *= thatData[i];
     }
   }
 
@@ -157,13 +155,13 @@ public class FloatImage extends RasterImage<Float> {
    *
    * @param value Scalar to multiply with each band of each pixel.
    */
-  @Override
   public void scale(float value) {
     int w = this.getWidth();
     int h = this.getHeight();
-    int b = this.getBands();
+    int b = this.getNumBands();
+    float[] thisData = this.getData();
     for (int i=0; i<w*h*b; i++) {
-      pels[i] *= value;
+      thisData[i] *= value;
     }
   }
 
@@ -176,63 +174,25 @@ public class FloatImage extends RasterImage<Float> {
    */
   @Override
   public String hex() {
-    return ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(pels));
+    float[] pels = this.getData();
+    return ByteUtils.asHex(ByteUtils.floatArrayToByteArray(pels));
   }
 
   /**
-   * Reads a float image stored in a simple uncompressed binary
-   * format.
+   * Helper routine that verifies two images have compatible
+   * dimensions for common operations (addition, elementwise
+   * multiplication, etc.)
    *
-   * @param input Interface for reading bytes from a binary stream.
-   * @throws IOException
-   * @see #write
+   * @param image RasterImage to check
+   * 
+   * @throws IllegalArgumentException if the image do not have
+   * compatible dimensions. Otherwise has no effect.
    */
-  @Override
-  public void readFields(DataInput input) throws IOException {
-    // Read in header
-    header.readFields(input);
-    int w = this.getWidth();
-    int h = this.getHeight();
-    int b = this.getBands();
-
-    // Read in pixel data
-    byte[] pixelBuffer = new byte[w*h*b*4]; // 4 bytes per float
-    input.readFully(pixelBuffer);
-    pels = ByteUtils.ByteArraytoFloatArray(pixelBuffer);
-  }
-
-  /**
-   * Writes float image in a simple uncompressed binary format.
-   *
-   * @param output Interface for writing bytes to a binary stream.
-   * @throws IOException
-   * @see #readFields
-   */
-  @Override
-  public void write(DataOutput output) throws IOException {
-    header.write(output);
-    output.write(ByteUtils.FloatArraytoByteArray(pels));
-  }
-
-  /**
-   * Produces a string representation of the image. Concatenates image
-   * dimensions with pixel data in lexicographic order.
-   *
-   * @return String representation of image.
-   */
-  @Override
-  public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append(_w + " " + _h + " " + _b + "\n");
-    for (int i = 0; i < _h; i++) {
-      for (int j = 0; j < _w * _b; j++) {
-        result.append(_pels[i * _w * _b + j]);
-        if (j < _w * _b - 1)
-          result.append(" ");
-      }
-      result.append("\n");
+  protected void checkCompatibleInputImage(FloatImage image) throws IllegalArgumentException {
+    if (image.getColorSpace() != this.getColorSpace() || image.getWidth() != this.getWidth() || 
+	image.getHeight() != this.getHeight() || image.getNumBands() != this.getNumBands()) {
+      throw new IllegalArgumentException("Color space and/or image dimensions do not match.");
     }
-    return result.toString();
   }
 
 } // public class FloatImage...

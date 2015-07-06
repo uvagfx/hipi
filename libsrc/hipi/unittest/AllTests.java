@@ -5,12 +5,11 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    FloatImageTestCase.class,
-      JPEGImageUtilTestCase.class,
-      PNGImageUtilTestCase.class,
-      HipiImageBundleTestCase.class,
-      SeqImageBundleTestCase.class
-  //    HARImageBundleTestCase.class // No longer works in JUnit harness / requires full Hadoop environment
+    PixelArrayTestCase.class,
+    HipiImageBundleTestCase.class
+    //    FloatImageTestCase.class,
+    //    JpegCodecTestCase.class,
+    //    PngCodecTestCase.class,
 })
 
 public class AllTests {

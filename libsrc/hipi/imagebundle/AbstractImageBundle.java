@@ -1,10 +1,13 @@
 package hipi.imagebundle;
 
-import hipi.image.FloatImage;
+import hipi.image.HipiImage;
+import hipi.image.HipiImageFactory;
 import hipi.image.ImageHeader;
-import hipi.image.ImageHeader.ImageType;
+import hipi.image.ImageHeader.ImageFormat;
 import hipi.image.io.ImageEncoder;
-import hipi.image.io.JPEGImageUtil;
+import hipi.image.io.ImageDecoder;
+import hipi.image.io.JpegCodec;
+import hipi.image.io.PngCodec;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,11 +40,31 @@ public abstract class AbstractImageBundle {
   private boolean hasNext;
   private boolean prepared;
   private boolean readHeader;
-  private FloatImage readImage;
+  private HipiImage readImage;
   protected Path filePath;
 
+  protected HipiImageFactory imageFactory;
+
   /**
-   * 
+   *
+   * @param imageFactory The {@link HipiImageFactory} required to
+   *        generate HipiImage objects (if this is equal to null the
+   *        read image functions will not function)
+   *
+   * @param filePath The {@link Path} indicating where the image
+   *        bundle is (or should be written to)
+   *
+   * @param conf {@link Configuration} that determines the {@link
+   * FileSystem} for the image bundle
+   */
+  public AbstractImageBundle(HipiImageFactory imageFactory, Path filePath, Configuration conf) 
+  {
+    this.imageFactory = imageFactory;
+    this.filePath = filePath;
+    this.conf = conf;
+  }
+
+  /**
    * @param filePath The {@link Path} indicating where the image
    *        bundle is (or should be written to)
    *
@@ -50,8 +73,7 @@ public abstract class AbstractImageBundle {
    */
   public AbstractImageBundle(Path filePath, Configuration conf) 
   {
-    this.filePath = filePath;
-    this.conf = conf;
+    this(null, filePath, conf);
   }
 
   public final void open(int mode) throws IOException 
@@ -60,12 +82,14 @@ public abstract class AbstractImageBundle {
   }
 
   /**
-   * Opens a file for either reading or writing. This method will return an IOException if an open
-   * call has already happened.
+   * Opens a file for either reading or writing. This method will
+   * return an IOException if an open call has already happened.
    * 
-   * @param mode determines whether the file will be read from or written to
-   * @param overwrite if the file exists and this is a write operation, this parameter determines
-   *        whether to delete the file first or throw an error
+   * @param mode determines whether the file will be read from or
+   *        written to
+   * @param overwrite if the file exists and this is a write
+   *        operation, this parameter determines whether to delete the
+   *        file first or throw an error
    * @throws IOException
    */
   public final void open(int mode, boolean overwrite) throws IOException {
@@ -106,32 +130,36 @@ public abstract class AbstractImageBundle {
   protected abstract void openForRead() throws IOException;
 
   /**
-   * Add an image to this bundle. Some implementations may not actually write the data to the file
-   * system until after close has been called.
+   * Add image to bundle.
    * 
    * @throws IOException
    */
-  public final void addImage(FloatImage image) throws IOException {
-    addImage(image, JPEGImageUtil.getInstance());
-  }
-
-  public final void addImage(FloatImage image, ImageEncoder encoder) throws IOException {
-    addImage(image, encoder, encoder.createSimpleHeader(image));
-  }
-
-  public final void addImage(FloatImage image, ImageEncoder encoder, ImageHeader header)
-    throws IOException {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    encoder.encodeImage(image, header, baos);
-    addImage(new ByteArrayInputStream(baos.toByteArray()), header.getImageType());
-  }
-
-  public abstract void addImage(InputStream image_stream, ImageType type) throws IOException;
+  public abstract void addImage(ImageHeader imageHeader, InputStream inputStream) throws IOException;
 
   /**
-   * Get the number of images contained in this bundle
+   * Add image to bundle.
+   * 
+   * @throws IOException
    */
-  public abstract long getImageCount();
+  public void addImage(InputStream inputStream, ImageFormat imageFormat) throws IllegalArgumentException, IOException {
+    ImageDecoder decoder = null;
+    switch (imageFormat) {
+      case JPEG:
+	decoder = JpegCodec.getInstance();
+	break;
+      case PNG:
+	decoder = PngCodec.getInstance();
+	break;
+      case PPM:
+	throw new IllegalArgumentException("Not implemented.");
+      case UNDEFINED:
+      defult:
+	throw new IllegalArgumentException("Unrecognized or unsupported image format.");
+      }
+
+    ImageHeader header = decoder.decodeHeader(inputStream);
+    addImage(header, inputStream);
+  }
 
   /**
    * Return the path to the index file
@@ -163,7 +191,7 @@ public abstract class AbstractImageBundle {
    * 
    * @throws IOException
    */
-  protected abstract FloatImage readImage() throws IOException;
+  protected abstract HipiImage readImage() throws IOException;
 
   /**
    * Advances the image bundle to the next image
@@ -172,41 +200,42 @@ public abstract class AbstractImageBundle {
    * @throws IOException
    */
   public final ImageHeader next() throws IOException {
-    if (!_prepared) {
-      _hasNext = prepareNext();
+    if (!prepared) {
+      hasNext = prepareNext();
     }
-    _prepared = false;
-    _readImage = null;
-    if (_hasNext) {
-      _readHeader = true;
+    prepared = false;
+    readImage = null;
+    if (hasNext) {
+      readHeader = true;
       return readHeader();
     } else {
-      _readHeader = false;
+      readHeader = false;
       return null;
     }
   }
 
   /**
    * 
-   * @return the FloatImage of the image at the current position in the image bundle
+   * @return the HipiImage of the image at the current position in the
+   * image bundle
    * @throws IOException
    */
-  public final FloatImage getCurrentImage() throws IOException {
-    if (_readImage == null && _readHeader) {
-      _readImage = readImage();
+  public final HipiImage getCurrentImage() throws IOException {
+    if (readImage == null && readHeader) {
+      readImage = readImage();
     }
-    return _readImage;
+    return readImage;
   }
 
   /**
    * @return a boolean indicating whether there are more images left to read from this bundle.
    */
   public boolean hasNext() {
-    if (!_prepared) {
-      _hasNext = prepareNext();
-      _prepared = true;
+    if (!prepared) {
+      hasNext = prepareNext();
+      prepared = true;
     }
-    return _hasNext;
+    return hasNext;
   }
 
   /**

@@ -2,78 +2,44 @@ package hipi.image;
 
 import hipi.image.PixelArray;
 import hipi.image.ImageHeader;
+import hipi.image.ImageHeader.ColorSpace;
 import hipi.image.HipiImage;
 import hipi.image.PixelArray;
+
+import org.apache.hadoop.io.BinaryComparable;
+import org.apache.hadoop.io.RawComparator;
+import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import org.apache.hadoop.io.BinaryComparable;
-import org.apache.hadoop.io.RawComparator;
-import org.apache.hadoop.io.Writable;
+import java.lang.IllegalArgumentException;
 
 /**
  * A raster (uncompressed) 2D image in HIPI. A raster image consists
  * of an ImageHeader (inherited from the HipiImage abstract base
  * class) and a flat array of uncompressed image pixel data stored in
- * interleaved raster-scan order (e.g., RGBRGBRGB...).
+ * interleaved raster-scan order (e.g., RGBRGBRGB...). The underlying
+ * type used to represent the pixel data is set using the
+ * @{link RasterImage#setPixelArray} method.
  */
-public abstract class RasterImage<T extends PixelArray> extends HipiImage {
+public abstract class RasterImage extends HipiImage {
 
-  protected T pixelArray;
+  protected PixelArray pixelArray;
 
-  /**
-   * Creates a raster image with provided header and pixel data array.
-   */
-  public RasterImage(ImageHeader header) throws IllegalArgumentException {
-    if (header.getWidth() <= 0 || header.getHeight() <= 0 || header.getNumBands() <= 0) {
-      throw new IllegalArgumentException("Invalid dimensions in image header.");
-    }      
-    super(header);
-    int size = header.getWidth()*header.getHeight()*header.getNumBands();
-    this.pixelArray = new T(size);
-  }
-
-  /**
-   * Creates a raster image of specified size and allocates pixel array.
-   */
-  public RasterImage(int width, int height, int bands) throws IllegalArgumentException {
-    this.header = new Header(ImageFormat.UNDEFINED, ColorSpace.getDefault(), width, height, bands, null);
-    int size = width*height*bands;
-    this.pixelArray = new T(size);
-  }
-
-  /**
-   * Creates a raster image of specified size and allocates pixel array.
-   */
-  public RasterImage(int width, int height, int bands, T pixelArray) throws IllegalArgumentException {
-    int size = width*height*bands;
-    if (size != pixelArray.size) {
-      throw new IllegalArgumentException("Mismatch between pixelArray size and specified image dimensions.");
-    }
-    this.header = new Header(ImageFormat.UNDEFINED, ColorSpace.getDefault(), width, height, bands, null);
+  protected RasterImage(PixelArray pixelArray) {
     this.pixelArray = pixelArray;
   }
 
-  public T getPixelArray() {
-    return pixelArray;
+  public void setHeader(ImageHeader header) throws IllegalArgumentException {
+    super.setHeader(header);
+    int size = header.getWidth()*header.getHeight()*header.getNumBands();
+    pixelArray.setSize(size);
   }
 
-  /**
-   * Helper routine that converts an integer to a value in the pixel
-   * data type.
-   *
-   * @return Converted value in the pixel data type.
-   */
-  public abstract T convertFromInt(int value);
-  
-  /**
-   * Helper routine that converts a value in the pixel data type to an
-   * integer.
-   *
-   * @return Converted value as a Java int.
-   */
-  public abstract int convertToInt(T value);
+  public PixelArray getPixelArray() {
+    return pixelArray;
+  }
 
   /**
    * Compares two raster images for equality.
@@ -87,29 +53,38 @@ public abstract class RasterImage<T extends PixelArray> extends HipiImage {
 
   /**
    * Crops a raster image to a (width x height) rectangular region
-   * with top-left corner at (x,y) pixel location.
+   * with top-left corner at (x,y) pixel location. Note that last
+   * argument is output target.
    * 
    * @return a {@link RasterImage} containing the cropped portion of
    * the original image
    */
-  public RasterImage<T> crop(int x, int y, int width, int height) throws IllegalArgumentException {
-    if (x < 0 || width <= 0 || x+width > this.width ||
-	y < 0 || height <= 0 || y+height > this.height) {
+  public void crop(int x, int y, int width, int height, RasterImage crop) throws IllegalArgumentException {
+    int w = this.getWidth();
+    int h = this.getHeight();
+    int b = this.getNumBands();
+
+    // Verify crop dimensions
+    if (x < 0 || width <= 0 || x+width > w ||
+	y < 0 || height <= 0 || y+height > h) {
       throw new IllegalArgumentException("Invalid crop region.");
     }
-    int w = this.getWidth();
-    int b = this.getNumBands();
-    T pixelArrayCrop = new T(width*height*b);
-    //    T[] pels = new T[width*height*b];
+
+    // Verify crop output target
+    if (width != crop.getWidth() || height != crop.getHeight() || b != crop.getNumBands()) {
+      throw new IllegalArgumentException("Mismatch between size of crop region and size of crop output target.");
+    }
+
+    PixelArray pixelArrayCrop = crop.getPixelArray();
+
+    // Assemble cropped output
     for (int j=y; j<y+height; j++) {
       for (int i=x; i<x+width; i++) {
 	for (int c=0; c<b; c++) {
-	  pixelArrayCrop.setElem(((j-y)*width+(i-x))*b+c) = pixelArray.getElem((j*w+i)*b+c);
+	  pixelArrayCrop.setElem(((j-y)*width+(i-x))*b+c,pixelArray.getElem((j*w+i)*b+c));
 	}
       }
-    }
-    
-    return new RasterImage<T>(width, height, b, pixelArrayCrop);
+    }    
   }
 
   /**
@@ -125,146 +100,51 @@ public abstract class RasterImage<T extends PixelArray> extends HipiImage {
       throw new IllegalArgumentException("Cannot convert color space to itself.");
     }
     throw new IllegalArgumentException("Not implemented.");
-    return null;
-    /*
-    switch (type) {
-      case RGB2GRAY:
-        float[] pels = new float[_w * _h];
-        for (int i = 0; i < _w * _h; i++)
-          pels[i] = _pels[i * _b] * 0.30f + _pels[i * _b + 1] * 0.59f + _pels[i * _b + 2] * 0.11f;
-        return new FloatImage(_w, _h, 1, pels);
-    }
-    return null;
-    */
   }
 
   /**
-   * Helper routine that verifies two images have compatible
-   * dimensions for common operations (addition, elementwise
-   * multiplication, etc.)
+   * Produces a string representation of the image that concatenates
+   * image dimensions with RGB values of up to first 10 pixels in
+   * raster-scan order.
    *
-   * @param image RasterImage to check
-   * 
-   * @throws IllegalArgumentException if the image do not have
-   * compatible dimensions. Otherwise has no effect.
-   */
-  protected void checkCompatibleInputImage(RasterImage image) throws IllegalArgumentException {
-    if (image.getColorSpace() != this.getColorSpace() || image.getWidth() != this.getWidth() || 
-	image.getHeight() != this.getHeight() || image.getBands() != this.getNumBands()) {
-      throw new IllegalArgumentException("Color space and/or image dimensions do not match.");
-    }
-  }
-
-  /**
-   * Performs in-place addition of a {@link RasterImage} and the
-   * current image.
-   * 
-   * @param image Target image to add to the current object.
-   *
-   * @throws IllegalArgumentException If the image dimensions do not match.
-   */
-  public abstract void add(RasterImage image) throws IllegalArgumentException;
-
-  /**
-   * Performs in-place addition of a constant to each band of every pixel.
-   * 
-   * @param number Constant to add to each band of each pixel.
-   */
-  public abstract void add(T number);
-
-  /**
-   * Performs in-place pairwise multiplication of {@link RasterImage}
-   * and the current image.
-   *
-   * @param image Target image to use for  multiplication.
-   */
-  public abstract void multiply(RasterImage image) throws IllegalArgumentException;
-
-  /**
-   * Performs in-place multiplication with scalar.
-   *
-   * @param value Scalar to multiply with each band of each pixel.
-   */
-  public abstract void scale(float value);
-
-  /**
-   * Get pixel value at specific location and band.
-   *
-   * @param x Horizintal pixel coordinate (between 0 and width-1, inclusive).
-   * @param y Vertical pixel coordinate (between 0 and height-1, inclusive).
-   * @param c Color band (between 0 and numBands-1, inclusive).
-   *
-   * @throws IndexOutOfBoundsException - If pixel coordinates or band
-   * is negative or exceeds image dimensions.
-   */
-  /*
-  public T getPixel(int x, int y, int b) throws IndexOutOfBoundsException {
-    int w = this.getWidth();
-    int h = this.getHeight();
-    int bands = this.getNumBands();
-    if (x < 0 || x >= w || y < 0 || y >= h || b < 0 || b >= bands) {
-      throw new IndexOutOfBoundsException(String.format("Attempted to access pixel (%d,%d,%d) in image with dimensions (%d,%d,%d)",x,y,b,w,h,bands));
-    }
-    return pels[b + (x + y * w) * bands];
-  }
-  */
-
-  /**
-   * Set pixel value at specific location and band.
-   *
-   * @param x Horizintal pixel coordinate (between 0 and width-1, inclusive).
-   * @param y Vertical pixel coordinate (between 0 and height-1, inclusive).
-   * @param b Color band (between 0 and numBands-1, inclusive).
-   *
-   * @throws IndexOutOfBoundsException - If pixel coordinates or band
-   * is negative or exceeds image dimensions.
-   */
-  /*
-  public void setPixel(int x, int y, int b, T val) throws IndexOutOfBoundsException {
-    int w = header.getWidth();
-    int h = header.getHeight();
-    int bands = header.getNumBands();
-    if (x < 0 || x >= w || y < 0 || y >= h || b < 0 || b >= bands) {
-      throw new IndexOutOfBoundsException(String.format("Attempted to set pixel (%d,%d,%d) in image with dimensions (%d,%d,%d)",x,y,b,w,h,bands));
-    }
-    pels[b + (x + y * w) * bands] = val;
-  }
-  */
-
-  /**
-   * Get array of image pixel data.
-   *
-   * @return Pixel data array.
-   */
-  /*
-  public T[] getData() {
-    return pels;
-  }
-  */
-
-  /**
-   * Produces a string representation of the image. Concatenates image
-   * header with pixel data in interleaved lexicographic order.
-   *
-   * @return String representation of image.
+   * @see java.lang.Object#toString
    */
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.appen(header.toString());
-    result.append("\n");
-    int w = header.getWidth();
-    int h = header.getHeight();
-    int b = header.getNumBands();
-    for (int j=0; j<h; j++) {
-      for (int i=0; i<w; i++) {
-	for (int c=0; c<b; c++) {
-        result.append(T.getElem[(j*w+i)*b+c]);
-	result.append(" ");
-	}
-      }
-      result.append("\n");
+    String typeString = "UNDEFINED IMAGE TYPE";
+    switch (getType()) {
+    case FLOAT:
+      typeString = "FloatImage";
+      break;
+    case BYTE:
+      typeString = "ByteImage";
+      break;
+    default:
     }
+    int w = this.getWidth();
+    int h = this.getHeight();
+    int b = this.getNumBands();
+    StringBuilder result = new StringBuilder();
+    result.append(String.format("%s: %d x %d x %d [", typeString, w, h, b));
+    int n = Math.min(10,w*h);
+    for (int i=0; i<n; i++) {
+      result.append("(");
+      for (int c=0; c<b; c++) {
+	if (getType() == HipiImageType.FLOAT) {
+	  result.append(String.format("%.2f",pixelArray.getElemFloat(i*b+c)));
+	} else {
+	  result.append(pixelArray.getElem(i*b+c));
+	}
+	if (c<(b-1))
+	  result.append(" ");
+	else
+	  result.append(")");
+      }
+      if (i<(n-1)) {
+	result.append(" ");
+      }
+    }
+    result.append("]");
     return result.toString();
   }
 
@@ -275,9 +155,38 @@ public abstract class RasterImage<T extends PixelArray> extends HipiImage {
    *
    * @param image Target image.
    */
-  public void set(RasterImage<T> image) {
+  public void set(RasterImage image) {
     this.header = image.header;
     this.pixelArray = image.pixelArray;
+  }
+
+  /**
+   * Writes raster image in a simple uncompressed binary format.
+   * @see org.apache.hadoop.io.Writable#write
+   */
+  @Override
+  public void write(DataOutput output) throws IOException {
+    header.write(output);
+    output.write(pixelArray.getByteArray());
+  }
+
+  /**
+   * Reads a raster image stored in a simple uncompressed binary
+   * format.
+   * @see org.apache.hadoop.io.Writable#readFields
+   */
+  @Override
+  public void readFields(DataInput input) throws IOException {
+    // Read in header
+    header.readFields(input);
+    int w = this.getWidth();
+    int h = this.getHeight();
+    int b = this.getNumBands();
+    int numBytes = w*h*b*PixelArray.getDataTypeSize(pixelArray.getDataType());
+    // Read in pixel data
+    byte[] pixelBytes = new byte[numBytes];
+    input.readFully(pixelBytes);
+    pixelArray.setFromByteArray(pixelBytes);
   }
 
 } // public abstract class RasterImage<T>...

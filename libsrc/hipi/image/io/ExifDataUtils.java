@@ -1,16 +1,13 @@
-/*
 package hipi.image.io;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
+import org.w3c.dom.Node;
+import org.w3c.dom.NamedNodeMap;
+
 import java.io.InputStream;
+import java.io.IOException;
+import java.util.Iterator;
 
-import java.io.*;
-import java.util.*;
-import javax.imageio.*;
-import javax.imageio.stream.*;
-*/
-
+import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.metadata.IIOMetadata;
@@ -31,10 +28,10 @@ public class ExifDataUtils {
    * @return initialized IIOMetadata object if successful, null
    * otherwise
    */
-  public static IIOMetadata readExifData(InputStream is) {
+  public static IIOMetadata readExifData(InputStream is) throws IOException {
     
     ImageInputStream iis = ImageIO.createImageInputStream(is);
-    if (!iis) {
+    if (iis == null) {
       return null;
     }
 	
@@ -69,7 +66,7 @@ public class ExifDataUtils {
     int length = names.length;
     for (int i=0; i<length; i++) {
       System.out.println( "EXIF data format name: " + names[i]);
-      displayExifData(exifData.getAsTree(names[i],0));
+      displayExifData(exifData.getAsTree(names[i]), 0);
     }
   }
 
@@ -79,13 +76,13 @@ public class ExifDataUtils {
   }
 
   private static void displayExifData(Node node, int level) {
-    // print open tag of element
+    // Print open tag of element
     indent(level);
     System.out.print("<" + node.getNodeName());
     NamedNodeMap map = node.getAttributes();
     if (map != null) {
       
-      // print attribute values
+      // Print attribute values
       int length = map.getLength();
       for (int i = 0; i < length; i++) {
 	Node attr = map.item(i);
@@ -96,20 +93,20 @@ public class ExifDataUtils {
     
     Node child = node.getFirstChild();
     if (child == null) {
-      // no children, so close element and return
+      // No children exist, so close element and return
       System.out.println("/>");
       return;
     }
     
-    // children, so close current tag
+    // Children exist, so close current tag and descend
     System.out.println(">");
     while (child != null) {
-      // print children recursively
-      displayMetadata(child, level + 1);
+      // Print children recursively
+      displayExifData(child, level + 1);
       child = child.getNextSibling();
     }
 
-    // print close tag of element
+    // Print close tag of element
     indent(level);
     System.out.println("</" + node.getNodeName() + ">");
   }

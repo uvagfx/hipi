@@ -12,7 +12,7 @@ public abstract class PixelArray {
   public static final int TYPE_DOUBLE  = 5;
   public static final int TYPE_UNDEFINED = 32;
 
-  private static final int dataTypeSize[] = {8,16,16,32,32,64};
+  private static final int dataTypeSize[] = {1,2,2,4,4,8};
 
   protected int dataType;
   protected int size;
@@ -24,18 +24,29 @@ public abstract class PixelArray {
     return dataTypeSize[type];
   }
 
+  public PixelArray() {
+    this.dataType = TYPE_UNDEFINED;
+    this.size = 0;
+  }
+
   protected PixelArray(int dataType, int size) {
     this.dataType = dataType;
     this.size = size;
   }
 
-  int getDataType() {
+  public int getDataType() {
     return dataType;
   }
 
   public int getSize() {
     return size;
   }
+
+  public abstract void setSize(int size) throws IllegalArgumentException;
+
+  public abstract byte[] getByteArray();
+
+  public abstract void setFromByteArray(byte[] bytes) throws IllegalArgumentException;
 
   public abstract int getElem(int i);
 

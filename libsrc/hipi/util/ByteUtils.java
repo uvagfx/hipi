@@ -12,15 +12,11 @@ public class ByteUtils {
    * 
    * @param floatArray
    */
-  public static byte[] FloatArraytoByteArray(float floatArray[]) {
-    byte byteArray[] = new byte[floatArray.length * 4];
-
+  public static byte[] floatArrayToByteArray(float floatArray[]) {
+    byte byteArray[] = new byte[floatArray.length*4];
     ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);
-
     FloatBuffer floatBuf = byteBuf.asFloatBuffer();
-
     floatBuf.put(floatArray);
-
     return byteArray;
   }
 
@@ -29,15 +25,14 @@ public class ByteUtils {
    * 
    * @param byteArray
    */
-  public static float[] ByteArraytoFloatArray(byte byteArray[]) {
+  public static float[] byteArrayToFloatArray(byte byteArray[]) throws IllegalArgumentException {
+    if (byteArray.length % 4 != 0) {
+      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 4, which is the number of bytes in single float.");
+    }
     float floatArray[] = new float[byteArray.length / 4];
-
     ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);
-
     FloatBuffer floatBuf = byteBuf.asFloatBuffer();
-
     floatBuf.get(floatArray);
-
     return floatArray;
   }
 
@@ -46,8 +41,8 @@ public class ByteUtils {
    * 
    * @param byteArray
    */
-  public static final int ByteArrayToInt(byte[] byteArray) {
-    return ByteArrayToInt(byteArray, 0);
+  public static final int byteArrayToInt(byte[] byteArray) {
+    return byteArrayToInt(byteArray, 0);
   }
 
   /**
@@ -56,11 +51,10 @@ public class ByteUtils {
    * @param byteArray
    * @param offset the offset in the byteArray that is the first byte of the int
    * 
-   *        TODO: Test that this will work for leading-zero bytes
+   * TODO: Test that this will work for leading-zero bytes
    */
-  public static final int ByteArrayToInt(byte[] byteArray, int offset) {
-    return byteArray[0 + offset] << 24 | (byteArray[1 + offset] & 0xff) << 16
-        | (byteArray[2 + offset] & 0xff) << 8 | (byteArray[3 + offset] & 0xff);
+  public static final int byteArrayToInt(byte[] byteArray, int offset) {
+    return byteArray[0 + offset] << 24 | (byteArray[1 + offset] & 0xff) << 16 | (byteArray[2 + offset] & 0xff) << 8 | (byteArray[3 + offset] & 0xff);
   }
 
   /**
@@ -68,14 +62,15 @@ public class ByteUtils {
    * 
    * @param i the integer
    */
-  public static final byte[] IntToByteArray(int i) {
+  public static final byte[] intToByteArray(int i) {
     return new byte[] {(byte) (i >> 24), (byte) (i >> 16), (byte) (i >> 8), (byte) i};
   }
 
   /**
+   * Computes SHA-1 hash of byte array.
    * 
-   * @param vals
-   * @return A hex string of the input according to SHA-1 standards
+   * @param vals input byte array
+   * @return SHA-1 hash of the input byte array
    */
   public static String asHex(byte[] vals) {
     try {
@@ -91,4 +86,5 @@ public class ByteUtils {
       return null;
     }
   }
+
 }

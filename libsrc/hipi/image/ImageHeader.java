@@ -1,9 +1,7 @@
 package hipi.image;
 
 import org.apache.hadoop.io.BinaryComparable;
-import org.apache.hadoop.io.RawComparator;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -26,8 +24,12 @@ import javax.imageio.metadata.IIOMetadata;
  * The {@link hipi.image.io} package provides classes for reading
  * (decoding) and writing (encoding) ImageHeader objects in various
  * image formats such as JPEG and PNG.
+ *
+ * Note that this class implements {@link
+ * org.apache.hadoop.io.WritableComparable}, allowing it to be used as
+ * a key/value object in MapReduce.
  */
-public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
+public class ImageHeader implements WritableComparable<ImageHeader> {
 
   /**
    * Image storage formats supported in HIPI.
@@ -59,12 +61,10 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
           return fmt;
         }
       }
-      throw new IllegalArgumentException(String.format("There is no ImageFormat enum value with an associated integer value of %d", input));
+      throw new IllegalArgumentException(String.format("There is no ImageFormat enum value associated with integer [%d]", format));
     }
 
     /** 
-     * Integer representation of ImageFormat.
-     *
      * @return Integer representation of ImageFormat.
      */
     public int toInteger() {
@@ -72,14 +72,15 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
     }
 
     /**
-     * Default ImageFormat. Currently UNDEFINED.
+     * Default ImageFormat.
      *
-     * @return Default ImageFormat enum value.
+     * @return ImageFormat.UNDEFINED
      */
     public static ImageFormat getDefault() {
       return UNDEFINED;
     }
-  }
+
+  } // public enum ImageFormat
 
   /**
    * Color spaces supported in HIPI.
@@ -105,13 +106,13 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
      *
      * @return Associated ColorSpace.
      */
-    public static ColorSpace fromInteger(int input) throws IllegalArgumentException {
+    public static ColorSpace fromInteger(int cspace) throws IllegalArgumentException {
       for (ColorSpace cs : values()) {
         if (cs.cspace == cspace) {
 	  return cs;
         }
       }
-      throw new IllegalArgumentException(String.format("There is no ColorSpace enum value with an associated integer value of %d", input));
+      throw new IllegalArgumentException(String.format("There is no ColorSpace enum value with an associated integer value of %d", cspace));
     }
 
     /** 
@@ -132,7 +133,7 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
       return RGB;
     }
 
-  }
+  } // public enum ColorSpace
 
   private ImageFormat storageFormat; // format used to store image on HDFS
   private ColorSpace colorSpace;     // color space of pixel data
@@ -155,9 +156,10 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
 
   /**
    * EXIF data associated with the image represented as a
-   * javax.imageio.metadata.IIOMetadata object.
+   * javax.imageio.metadata.IIOMetadata object. 
+   *
+   * See {@link hipi.image.io.ExifDataUtils}.
    */
-  //  private Map<String, String> exifData = new HashMap<String,String>();
   private IIOMetadata exifData;
 
   /**
@@ -195,7 +197,7 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    *
    * @return Current image storage type.
    */
-  public ImageType getStorageFormat() {
+  public ImageFormat getStorageFormat() {
     return storageFormat;
   }
 
@@ -253,16 +255,11 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    * Attempt to retrieve metadata value associated with key.
    *
    * @param key field name of the desired metadata record
-   * @return either the value corresponding to the key or the empty
-   *         string if the key was not found
+   * @return either the value corresponding to the key or null if the
+   * key was not found
    */
   public String getMetaData(String key) {
-    String value = metaData.get(key);
-    if (value == null) {
-      return "";
-    } else {
-      return value;
-    }
+    return metaData.get(key);
   }
 
   /**
@@ -299,6 +296,7 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
    * @param utf8Bytes UTF-8-encoded bytes of a JSON object
    * representing the data
    */
+  @SuppressWarnings("unchecked")
   public void setMetaDataFromBytes(byte[] utf8Bytes) {
     try {
       String jsonText = new String(utf8Bytes, "UTF-8");
@@ -344,81 +342,50 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
   }
 
   /**
-   * Produces a string representation of the image header.
-   *
-   * @return String representation of image header.
+   * Produce readable string representation of header.
+   * @see java.lang.Object#toString
    */
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append(storageFormat.toInteger() + " " +
-		  colorSpace.toInteger() + " " +
-		  width + " " +
-		  height + " " +
-		  bands);
-    return result.toString();
+    String metaText = JSONValue.toJSONString(metaData);
+    return String.format("ImageHeader: (%d %d) %d x %d x %d meta: %s", 
+			 storageFormat.toInteger(), colorSpace.toInteger(), width, height, bands, metaText);
   }  
 
   /**
-   * Compare method from the {@link RawComparator} interface.
-   *
-   * @return An integer result of the comparison.
+   * Writes ImageHeader in a simple uncompressed binary
+   * format.
+   * @see org.apache.hadoop.io.WritableComparable#write
+   * @see #readFields
    */
-  public int compare(byte[] byteArray1, int start1, int length1, 
-		     byte[] byteArray2, int start2, int length2) {
-
-    int st1 = ByteUtils.ByteArrayToInt(byteArray1, start1);
-    int st2 = ByteUtils.ByteArrayToInt(byteArray2, start2);
-
-    int cs1 = ByteUtils.ByteArrayToInt(byteArray1, start1 + 4);
-    int cs2 = ByteUtils.ByteArrayToInt(byteArray2, start2 + 4);
-
-    int w1  = ByteUtils.ByteArrayToInt(byteArray1, start1 +  8);
-    int w2  = ByteUtils.ByteArrayToInt(byteArray2, start2 +  8);
-
-    int h1  = ByteUtils.ByteArrayToInt(byteArray1, start1 + 12);
-    int h2  = ByteUtils.ByteArrayToInt(byteArray2, start2 + 12);
-
-    int b1  = ByteUtils.ByteArrayToInt(byteArray1, start1 + 16);
-    int b2  = ByteUtils.ByteArrayToInt(byteArray2, start2 + 16);
-
-    int size1 = w1 * h1 * b1;
-    int size2 = w2 * h2 * b2;
-
-    return (size1 - size2);
+  @Override
+  public void write(DataOutput out) throws IOException {
+    out.writeInt(storageFormat.toInteger());
+    out.writeInt(colorSpace.toInteger());
+    out.writeInt(width);
+    out.writeInt(height);
+    out.writeInt(bands);
+    byte[] metaDataBytes = getMetaDataAsBytes();
+    if (metaDataBytes == null || metaDataBytes.length == 0) {
+      out.writeInt(0);
+    } else {
+      out.writeInt(metaDataBytes.length);
+      out.write(metaDataBytes);
+    }
   }
 
   /**
-   * Compare method from the {@link java.util.Comparator}
-   * interface. This method reads both {@link BinaryComparable}
-   * objects into byte arrays and calls {@link #compare}.
-   *
-   * @return An integer result of the comparison.
-   * @see #compare
-   */
-  public int compare(BinaryComparable o1, BinaryComparable o2) {
-
-    byte[] b1 = o1.getBytes();
-    byte[] b2 = o2.getBytes();
-    int length1 = o1.getLength();
-    int length2 = o2.getLength();
-
-    return compare(b1, 0, length1, b2, 0, length2);
-  }
-
-  /**
-   * Reads an ImageHeader stored in a simple uncompressed binary
+   * Reads ImageHeader stored in a simple uncompressed binary
    * format. The first twenty bytes are the image type, width, height,
    * bit depth, and number of color bands (aka channels), all stored
    * as ints, followed by the meta data stored as a set of key/value
    * pairs.
-   *
-   * @param input Interface for reading bytes from a binary stream.
-   * @throws IOException
+   * @see org.apache.hadoop.io.WritableComparable#readFields
    */
+  @Override
   public void readFields(DataInput input) throws IOException {
-    this.storageFormat = ImageFormat.fromValue(input.readInt());
-    this.colorSpace = ColorSpace.fromValue(input.readInt());
+    this.storageFormat = ImageFormat.fromInteger(input.readInt());
+    this.colorSpace = ColorSpace.fromInteger(input.readInt());
     this.width = input.readInt();
     this.height = input.readInt();
     this.bands = input.readInt();
@@ -431,25 +398,28 @@ public class ImageHeader implements Writable, RawComparator<BinaryComparable> {
   }
 
   /**
-   * Writes ImageHeader in a simple uncompressed binary format.
+   * Compare method from the {@link java.util.Comparator}
+   * interface. This method reads both {@link BinaryComparable}
+   * objects into byte arrays and calls {@link #compare}.
    *
-   * @param output Interface for writing bytes to a binary stream.
-   * @throws IOException
-   * @see #readFields
+   * @return An integer result of the comparison.
+   * @see #compare
    */
-  public void write(DataOutput output) throws IOException {
-    output.writeInt(storageFormat.toValue());
-    output.writeInt(colorSpace.toValue());
-    output.writeInt(width);
-    output.writeInt(height);
-    output.writeInt(bands);
-    out.writeInt(metaData.size());
-    byte[] metaDataBytes = getMetaDataAsBytes();
-    if (metaDataBytes == null || metaDataBytes.length == 0) {
-      out.writeInt(0);
-    } else {
-      out.writeInt(metaDataBytes.length);
-      out.write(metaDataBytes);
-    }
+  public int compareTo(ImageHeader that) {
+
+    int thisFormat = this.storageFormat.toInteger();
+    int thatFormat = that.storageFormat.toInteger();
+
+    return (thisFormat < thatFormat ? -1 : (thisFormat == thatFormat ? 0 : 1));
   }
+
+  /**
+   * Returns hash code value for object.
+   * @see java.lang.Object#hashCode
+   */
+  @Override
+  public int hashCode() {
+    return this.storageFormat.toInteger();
+  }
+
 }

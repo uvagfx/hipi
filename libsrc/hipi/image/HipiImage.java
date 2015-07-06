@@ -1,25 +1,102 @@
 package hipi.image;
 
 import hipi.image.ImageHeader;
+import hipi.image.ImageHeader.ImageFormat;
+import hipi.image.ImageHeader.ColorSpace;
 import hipi.image.HipiImageException;
 import hipi.util.ByteUtils;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import org.apache.hadoop.io.BinaryComparable;
 import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.Writable;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.HashMap;
+
+import javax.imageio.metadata.IIOMetadata;
+
 /**
- * A 2D image object in HIPI.
+ * A 2D image object in HIPI. This class implements the Writable
+ * interface so that it can be used as a value object in MapReduce.
+ * @see org.apache.hadoop.io.Writable
  */
-public abstract class HipiImage implements Writable, RawComparator<BinaryComparable> {
+
+public abstract class HipiImage implements Writable {
+
+  public enum HipiImageType {
+    UNDEFINED(0x0), FLOAT(0x1), BYTE(0x2), RAW(0x3), OPENCV(0x4);
+
+    private int type;
+
+    /**
+     * Creates a HipiImageType from an int.
+     *
+     * @param format Integer representation of HipiImageType.
+     */
+    HipiImageType(int type) {
+      this.type = type;
+    }
+
+    /**
+     * Creates a HipiImageType from an int.
+     *
+     * @param val Integer representation of HipiImageType.
+     *
+     * @return Associated HipiImageType.
+     */
+    public static HipiImageType fromInteger(int type) throws IllegalArgumentException {
+      for (HipiImageType typ : values()) {
+	if (typ.type == type) {
+	  return typ;
+	}
+      }
+      throw new IllegalArgumentException(String.format("There is no HipiImageType enum value associated with integer [%d]", type));
+    }
+
+    /** 
+     * @return Integer representation of HipiImageType
+     */
+    public int toInteger() {
+      return type;
+    }
+
+    /**
+     * Default HipiImageType.
+     *
+     * @return HipiImageType.UNDEFINED
+     */
+    public static HipiImageType getDefault() {
+      return UNDEFINED;
+    }
+
+  } // public enum HipiImageType
 
   protected ImageHeader header;
 
-  protected HipiImage(ImageHeader header) throws IllegalArgumentException, RuntimeException {
+  protected HipiImage() {
+    this.header = null;
+  }
+
+  public void setHeader(ImageHeader header) throws IllegalArgumentException {
+    if (header == null) {
+      throw new IllegalArgumentException("Image header must not be null.");
+    }
+    if (header.getWidth() <= 0 || header.getHeight() <= 0 || header.getNumBands() <= 0) {
+      throw new IllegalArgumentException(String.format("Invalid dimensions in image header: [w:%d x h:%d x b:%d]", 
+						       header.getWidth(), header.getHeight(), header.getNumBands()));
+    }
     this.header = header;
+  }
+
+  /**
+   * Get object type identifier.
+   *
+   * @return Type of object.
+   */
+  public HipiImageType getType() {
+    return HipiImageType.UNDEFINED;
   }
 
   /**
@@ -36,7 +113,7 @@ public abstract class HipiImage implements Writable, RawComparator<BinaryCompara
    *
    * @return Color space of image.
    */
-  public int getColorSpace() {
+  public ColorSpace getColorSpace() {
     return header.getColorSpace();
   }
 
@@ -68,6 +145,34 @@ public abstract class HipiImage implements Writable, RawComparator<BinaryCompara
   }
 
   /**
+   * Get meta data for particular key.
+   *
+   * @return EXIF data object
+   */
+  public String getMetaData(String key) {
+    return header.getMetaData(key);
+  }
+
+  /**
+   * Get all of the metadata associated with this image as {@link
+   * HashMap}.
+   *
+   * @return a hash map containing the keys and values of the metadata
+   */
+  public HashMap<String, String> getAllMetaData() {
+    return header.getAllMetaData();
+  }
+
+  /**
+   * Get EXIF data object (if any).
+   *
+   * @return EXIF data object
+   */
+  public IIOMetadata getExifData() {
+    return header.getExifData();
+  }
+
+  /**
    * Computes hash of array of image pixel data.
    *
    * @return Hash of pixel data represented as a string.
@@ -75,27 +180,5 @@ public abstract class HipiImage implements Writable, RawComparator<BinaryCompara
    * @see ByteUtils#asHex is used to compute the hash.
    */
   public abstract String hex();
-
-  /**
-   * Compare method from the {@link java.util.Comparator}
-   * interface. Currently calls the corresponding compare method in
-   * the {@link ImageHeader} class.
-   *
-   * @return An integer result of the comparison.
-   */
-  public int compare(BinaryComparable o1, BinaryComparable o2) {
-    return ImageHeader.compare(o1,o2);
-  }
-
-  /**
-   * Compare method from the {@link RawComparator}
-   * interface. Currently calls the corresponding compare method in
-   * the {@link ImageHeader} class.
-   *
-   * @return An integer result of the comparison.
-   */
-  public int compare(byte[] arg0, int arg1, int arg2, byte[] arg3, int arg4, int arg5) {
-    return ImageHeader.compare(arg0, arg1, arg2, arg3, arg4, arg5);
-  }
 
 }

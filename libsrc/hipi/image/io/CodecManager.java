@@ -3,43 +3,42 @@ package hipi.image.io;
 import hipi.image.ImageHeader.ImageFormat;
 import hipi.image.io.JpegCodec;
 import hipi.image.io.PngCodec;
-import hipi.image.io.PpmCodec;
+//import hipi.image.io.PpmCodec;
 
 /**
  * This class manages choosing codecs for the different image formats.
  */
 public final class CodecManager {
 
-  static public ImageDecoder getDecoder(ImageFormat format) {
-    ImageDecoder decoder = null;
+  static public ImageDecoder getDecoder(ImageFormat format) throws IllegalArgumentException {
     switch (format) {
     case JPEG:
-      decoder = JpegCodec.getInstance();
-      break;
+      return JpegCodec.getInstance();
     case PNG:
-      decoder = PngCodec.getInstance();
-      break;
-    case PPM:
-      decoder = PpmCodec.getInstance();
-      break;
+      return PngCodec.getInstance();
+      /*
+	case PPM:
+	decoder = PpmCodec.getInstance();
+	break;
+      */
+    default:
+      throw new IllegalArgumentException("Image format currently unsupported.");
     }
-    return decoder;
   }
-
-  static public ImageEncoder getEncoder(ImageFormat format) {
-    ImageEncoder encoder = null;
+  
+  static public ImageEncoder getEncoder(ImageFormat format) throws IllegalArgumentException {
     switch (format) {
     case JPEG:
-      encoder = JpegCodec.getInstance();
-      break;
+      return JpegCodec.getInstance();
     case PNG:
-      encoder = PngCodec.getInstance();
-      break;
-    case PPM:
-      encoder = PpmCodec.getInstance();
-      break;
+      return PngCodec.getInstance();
+      /*
+	case PPM:
+	return PpmCodec.getInstance();
+      */
+    default:
+      throw new IllegalArgumentException("Image format currently unsupported.");
     }
-    return encoder;
   }
 
 }

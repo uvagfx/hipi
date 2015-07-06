@@ -128,7 +128,7 @@ public class Downloader extends Configured implements Tool {
 	      bis.reset();
 
 	      // Add image to HIB
-	      hib.addImage(bis, type.compareTo("image/jpeg") == 0 ? ImageType.JPEG_IMAGE : ImageType.PNG_IMAGE);
+	      hib.addImage(header, bis); //, type.compareTo("image/jpeg") == 0 ? ImageType.JPEG_IMAGE : ImageType.PNG_IMAGE);
 
 	      System.err.println("Added to HIB: " + uri);
 

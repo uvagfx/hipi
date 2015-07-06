@@ -10,15 +10,18 @@
     </delete>
     
     <!-- Compile -->
-    <javac debug="yes" nowarn="on" includeantruntime="no" srcdir="./hipi/container:./hipi/image:./hipi/imagebundle:./hipi/util:./hipi/unittest" destdir="../lib" classpath="${hadoop.classpath}:${json.jar}:${metadata.jar}:${junit.jar}">
+    <javac debug="yes" nowarn="on" includeantruntime="no" srcdir="./hipi/container:./hipi/image:./hipi/imagebundle:./hipi/util:./hipi/unittest" destdir="../lib" classpath="${hadoop.classpath}:${json.jar}:${junit.jar}:${commons.io.jar}">
       <compilerarg value="-Xlint:deprecation" />
+      <compilerarg value="-Xlint:unchecked" />
     </javac>
     
     <!-- Create the jar -->
     <jar destfile="../lib/hipi-${hipi.version}.jar" basedir="../lib">
       <zipfileset src="${json.jar}" />
+      <!--
       <zipfileset src="${metadata.jar}" />
       <zipfileset src="${xmpcore.jar}" />
+      -->
       <manifest>
       </manifest>
     </jar>

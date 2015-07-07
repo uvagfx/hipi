@@ -13,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.BufferedInputStream;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -157,8 +158,11 @@ public abstract class AbstractImageBundle {
 	throw new IllegalArgumentException("Unrecognized or unsupported image format.");
       }
 
-    ImageHeader header = decoder.decodeHeader(inputStream);
-    addImage(header, inputStream);
+    BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+    bufferedInputStream.mark(Integer.MAX_VALUE); // 100MB
+    ImageHeader header = decoder.decodeHeader(bufferedInputStream);
+    bufferedInputStream.reset();
+    addImage(header, bufferedInputStream);
   }
 
   /**

@@ -5,10 +5,10 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    PixelArrayTestCase.class,
-    HipiImageBundleTestCase.class
+    //    PixelArrayTestCase.class,
+    //    HipiImageBundleTestCase.class
     //    FloatImageTestCase.class,
-    //    JpegCodecTestCase.class,
+    JpegCodecTestCase.class
     //    PngCodecTestCase.class,
 })
 

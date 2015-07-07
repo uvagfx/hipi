@@ -6,6 +6,7 @@ import hipi.image.HipiImageFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.BufferedInputStream;
 
 /**
  * This class provides the necessary functions for decoding an image
@@ -15,16 +16,22 @@ import java.io.InputStream;
  */
 public interface ImageDecoder {
 
-  public ImageHeader decodeHeader(InputStream inputStream) throws IOException;
+  public ImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException;
+
+  public default ImageHeader decodeHeader(InputStream inputStream) throws IOException {
+    return decodeHeader(inputStream, false);
+  }
 
   public HipiImage decodeImage(InputStream inputStream, ImageHeader imageHeader, HipiImageFactory imageFactory) throws IllegalArgumentException, IOException;
 
-  //  public HipiImage decodeHeaderAndImage(InputStream imageStream, HipiImageFactory imageFactory) throws IOException, IllegalArgumentException;
   public default HipiImage decodeHeaderAndImage(InputStream inputStream, HipiImageFactory imageFactory) 
     throws IOException, IllegalArgumentException 
   {
-    ImageHeader header = decodeHeader(inputStream);
-    return decodeImage(inputStream, header, imageFactory);
+    BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+    bufferedInputStream.mark(Integer.MAX_VALUE);  // 100MB
+    ImageHeader header = decodeHeader(bufferedInputStream);
+    bufferedInputStream.reset();
+    return decodeImage(bufferedInputStream, header, imageFactory);
   }
 
 }

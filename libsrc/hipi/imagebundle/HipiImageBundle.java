@@ -507,6 +507,11 @@ public class HipiImageBundle extends AbstractImageBundle {
     System.out.println("imageLength: " + imageLength);
     System.out.println("imageFormatInt: " + imageFormatInt);
 
+    System.out.printf("ImageHeader bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n", 
+		      imageHeaderBytes[0], imageHeaderBytes[1], imageHeaderBytes[2], imageHeaderBytes[3]);
+    System.out.printf("Image bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n", 
+		      imageBytes[0], imageBytes[1], imageBytes[2], imageBytes[3]);
+
     dataOutputStream.write(sig);
     dataOutputStream.write(imageHeaderBytes);
     dataOutputStream.write(imageBytes);

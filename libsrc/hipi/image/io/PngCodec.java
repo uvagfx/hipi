@@ -8,6 +8,7 @@ import hipi.image.HipiImage;
 import hipi.image.HipiImage.HipiImageType;
 import hipi.image.HipiImageFactory;
 import hipi.image.PixelArray;
+import hipi.image.io.ExifDataUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -22,6 +23,8 @@ import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
+
+import javax.imageio.metadata.IIOMetadata;
 
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -87,7 +90,12 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
    * @param is The {@link InputStream} that contains the PNG image
    * @return The {@link ImageHeader} found in the input stream
    */
-  public ImageHeader decodeHeader(InputStream is) throws IOException {
+  public ImageHeader decodeHeader(InputStream is, boolean includeExifData) throws IOException {
+
+    IIOMetadata exifData = null;
+    if (includeExifData) {
+      exifData = ExifDataUtils.readExifData(is);
+    }
 
     DataInputStream in = new DataInputStream(is);
     readSignature(in);
@@ -136,7 +144,7 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
     }
     
     return new ImageHeader(ImageFormat.PNG, ColorSpace.RGB,
-			   width, height, 3, null, null);
+			   width, height, 3, null, exifData);
   }
 
   /**

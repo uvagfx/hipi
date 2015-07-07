@@ -8,6 +8,7 @@ import hipi.image.HipiImage.HipiImageType;
 import hipi.image.RasterImage;
 import hipi.image.HipiImageFactory;
 import hipi.image.PixelArray;
+import hipi.image.io.ExifDataUtils;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
@@ -20,6 +21,7 @@ import java.io.OutputStream;
 import java.util.Iterator;
 
 import javax.imageio.IIOImage;
+import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
@@ -36,60 +38,56 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
     return staticObject;
   }
 
-  public ImageHeader decodeHeader(InputStream inputStream) throws IOException, IllegalArgumentException {
+  public ImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException, IllegalArgumentException {
 
     ImageHeader header = null;
 
-    //    try {
-      DataInputStream dis = new DataInputStream(new BufferedInputStream(inputStream));
-      dis.mark(Integer.MAX_VALUE);
+    DataInputStream dis = new DataInputStream(new BufferedInputStream(inputStream));
+    dis.mark(Integer.MAX_VALUE);
       
-      // all JPEGs start with -40
-      short magic = dis.readShort();
-      if (magic != -40)
-	return null;
+    // all JPEGs start with -40
+    short magic = dis.readShort();
+    if (magic != -40)
+      return null;
 
-      int width=0, height=0, depth=0;
-	
-      byte[] data = new byte[6];
+    int width=0, height=0, depth=0;
+    
+    byte[] data = new byte[6];
       
-      // read in each block to determine resolution and bit depth
-      for (;;) {
-	dis.read(data, 0, 4);
-	if ((data[0] & 0xff) != 0xff)
-	  return null;
-	if ((data[1] & 0xff) == 0x01 || ((data[1] & 0xff) >= 0xd0 && (data[1] & 0xff) <= 0xd7))
-	  continue;
-	long length = (((data[2] & 0xff) << 8) | (data[3] & 0xff)) - 2;
-	if ((data[1] & 0xff) == 0xc0 || (data[1] & 0xff) == 0xc2) {
-	  dis.read(data);
-	  height = ((data[1] & 0xff) << 8) | (data[2] & 0xff);
-	  width = ((data[3] & 0xff) << 8) | (data[4] & 0xff);
-	  depth = data[0] & 0xff;
-	  break;
-	} else {
-	  while (length > 0) {
-	    long skipped = dis.skip(length);
-	    if (skipped == 0)
-	      break;
-	    length -= skipped;
-	  }
+    // read in each block to determine resolution and bit depth
+    for (;;) {
+      dis.read(data, 0, 4);
+      if ((data[0] & 0xff) != 0xff)
+	return null;
+      if ((data[1] & 0xff) == 0x01 || ((data[1] & 0xff) >= 0xd0 && (data[1] & 0xff) <= 0xd7))
+	continue;
+      long length = (((data[2] & 0xff) << 8) | (data[3] & 0xff)) - 2;
+      if ((data[1] & 0xff) == 0xc0 || (data[1] & 0xff) == 0xc2) {
+	dis.read(data);
+	height = ((data[1] & 0xff) << 8) | (data[2] & 0xff);
+	width = ((data[3] & 0xff) << 8) | (data[4] & 0xff);
+	depth = data[0] & 0xff;
+	break;
+      } else {
+	while (length > 0) {
+	  long skipped = dis.skip(length);
+	  if (skipped == 0)
+	    break;
+	  length -= skipped;
 	}
       }
-      
-      dis.reset();
-
-      if (depth != 8) {
-	throw new IllegalArgumentException(String.format("Image has unsupported bit depth [%d].", depth));
-      }
-      
-      header = new ImageHeader(ImageFormat.JPEG, ColorSpace.RGB, 
-			       width, height, 3, null, null);
-
-      /*    } catch (Exception e) {
-      System.err.println("Exception while decoding image header.");
     }
-      */
+    
+    dis.reset();
+
+    if (depth != 8) {
+      throw new IllegalArgumentException(String.format("Image has unsupported bit depth [%d].", depth));
+    }
+
+    IIOMetadata exifData = (includeExifData ? ExifDataUtils.readExifData(dis) : null);
+    
+    header = new ImageHeader(ImageFormat.JPEG, ColorSpace.RGB, 
+			     width, height, 3, null, exifData);
 
     return header;
   }

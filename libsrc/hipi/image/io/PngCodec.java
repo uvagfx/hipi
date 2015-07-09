@@ -17,6 +17,7 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.BufferedInputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.zip.CRC32;
@@ -90,15 +91,12 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
    * @param is The {@link InputStream} that contains the PNG image
    * @return The {@link ImageHeader} found in the input stream
    */
-  public ImageHeader decodeHeader(InputStream is, boolean includeExifData) throws IOException {
+  public ImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException {
 
-    IIOMetadata exifData = null;
-    if (includeExifData) {
-      exifData = ExifDataUtils.readExifData(is);
-    }
+    DataInputStream dis = new DataInputStream(new BufferedInputStream(inputStream));
+    dis.mark(Integer.MAX_VALUE);
 
-    DataInputStream in = new DataInputStream(is);
-    readSignature(in);
+    readSignature(dis);
 
     int width = -1;
     int height = -1;
@@ -107,42 +105,41 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
     while (trucking) {
       try {
 	// Read the length.
-	int length = in.readInt();
-	if (length < 0)
-	  throw new IOException("Sorry, that file is too long.");
+	int length = dis.readInt();
+	if (length <= 0)
+	  throw new IOException("PNG file is too long to proceed. (Found length <= 0).");
 	// Read the type.
 	byte[] typeBytes = new byte[4];
-	in.readFully(typeBytes);
+	dis.readFully(typeBytes);
 	String typeString = new String(typeBytes, "UTF8");
 	if (typeString.equals("IHDR")) {
 	  // Read the data.
 	  byte[] data = new byte[length];
-	  in.readFully(data);
+	  dis.readFully(data);
 	  // Read the CRC.
-	  long crc = in.readInt() & 0x00000000ffffffffL; // Make it unsigned.
+	  long crc = dis.readInt() & 0x00000000ffffffffL; // Make it unsigned.
 	  if (verifyCRC(typeBytes, data, crc) == false) {
-	    throw new IOException("That file appears to be corrupted.");
+	    throw new IOException("PNG file appears to be corrupted (unverifiable CRC).");
 	  }
 	  PNGChunk chunk = staticObject.new PNGChunk(typeBytes, data);
-	  //          header.width = (int)chunk.getUnsignedInt(0);
 	  width = (int)chunk.getUnsignedInt(0);
-	  //	    header.height = (int)chunk.getUnsignedInt(4);
 	  height = (int)chunk.getUnsignedInt(4);
-	  //          header.bitDepth = chunk.getUnsignedByte(8);
 	  break;
 	} else {
-	  // skip the data associated, plus the crc signature
-	  in.skipBytes(length + 4);
+	  // Skip data + CRC signature.
+	  dis.skipBytes(length + 4);
 	}
       } catch (EOFException eofe) {
 	trucking = false;
       }
     }
 
-    if (width < 0 || height < 0) {
-      throw new IOException("Failed to decode PNG image header.");
+    if (width <= 0 || height <= 0) {
+      throw new IOException("Failed to decode PNG image header. (Found invalid dimensions width <= 0 or height <= 0.)");
     }
     
+    IIOMetadata exifData = (includeExifData ? ExifDataUtils.readExifData(dis) : null);
+
     return new ImageHeader(ImageFormat.PNG, ColorSpace.RGB,
 			   width, height, 3, null, exifData);
   }
@@ -170,6 +167,7 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
     long heightLong = chunks.getHeight();
     if (widthLong > Integer.MAX_VALUE || heightLong > Integer.MAX_VALUE)
       throw new IOException("That image is too wide or tall.");
+
     int width = (int) widthLong;
     int height = (int) heightLong;
     byte[] image_bytes = chunks.getImageData();
@@ -189,7 +187,7 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
 
     for (int i = 0; i < image_bytes.length; i++) {
       //      pels[i] = (float) ((image_bytes[i] & 0xff) / 255.0);
-      pa.setElem(i,image_bytes[i]&0xff);
+      pa.setElem(i, (image_bytes[i] & 0xff));
     }
 
     return image;
@@ -209,8 +207,8 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
       try {
         // Read the length.
         int length = in.readInt();
-        if (length < 0)
-          throw new IOException("Sorry, that file is too long.");
+        if (length <= 0)
+          throw new IOException("Found invalid length in PNG segment (length <= 0).");
         // Read the type.
         byte[] typeBytes = new byte[4];
         in.readFully(typeBytes);

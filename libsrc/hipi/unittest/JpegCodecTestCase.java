@@ -45,13 +45,20 @@ public class JpegCodecTestCase {
       String fname = "data/test/JPEGImageUtilTestCase/exif/" + fileName[i] + ".jpg";
       FileInputStream fis = new FileInputStream(fname);
       ImageHeader header = decoder.decodeHeader(fis, true);
+
       assertNotNull("failed to decode header: " + fname, header);
-      //      assertEquals("exif model not correct: " + fname, model[i].trim(), header.getEXIFInformation("Model").trim());
+      assertEquals("exif model not correct: " + fname, model[i].trim(), header.getExifData("Model").trim());
       assertEquals("width not correct: " + fname, width[i], header.getWidth());
       assertEquals("height not correct: " + fname, height[i], header.getHeight());
-      //      assertEquals("bit depth not correct: " + fname, bit_depth[i], header.bitDepth);
 
-      ExifDataUtils.displayExifData(header.getExifData());
+      /*
+      // display EXIF data
+      for (String key : header.getAllExifData().keySet()) {
+	String value = header.getExifData(key);
+	System.out.println(key + " : " + value);
+      }
+      */
+      //      System.exit(1);
     }
   }
 

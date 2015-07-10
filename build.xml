@@ -11,7 +11,7 @@
     <property name="hipi.version" value="2.0" />
 
     <!-- Hadoop dependencies -->
-    <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-${hadoop.version}.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/common/lib/hadoop-auth-${hadoop.version}.jar:${hadoop.home}/hdfs/hadoop-hdfs-${hadoop.version}.jar:${hadoop.home}/common/hadoop-nfs-${hadoop.version}.jar" />
+    <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-${hadoop.version}.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/common/lib/commons-io-2.4.jar:${hadoop.home}/common/lib/hadoop-auth-${hadoop.version}.jar:${hadoop.home}/hdfs/hadoop-hdfs-${hadoop.version}.jar:${hadoop.home}/common/hadoop-nfs-${hadoop.version}.jar" />
 
     <!-- External dependencies -->
     <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
@@ -25,13 +25,9 @@
     <property name="log4j.jar" value="${hadoop.home}/common/lib/log4j-1.2.17.jar" />
     <property name="avro.jar" value="${hadoop.home}/common/lib/avro-1.7.4.jar" />
 
-    <property name="commons.io.jar" value="${hadoop.home}/common/lib/commons-io-2.4.jar" />
-
     <!-- https://drewnoakes.com/code/exif/ -->
-    <!--
     <property name="xmpcore.jar" value="./3rdparty/xmpcore-5.1.2.jar" />
-    <property name="metadata.jar" value="./3rdparty/metadata-extractor-2.7.2.jar" />
-    -->
+    <property name="metadata.jar" value="./3rdparty/metadata-extractor-2.8.1.jar" />
 
     <!-- https://code.google.com/p/json-simple -->
     <property name="json.jar" value="./3rdparty/json-simple-1.1.1.jar"/>
@@ -81,17 +77,14 @@
       <property name="hadoop.classpath" value="${hadoop.classpath}" />
 
        <!-- https://drewnoakes.com/code/exif/ -->
-       <!-- 
       <property name="xmpcore.jar" value="../3rdparty/xmpcore-5.1.2.jar" />
-      <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.7.2.jar" />
-       -->
+      <property name="metadata.jar" value="../3rdparty/metadata-extractor-2.8.1.jar" />
        
       <!-- https://code.google.com/p/json-simple -->
       <property name="json.jar" value="../3rdparty/json-simple-1.1.1.jar"/>
 
       <!-- Unit test dependencies -->
       <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
-      <property name="commons.io.jar" value="${hadoop.home}/common/lib/commons-io-2.4.jar" />
     </ant>
     <echo message="Hipi library built."/>
   </target>
@@ -170,8 +163,8 @@
 
   <!-- Runs all of the HIPI unit tests -->
   <target name="test" depends="setup,test_settings,hipi">
-    <javac includeantruntime="false" fork="true" srcdir="libsrc/hipi/unittest" destdir="lib/hipi/unittest" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}:${commons.io.jar}" debug="yes"></javac>
-    <java fork="true" maxmemory="2048m" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${slf4j.api.jar}:${log4j.jar}:${avro.jar}:${commons.io.jar}:./lib/hipi-${hipi.version}.jar">
+    <javac includeantruntime="false" fork="true" srcdir="libsrc/hipi/unittest" destdir="lib/hipi/unittest" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
+    <java fork="true" maxmemory="2048m" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${slf4j.api.jar}:${log4j.jar}:${avro.jar}:./lib/hipi-${hipi.version}.jar">
       <arg value="hipi.unittest.AllTests"/>
     </java>
   </target>
@@ -188,7 +181,7 @@
 	      sourcepath="./libsrc"
 	      destdir="./doc/api"
 	      windowtitle="HIPI - Hadoop Image Processing Interface"
-	      classpath="${hadoop.classpath}:${junit.jar}">
+	      classpath="${hadoop.classpath}:${junit.jar}:${xmpcore.jar}:${metadata.jar}">
        <doctitle><![CDATA[<h1>HIPI - Hadoop Image Processing Interface</h1>]]></doctitle>
        <bottom><![CDATA[<i>Copyright &#169; 2014 <a target="_blank" href="http://www.virginia.edu/">University of Virginia</a>. All Rights Reserved.</i>]]></bottom>
        <link href="http://docs.oracle.com/javase/6/docs/api/"/>

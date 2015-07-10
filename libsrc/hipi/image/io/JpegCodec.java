@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
+import java.util.HashMap;
 
 import javax.imageio.IIOImage;
 import javax.imageio.metadata.IIOMetadata;
@@ -39,8 +40,6 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
   }
 
   public ImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException, IllegalArgumentException {
-
-    ImageHeader header = null;
 
     DataInputStream dis = new DataInputStream(new BufferedInputStream(inputStream));
     dis.mark(Integer.MAX_VALUE);
@@ -78,18 +77,18 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
       }
     }
     
-    dis.reset();
-
     if (depth != 8) {
       throw new IllegalArgumentException(String.format("Image has unsupported bit depth [%d].", depth));
     }
 
-    IIOMetadata exifData = (includeExifData ? ExifDataUtils.readExifData(dis) : null);
+    HashMap<String,String> exifData = null;
+    if (includeExifData) {
+      dis.reset();
+      exifData = ExifDataReader.extractAndFlatten(dis);
+    }
     
-    header = new ImageHeader(ImageFormat.JPEG, ColorSpace.RGB, 
-			     width, height, 3, null, exifData);
-
-    return header;
+    return new ImageHeader(ImageFormat.JPEG, ColorSpace.RGB, 
+			   width, height, 3, null, exifData);
   }
 
   public HipiImage decodeImage(InputStream inputStream, ImageHeader imageHeader, HipiImageFactory imageFactory) throws IllegalArgumentException, IOException {
@@ -133,8 +132,7 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
     try {
       image = (RasterImage)imageFactory.createImage(imageHeader);
     } catch (Exception e) {
-      // TODO?!?
-      System.err.println("CRASH");
+      System.err.println(String.format("Unrecoverable exception while creating image object [%s]", e.getMessage()));
       e.printStackTrace();
       System.exit(1);
     }
@@ -152,11 +150,6 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
 	  int m = (int) Math.min(Math.max(Y - 0.34414 * (Cb - 128) - 0.71414 * (Cr - 128), 0), 255);
 	  int y = (int) Math.min(Math.max(Y + 1.402 * (Cr - 128), 0), 255);
 	  int k = dataBuffer.getElem(i * w * 4 + j * 4 + 3);
-	  /*
-	  pels[i * w * 3 + j * 3 + 0] = (float) ((k - (c * k >> 8)) / 255.0);
-	  pels[i * w * 3 + j * 3 + 1] = (float) ((k - (m * k >> 8)) / 255.0);
-	  pels[i * w * 3 + j * 3 + 2] = (float) ((k - (y * k >> 8)) / 255.0);
-	  */
 	  pa.setElem(i * w * 3 + j * 3 + 0, (k - (c * k >> 8)));
 	  pa.setElem(i * w * 3 + j * 3 + 1, (k - (m * k >> 8)));
 	  pa.setElem(i * w * 3 + j * 3 + 2, (k - (y * k >> 8)));
@@ -169,11 +162,6 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
 	  int Y  = dataBuffer.getElem(i * w * 3 + j * 3 + 0);
 	  int Cr = dataBuffer.getElem(i * w * 3 + j * 3 + 1);
 	  int Cb = dataBuffer.getElem(i * w * 3 + j * 3 + 2);
-	  /*
-	  pels[i * w * 3 + j * 3 + 0] = (float) ((Math.min(Math.max(Y + 1.772f * (Cb - 128), 0), 255)) / 255.0);
-	  pels[i * w * 3 + j * 3 + 1] = (float) ((Math.min(Math.max(Y - 0.34414f * (Cb - 128) - 0.71414f * (Cr - 128), 0), 255)) / 255.0);
-	  pels[i * w * 3 + j * 3 + 2] = (float) ((Math.min(Math.max(Y + 1.402f * (Cr - 128), 0), 255)) / 255.0);
-	  */
 	  pa.setElem(i * w * 3 + j * 3 + 0, (int)Math.min(Math.max(Y + 1.772f * (Cb - 128), 0), 255));
 	  pa.setElem(i * w * 3 + j * 3 + 1, (int)Math.min(Math.max(Y - 0.34414f * (Cb - 128) - 0.71414f * (Cr - 128), 0), 255));
 	  pa.setElem(i * w * 3 + j * 3 + 2, (int)Math.min(Math.max(Y + 1.402f * (Cr - 128), 0), 255));
@@ -183,11 +171,6 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
       for (int i = 0; i < h; i++) {
 	for (int j = 0; j < w; j++) {
 	  int Y = dataBuffer.getElem(i * w + j);
-	  /*
-	  pels[i * w * 3 + j * 3 + 0] = (float) (Y / 255.0);
-	  pels[i * w * 3 + j * 3 + 1] = (float) (Y / 255.0);
-	  pels[i * w * 3 + j * 3 + 2] = (float) (Y / 255.0);
-	  */
 	  pa.setElem(i * w * 3 + j * 3 + 0, Y);
 	  pa.setElem(i * w * 3 + j * 3 + 1, Y);
 	  pa.setElem(i * w * 3 + j * 3 + 2, Y);

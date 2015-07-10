@@ -14,8 +14,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.imageio.metadata.IIOMetadata;
-
 /**
  * The header information for a 2D image. ImageHeader encapsulates
  * universally available information about a 2D image (width, height,
@@ -156,18 +154,16 @@ public class ImageHeader implements WritableComparable<ImageHeader> {
 
   /**
    * EXIF data associated with the image represented as a
-   * javax.imageio.metadata.IIOMetadata object. 
-   *
-   * See {@link hipi.image.io.ExifDataUtils}.
+   * HashMap. {@see hipi.image.io.ExifDataUtils}
    */
-  private IIOMetadata exifData;
+  private Map<String, String> exifData = new HashMap<String,String>();
 
   /**
    * Creates an ImageHeader.
    */
   public ImageHeader(ImageFormat storageFormat, ColorSpace colorSpace, 
 		     int width, int height,
-		     int bands, byte[] metaDataBytes, IIOMetadata exifData)
+		     int bands, byte[] metaDataBytes, Map<String,String> exifData)
     throws IllegalArgumentException {
     if (width < 1 || height < 1 || bands < 1) {
       throw new IllegalArgumentException(String.format("Invalid spatial dimensions or number of bands: (%d,%d,%d)", width, height, bands));
@@ -186,7 +182,7 @@ public class ImageHeader implements WritableComparable<ImageHeader> {
   /**
    * Creates an ImageHeader by calling #readFields on the data input
    * object. Note that this function does not populate the exifData
-   * field. That must be done using a separate assignment.
+   * field. That must be done with a separate method call.
    */
   public ImageHeader(DataInput input) throws IOException {
     readFields(input);
@@ -308,21 +304,23 @@ public class ImageHeader implements WritableComparable<ImageHeader> {
   }
 
   /**
-   * Sets image EXIF data.
+   * Attempt to retrieve EXIF data value for specific key.
    *
-   * @param exifData the metadata object to use in the assignment
+   * @param key field name of the desired EXIF data record
+   * @return either the value corresponding to the key or null if the
+   * key was not found
    */
-  public void setExifData(IIOMetadata exifData) {
-    this.exifData = exifData;
+  public String getExifData(String key) {
+    return exifData.get(key);
   }
 
   /**
-   * Access image EXIF data object.
+   * Get the entire map of EXIF data.
    *
-   * @return EXIF data object stored with this image header
+   * @return a hash map containing the keys and values of the metadata
    */
-  public IIOMetadata getExifData() {
-    return exifData;
+  public HashMap<String, String> getAllExifData() {
+    return new HashMap<String, String>(exifData);
   }
 
   /**
@@ -338,7 +336,7 @@ public class ImageHeader implements WritableComparable<ImageHeader> {
     this.height = header.getHeight();
     this.bands = header.getNumBands();
     this.metaData = header.getAllMetaData();
-    this.exifData = header.getExifData();
+    this.exifData = header.getAllExifData();
   }
 
   /**

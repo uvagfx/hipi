@@ -24,6 +24,7 @@ import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
+import java.util.HashMap;
 
 import javax.imageio.metadata.IIOMetadata;
 
@@ -137,8 +138,12 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
     if (width <= 0 || height <= 0) {
       throw new IOException("Failed to decode PNG image header. (Found invalid dimensions width <= 0 or height <= 0.)");
     }
-    
-    IIOMetadata exifData = (includeExifData ? ExifDataUtils.readExifData(dis) : null);
+
+    HashMap<String,String> exifData = null;
+    if (includeExifData) {
+      dis.reset();
+      exifData = ExifDataReader.extractAndFlatten(dis);
+    }
 
     return new ImageHeader(ImageFormat.PNG, ColorSpace.RGB,
 			   width, height, 3, null, exifData);

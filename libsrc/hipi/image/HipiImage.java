@@ -147,7 +147,7 @@ public abstract class HipiImage implements Writable {
   /**
    * Get meta data for particular key.
    *
-   * @return EXIF data object
+   * @return meta data value as String
    */
   public String getMetaData(String key) {
     return header.getMetaData(key);
@@ -164,12 +164,12 @@ public abstract class HipiImage implements Writable {
   }
 
   /**
-   * Get EXIF data object (if any).
+   * Get EXIF data value for particular key.
    *
-   * @return EXIF data object
+   * @return EXIF data object as String
    */
-  public IIOMetadata getExifData() {
-    return header.getExifData();
+  public String getExifData(String key) {
+    return header.getExifData(key);
   }
 
   /**

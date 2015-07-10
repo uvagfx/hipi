@@ -1,12 +1,19 @@
 package hipi.image.io;
 
-import hipi.image.FloatImage;
 import hipi.image.ImageHeader;
+import hipi.image.ImageHeader.ImageFormat;
+import hipi.image.ImageHeader.ColorSpace;
+import hipi.image.HipiImage;
+import hipi.image.HipiImage.HipiImageType;
+import hipi.image.RasterImage;
+import hipi.image.HipiImageFactory;
+import hipi.image.PixelArray;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 public class PpmCodec implements ImageDecoder, ImageEncoder {
   
@@ -20,48 +27,64 @@ public class PpmCodec implements ImageDecoder, ImageEncoder {
 
     public int width;
     public int height;
+    public int numBands;
     public int maxValue;
-    public List<String> comments;
-
-    public static PpmHeader decode(InputStream inputStream) throws IOException {
-
-      byte[] header = new byte[255];
-      inputStream.read(header);
-      
-      // Only P6 supported.
-      if (header[0] != 'P' || header[1] != '6') {
-	throw new IOException(String.format("PPM file has invalid or unsupported format [%c%c]. Only P6 is currently supported.", header[0], header[1]));
-      }
-      int off = 3;
-      
-      PpmHeader ppmHeader = new PpmHeader();
-      
-      // TODO: Fix this totally broken way to parse header. It assumes
-      // the header ends after the third integer is parsed. This ignores
-      // valid comment structure.
-      
-      ppmHeader.width = 0;
-      while (header[off] >= '0' && header[off] <= '9')
-	ppmHeader.width = ppmHeader.width * 10 + (header[off++] - '0');
-      off++;
-      
-      ppmHeader.height = 0;
-      while (header[off] >= '0' && header[off] <= '9')
-	ppmHeader.height = ppmHeader.height * 10 + (header[off++] - '0');
-      off++;
-      
-      ppmHeader.maxValue = 0;
-      while (header[off] >= '0' && header[off] <= '9')
-	ppmHeader.maxValue = ppmHeader.maxValue * 10 + (header[off++] - '0');
-      off++;
-      
-      // TODO: Add support for extracting header comments and return in
-      // List<String> comments field.
-      
-      return ppmHeader;
-    }
+    public ArrayList<String> comments = new ArrayList<String>();
+    public int streamOffset; // byte offset to start of image data
+    public byte[] headerBytes = new byte[255];
 
   } // private class PpmHeader
+
+  private PpmHeader internalDecodeHeader(InputStream inputStream) throws IOException {
+
+    PpmHeader ppmHeader = new PpmHeader();
+    ppmHeader.numBands = 3;
+
+    inputStream.read(ppmHeader.headerBytes);
+    
+    // Only P6 supported.
+    if (ppmHeader.headerBytes[0] != 'P' || ppmHeader.headerBytes[1] != '6') {
+      byte[] format = new byte[2];
+      format[0] = ppmHeader.headerBytes[0];
+      format[1] = ppmHeader.headerBytes[1];
+      throw new IOException(String.format("PPM file has invalid or unsupported format [%s]. Only P6 is currently supported.", new String(format, "UTF-8")));
+    }
+    
+    int off = 3;
+    
+    // TODO: Fix this totally broken way to parse header. It assumes
+    // the header ends after the third integer is parsed. This ignores
+    // valid comment structure.
+    
+    ppmHeader.width = 0;
+    while (ppmHeader.headerBytes[off] >= '0' && 
+	   ppmHeader.headerBytes[off] <= '9') {
+      ppmHeader.width = ppmHeader.width * 10 + (ppmHeader.headerBytes[off++] - '0');
+    }
+    off++;
+
+    ppmHeader.height = 0;
+    while (ppmHeader.headerBytes[off] >= '0' && 
+	   ppmHeader.headerBytes[off] <= '9') {
+      ppmHeader.height = ppmHeader.height * 10 + (ppmHeader.headerBytes[off++] - '0');
+    }
+    off++;
+
+    ppmHeader.maxValue = 0;
+    while (ppmHeader.headerBytes[off] >= '0' && 
+	   ppmHeader.headerBytes[off] <= '9') {
+      ppmHeader.maxValue = ppmHeader.maxValue * 10 + (ppmHeader.headerBytes[off++] - '0');
+    }
+    off++;
+
+    ppmHeader.streamOffset = off;
+    
+    // TODO: Add support for extracting header comments and return in
+    // List<String> comments field.
+    
+    return ppmHeader;
+
+  }
 
   public ImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException, IllegalArgumentException {
 
@@ -87,16 +110,23 @@ public class PpmCodec implements ImageDecoder, ImageEncoder {
       throw new IllegalArgumentException("PPM decoder supports only FloatImage and ByteImage output types.");
     }
 
-    ImageHeader checkHeader = decodeHeader(inputStream, false);
+    PpmHeader ppmHeader = internalDecodeHeader(inputStream);
+
+    if (ppmHeader.maxValue != 255) {
+      throw new IOException(String.format("Only 8-bit PPMs are currently supported. Max value reported in PPM header is [%d].", ppmHeader.maxValue));
+    }
 
     // Check that image dimensions in header match those in JPEG
-    if (checkHeader.width != imageHeader.getWidth() || checkHeader.height != imageHeader.getHeight()) {
+    if (ppmHeader.width != imageHeader.getWidth() || 
+	ppmHeader.height != imageHeader.getHeight()) {
       throw new IllegalArgumentException("Image dimensions in header do not match those in PPM.");
     }
 
-    if (checkHeader.getNumBands() != imageHeader.getNumBands()) {
+    if (ppmHeader.numBands != imageHeader.getNumBands()) {
       throw new IllegalArgumentException("Number of image bands specified in header does not match number found in PPM.");
     }
+
+    int off = ppmHeader.streamOffset;
 
     // Create output image
     RasterImage image = null;
@@ -114,11 +144,12 @@ public class PpmCodec implements ImageDecoder, ImageEncoder {
     int h = imageHeader.getHeight();
 
     byte[] rest = new byte[w * h * 3 - (255 - off)];
-    is.read(rest);
+    inputStream.read(rest);
 
     for (int i = 0; i < 255 - off; i++) {
-      ps.setElem(i, header[i + off] & 0xff);
+      pa.setElem(i, ppmHeader.headerBytes[i + off] & 0xff);
     }
+
     for (int i = 0; i < w * h * 3 - (255 - off); i++) {
       pa.setElem(i + 255 - off, rest[i] & 0xff);
     }

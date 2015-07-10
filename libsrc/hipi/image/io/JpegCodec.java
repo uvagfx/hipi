@@ -212,11 +212,6 @@ public class JpegCodec implements ImageDecoder, ImageEncoder {
     PixelArray pa = ((RasterImage)image).getPixelArray();
     int[] rgb = new int[w*h];
     for (int i=0; i<w*h; i++) {
-      /*
-      int r = Math.min(Math.max((int) (data[i*3+0] * 255), 0), 255);
-      int g = Math.min(Math.max((int) (data[i*3+1] * 255), 0), 255);
-      int b = Math.min(Math.max((int) (data[i*3+2] * 255), 0), 255);
-      */
       int r = pa.getElem(i*3+0);
       int g = pa.getElem(i*3+1);
       int b = pa.getElem(i*3+2);

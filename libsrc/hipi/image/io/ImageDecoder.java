@@ -1,6 +1,6 @@
 package hipi.image.io;
 
-import hipi.image.ImageHeader;
+import hipi.image.HipiImageHeader;
 import hipi.image.HipiImage;
 import hipi.image.HipiImageFactory;
 
@@ -16,20 +16,22 @@ import java.io.BufferedInputStream;
  */
 public interface ImageDecoder {
 
-  public ImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException;
+  public HipiImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException;
 
-  public default ImageHeader decodeHeader(InputStream inputStream) throws IOException {
+  public default HipiImageHeader decodeHeader(InputStream inputStream) 
+    throws IOException {
     return decodeHeader(inputStream, false);
   }
+  
+  public HipiImage decodeImage(InputStream inputStream, HipiImageHeader imageHeader, 
+			       HipiImageFactory imageFactory) throws IllegalArgumentException, IOException;
 
-  public HipiImage decodeImage(InputStream inputStream, ImageHeader imageHeader, HipiImageFactory imageFactory) throws IllegalArgumentException, IOException;
-
-  public default HipiImage decodeHeaderAndImage(InputStream inputStream, HipiImageFactory imageFactory) 
+  public default HipiImage decodeHeaderAndImage(InputStream inputStream, HipiImageFactory imageFactory, boolean includeExifData) 
     throws IOException, IllegalArgumentException 
   {
     BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-    bufferedInputStream.mark(Integer.MAX_VALUE);  // 100MB
-    ImageHeader header = decodeHeader(bufferedInputStream);
+    bufferedInputStream.mark(Integer.MAX_VALUE);
+    HipiImageHeader header = decodeHeader(bufferedInputStream, includeExifData);
     bufferedInputStream.reset();
     return decodeImage(bufferedInputStream, header, imageFactory);
   }

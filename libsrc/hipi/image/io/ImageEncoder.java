@@ -12,6 +12,6 @@ import java.io.OutputStream;
  */
 public interface ImageEncoder {
 
-  public void encodeImage(HipiImage image, OutputStream outputStream) throws IllegalArgumentException, IOException;
+  public abstract void encodeImage(HipiImage image, OutputStream outputStream) throws IllegalArgumentException, IOException;
 
 }

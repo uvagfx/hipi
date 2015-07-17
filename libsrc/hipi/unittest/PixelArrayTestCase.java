@@ -8,8 +8,45 @@ import hipi.image.PixelArrayFloat;
 import hipi.image.PixelArrayByte;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 public class PixelArrayTestCase {
+
+  @Ignore
+  @Test
+  public void testPrintSRGBLUT() {
+    // gamma compressed 8-bit sRGB => linear floating point RGB
+    System.out.print("private static final float[] gammaExpand = {");
+    for (int i=0; i<256; i++) {
+      double nonlinear = ((double)i)/255.0;
+      double linear = (float)( ( nonlinear <= 0.04045 )
+			       ? ( nonlinear / 12.92 )
+			       : ( Math.pow( (nonlinear+0.055)/1.055, 2.4 ) ) );
+      System.out.print(linear);
+      System.out.print("f");
+      if (i<(256-1)) {
+	System.out.print(",");
+      }
+    }
+    System.out.print("};");
+
+    // linear floating-point RGB => gamma compressed 8-bit sRGB
+    int n = 2048;
+    System.out.print("private static final byte[] gammaCompress = {");
+    for (int i=0; i<n; i++) {
+      double linear = ((double)i+0.5)/(double)(n-1);
+      double nonlinear = ( ( linear <= 0.0031308 )
+			   ? ( 12.92 * linear )
+			   : ( 1.055 * Math.pow( linear, 1.0/2.4 ) - 0.055 ) );
+      int srgb = (int)(Math.max(0,Math.min(255,(int)(nonlinear*255.0))));
+      System.out.print(srgb);
+      if (i<(n-1)) {
+	System.out.print(",");
+      }
+    }
+    System.out.print("};");
+
+  }
 
   @Test
   public void testAllocations() {

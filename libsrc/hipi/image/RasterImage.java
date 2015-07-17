@@ -1,8 +1,8 @@
 package hipi.image;
 
 import hipi.image.PixelArray;
-import hipi.image.ImageHeader;
-import hipi.image.ImageHeader.ColorSpace;
+import hipi.image.HipiImageHeader;
+import hipi.image.HipiImageHeader.HipiColorSpace;
 import hipi.image.HipiImage;
 import hipi.image.PixelArray;
 
@@ -31,7 +31,7 @@ public abstract class RasterImage extends HipiImage {
     this.pixelArray = pixelArray;
   }
 
-  public void setHeader(ImageHeader header) throws IllegalArgumentException {
+  public void setHeader(HipiImageHeader header) throws IllegalArgumentException {
     super.setHeader(header);
     int size = header.getWidth()*header.getHeight()*header.getNumBands();
     pixelArray.setSize(size);
@@ -42,9 +42,19 @@ public abstract class RasterImage extends HipiImage {
   }
 
   /**
-   * Compares two raster images for equality.
+   * Compares two RasterImage objects for equality allowing for some
+   * amount of differences in pixel values.
    *
-   * @return true if the two images are found to deviate by an amount
+   * @return True if the two images have equal dimensions, color
+   * spaces, and are found to deviate by less than a specified maximum
+   * difference, false otherwise.
+   */
+  public abstract boolean equalsWithTolerance(RasterImage thatImage, float maxDifference);
+
+  /**
+   * Compares two RasterImage objects for equality.
+   *
+   * @return True if the two images are found to deviate by an amount
    * that is not representable in the underlying pixel type, false
    * otherwise.
    */
@@ -95,7 +105,7 @@ public abstract class RasterImage extends HipiImage {
    * @return A {@link RasterImage} of the converted image. Returns
    * null if the conversion could not be performed.
    */
-  public RasterImage convertToColorSpace(ColorSpace colorSpace) throws IllegalArgumentException {
+  public RasterImage convertToColorSpace(HipiColorSpace colorSpace) throws IllegalArgumentException {
     if (header.getColorSpace() == colorSpace) {
       throw new IllegalArgumentException("Cannot convert color space to itself.");
     }
@@ -177,13 +187,13 @@ public abstract class RasterImage extends HipiImage {
    */
   @Override
   public void readFields(DataInput input) throws IOException {
-    // Read in header
-    header.readFields(input);
+    // Create and read header
+    header = new HipiImageHeader(input);
     int w = this.getWidth();
     int h = this.getHeight();
     int b = this.getNumBands();
     int numBytes = w*h*b*PixelArray.getDataTypeSize(pixelArray.getDataType());
-    // Read in pixel data
+    // Read pixel data
     byte[] pixelBytes = new byte[numBytes];
     input.readFully(pixelBytes);
     pixelArray.setFromByteArray(pixelBytes);

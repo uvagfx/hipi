@@ -21,7 +21,7 @@ import org.apache.hadoop.io.Writable;
  *
  * The {@link hipi.image.io} package provides classes for reading
  * (decoding) and writing (encoding) FloatImage objects in various
- * compressed and uncompressed image formats such as JPEG.
+ * compressed and uncompressed image formats such as JPEG and PNG.
  */
 public class FloatImage extends RasterImage {
 
@@ -46,6 +46,41 @@ public class FloatImage extends RasterImage {
   }
 
   /**
+   * Compares two ByteImage objects for equality allowing for some
+   * amount of differences in pixel values.
+   *
+   * @return True if the two images have equal dimensions, color
+   * spaces, and are found to deviate by less than a maximum
+   * difference, false otherwise.
+   */
+  public boolean equalsWithTolerance(RasterImage thatImage, float maxDifference) {
+    // Verify dimensions in headers are equal
+    int w = this.getWidth();
+    int h = this.getHeight();
+    int b = this.getNumBands();
+    if (this.getColorSpace() != thatImage.getColorSpace() ||
+	thatImage.getWidth() != w || thatImage.getHeight() != h || 
+	thatImage.getNumBands() != b) {
+      return false;
+    }
+
+    // Get pointers to pixel arrays
+    PixelArray thisPA = this.getPixelArray();
+    PixelArray thatPA = thatImage.getPixelArray();
+
+    // Check that pixel data is equal.
+    for (int i=0; i<w*h*b; i++) {
+      double diff = Math.abs(thisPA.getElemFloat(i)-thatPA.getElemFloat(i));
+      if (diff > maxDifference) {
+	return false;
+      }
+    }
+
+    // Passed, declare equality
+    return true;
+  }
+
+  /**
    * Compares two FloatImage objects for equality.
    *
    * @return True if the two images are found to deviate by less than
@@ -61,31 +96,7 @@ public class FloatImage extends RasterImage {
     if (!(that instanceof FloatImage))
       return false;
 
-    FloatImage thatImage = (FloatImage)that;
-
-    // Verify dimensions in headers are equal
-    int w = this.getWidth();
-    int h = this.getHeight();
-    int b = this.getNumBands();
-    if (this.getColorSpace() != thatImage.getColorSpace() ||
-	thatImage.getWidth() != w || thatImage.getHeight() != h || thatImage.getNumBands() != b) {
-      return false;
-    }
-
-    // Get pointers to pixel arrays
-    float[] thisData = this.getData();
-    float[] thatData = thatImage.getData();
-
-    // Check that pixel data is equal.
-    float delta = 1.0f / 255.0f;
-    for (int i = 0; i < w*h*b; i++) {
-      if (Math.abs(thisData[i] - thatData[i]) > delta) {
-	return false;
-      }
-    }
-
-    // Passed, declare equality
-    return true;
+    return equalsWithTolerance((FloatImage)that, 0.0f);
   }
 
   /**

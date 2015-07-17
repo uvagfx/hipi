@@ -4,7 +4,7 @@ import hipi.image.HipiImage;
 import hipi.image.FloatImage;
 import hipi.image.ByteImage;
 import hipi.image.HipiImageFactory;
-import hipi.image.ImageHeader;
+import hipi.image.HipiImageHeader;
 import hipi.imagebundle.HipiImageBundle;
 
 import org.apache.hadoop.conf.Configuration;
@@ -25,7 +25,7 @@ import java.io.IOException;
  * in the current Mapper class) dynamically using Java reflection
  * utils.
  */
-public class HibRecordReader extends RecordReader<ImageHeader, HipiImage> {
+public class HibRecordReader extends RecordReader<HipiImageHeader, HipiImage> {
 
   private Configuration conf;
   private HipiImageBundle.HibReader reader;
@@ -61,7 +61,7 @@ public class HibRecordReader extends RecordReader<ImageHeader, HipiImage> {
   }
 
   @Override
-  public ImageHeader getCurrentKey() throws IOException, InterruptedException  {
+  public HipiImageHeader getCurrentKey() throws IOException, InterruptedException  {
     return reader.getCurrentKey();
   }
 

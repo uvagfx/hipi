@@ -2,8 +2,8 @@ package hipi.imagebundle;
 
 import hipi.image.HipiImage;
 import hipi.image.HipiImageFactory;
-import hipi.image.ImageHeader;
-import hipi.image.ImageHeader.ImageFormat;
+import hipi.image.HipiImageHeader;
+import hipi.image.HipiImageHeader.HipiImageFormat;
 import hipi.image.io.ImageEncoder;
 import hipi.image.io.ImageDecoder;
 import hipi.image.io.JpegCodec;
@@ -135,14 +135,15 @@ public abstract class AbstractImageBundle {
    * 
    * @throws IOException
    */
-  public abstract void addImage(ImageHeader imageHeader, InputStream inputStream) throws IOException;
+  public abstract void addImage(HipiImageHeader imageHeader, InputStream inputStream) throws IOException;
 
   /**
    * Add image to bundle.
    * 
    * @throws IOException
    */
-  public void addImage(InputStream inputStream, ImageFormat imageFormat) throws IllegalArgumentException, IOException {
+  public void addImage(InputStream inputStream, HipiImageFormat imageFormat) 
+    throws IllegalArgumentException, IOException {
     ImageDecoder decoder = null;
     switch (imageFormat) {
       case JPEG:
@@ -160,7 +161,7 @@ public abstract class AbstractImageBundle {
 
     BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
     bufferedInputStream.mark(Integer.MAX_VALUE); // 100MB
-    ImageHeader header = decoder.decodeHeader(bufferedInputStream);
+    HipiImageHeader header = decoder.decodeHeader(bufferedInputStream);
     bufferedInputStream.reset();
     addImage(header, bufferedInputStream);
   }
@@ -186,7 +187,7 @@ public abstract class AbstractImageBundle {
    *         bundle to the next image upon return
    * @throws IOException
    */
-  protected abstract ImageHeader readHeader() throws IOException;
+  protected abstract HipiImageHeader readHeader() throws IOException;
 
   /**
    * @return the decoded FloatImage from the cache that has been
@@ -203,7 +204,7 @@ public abstract class AbstractImageBundle {
    * @return ImageHeader of the next image
    * @throws IOException
    */
-  public final ImageHeader next() throws IOException {
+  public final HipiImageHeader next() throws IOException {
     if (!prepared) {
       hasNext = prepareNext();
     }

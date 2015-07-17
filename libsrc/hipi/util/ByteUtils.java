@@ -87,4 +87,19 @@ public class ByteUtils {
     }
   }
 
+  public static String makeString(byte[] vals, int count) {
+    if (vals == null || Math.min(vals.length, count) <= 0) {
+      return "";
+    }
+    int n = Math.min(vals.length, count);
+    String result = "";
+    for (int i=0; i<n; i++) {
+      result += String.format("0x%02X", vals[i]);
+      if (i<(n-1)) {
+	result += " ";
+      }
+    }
+    return result;
+  }
+
 }

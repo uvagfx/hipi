@@ -2,8 +2,8 @@ package hipi.unittest;
 
 import static org.junit.Assert.*;
 
-import hipi.image.ImageHeader;
-import hipi.image.ImageHeader.ImageFormat;
+import hipi.image.HipiImageHeader;
+import hipi.image.HipiImageHeader.HipiImageFormat;
 import hipi.image.HipiImage;
 import hipi.image.ByteImage;
 import hipi.image.FloatImage;
@@ -18,6 +18,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.BeforeClass;
 
 import java.io.FileInputStream;
@@ -36,13 +37,13 @@ public class HipiImageBundleTestCase {
   @BeforeClass
   public static void setup() throws IOException {
 
-    System.out.println("AbstractImageBundle#setup");
+    System.out.println("HipiImageBundle#setup");
 
     HipiImageBundle hib = createHibAndOpen(AbstractImageBundle.FILE_MODE_WRITE, null);
 
     JpegCodec jpegCodec = JpegCodec.getInstance();
 
-    File[] files = new File("./testimages").listFiles();
+    File[] files = new File("./testimages/jpeg-rgb").listFiles();
 
     for (File file : files) {
       String ext = FilenameUtils.getExtension(file.getName());
@@ -50,7 +51,7 @@ public class HipiImageBundleTestCase {
 	String path = file.getPath();
 	System.out.println("ADDING IMAGE: " + path);
 
-	ImageHeader imageHeader = jpegCodec.decodeHeader(new FileInputStream(path));
+	HipiImageHeader imageHeader = jpegCodec.decodeHeader(new FileInputStream(path));
 	imageHeader.addMetaData("path",path);
 	System.out.println(imageHeader);
 	hib.addImage(imageHeader, new FileInputStream(path));
@@ -63,7 +64,6 @@ public class HipiImageBundleTestCase {
     hib.close();
   }  
 
-  /*
   @Test
   public void testIterator() throws IOException {
 
@@ -81,7 +81,7 @@ public class HipiImageBundleTestCase {
 
 	System.out.println("VERIFYING IMAGE: " + (count + 1));
 	
-	ImageHeader header = hib.next();
+	HipiImageHeader header = hib.next();
 	System.out.println(header);
 	
 	String sourcePath = header.getMetaData("path");
@@ -110,17 +110,16 @@ public class HipiImageBundleTestCase {
   @Test
   public void testOffsets() throws IOException {
     System.out.println("testOffsets");
-    HipiImageBundle hib =
-      (HipiImageBundle)createHibAndOpen(AbstractImageBundle.FILE_MODE_READ, null);
-    Long trueOffsets[] = {2175094l, 6823622l, 9309561l, 12349434l, 14445862l, 19455737l, 20336265l, 21539565l, 21735915l, 21975786l, 23774727l};
+    HipiImageBundle hib = (HipiImageBundle)createHibAndOpen(AbstractImageBundle.FILE_MODE_READ, null);
+    Long trueOffsets[] = {2175104l, 6823642l, 9309591l, 12349474l, 14445912l, 14574035l};
     List<Long> offsets = hib.readAllOffsets();
+    System.out.println(offsets);
     assertEquals(offsets.size(), trueOffsets.length);
     for (int i=0; i<trueOffsets.length; i++) {
       System.out.println(offsets.get(i));
       assertEquals(trueOffsets[i], offsets.get(i));
     }
   }
-  */
 
   @Test
   public void testAppend() throws IOException {
@@ -131,14 +130,14 @@ public class HipiImageBundleTestCase {
 
     HipiImageBundle hib1 = new HipiImageBundle(null, new Path("/tmp/bundle1.hib"), conf);
     hib1.open(AbstractImageBundle.FILE_MODE_WRITE, true);
-    hib1.addImage(new FileInputStream("testimages/01.JPEG"), ImageFormat.JPEG);
-    hib1.addImage(new FileInputStream("testimages/02.JPG"), ImageFormat.JPEG);
+    hib1.addImage(new FileInputStream("testimages/jpeg-rgb/01.JPEG"), HipiImageFormat.JPEG);
+    hib1.addImage(new FileInputStream("testimages/jpeg-rgb/02.JPG"), HipiImageFormat.JPEG);
     hib1.close();
 
     HipiImageBundle hib2 = new HipiImageBundle(null, new Path("/tmp/bundle2.hib"), conf);
     hib2.open(AbstractImageBundle.FILE_MODE_WRITE, true);
-    hib2.addImage(new FileInputStream("testimages/03.jpg"), ImageFormat.JPEG);
-    hib2.addImage(new FileInputStream("testimages/04.jpg"), ImageFormat.JPEG);
+    hib2.addImage(new FileInputStream("testimages/jpeg-rgb/03.jpg"), HipiImageFormat.JPEG);
+    hib2.addImage(new FileInputStream("testimages/jpeg-rgb/04.jpg"), HipiImageFormat.JPEG);
     hib2.close();
 
     HipiImageBundle hib1Read = new HipiImageBundle(null, new Path("/tmp/bundle1.hib"), conf);
@@ -167,13 +166,13 @@ public class HipiImageBundleTestCase {
 
 	assertTrue(hib.hasNext());
 
-	ImageHeader header = hib.next();
+	HipiImageHeader header = hib.next();
 	System.out.println(header);
 	
 	HipiImage image = hib.getCurrentImage();
 	System.out.println(image);
 	
-	HipiImage source = (HipiImage)decoder.decodeImage(new FileInputStream("testimages/"+fnames[i]), header, HipiImageFactory.getByteImageFactory());
+	HipiImage source = (HipiImage)decoder.decodeImage(new FileInputStream("testimages/jpeg-rgb/"+fnames[i]), header, HipiImageFactory.getByteImageFactory());
 	
 	assertEquals(width[i], header.getWidth());
 	assertEquals(height[i], header.getHeight());

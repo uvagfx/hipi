@@ -1,8 +1,8 @@
 package hipi.image.io;
 
-import hipi.image.ImageHeader;
-import hipi.image.ImageHeader.ImageFormat;
-import hipi.image.ImageHeader.ColorSpace;
+import hipi.image.HipiImageHeader;
+import hipi.image.HipiImageHeader.HipiImageFormat;
+import hipi.image.HipiImageHeader.HipiColorSpace;
 import hipi.image.HipiImage;
 import hipi.image.HipiImage.HipiImageType;
 import hipi.image.RasterImage;
@@ -15,7 +15,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-public class PpmCodec implements ImageDecoder, ImageEncoder {
+public class PpmCodec extends ImageCodec {
   
   private static final PpmCodec staticObject = new PpmCodec();
 	
@@ -86,7 +86,8 @@ public class PpmCodec implements ImageDecoder, ImageEncoder {
 
   }
 
-  public ImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException, IllegalArgumentException {
+  public HipiImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) 
+    throws IOException, IllegalArgumentException {
 
     PpmHeader ppmHeader = internalDecodeHeader(inputStream);
 
@@ -100,11 +101,13 @@ public class PpmCodec implements ImageDecoder, ImageEncoder {
       throw new IllegalArgumentException("Support for extracting EXIF data from PPM files not implemented.");
     }
 
-    return new ImageHeader(ImageFormat.PPM, ColorSpace.RGB,
-			   ppmHeader.width, ppmHeader.height, 3, null, null);
+    return new HipiImageHeader(HipiImageFormat.PPM, HipiColorSpace.RGB,
+			       ppmHeader.width, ppmHeader.height, 3, null, null);
   }
 
-  public HipiImage decodeImage(InputStream inputStream, ImageHeader imageHeader, HipiImageFactory imageFactory) throws IllegalArgumentException, IOException {
+  /*
+  public HipiImage decodeImage(InputStream inputStream, HipiImageHeader imageHeader,
+			       HipiImageFactory imageFactory) throws IllegalArgumentException, IOException {
 
     if (!(imageFactory.getType() == HipiImageType.FLOAT || imageFactory.getType() == HipiImageType.BYTE)) {
       throw new IllegalArgumentException("PPM decoder supports only FloatImage and ByteImage output types.");
@@ -147,15 +150,16 @@ public class PpmCodec implements ImageDecoder, ImageEncoder {
     inputStream.read(rest);
 
     for (int i = 0; i < 255 - off; i++) {
-      pa.setElem(i, ppmHeader.headerBytes[i + off] & 0xff);
+      pa.setElemNonLinSRGB(i, ppmHeader.headerBytes[i + off] & 0xff);
     }
 
     for (int i = 0; i < w * h * 3 - (255 - off); i++) {
-      pa.setElem(i + 255 - off, rest[i] & 0xff);
+      pa.setElemNonLinSRGB(i + 255 - off, rest[i] & 0xff);
     }
 
     return image;
   }
+  */
 
   public void encodeImage(HipiImage image, OutputStream outputStream) throws IllegalArgumentException, IOException {
 
@@ -166,8 +170,8 @@ public class PpmCodec implements ImageDecoder, ImageEncoder {
     if (image.getWidth() <= 0 || image.getHeight() <= 0) {
       throw new IllegalArgumentException("Invalid image resolution.");
     }
-    if (image.getColorSpace() != ColorSpace.RGB) {
-      throw new IllegalArgumentException("PPM encoder supports only RGB color space.");
+    if (image.getColorSpace() != HipiColorSpace.RGB) {
+      throw new IllegalArgumentException("PPM encoder supports only linear RGB color space.");
     }
     if (image.getNumBands() != 3) {
       throw new IllegalArgumentException("PPM encoder supports only three band images.");
@@ -186,7 +190,7 @@ public class PpmCodec implements ImageDecoder, ImageEncoder {
 
     byte[] raw = new byte[w*h*3];
     for (int i=0; i<w*h*3; i++) {
-      raw[i] = (byte)pa.getElem(i);
+      raw[i] = (byte)pa.getElemNonLinSRGB(i);
     }
 
     outputStream.write(raw);

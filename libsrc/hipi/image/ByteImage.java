@@ -47,6 +47,41 @@ public class ByteImage extends RasterImage {
   }
 
   /**
+   * Compares two ByteImage objects for equality allowing for some
+   * amount of differences in pixel values.
+   *
+   * @return True if the two images have equal dimensions, color
+   * spaces, and are found to deviate by less than a maximum
+   * difference, false otherwise.
+   */
+  public boolean equalsWithTolerance(RasterImage thatImage, float maxDifference) {
+
+    // Verify dimensions in headers are equal
+    int w = this.getWidth();
+    int h = this.getHeight();
+    int b = this.getNumBands();
+    if (this.getColorSpace() != thatImage.getColorSpace() ||
+	thatImage.getWidth() != w || thatImage.getHeight() != h || 
+	thatImage.getNumBands() != b) {
+      return false;
+    }
+
+    // Get pointers to pixel arrays
+    PixelArray thisPA = this.getPixelArray();
+    PixelArray thatPA = thatImage.getPixelArray();
+
+    // Check that pixel data is equal.
+    for (int i = 0; i < w*h*b; i++) {
+      if ((float)Math.abs(thisPA.getElem(i) - thatPA.getElem(i)) > maxDifference) {
+	return false;
+      }
+    }
+
+    // Passed, declare equality
+    return true;
+  }
+
+  /**
    * Compares two ByteImage objects for equality.
    *
    * @return True if the two images have equal dimensions, color
@@ -63,30 +98,7 @@ public class ByteImage extends RasterImage {
     if (!(that instanceof ByteImage))
       return false;
 
-    ByteImage thatImage = (ByteImage)that;
-
-    // Verify dimensions in headers are equal
-    int w = this.getWidth();
-    int h = this.getHeight();
-    int b = this.getNumBands();
-    if (this.getColorSpace() != thatImage.getColorSpace() ||
-	thatImage.getWidth() != w || thatImage.getHeight() != h || thatImage.getNumBands() != b) {
-      return false;
-    }
-
-    // Get pointers to pixel arrays
-    byte[] thisData = this.getData();
-    byte[] thatData = thatImage.getData();
-
-    // Check that pixel data is equal.
-    for (int i = 0; i < w*h*b; i++) {
-      if (thisData[i] != thatData[i]) {
-	return false;
-      }
-    }
-
-    // Passed, declare equality
-    return true;
+    return equalsWithTolerance((ByteImage)that, 0.0f);
   }
 
   /**

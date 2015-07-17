@@ -2,35 +2,52 @@ package hipi.unittest;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
+
 import hipi.image.FloatImage;
-import hipi.image.ImageHeader;
+import hipi.image.HipiImageHeader;
 import hipi.image.io.ImageDecoder;
 import hipi.image.io.ImageEncoder;
 import hipi.image.io.PngCodec;
-//import hipi.image.io.PPMImageUtil;
+
+import org.junit.Test;
+import org.junit.Ignore;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
+import java.util.Iterator;
 
-import org.junit.Test;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 public class PngCodecTestCase {
 
+  @Test
+  public void testTwelveMonkeysPlugIn() {
+    boolean foundTwelveMonkeys = false;
+    Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("PNG");
+    while (readers.hasNext()) {
+      ImageReader imageReader = readers.next();
+      System.out.println("ImageReader: " + imageReader);
+      /*
+	if (imageReader.toString().startsWith("com.twelvemonkeys.imageio.plugins")) {
+	foundTwelveMonkeys = true;
+      }
+      */
+    }
+    assertTrue("FATAL ERROR: failed to locate TwelveMonkeys ImageIO plugins", foundTwelveMonkeys);
+  }
 
-  /**
-   * Test method for {@link hipi.image.io.PNGImageUtil#decodeImageHeader(java.io.InputStream)}.
-   * 
-   * @throws IOException
-   */
-
+  @Ignore
   @Test
   public void testDecodeImageHeader() throws IOException {
     ImageDecoder decoder = PngCodec.getInstance();
     FileInputStream fis;
-    ImageHeader header;
+    HipiImageHeader header;
     String[] fileName =
         {"canon-ixus", "fujifilm-dx10", "fujifilm-finepix40i", "fujifilm-mx1700", "kodak-dc210",
             "kodak-dc240", "nikon-e950", "olympus-c960", "ricoh-rdc5300", "sanyo-vpcg250",
@@ -54,6 +71,7 @@ public class PngCodecTestCase {
    * @throws IOException
    */
 
+  @Ignore
   @Test
   public void testDecodeImage() throws IOException {
     /*
@@ -86,6 +104,7 @@ public class PngCodecTestCase {
    * 
    * @throws IOException
    */
+  @Ignore
   @Test
   public void testEncodeImage() throws IOException {
     /*

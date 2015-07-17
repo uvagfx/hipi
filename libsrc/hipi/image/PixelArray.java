@@ -50,7 +50,11 @@ public abstract class PixelArray {
 
   public abstract int getElem(int i);
 
+  public abstract int getElemNonLinSRGB(int i);
+
   public abstract void setElem(int i, int val);
+
+  public abstract void setElemNonLinSRGB(int i, int val);
 
   public float getElemFloat(int i) {
     return (float)getElem(i);

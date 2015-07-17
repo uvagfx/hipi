@@ -87,7 +87,7 @@ public class HipiImageFactory {
 
       // Use the fact that first parameter should be ImageHeader
       // object to identify target map method
-      if (params[0] != ImageHeader.class) {
+      if (params[0] != HipiImageHeader.class) {
 	continue;
       }
       
@@ -109,7 +109,7 @@ public class HipiImageFactory {
     return imageType;
   }
     
-  public HipiImage createImage(ImageHeader imageHeader)
+  public HipiImage createImage(HipiImageHeader imageHeader)
     throws InstantiationException,
 	   IllegalAccessException,
 	   ExceptionInInitializerError,

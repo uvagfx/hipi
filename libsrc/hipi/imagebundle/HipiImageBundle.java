@@ -1,7 +1,7 @@
 package hipi.imagebundle;
 
-import hipi.image.ImageHeader;
-import hipi.image.ImageHeader.ImageFormat;
+import hipi.image.HipiImageHeader;
+import hipi.image.HipiImageHeader.HipiImageFormat;
 import hipi.image.HipiImage;
 import hipi.image.HipiImage.HipiImageType;
 import hipi.image.RasterImage;
@@ -79,9 +79,9 @@ public class HipiImageBundle extends AbstractImageBundle {
 
     // Current image, accessed with calls to getCurrentKey and
     // getCurrentValue
-    private ImageFormat imageFormat = ImageFormat.UNDEFINED;
+    private HipiImageFormat imageFormat = HipiImageFormat.UNDEFINED;
     private byte[] imageBytes = null;
-    private ImageHeader imageHeader = null;
+    private HipiImageHeader imageHeader = null;
     private HipiImage image = null;
 
     /**
@@ -167,7 +167,7 @@ public class HipiImageBundle extends AbstractImageBundle {
       try {
 
 	// Reset state of current key/value
-	imageFormat = ImageFormat.UNDEFINED;
+	imageFormat = HipiImageFormat.UNDEFINED;
 	imageBytes = null;
 	imageHeader = null;
 	image = null;
@@ -229,11 +229,11 @@ public class HipiImageBundle extends AbstractImageBundle {
 	// Parse and validate image format
 	int imageFormatInt = ((sig[8] & 0xff) << 24) | ((sig[9] & 0xff) << 16) | ((sig[10] & 0xff) << 8) | (sig[11] & 0xff);
 	try {
-	  imageFormat = ImageFormat.fromInteger(imageFormatInt);
+	  imageFormat = HipiImageFormat.fromInteger(imageFormatInt);
 	} catch (IllegalArgumentException e) {
 	  throw new IOException("Found invalid image storage format in HIB at offset: " + currentOffset);
 	}
-	if (imageFormat == ImageFormat.UNDEFINED) {
+	if (imageFormat == HipiImageFormat.UNDEFINED) {
 	  throw new IOException("Found UNDEFINED image storage format in HIB at offset: " + currentOffset);
 	}
 
@@ -265,7 +265,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 
 	// Attempt to decode image header
 	DataInputStream dis = new DataInputStream(new ByteArrayInputStream(imageHeaderBytes));
-	imageHeader = new ImageHeader(dis);
+	imageHeader = new HipiImageHeader(dis);
 
 	//
 	// TODO: Perform cull step here? Continue advancing
@@ -301,7 +301,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 	System.err.println(String.format("EOF exception [%s] while decoding HIB image record ending at byte offset [%d]", 
 					 e.getMessage(), currentOffset, endOffset));
 	e.printStackTrace();
-	imageFormat = ImageFormat.UNDEFINED;
+	imageFormat = HipiImageFormat.UNDEFINED;
 	imageBytes = null;
 	imageHeader = null;
 	image = null;
@@ -310,7 +310,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 	System.err.println(String.format("IO exception [%s] while decoding HIB image record ending at byte offset [%d]",
 					 e.getMessage(), currentOffset));
 	e.printStackTrace();
-	imageFormat = ImageFormat.UNDEFINED;
+	imageFormat = HipiImageFormat.UNDEFINED;
 	imageBytes = null;
 	imageHeader = null;
 	image = null;
@@ -319,7 +319,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 	System.err.println(String.format("Runtime exception [%s] while decoding HIB image record ending at byte offset [%d]",
 					 e.getMessage(), currentOffset));
 	e.printStackTrace();
-	imageFormat = ImageFormat.UNDEFINED;
+	imageFormat = HipiImageFormat.UNDEFINED;
 	imageBytes = null;
 	imageHeader = null;
 	image = null;
@@ -328,7 +328,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 	System.err.println(String.format("Unexpected exception [%s] while decoding HIB image record ending at byte offset [%d]",
 					 e.getMessage(), currentOffset));
 	e.printStackTrace();
-	imageFormat = ImageFormat.UNDEFINED;
+	imageFormat = HipiImageFormat.UNDEFINED;
 	imageBytes = null;
 	imageHeader = null;
 	image = null;
@@ -346,7 +346,7 @@ public class HipiImageBundle extends AbstractImageBundle {
     /**
      * @return Storage format of raw image bytes.
      */
-    public ImageFormat getImageStorageFormat() {
+    public HipiImageFormat getImageStorageFormat() {
       return imageFormat;
     }
 
@@ -354,7 +354,7 @@ public class HipiImageBundle extends AbstractImageBundle {
      * @return Header for the current image, as retrieved by {@link
      * #nextKeyValue()}
      */
-    public ImageHeader getCurrentKey() {
+    public HipiImageHeader getCurrentKey() {
       return imageHeader;
     }
 
@@ -375,7 +375,7 @@ public class HipiImageBundle extends AbstractImageBundle {
   private byte sig[] = new byte[12];
   private int imageHeaderLength = 0;
   private int imageLength = 0;
-  private ImageFormat imageFormat = ImageFormat.UNDEFINED;
+  private HipiImageFormat imageFormat = HipiImageFormat.UNDEFINED;
   private long currentOffset = 0;
   private Path indexFilePath = null;
   private Path dataFilePath = null;
@@ -472,7 +472,7 @@ public class HipiImageBundle extends AbstractImageBundle {
    * adding the image offset to the index file.
    */
   @Override
-  public void addImage(ImageHeader imageHeader, InputStream imageStream) throws IOException {
+  public void addImage(HipiImageHeader imageHeader, InputStream imageStream) throws IOException {
 
     // TODO: Verify that HIB is in proper state for this operation.
 
@@ -518,6 +518,8 @@ public class HipiImageBundle extends AbstractImageBundle {
 
     currentOffset += 12 + imageHeaderLength + imageLength;
     indexOutputStream.writeLong(currentOffset);
+
+    System.out.println("Offset: " + currentOffset);
   }
 
   private byte[] inputStreamToBytes(InputStream stream) throws IOException {
@@ -643,7 +645,7 @@ public class HipiImageBundle extends AbstractImageBundle {
    * Implemented with {@link HipiImageBundle.FileReader#getCurrentKey()}
    */
   @Override
-  protected ImageHeader readHeader() throws IOException {
+  protected HipiImageHeader readHeader() throws IOException {
     return reader.getCurrentKey();
   }
 

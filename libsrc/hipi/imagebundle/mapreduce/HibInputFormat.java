@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import hipi.image.HipiImage;
-//import hipi.image.FloatImage;
-import hipi.image.ImageHeader;
+import hipi.image.HipiImageHeader;
 import hipi.imagebundle.AbstractImageBundle;
 import hipi.imagebundle.HipiImageBundle;
 
@@ -34,13 +33,13 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
  * corresponding {@link RecordReader} class.
  */
 
-public class HibInputFormat extends FileInputFormat<ImageHeader, HipiImage> {
+public class HibInputFormat extends FileInputFormat<HipiImageHeader, HipiImage> {
 
   /**
    * Creates an {@link ImageBundleRecordReader}
    */
   @Override
-  public RecordReader<ImageHeader, HipiImage> createRecordReader(InputSplit split, TaskAttemptContext context) 
+  public RecordReader<HipiImageHeader, HipiImage> createRecordReader(InputSplit split, TaskAttemptContext context) 
     throws IOException, InterruptedException {
     return new HibRecordReader();
   }

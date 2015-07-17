@@ -1,8 +1,8 @@
 package hipi.image;
 
-import hipi.image.ImageHeader;
-import hipi.image.ImageHeader.ImageFormat;
-import hipi.image.ImageHeader.ColorSpace;
+import hipi.image.HipiImageHeader;
+import hipi.image.HipiImageHeader.HipiImageFormat;
+import hipi.image.HipiImageHeader.HipiColorSpace;
 import hipi.image.HipiImageException;
 import hipi.util.ByteUtils;
 
@@ -73,13 +73,13 @@ public abstract class HipiImage implements Writable {
 
   } // public enum HipiImageType
 
-  protected ImageHeader header;
+  protected HipiImageHeader header;
 
   protected HipiImage() {
     this.header = null;
   }
 
-  public void setHeader(ImageHeader header) throws IllegalArgumentException {
+  public void setHeader(HipiImageHeader header) throws IllegalArgumentException {
     if (header == null) {
       throw new IllegalArgumentException("Image header must not be null.");
     }
@@ -104,7 +104,7 @@ public abstract class HipiImage implements Writable {
    *
    * @return Storage format of image.
    */
-  public ImageFormat getStorageFormat() {
+  public HipiImageFormat getStorageFormat() {
     return header.getStorageFormat();
   }
 
@@ -113,7 +113,7 @@ public abstract class HipiImage implements Writable {
    *
    * @return Color space of image.
    */
-  public ColorSpace getColorSpace() {
+  public HipiColorSpace getColorSpace() {
     return header.getColorSpace();
   }
 
@@ -170,6 +170,15 @@ public abstract class HipiImage implements Writable {
    */
   public String getExifData(String key) {
     return header.getExifData(key);
+  }
+
+  /**
+   * Get the entire map of EXIF data.
+   *
+   * @return a hash map containing the keys and values of the metadata
+   */
+  public HashMap<String, String> getAllExifData() {
+    return header.getAllExifData();
   }
 
   /**

@@ -1,8 +1,8 @@
 package hipi.image.io;
 
-import hipi.image.ImageHeader;
-import hipi.image.ImageHeader.ImageFormat;
-import hipi.image.ImageHeader.ColorSpace;
+import hipi.image.HipiImageHeader;
+import hipi.image.HipiImageHeader.HipiImageFormat;
+import hipi.image.HipiImageHeader.HipiColorSpace;
 import hipi.image.RasterImage;
 import hipi.image.HipiImage;
 import hipi.image.HipiImage.HipiImageType;
@@ -10,6 +10,11 @@ import hipi.image.HipiImageFactory;
 import hipi.image.PixelArray;
 import hipi.image.io.ExifDataUtils;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+//import java.awt.image.Raster;
+//import java.awt.image.ColorConvertOp;
+//import java.awt.color.ColorSpace;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,6 +32,7 @@ import java.util.zip.InflaterInputStream;
 import java.util.HashMap;
 
 import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.ImageIO;
 
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -92,7 +98,7 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
    * @param is The {@link InputStream} that contains the PNG image
    * @return The {@link ImageHeader} found in the input stream
    */
-  public ImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException {
+  public HipiImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException {
 
     DataInputStream dis = new DataInputStream(new BufferedInputStream(inputStream));
     dis.mark(Integer.MAX_VALUE);
@@ -145,8 +151,8 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
       exifData = ExifDataReader.extractAndFlatten(dis);
     }
 
-    return new ImageHeader(ImageFormat.PNG, ColorSpace.RGB,
-			   width, height, 3, null, exifData);
+    return new HipiImageHeader(HipiImageFormat.PNG, HipiColorSpace.RGB,
+			       width, height, 3, null, exifData);
   }
 
   /**
@@ -157,21 +163,62 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
    * @param is The {@link InputStream} that contains the PNG image
    * @return The {@link FloatImage} from the input stream
    */
-  public HipiImage decodeImage(InputStream is, ImageHeader header, HipiImageFactory imageFactory) throws IllegalArgumentException, IOException {
+  public HipiImage decodeImage(InputStream inputStream, HipiImageHeader imageHeader,
+			       HipiImageFactory imageFactory) throws IllegalArgumentException, IOException {
 
     // Verify image factory
     if (!(imageFactory.getType() == HipiImageType.FLOAT || imageFactory.getType() == HipiImageType.BYTE)) {
       throw new IllegalArgumentException("PNG decoder supports only FloatImage and ByteImage output types.");
     }
 
+    BufferedImage javaImage = ImageIO.read(inputStream);
+    int w = javaImage.getWidth();
+    int h = javaImage.getHeight();
+
+    // Check that image dimensions in header match those in JPEG
+    if (w != imageHeader.getWidth() || h != imageHeader.getHeight()) {
+      throw new IllegalArgumentException("Image dimensions in header do not match those in JPEG.");
+    }
+
+    // Create output image
+    RasterImage image = null;
+    try {
+      image = (RasterImage)imageFactory.createImage(imageHeader);
+    } catch (Exception e) {
+      System.err.println(String.format("Unrecoverable exception while creating image object [%s]", e.getMessage()));
+      e.printStackTrace();
+      System.exit(1);
+    }
+
+    PixelArray pa = image.getPixelArray();
+    
+    for (int j=0; j<h; j++) {
+      for (int i=0; i<w; i++) {
+
+	// Retrieve 8-bit non-linear sRGB value packed into int
+	int pixel = javaImage.getRGB(i,j); 
+	//	int alpha = (pixel >> 24) & 0xff;
+	int red = (pixel >> 16) & 0xff;
+	int grn = (pixel >>  8) & 0xff;
+	int blu = (pixel      ) & 0xff;
+
+	pa.setElemNonLinSRGB((j*w+i)*3+0, red);
+	pa.setElemNonLinSRGB((j*w+i)*3+1, grn);
+	pa.setElemNonLinSRGB((j*w+i)*3+2, blu);
+
+      }
+    }
+
+    /*
     DataInputStream dataIn = new DataInputStream(is);
     readSignature(dataIn);
     PNGData chunks = readChunks(dataIn);
 
     long widthLong = chunks.getWidth();
     long heightLong = chunks.getHeight();
-    if (widthLong > Integer.MAX_VALUE || heightLong > Integer.MAX_VALUE)
+    if (widthLong > Integer.MAX_VALUE || heightLong > Integer.MAX_VALUE) {
       throw new IOException("That image is too wide or tall.");
+    }
 
     int width = (int) widthLong;
     int height = (int) heightLong;
@@ -194,6 +241,7 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
       //      pels[i] = (float) ((image_bytes[i] & 0xff) / 255.0);
       pa.setElem(i, (image_bytes[i] & 0xff));
     }
+    */
 
     return image;
   }
@@ -409,9 +457,11 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
     if (image.getWidth() <= 0 || image.getHeight() <= 0) {
       throw new IllegalArgumentException("Invalid image dimensions.");
     }
-    if (image.getColorSpace() != ColorSpace.RGB) {
-      throw new IllegalArgumentException("PNG encoder supports only RGB color space.");
+
+    if (image.getColorSpace() != HipiColorSpace.RGB) {
+      throw new IllegalArgumentException("PNG encoder supports only linear RGB color space.");
     }
+
     if (image.getNumBands() != 3) {
       throw new IllegalArgumentException("PNG encoder supports only three band images.");
     }

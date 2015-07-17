@@ -33,7 +33,7 @@ public class ImageConverter {
    */
   public static void convert(InputStream inputStream, ImageDecoder decoder,
 			     OutputStream outputStream, ImageEncoder encoder) throws IOException {
-    ByteImage image = (ByteImage)decoder.decodeHeaderAndImage(inputStream, HipiImageFactory.getByteImageFactory());
+    ByteImage image = (ByteImage)decoder.decodeHeaderAndImage(inputStream, HipiImageFactory.getByteImageFactory(), true);
     encoder.encodeImage(image, outputStream);
   }
 

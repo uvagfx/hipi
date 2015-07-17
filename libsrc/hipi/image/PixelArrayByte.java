@@ -50,9 +50,21 @@ public class PixelArrayByte extends PixelArray {
     return data[i] & 0xff;
   }
 
+  public int getElemNonLinSRGB(int i) {
+    // Assumes values are stored in gamma compressed non-linear sRGB
+    // space
+    return getElem(i);
+  }
+
   public void setElem(int i, int val) {
     data[i] = (byte)(Math.max(0,Math.min(255,val)));
   }    
+
+  public void setElemNonLinSRGB(int i, int val) {
+    // Assumes values are stored in gamma compressed non-linear sRGB
+    // space
+    setElem(i,val);
+  }
 
   public float getElemFloat(int i) {
     return (float)(data[i] & 0xff)/255.0f;

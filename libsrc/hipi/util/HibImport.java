@@ -1,4 +1,4 @@
-package hipi.tool;
+package hipi.util;
 
 import hipi.image.HipiImageHeader.HipiImageFormat;
 import hipi.imagebundle.AbstractImageBundle;
@@ -7,11 +7,12 @@ import hipi.imagebundle.HipiImageBundle;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 
-public class CreateHipiImageBundle {
+public class HibImport {
 
   public static void main(String[] args) throws IOException  {
 
@@ -23,21 +24,30 @@ public class CreateHipiImageBundle {
     File folder = new File(args[0]);
     File[] files = folder.listFiles();
 
+    if (files == null) {
+      System.err.println(String.format("Did not find any files in the directory [%s]", args[0]));
+      System.exit(0);
+    }
+
     Configuration conf = new Configuration();
     HipiImageBundle hib = new HipiImageBundle(null, new Path(args[1]), conf);
     hib.open(AbstractImageBundle.FILE_MODE_WRITE, true);
 
     for (File file : files) {
       FileInputStream fis = new FileInputStream(file);
+      String localPath = file.getPath();
+      HashMap<String, String> metaData = new HashMap<String,String>();
+      metaData.put("source", localPath);
       String fileName = file.getName().toLowerCase();
       String suffix = fileName.substring(fileName.lastIndexOf('.'));
       if (suffix.compareTo(".jpg") == 0 || suffix.compareTo(".jpeg") == 0) {
-	hib.addImage(fis, HipiImageFormat.JPEG);
+	hib.addImage(fis, HipiImageFormat.JPEG, metaData);
+	System.out.println(" ** added: " + fileName);
       }
       else if (suffix.compareTo(".png") == 0) {
-	hib.addImage(fis, HipiImageFormat.PNG);
+	hib.addImage(fis, HipiImageFormat.PNG, metaData);
+	System.out.println(" ** added: " + fileName);
       } 
-      System.out.println(" ** added: " + fileName);
     }
 
     hib.close();

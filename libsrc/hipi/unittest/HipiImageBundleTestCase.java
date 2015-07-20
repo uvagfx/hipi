@@ -91,7 +91,7 @@ public class HipiImageBundleTestCase {
 
 	System.out.println(image);
 	
-	HipiImage source = (HipiImage)decoder.decodeImage(new FileInputStream(sourcePath), header, (iter == 0 ? HipiImageFactory.getByteImageFactory() : HipiImageFactory.getFloatImageFactory()));
+	HipiImage source = (HipiImage)decoder.decodeImage(new FileInputStream(sourcePath), header, (iter == 0 ? HipiImageFactory.getByteImageFactory() : HipiImageFactory.getFloatImageFactory()), true);
 	
 	assertEquals(count + " image header fails", width[count], header.getWidth());
 	assertEquals(count + " image header fails", height[count], header.getHeight());
@@ -172,7 +172,7 @@ public class HipiImageBundleTestCase {
 	HipiImage image = hib.getCurrentImage();
 	System.out.println(image);
 	
-	HipiImage source = (HipiImage)decoder.decodeImage(new FileInputStream("testimages/jpeg-rgb/"+fnames[i]), header, HipiImageFactory.getByteImageFactory());
+	HipiImage source = (HipiImage)decoder.decodeImage(new FileInputStream("testimages/jpeg-rgb/"+fnames[i]), header, HipiImageFactory.getByteImageFactory(), true);
 	
 	assertEquals(width[i], header.getWidth());
 	assertEquals(height[i], header.getHeight());

@@ -73,7 +73,6 @@ public class JpegCodecTestCase {
    * 
    * @throws IOException
    */
-  @Ignore
   @Test
   public void testDecodeHeader() throws IOException {
     ImageDecoder decoder = JpegCodec.getInstance();
@@ -98,7 +97,6 @@ public class JpegCodecTestCase {
     }
   }
 
-  @Ignore
   @Test
   public void testSRGBConversions() throws IOException {
     ImageDecoder jpegDecoder = JpegCodec.getInstance();
@@ -156,7 +154,6 @@ public class JpegCodecTestCase {
     }    
   }
 
-  @Ignore
   @Test
   public void testDecodeImage() throws IOException {
     ImageDecoder jpegDecoder = JpegCodec.getInstance();

@@ -71,7 +71,7 @@ import javax.imageio.ImageIO;
  * Currently, images can only be encoded and decoded with RGB encoding. That is, black and white,
  * and grayscale encoded images cannot be used.
  */
-public class PngCodec implements ImageDecoder, ImageEncoder {
+public class PngCodec extends ImageCodec { //implements ImageDecoder, ImageEncoder {
 
   private static final PngCodec staticObject = new PngCodec();
   
@@ -153,97 +153,6 @@ public class PngCodec implements ImageDecoder, ImageEncoder {
 
     return new HipiImageHeader(HipiImageFormat.PNG, HipiColorSpace.RGB,
 			       width, height, 3, null, exifData);
-  }
-
-  /**
-   * Decodes a PNG image from an input stream. This method only creates a {@link FloatImage} and
-   * will not create a {@link ImageHeader}. {@link #decodeImageHeader(InputStream)} must be called
-   * in order to acquire an {@link ImageHeader}
-   * 
-   * @param is The {@link InputStream} that contains the PNG image
-   * @return The {@link FloatImage} from the input stream
-   */
-  public HipiImage decodeImage(InputStream inputStream, HipiImageHeader imageHeader,
-			       HipiImageFactory imageFactory) throws IllegalArgumentException, IOException {
-
-    // Verify image factory
-    if (!(imageFactory.getType() == HipiImageType.FLOAT || imageFactory.getType() == HipiImageType.BYTE)) {
-      throw new IllegalArgumentException("PNG decoder supports only FloatImage and ByteImage output types.");
-    }
-
-    BufferedImage javaImage = ImageIO.read(inputStream);
-    int w = javaImage.getWidth();
-    int h = javaImage.getHeight();
-
-    // Check that image dimensions in header match those in JPEG
-    if (w != imageHeader.getWidth() || h != imageHeader.getHeight()) {
-      throw new IllegalArgumentException("Image dimensions in header do not match those in JPEG.");
-    }
-
-    // Create output image
-    RasterImage image = null;
-    try {
-      image = (RasterImage)imageFactory.createImage(imageHeader);
-    } catch (Exception e) {
-      System.err.println(String.format("Unrecoverable exception while creating image object [%s]", e.getMessage()));
-      e.printStackTrace();
-      System.exit(1);
-    }
-
-    PixelArray pa = image.getPixelArray();
-    
-    for (int j=0; j<h; j++) {
-      for (int i=0; i<w; i++) {
-
-	// Retrieve 8-bit non-linear sRGB value packed into int
-	int pixel = javaImage.getRGB(i,j); 
-	//	int alpha = (pixel >> 24) & 0xff;
-	int red = (pixel >> 16) & 0xff;
-	int grn = (pixel >>  8) & 0xff;
-	int blu = (pixel      ) & 0xff;
-
-	pa.setElemNonLinSRGB((j*w+i)*3+0, red);
-	pa.setElemNonLinSRGB((j*w+i)*3+1, grn);
-	pa.setElemNonLinSRGB((j*w+i)*3+2, blu);
-
-      }
-    }
-
-    /*
-    DataInputStream dataIn = new DataInputStream(is);
-    readSignature(dataIn);
-    PNGData chunks = readChunks(dataIn);
-
-    long widthLong = chunks.getWidth();
-    long heightLong = chunks.getHeight();
-    if (widthLong > Integer.MAX_VALUE || heightLong > Integer.MAX_VALUE) {
-      throw new IOException("That image is too wide or tall.");
-    }
-
-    int width = (int) widthLong;
-    int height = (int) heightLong;
-    byte[] image_bytes = chunks.getImageData();
-
-    // Create output image
-    RasterImage image = null;
-    try {
-      image = (RasterImage)imageFactory.createImage(header);
-    } catch (Exception e) {
-      // TODO?!?
-      System.err.println("CRASH");
-      e.printStackTrace();
-      System.exit(1);
-    }
-
-    PixelArray pa = ((RasterImage)image).getPixelArray();
-
-    for (int i = 0; i < image_bytes.length; i++) {
-      //      pels[i] = (float) ((image_bytes[i] & 0xff) / 255.0);
-      pa.setElem(i, (image_bytes[i] & 0xff));
-    }
-    */
-
-    return image;
   }
 
   protected static void readSignature(DataInputStream in) throws IOException {

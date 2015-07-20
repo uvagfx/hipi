@@ -29,7 +29,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
-public class JpegCodec extends ImageCodec { //implements ImageDecoder, ImageEncoder {
+public class JpegCodec extends ImageCodec {
 
   private static final JpegCodec staticObject = new JpegCodec();
 
@@ -90,59 +90,6 @@ public class JpegCodec extends ImageCodec { //implements ImageDecoder, ImageEnco
 			       width, height, 3, null, exifData);
   }
 
-  /*
-  public HipiImage decodeImage(InputStream inputStream, HipiImageHeader imageHeader, 
-			       HipiImageFactory imageFactory) throws IllegalArgumentException, IOException {
-
-    // Verify image factory
-    if (!(imageFactory.getType() == HipiImageType.FLOAT || imageFactory.getType() == HipiImageType.BYTE)) {
-      throw new IllegalArgumentException("JPEG decoder supports only FloatImage and ByteImage output types.");
-    }
-
-    // Use TwelveMonkeys ImageIO plugin decoder
-    BufferedImage javaImage = ImageIO.read(inputStream);
-    int w = javaImage.getWidth();
-    int h = javaImage.getHeight();
-
-    // Check that image dimensions in header match those in JPEG
-    if (w != imageHeader.getWidth() || h != imageHeader.getHeight()) {
-      throw new IllegalArgumentException("Image dimensions in header do not match those in JPEG.");
-    }
-
-    // Create output image
-    RasterImage image = null;
-    try {
-      image = (RasterImage)imageFactory.createImage(imageHeader);
-    } catch (Exception e) {
-      System.err.println(String.format("Fatal error while creating image object [%s]", e.getMessage()));
-      e.printStackTrace();
-      System.exit(1);
-    }
-
-    PixelArray pa = image.getPixelArray();
-    
-    for (int j=0; j<h; j++) {
-      for (int i=0; i<w; i++) {
-
-	// Retrieve 8-bit non-linear sRGB value packed into int
-	int pixel = javaImage.getRGB(i,j); 
-
-	int red = (pixel >> 16) & 0xff;
-	int grn = (pixel >>  8) & 0xff;
-	int blu = (pixel      ) & 0xff;
-
-	// Set value in pixel array using routine designed for sRGB values
-	pa.setElemNonLinSRGB((j*w+i)*3+0, red);
-	pa.setElemNonLinSRGB((j*w+i)*3+1, grn);
-	pa.setElemNonLinSRGB((j*w+i)*3+2, blu);
-
-      }
-    }
-
-    return image;
-  }
-  */
-
   public void encodeImage(HipiImage image, OutputStream outputStream) throws IllegalArgumentException, IOException {
 
     if (!(RasterImage.class.isAssignableFrom(image.getClass()))) {
@@ -165,30 +112,6 @@ public class JpegCodec extends ImageCodec { //implements ImageDecoder, ImageEnco
     ImageWriter writer = writers.next();
     System.out.println("Using JPEG encoder: " + writer);
     writer.setOutput(ios);
-
-    /*
-    int w = image.getWidth();
-    int h = image.getHeight();
-
-    BufferedImage bufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-
-    PixelArray pa = ((RasterImage)image).getPixelArray();
-    int[] rgb = new int[w*h];
-    for (int i=0; i<w*h; i++) {
-
-      int r = pa.getElemNonLinSRGB(i*3+0);
-      int g = pa.getElemNonLinSRGB(i*3+1);
-      int b = pa.getElemNonLinSRGB(i*3+2);
-
-      rgb[i] = (r << 16) | (g << 8) | b;
-    }
-    bufferedImage.setRGB(0, 0, w, h, rgb, 0, w);
-    IIOImage iioImage = new IIOImage(bufferedImage, null, null);
-    ImageWriteParam param = writer.getDefaultWriteParam();
-    param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-    param.setCompressionQuality(0.95F); // highest quality = 1.0F
-    writer.write(null, iioImage, param);
-    */
 
     ImageWriteParam param = writer.getDefaultWriteParam();
     param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);

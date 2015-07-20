@@ -24,16 +24,18 @@ public interface ImageDecoder {
   }
   
   public HipiImage decodeImage(InputStream inputStream, HipiImageHeader imageHeader, 
-			       HipiImageFactory imageFactory) throws IllegalArgumentException, IOException;
+			       HipiImageFactory imageFactory, boolean includeExifData)
+    throws IllegalArgumentException, IOException;
 
-  public default HipiImage decodeHeaderAndImage(InputStream inputStream, HipiImageFactory imageFactory, boolean includeExifData) 
+  public default HipiImage decodeHeaderAndImage(InputStream inputStream,
+						HipiImageFactory imageFactory, boolean includeExifData) 
     throws IOException, IllegalArgumentException 
   {
     BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
     bufferedInputStream.mark(Integer.MAX_VALUE);
     HipiImageHeader header = decodeHeader(bufferedInputStream, includeExifData);
     bufferedInputStream.reset();
-    return decodeImage(bufferedInputStream, header, imageFactory);
+    return decodeImage(bufferedInputStream, header, imageFactory, false);
   }
 
 }

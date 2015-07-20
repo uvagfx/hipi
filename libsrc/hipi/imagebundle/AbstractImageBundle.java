@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.BufferedInputStream;
+import java.util.HashMap;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -142,7 +143,7 @@ public abstract class AbstractImageBundle {
    * 
    * @throws IOException
    */
-  public void addImage(InputStream inputStream, HipiImageFormat imageFormat) 
+  public void addImage(InputStream inputStream, HipiImageFormat imageFormat, HashMap<String, String> metaData) 
     throws IllegalArgumentException, IOException {
     ImageDecoder decoder = null;
     switch (imageFormat) {
@@ -162,8 +163,21 @@ public abstract class AbstractImageBundle {
     BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
     bufferedInputStream.mark(Integer.MAX_VALUE); // 100MB
     HipiImageHeader header = decoder.decodeHeader(bufferedInputStream);
+    if (metaData != null) {
+      header.setMetaData(metaData);
+    }
     bufferedInputStream.reset();
     addImage(header, bufferedInputStream);
+  }
+
+  /**
+   * Add image to bundle.
+   * 
+   * @throws IOException
+   */
+  public void addImage(InputStream inputStream, HipiImageFormat imageFormat)
+    throws IllegalArgumentException, IOException {
+    addImage(inputStream, imageFormat, null);
   }
 
   /**

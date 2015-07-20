@@ -249,6 +249,15 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
   }
 
   /**
+   * Sets the entire metadata map structure.
+   *
+   * @param metaData hash map containing the metadata key/value pairs
+   */
+  public void setMetaData(HashMap<String, String> metaData) {
+    this.metaData = new HashMap<String, String>(metaData);
+  }
+
+  /**
    * Attempt to retrieve metadata value associated with key.
    *
    * @param key field name of the desired metadata record
@@ -322,6 +331,15 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
    */
   public HashMap<String, String> getAllExifData() {
     return new HashMap<String, String>(exifData);
+  }
+
+  /**
+   * Sets the entire EXIF data map structure.
+   *
+   * @param exifData hash map containing the EXIF data key/value pairs
+   */
+  public void setExifData(HashMap<String, String> exifData) {
+    this.exifData = new HashMap<String, String>(exifData);
   }
 
   /**

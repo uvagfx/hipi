@@ -34,15 +34,19 @@ public abstract class ImageCodec implements ImageDecoder, ImageEncoder {
 
   // By default use ImageIO plugins to decode image
   public HipiImage decodeImage(InputStream inputStream, HipiImageHeader imageHeader, 
-			       HipiImageFactory imageFactory) throws IllegalArgumentException, IOException {
+			       HipiImageFactory imageFactory, boolean includeExifData)
+    throws IllegalArgumentException, IOException {
     
     // Verify image factory
     if (!(imageFactory.getType() == HipiImageType.FLOAT || imageFactory.getType() == HipiImageType.BYTE)) {
       throw new IllegalArgumentException("JPEG decoder supports only FloatImage and ByteImage output types.");
     }
 
+    DataInputStream dis = new DataInputStream(new BufferedInputStream(inputStream));
+    dis.mark(Integer.MAX_VALUE);
+
     // Find suitable ImageIO plugin (should be TwelveMonkeys)
-    BufferedImage javaImage = ImageIO.read(inputStream);
+    BufferedImage javaImage = ImageIO.read(dis);//inputStream);
 
     int w = javaImage.getWidth();
     int h = javaImage.getHeight();
@@ -80,6 +84,12 @@ public abstract class ImageCodec implements ImageDecoder, ImageEncoder {
 	pa.setElemNonLinSRGB((j*w+i)*3+2, blu);
 
       }
+    }
+
+    if (includeExifData) {      
+      // Extract EXIF data from image stream and store in image header
+      dis.reset();
+      imageHeader.setExifData(ExifDataReader.extractAndFlatten(dis));
     }
 
     return image;

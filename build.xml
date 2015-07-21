@@ -155,6 +155,8 @@
   </target>
 
 
+
+
   <!-- Used to compute the principal components of natural image patches (see http://hipi.cs.virginia.edu/examples/pca.html) -->
   <target name="covariance">
     <echo message="Building covariance example..."/>
@@ -167,13 +169,23 @@
     <echo message="Covariance built."/>
   </target>
 
-  <!-- Runs all of the HIPI unit tests -->
-  <target name="test" depends="setup,test_settings,hipi">
-    <javac includeantruntime="false" fork="true" srcdir="libsrc/hipi/unittest" destdir="lib/hipi/unittest" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
+  <!-- Stand-alone HIPI unit tests -->
+  <target name="testhipi" depends="setup,test_settings,hipi">
+    <javac includeantruntime="false" fork="true" srcdir="libsrc/hipi/test" destdir="./lib/hipi/test" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
     <java fork="true" maxmemory="2048m" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${slf4j.api.jar}:${log4j.jar}:${avro.jar}:./lib/hipi-${hipi.version}.jar:${twelvemonkeys.jar}">
-      <arg value="hipi.unittest.AllTests"/>
+      <arg value="hipi.test.AllHipiTests"/>
     </java>
   </target>
+
+  <!-- Runs MR/HIPI unit tests -->
+  <target name="testmr" depends="setup,test_settings,hipi">
+    <javac includeantruntime="false" fork="true" srcdir="libsrc/hipi/test" destdir="./lib/hipi/test" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
+    <java fork="true" maxmemory="2048m" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${slf4j.api.jar}:${log4j.jar}:${avro.jar}:./lib/hipi-${hipi.version}.jar:${twelvemonkeys.jar}">
+      <arg value="hipi.test.AllHipiMapReduceTests" />
+    </java>
+  </target>
+
+
 
   <!-- Produces HIPI javadoc documentation for HIPI -->
    <target name="doc" depends="setup,test_settings,hipi">

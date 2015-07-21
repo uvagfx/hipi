@@ -10,7 +10,7 @@
     </delete>
     
     <!-- Compile -->
-    <javac debug="yes" nowarn="on" includeantruntime="no" srcdir="./hipi/container:./hipi/image:./hipi/imagebundle:./hipi/util:./hipi/unittest" destdir="../lib" classpath="${hadoop.classpath}:${json.jar}:${metadata.jar}:${junit.jar}"> <!-- :../3rdparty/twelvemonkeys/*"> -->
+    <javac debug="yes" nowarn="on" includeantruntime="no" srcdir="./hipi/container:./hipi/image:./hipi/imagebundle:./hipi/util:./hipi/test" destdir="../lib" classpath="${hadoop.classpath}:${json.jar}:${metadata.jar}:${junit.jar}"> <!-- :../3rdparty/twelvemonkeys/*"> -->
       <compilerarg value="-Xlint:deprecation" />
       <compilerarg value="-Xlint:unchecked" />
     </javac>

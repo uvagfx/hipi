@@ -1,4 +1,4 @@
-package hipi.unittest;
+package hipi.test;
 
 import static org.junit.Assert.*;
 

@@ -237,12 +237,11 @@ public class HipiImageBundle extends AbstractImageBundle {
 	  throw new IOException("Found UNDEFINED image storage format in HIB at offset: " + currentOffset);
 	}
 
-	/*
 	System.out.println("nextKeyValue()");
 	System.out.println("imageHeaderLength: " + imageHeaderLength);
 	System.out.println("imageLength: " + imageLength);
 	System.out.println("imageFormatInt: " + imageFormatInt);
-	*/
+	System.out.println("imageFormat: " + imageFormat.toInteger());
 
 	// Allocate byte array to hold image header data
 	byte[] imageHeaderBytes = new byte[imageHeaderLength];
@@ -271,6 +270,8 @@ public class HipiImageBundle extends AbstractImageBundle {
 	DataInputStream dis = new DataInputStream(new ByteArrayInputStream(imageHeaderBytes));
 	imageHeader = new HipiImageHeader(dis);
 
+	System.out.println(imageHeader);
+
 	//
 	// TODO: Perform cull step here? Continue advancing
 	// dataInputStream until a valid image record is found. Would
@@ -287,8 +288,6 @@ public class HipiImageBundle extends AbstractImageBundle {
 	case FLOAT:
 	case BYTE:
 	  image = decoder.decodeImage(new ByteArrayInputStream(imageBytes), imageHeader, imageFactory, true);
-	  //	  System.out.println(imageHeader.getAllExifData());
-	  //	  System.exit(0);
 	  break;
 	case RAW:
 	  throw new RuntimeException("Support for RAW image type not yet implemented.");

@@ -85,6 +85,7 @@ public class HibInfo {
       if (imageIndex == -1 || imageIndex == (count+1)) {
 
 	System.out.println(String.format("   %d x %d", header.getWidth(), header.getHeight()));
+	System.out.println(String.format("   format: %d", header.getStorageFormat().toInteger()));
 	
 	HashMap<String, String> metaData = header.getAllMetaData();
 	System.out.println("   meta: " + metaData);

@@ -55,7 +55,9 @@ public class ByteImage extends RasterImage {
    * difference, false otherwise.
    */
   public boolean equalsWithTolerance(RasterImage thatImage, float maxDifference) {
-
+    if (thatImage == null) {
+      return false;
+    }
     // Verify dimensions in headers are equal
     int w = this.getWidth();
     int h = this.getHeight();

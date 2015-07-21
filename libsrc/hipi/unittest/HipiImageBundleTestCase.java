@@ -68,9 +68,9 @@ public class HipiImageBundleTestCase {
   public void testIterator() throws IOException {
 
     ImageDecoder decoder = JpegCodec.getInstance();
-    int[] width = {3456, 3072, 2592, 3072, 3456, 4320, 3456, 3456, 1600, 1600, 2048, 1024};
-    int[] height = {2304, 2304, 1944, 2304, 2304, 3240, 2304, 2304, 1065, 1065, 1318, 767};
-    int[] bands = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+    int[] width = {3456, 3072, 2592, 3072, 3456, 640};//4320, 3456, 3456, 1600, 1600, 2048, 1024};
+    int[] height = {2304, 2304, 1944, 2304, 2304, 480};//3240, 2304, 2304, 1065, 1065, 1318, 767};
+    int[] bands = {3, 3, 3, 3, 3, 3};//, 3, 3, 3, 3, 3, 3};
     
     for (int iter=0; iter<2; iter++) {
       

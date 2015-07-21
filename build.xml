@@ -91,7 +91,7 @@
       <!-- Unit test dependencies -->
       <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
     </ant>
-    <echo message="HIPI library built."/>
+    <echo message="HIPI library built." />
   </target>
 
   <!-- Builds utility 'hibimport' which creates a HIB file on the HDFS from a set of images on the local FX -->
@@ -103,7 +103,7 @@
       <param name="jardir" value="util" />
       <param name="mainclass" value="hipi.util.HibImport" />
     </antcall>
-    <echo message="hibimport built."/>
+    <echo message="hibimport built." />
   </target>
 
   <!-- Builds utility 'hibinfo' which displays basic information about a HIB -->
@@ -115,7 +115,7 @@
       <param name="jardir" value="util" />
       <param name="mainclass" value="hipi.util.HibInfo" />
     </antcall>
-    <echo message="hibinfo built."/>
+    <echo message="hibinfo built." />
   </target>
 
   <!-- Display basic information about a HIB file (see http://hipi.cs.virginia.edu/examples/dumphib.html) -->
@@ -127,44 +127,33 @@
       <param name="jardir" value="util" />
       <param name="mainclass" value="hipi.util.DumpHib" />
     </antcall>
-    <echo message="dumphib built."/>
-  </target>
-
-  <!-- Downloads a list of URLs and creates a single HIB (see http://hipi.cs.virginia.edu/examples/downloader.html) -->
-  <target name="downloader">
-    <echo message="Building downloader example..."/>
-    <antcall target="compile">
-      <param name="srcdir" value="examples/hipi/examples/downloader" />
-      <param name="jarfilename" value="downloader.jar" />
-      <param name="jardir" value="examples" />
-      <param name="mainclass" value="hipi.examples.downloader.Downloader" />
-    </antcall>
-    <echo message="downloader built."/>
+    <echo message="dumphib built." />
   </target>
 
   <!-- Extracts individual JPEG images contained within a HIB file (see http://hipi.cs.virginia.edu/examples/jpegfromhib.html) -->
   <target name="jpegfromhib">
-    <echo message="Building jpegfromhib example..."/>
+    <echo message="Building jpegfromhib..."/>
     <antcall target="compile">
-      <param name="srcdir" value="examples/hipi/examples/jpegfromhib" />
+      <param name="srcdir" value="libsrc/hipi/util" />
       <param name="jarfilename" value="jpegfromhib.jar" />
-      <param name="jardir" value="examples" />
-      <param name="mainclass" value="hipi.examples.jpegfromhib.JpegFromHib" />
+      <param name="jardir" value="util" />
+      <param name="mainclass" value="hipi.util.JpegFromHib" />
     </antcall>
-    <echo message="Jpegfromhib built."/>
+    <echo message="jpegfromhib built." />
   </target>
 
-  <!-- Converts a HIB file into a Hadoop SequenceFile (see http://hipi.cs.virginia.edu/examples/createSequenceFile.html) -->
-  <target name="createsequencefile">
-    <echo message="Building createsequencefile example..."/>
+  <!-- Downloads a list of URLs and creates a single HIB (see http://hipi.cs.virginia.edu/examples/downloader.html) -->
+  <target name="downloader">
+    <echo message="Building downloader..."/>
     <antcall target="compile">
-      <param name="srcdir" value="examples/hipi/examples/createsequencefile" />
-      <param name="jarfilename" value="createsequencefile.jar" />
-      <param name="jardir" value="examples" />
-      <param name="mainclass" value="hipi.examples.createsequencefile.CreateSequenceFile" />
+      <param name="srcdir" value="libsrc/hipi/util/downloader" />
+      <param name="jarfilename" value="downloader.jar" />
+      <param name="jardir" value="util" />
+      <param name="mainclass" value="hipi.util.downloader.Downloader" />
     </antcall>
-    <echo message="Createsequencefile built."/>
+    <echo message="downloader built." />
   </target>
+
 
   <!-- Used to compute the principal components of natural image patches (see http://hipi.cs.virginia.edu/examples/pca.html) -->
   <target name="covariance">
@@ -209,7 +198,7 @@
     
    </target>
   
-   <target name="all" depends="hipi,hibimport,hibinfo,downloader,dumphib,jpegfromhib,createsequencefile,covariance" />
+   <target name="all" depends="hipi,hibimport,hibinfo,downloader,dumphib,jpegfromhib,covariance" />
 
    <!-- Clean -->
    <target name="clean">

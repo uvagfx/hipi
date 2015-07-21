@@ -89,7 +89,11 @@ public abstract class ImageCodec implements ImageDecoder, ImageEncoder {
     if (includeExifData) {      
       // Extract EXIF data from image stream and store in image header
       dis.reset();
-      imageHeader.setExifData(ExifDataReader.extractAndFlatten(dis));
+      try {
+	imageHeader.setExifData(ExifDataReader.extractAndFlatten(dis));
+      } catch (IOException ex) {
+	System.err.println("Failed to extract EXIF data for image record.");
+      }
     }
 
     return image;

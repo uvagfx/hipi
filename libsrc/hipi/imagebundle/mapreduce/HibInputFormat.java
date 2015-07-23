@@ -90,8 +90,8 @@ public class HibInputFormat extends FileInputFormat<HipiImageHeader, HipiImage> 
       
       // Create HIB object for reading (pasing null as the image
       // factory disallows calling any of the image reading methods)
-      HipiImageBundle hib = new HipiImageBundle(null, path, conf);
-      hib.open(AbstractImageBundle.FILE_MODE_READ);
+      HipiImageBundle hib = new HipiImageBundle(path, conf);
+      hib.openForRead();
 
       // Get image block offsets (should be in ascending order)
       List<Long> offsets = hib.readAllOffsets();

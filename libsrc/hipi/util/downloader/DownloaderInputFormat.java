@@ -3,6 +3,7 @@ package hipi.util.downloader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -87,11 +88,14 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> {
         System.out.println("Found unique host: " + i);
       }
       i++;
+
     }
 
+    /*
     System.out.println("Tried to get " + numDownloadNodes + " unique nodes, found " + uniqueNodes.size() + " unique nodes.");
 
     // Determine number of images to download (assume a single input text file with one image URL per line)
+    // Use a default value of 10 if 'downloader.nodes' is not explicitly set
     FileStatus file = listStatus(job).get(0);
     Path path = file.getPath();
     BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(path)));
@@ -130,6 +134,47 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> {
     }
 
     return splits;
+    */
+
+    System.out.println("Tried to get " + numDownloadNodes + " unique nodes, found " + uniqueNodes.size() + " unique nodes.");
+
+    // Accept an arbitrary number of input files for download, but assume one image/metadata set per line.
+    for (FileStatus file : listStatus(job)) {
+
+      Path path = file.getPath();
+      FSDataInputStream fileIn = fileSystem.open(path);
+
+      int numImages = conf.getInt("downloader.imagesperfile", 1000000);
+
+      // Determine download schedule (number of images per node)
+      int span = (int) Math.ceil(((float) numImages) / ((float) uniqueNodes.size()));
+      int last = numImages - span * (uniqueNodes.size() - 1);
+
+      if (uniqueNodes.size() > 1) {
+	System.out.println("First " + (uniqueNodes.size() - 1) + " nodes will each download " + span + " images");
+	System.out.println("Last node will download " + last + " images");
+      } else {
+	System.out.println("Single node will download " + last + " images");
+      }
+
+      // Produce file splits according to download schedule
+      for (int j = 0; j < uniqueNodes.size(); j++) {
+	String[] node = new String[] {uniqueNodes.get(j)};
+	if (j < uniqueNodes.size() - 1) {
+	  splits.add(new FileSplit(path, (j * span), span, node));
+	} else {
+	  splits.add(new FileSplit(path, (j * span), last, node));
+	}
+      }
+      
+      // Remove temporary files used to identify unique nodes in cluster
+      if (fileSystem.exists(tempOutputDir)) {
+	fileSystem.delete(tempOutputDir, true);
+      }
+    }
+
+    return splits;
+
   }
 
 }

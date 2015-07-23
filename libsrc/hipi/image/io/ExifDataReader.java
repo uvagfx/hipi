@@ -1,7 +1,9 @@
 package hipi.image.io;
 
-import com.drew.imaging.jpeg.JpegMetadataReader;
-import com.drew.imaging.jpeg.JpegProcessingException;
+//import com.drew.imaging.jpeg.JpegMetadataReader;
+//import com.drew.imaging.jpeg.JpegProcessingException;
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
@@ -35,8 +37,8 @@ public class ExifDataReader {
     ubis = new UnclosableBufferedInputStream(is);
   }
   
-  public Metadata extract() throws JpegProcessingException, IOException {
-    return JpegMetadataReader.readMetadata(ubis);
+  public Metadata extract() throws ImageProcessingException, IOException {
+    return ImageMetadataReader.readMetadata(ubis);
   }
 
   public static HashMap<String,String> extractAndFlatten(InputStream is) throws IOException {
@@ -53,8 +55,8 @@ public class ExifDataReader {
 	  exifData.put(tag.getTagName(), tag.getDescription());
 	}
       }
-    } catch (JpegProcessingException ex) {
-      throw new IOException(String.format("Encountered error while reading image EXIF data [%s]", ex.getMessage()));
+    } catch (ImageProcessingException ex) {
+      throw new IOException(String.format("Encountered error while attempting to extract image EXIF data [%s]", ex.getMessage()));
     }
     return exifData;
   }

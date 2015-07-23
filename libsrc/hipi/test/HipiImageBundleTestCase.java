@@ -29,8 +29,12 @@ import java.util.List;
 public class HipiImageBundleTestCase {
 
   public static HipiImageBundle createHibAndOpen(int mode, HipiImageFactory imageFactory) throws IOException {
-    HipiImageBundle hib = new HipiImageBundle(imageFactory, new Path("/tmp/bundle.hib"), new Configuration());
-    hib.open(mode, true);
+    HipiImageBundle hib = new HipiImageBundle(new Path("/tmp/bundle.hib"), new Configuration(), imageFactory);
+    if (mode == HipiImageBundle.FILE_MODE_WRITE) {
+      hib.openForWrite(true);
+    } else {
+      hib.openForRead();
+    }
     return hib;
   }
 
@@ -39,7 +43,7 @@ public class HipiImageBundleTestCase {
 
     System.out.println("HipiImageBundle#setup");
 
-    HipiImageBundle hib = createHibAndOpen(AbstractImageBundle.FILE_MODE_WRITE, null);
+    HipiImageBundle hib = createHibAndOpen(HipiImageBundle.FILE_MODE_WRITE, null);
 
     JpegCodec jpegCodec = JpegCodec.getInstance();
 
@@ -74,20 +78,20 @@ public class HipiImageBundleTestCase {
     
     for (int iter=0; iter<2; iter++) {
       
-      HipiImageBundle hib = createHibAndOpen(AbstractImageBundle.FILE_MODE_READ, (iter == 0 ? HipiImageFactory.getByteImageFactory() : HipiImageFactory.getFloatImageFactory()));
+      HipiImageBundle hib = createHibAndOpen(HipiImageBundle.FILE_MODE_READ, (iter == 0 ? HipiImageFactory.getByteImageFactory() : HipiImageFactory.getFloatImageFactory()));
       
       int count = 0;
-      while (hib.hasNext()) {
+      while (hib.next()) {
 
-	System.out.println("VERIFYING IMAGE: " + (count + 1));
+	System.out.println("VERIFYING IMAGE: " + count);
 	
-	HipiImageHeader header = hib.next();
+	HipiImageHeader header = hib.currentHeader();
 	System.out.println(header);
 	
 	String sourcePath = header.getMetaData("path");
 	System.out.println("sourcePath: " + sourcePath);
 	
-	HipiImage image = hib.getCurrentImage();
+	HipiImage image = hib.currentImage();
 
 	System.out.println(image);
 	
@@ -110,7 +114,7 @@ public class HipiImageBundleTestCase {
   @Test
   public void testOffsets() throws IOException {
     System.out.println("testOffsets");
-    HipiImageBundle hib = (HipiImageBundle)createHibAndOpen(AbstractImageBundle.FILE_MODE_READ, null);
+    HipiImageBundle hib = (HipiImageBundle)createHibAndOpen(HipiImageBundle.FILE_MODE_READ, null);
     Long trueOffsets[] = {2175104l, 6823642l, 9309591l, 12349474l, 14445912l, 14574035l};
     List<Long> offsets = hib.readAllOffsets();
     System.out.println(offsets);
@@ -128,23 +132,23 @@ public class HipiImageBundleTestCase {
     // create image bundles
     Configuration conf = new Configuration();
 
-    HipiImageBundle hib1 = new HipiImageBundle(null, new Path("/tmp/bundle1.hib"), conf);
-    hib1.open(AbstractImageBundle.FILE_MODE_WRITE, true);
+    HipiImageBundle hib1 = new HipiImageBundle(new Path("/tmp/bundle1.hib"), conf);
+    hib1.openForWrite(true);
     hib1.addImage(new FileInputStream("testimages/jpeg-rgb/01.JPEG"), HipiImageFormat.JPEG);
     hib1.addImage(new FileInputStream("testimages/jpeg-rgb/02.JPG"), HipiImageFormat.JPEG);
     hib1.close();
 
-    HipiImageBundle hib2 = new HipiImageBundle(null, new Path("/tmp/bundle2.hib"), conf);
-    hib2.open(AbstractImageBundle.FILE_MODE_WRITE, true);
+    HipiImageBundle hib2 = new HipiImageBundle(new Path("/tmp/bundle2.hib"), conf);
+    hib2.openForWrite(true);
     hib2.addImage(new FileInputStream("testimages/jpeg-rgb/03.jpg"), HipiImageFormat.JPEG);
     hib2.addImage(new FileInputStream("testimages/jpeg-rgb/04.jpg"), HipiImageFormat.JPEG);
     hib2.close();
 
-    HipiImageBundle hib1Read = new HipiImageBundle(null, new Path("/tmp/bundle1.hib"), conf);
-    HipiImageBundle hib2Read = new HipiImageBundle(null, new Path("/tmp/bundle2.hib"), conf);
+    HipiImageBundle hib1Read = new HipiImageBundle(new Path("/tmp/bundle1.hib"), conf);
+    HipiImageBundle hib2Read = new HipiImageBundle(new Path("/tmp/bundle2.hib"), conf);
 
-    HipiImageBundle hibMerged = new HipiImageBundle(null, new Path("/tmp/merged_bundle.hib"), conf);
-    hibMerged.open(HipiImageBundle.FILE_MODE_WRITE, true);
+    HipiImageBundle hibMerged = new HipiImageBundle(new Path("/tmp/merged_bundle.hib"), conf);
+    hibMerged.openForWrite(true);
     hibMerged.append(hib1Read);
     hibMerged.append(hib2Read);
     hibMerged.close();
@@ -157,19 +161,21 @@ public class HipiImageBundleTestCase {
     int[] bands = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
     String[] fnames = {"01.JPEG", "02.JPG", "03.jpg", "04.jpg"};
 
-    HipiImageBundle hib = new HipiImageBundle(HipiImageFactory.getByteImageFactory(), new Path("/tmp/merged_bundle.hib"), conf);
-    hib.open(HipiImageBundle.FILE_MODE_READ, false);
+    HipiImageBundle hib = new HipiImageBundle(new Path("/tmp/merged_bundle.hib"), conf, HipiImageFactory.getByteImageFactory());
+    hib.openForRead();
 
     for (int i=0; i<4; i++)
       {
 	System.out.println("VERIFYING IMAGE: " + fnames[i]);
 
-	assertTrue(hib.hasNext());
+	boolean hasNext = hib.next();
 
-	HipiImageHeader header = hib.next();
+	assertTrue(hasNext);
+
+	HipiImageHeader header = hib.currentHeader();
 	System.out.println(header);
 	
-	HipiImage image = hib.getCurrentImage();
+	HipiImage image = hib.currentImage();
 	System.out.println(image);
 	
 	HipiImage source = (HipiImage)decoder.decodeImage(new FileInputStream("testimages/jpeg-rgb/"+fnames[i]), header, HipiImageFactory.getByteImageFactory(), true);

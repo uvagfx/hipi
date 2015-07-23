@@ -10,6 +10,10 @@ import hipi.image.ByteImage;
 import hipi.image.HipiImageFactory;
 import hipi.image.io.CodecManager;
 import hipi.image.io.ImageDecoder;
+import hipi.image.io.ImageEncoder;
+import hipi.image.io.JpegCodec;
+import hipi.image.io.PngCodec;
+import hipi.util.ByteUtils;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -18,6 +22,7 @@ import org.apache.hadoop.fs.Path;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -25,6 +30,7 @@ import java.io.EOFException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -48,7 +54,7 @@ import java.util.List;
  * @see <a href="http://hipi.cs.virginia.edu/">HIPI Project Homepage</a>
  */
 
-public class HipiImageBundle extends AbstractImageBundle {
+public class HipiImageBundle {
 
   /**
    * This FileReader enables reading individual images from a {@link
@@ -237,11 +243,13 @@ public class HipiImageBundle extends AbstractImageBundle {
 	  throw new IOException("Found UNDEFINED image storage format in HIB at offset: " + currentOffset);
 	}
 
+	/*
 	System.out.println("nextKeyValue()");
 	System.out.println("imageHeaderLength: " + imageHeaderLength);
 	System.out.println("imageLength: " + imageLength);
 	System.out.println("imageFormatInt: " + imageFormatInt);
 	System.out.println("imageFormat: " + imageFormat.toInteger());
+	*/
 
 	// Allocate byte array to hold image header data
 	byte[] imageHeaderBytes = new byte[imageHeaderLength];
@@ -270,7 +278,7 @@ public class HipiImageBundle extends AbstractImageBundle {
 	DataInputStream dis = new DataInputStream(new ByteArrayInputStream(imageHeaderBytes));
 	imageHeader = new HipiImageHeader(dis);
 
-	System.out.println(imageHeader);
+	//	System.out.println(imageHeader);
 
 	//
 	// TODO: Perform cull step here? Continue advancing
@@ -371,77 +379,123 @@ public class HipiImageBundle extends AbstractImageBundle {
 
   } // public static class HibReader
 
+  public static final int FILE_MODE_UNDEFINED = 0;
+  public static final int FILE_MODE_READ = 1;
+  public static final int FILE_MODE_WRITE = 2;
+
+  private int fileMode = FILE_MODE_UNDEFINED;
+
+  private Path indexFilePath = null;
+  private Path dataFilePath = null;
+
+  protected Configuration conf = null;
+
+  protected HipiImageFactory imageFactory = null;
+
   private DataInputStream indexInputStream = null;
   private DataOutputStream indexOutputStream = null;
   private DataOutputStream dataOutputStream = null;
-  private HibReader reader = null;
+
+  private HibReader hibReader = null;
+
   private byte sig[] = new byte[12];
-  private int imageHeaderLength = 0;
-  private int imageLength = 0;
-  private HipiImageFormat imageFormat = HipiImageFormat.UNDEFINED;
+
   private long currentOffset = 0;
-  private Path indexFilePath = null;
-  private Path dataFilePath = null;
 
   private long blockSize = 0;
   private short replication = 0;
 
-  public HipiImageBundle(HipiImageFactory imageFactory, Path filePath, Configuration conf) {
-    super(imageFactory, filePath, conf);
+  public HipiImageBundle(Path indexFilePath, Configuration conf, HipiImageFactory imageFactory) {
+    this.indexFilePath = indexFilePath;
+    this.dataFilePath = indexFilePath.suffix(".dat");
+    this.conf = conf;
+    this.imageFactory = imageFactory;
   }
 
-  public HipiImageBundle(HipiImageFactory imageFactory, Path filePath, Configuration conf, short replication) {
-    super(imageFactory, filePath, conf);
+  public HipiImageBundle(Path indexFilePath, Configuration conf) {
+    this(indexFilePath, conf, null);
+  }
+
+  public HipiImageBundle(Path indexFilePath, Configuration conf, HipiImageFactory imageFactory, short replication) {
+    this(indexFilePath, conf, imageFactory);
     this.replication = replication;
   }
 
-  public HipiImageBundle(HipiImageFactory imageFactory, Path filePath, Configuration conf, long blockSize) {
-    super(imageFactory, filePath, conf);
+  public HipiImageBundle(Path indexFilePath, Configuration conf, HipiImageFactory imageFactory, long blockSize) {
+    this(indexFilePath, conf, imageFactory);
     this.blockSize = blockSize;
   }
 
-  public HipiImageBundle(HipiImageFactory imageFactory, Path filePath, Configuration conf, short replication, long blockSize) {
-    super(imageFactory, filePath, conf);
-    replication = replication;
-    blockSize = blockSize;
+  public HipiImageBundle(Path indexFilePath, Configuration conf, HipiImageFactory imageFactory, short replication, long blockSize) {
+    this(indexFilePath, conf, imageFactory);
+    this.replication = replication;
+    this.blockSize = blockSize;
+  }
+
+  public Path getPath() {
+    return indexFilePath;
   }
 
   /**
-   * {@inheritDoc}
+   * Opens the underlying index and data files for writing.
+   * 
+   * @param overwrite if either part of the HIB file (index and/or
+   *        data) exists this parameter determines whether or not to
+   *        delete the file first or throw an exception
+   * @throws IOException
    */
-  @Override 
-  protected void openForWrite() throws IOException {
+  public final void openForWrite(boolean overwrite) throws IOException {
 
-    // Check if this object is already in an opened state
-    if (indexOutputStream != null || dataOutputStream != null) {
-      throw new IOException("File " + filePath.getName() + " already opened for WRITING");
+    if (fileMode != FILE_MODE_UNDEFINED) {
+      throw new IOException("HIB [" + indexFilePath.getName() + "] is already open. Must close before calling this method.");
     }
 
-    if (indexInputStream != null) { // || reader != null) {
-      throw new IOException("File " + filePath.getName() + " already opened for READING");
-    }
-
-    // HipiImageBundle will create two files: an index file (provided
-    // by filePath from AbstractImageBundle) and a data file which is
-    // name of index file with .dat suffix
-    indexFilePath = filePath;
     FileSystem fs = FileSystem.get(conf);
-    indexOutputStream = new DataOutputStream(fs.create(indexFilePath));
-    dataFilePath = filePath.suffix(".dat");
+
+    if (fs.exists(indexFilePath) && !overwrite) {
+      throw new IOException("HIB [" + indexFilePath.getName() + "] already exists. Cannot open HIB for writing unless overwrite is specified.");
+    }
+
+    if (fs.exists(dataFilePath) && !overwrite) {
+      throw new IOException("HIB [" + dataFilePath.getName() + "] already exists. Cannot open HIB for writing unless overwrite is specified.");
+    }
+
+    assert indexOutputStream == null;
+    assert dataOutputStream == null;
+    assert indexInputStream == null;
 
     if (blockSize <= 0) {
-      blockSize = fs.getDefaultBlockSize(filePath);
+      blockSize = fs.getDefaultBlockSize(dataFilePath);
+      System.out.println("HIPI: Using default blockSize of [" + blockSize + "].");
     }
 
     if (replication <= 0) {
-      replication = fs.getDefaultReplication(filePath);
+      replication = fs.getDefaultReplication(dataFilePath);
+      System.out.println("HIPI: Using default replication factor of [" + replication + "].");
     }
 
-    dataOutputStream = new DataOutputStream(fs.create(dataFilePath, true, fs.getConf().getInt("io.file.buffer.size", 4096), replication, blockSize));
+    try {
+      if (!overwrite && fs.exists(indexFilePath) && fs.exists(dataFilePath)) {
+	// Appending => open for write and seek to end of index and data files
+	throw new IOException("Not implemented.");      
+      } else {
+	// Begin from scratch either because HIB doesn't yet exist or because an explicit overwrite was requested
+	indexOutputStream = new DataOutputStream(fs.create(indexFilePath));
+	dataOutputStream = new DataOutputStream(fs.create(dataFilePath, true, fs.getConf().getInt("io.file.buffer.size", 4096), replication, blockSize));
+	currentOffset = 0;
+	writeBundleHeader();
+      }
+    } catch (IOException ex) {
+      System.err.println("I/O exception while attempting to open HIB [" + indexFilePath.getName() + "] for writing with overwrite [" + overwrite + "].");
+      System.err.println(ex.getMessage());
+      indexOutputStream = null;
+      dataOutputStream = null;
+      indexInputStream = null;
+      return;
+    }
 
-    currentOffset = 0;
-    
-    writeBundleHeader();
+    // Indicates success
+    fileMode = FILE_MODE_WRITE;
   }
 
   /**
@@ -456,13 +510,10 @@ public class HipiImageBundle extends AbstractImageBundle {
    * EOF
    */
   private void writeBundleHeader() throws IOException {
+    assert fileMode == FILE_MODE_WRITE;
+    assert indexOutputStream != null;
     // Magic number
     indexOutputStream.writeInt(0x81911b18);
-    // Data file name
-    String dataFileName = dataFilePath.getName();
-    byte[] dataFileNameBytes = dataFileName.getBytes("UTF-8");
-    indexOutputStream.writeShort(dataFileNameBytes.length);
-    indexOutputStream.write(dataFileNameBytes);
     // Reserved fields (16 bytes)
     indexOutputStream.writeLong(0);
     indexOutputStream.writeLong(0);
@@ -471,13 +522,15 @@ public class HipiImageBundle extends AbstractImageBundle {
   }
 
   /**
-   * Adds the image to the HipiImageBundle. This involves appending the image to the data file, and
-   * adding the image offset to the index file.
+   * Adds the image to the HipiImageBundle. This involves appending
+   * the image to the data file, and adding the image offset to the
+   * index file.
    */
-  @Override
   public void addImage(HipiImageHeader imageHeader, InputStream imageStream) throws IOException {
 
-    // TODO: Verify that HIB is in proper state for this operation.
+    if (fileMode != FILE_MODE_WRITE) {
+      throw new IOException("HIB [" + indexFilePath.getName() + "] is not opened for writing. Must successfully open HIB for writing before calling this method.");
+    }
 
     // Serialize imageHeader into byte[]
     ByteArrayOutputStream imageHeaderStream = new ByteArrayOutputStream(1024);
@@ -485,7 +538,8 @@ public class HipiImageBundle extends AbstractImageBundle {
     byte imageHeaderBytes[] = imageHeaderStream.toByteArray();
     int imageHeaderLength = imageHeaderBytes.length;
 
-    byte imageBytes[] = inputStreamToBytes(imageStream);
+    // Read image input stream and convert to byte[]
+    byte imageBytes[] = ByteUtils.inputStreamToByteArray(imageStream);
     int imageLength = imageBytes.length;
 
     int imageFormatInt = imageHeader.getStorageFormat().toInteger();
@@ -505,15 +559,17 @@ public class HipiImageBundle extends AbstractImageBundle {
     sig[10] = (byte)((imageFormatInt >>  8) & 0xff);
     sig[11] = (byte)((imageFormatInt      ) & 0xff);
 
+    /*
+      // debug
     System.out.println("addImage()");
     System.out.println("imageHeaderLength: " + imageHeaderLength);
     System.out.println("imageLength: " + imageLength);
     System.out.println("imageFormatInt: " + imageFormatInt);
-
     System.out.printf("ImageHeader bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n", 
 		      imageHeaderBytes[0], imageHeaderBytes[1], imageHeaderBytes[2], imageHeaderBytes[3]);
     System.out.printf("Image bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n", 
 		      imageBytes[0], imageBytes[1], imageBytes[2], imageBytes[3]);
+    */
 
     dataOutputStream.write(sig);
     dataOutputStream.write(imageHeaderBytes);
@@ -522,74 +578,107 @@ public class HipiImageBundle extends AbstractImageBundle {
     currentOffset += 12 + imageHeaderLength + imageLength;
     indexOutputStream.writeLong(currentOffset);
 
-    System.out.println("Offset: " + currentOffset);
+    //    System.out.println("Offset: " + currentOffset);
   }
 
-  private byte[] inputStreamToBytes(InputStream stream) throws IOException {
-    if (stream == null) {
-      return new byte[] {};
+  public void addImage(InputStream inputStream, HipiImageFormat imageFormat, HashMap<String, String> metaData) 
+    throws IllegalArgumentException, IOException {
+    ImageDecoder decoder = null;
+    switch (imageFormat) {
+      case JPEG:
+	decoder = JpegCodec.getInstance();
+	break;
+      case PNG:
+	decoder = PngCodec.getInstance();
+	break;
+      case PPM:
+	throw new IllegalArgumentException("Not implemented.");
+      case UNDEFINED:
+      defult:
+	throw new IllegalArgumentException("Unrecognized or unsupported image format.");
+      }
+
+    BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+    bufferedInputStream.mark(Integer.MAX_VALUE); // 100MB
+    HipiImageHeader header = decoder.decodeHeader(bufferedInputStream);
+    if (metaData != null) {
+      header.setMetaData(metaData);
     }
-    byte[] buffer = new byte[1024];
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    boolean error = false;
+    bufferedInputStream.reset();
+    addImage(header, bufferedInputStream);
+  }
+
+  public void addImage(InputStream inputStream, HipiImageFormat imageFormat)
+    throws IllegalArgumentException, IOException {
+    addImage(inputStream, imageFormat, null);
+  }
+
+  public void openForRead(int seekToImageIndex) throws IOException, IllegalArgumentException {
+
+    if (seekToImageIndex < 0) {
+      throw new IllegalArgumentException("Image index must be non-negative [" + seekToImageIndex + "].");
+    }
+
+    if (fileMode != FILE_MODE_UNDEFINED) {
+      throw new IOException("HIB [" + indexFilePath.getName() + "] is already open. Must close before calling this method.");
+    }
+
+    FileSystem fs = FileSystem.get(conf);
+
+    if (!fs.exists(indexFilePath)) {
+      throw new IOException("HIB index file not found while attempting open for read [" + indexFilePath.getName() + "].");
+    }
+
+    if (!fs.exists(dataFilePath)) {
+      throw new IOException("HIB data file not found while attempting open for read [" + dataFilePath.getName() + "].");
+    }
+
+    assert indexOutputStream == null;
+    assert dataOutputStream == null;
+    assert indexInputStream == null;
+
     try {
-      int numRead = 0;
-      while ((numRead = stream.read(buffer)) > -1) {
-        output.write(buffer, 0, numRead);
+      if (seekToImageIndex == 0) {
+	indexInputStream = new DataInputStream(fs.open(indexFilePath));
+	readBundleHeader();
+	hibReader = new HibReader(imageFactory, fs, dataFilePath);
+      } else {
+	// Attempt to seek to desired image position
+	indexInputStream = new DataInputStream(fs.open(indexFilePath));
+	readBundleHeader();
+	List<Long> offsets = readOffsets(seekToImageIndex);
+	//	System.out.println("offsets " + offsets);
+	if (offsets.size() != seekToImageIndex) {
+	  throw new IOException("Failed to seek to image index [" + seekToImageIndex + "]. Check that it is not past end of file.");
+	}
+	hibReader = new HibReader(imageFactory, fs, dataFilePath, offsets.get(offsets.size()-1), 0);
       }
-    } catch (IOException ioe) {
-      error = true; // this error should be thrown, even if there is an error closing stream
-      throw ioe;
-    } catch (RuntimeException re) {
-      error = true; // this error should be thrown, even if there is an error closing stream
-      throw re;
-    } finally {
-      try {
-        stream.close();
-      } catch (IOException ioe) {
-        if (!error) {
-          throw ioe;
-        }
-      }
+    } catch (IOException ex) {
+      System.err.println("I/O exception while attempting to open HIB [" + indexFilePath.getName() + "] for reading.");
+      System.err.println(ex.getMessage());
+      indexOutputStream = null;
+      dataOutputStream = null;
+      indexInputStream = null;
+      return;
     }
-    output.flush();
-    return output.toByteArray();
+
+    // Indicates success
+    fileMode = FILE_MODE_READ;
   }
 
-  @Override
-  protected void openForRead() throws IOException {
-
-    // Check if this object is already in an opened state
-    if (indexOutputStream != null || dataOutputStream != null) {
-      throw new IOException("File " + filePath.getName() + " already opened for WRITING");
-    }
-
-    if (indexInputStream != null || reader != null) {
-      throw new IOException("File " + filePath.getName() + " already opened for READING");
-    }
-    
-    indexFilePath = filePath;
-    indexInputStream = new DataInputStream(FileSystem.get(conf).open(indexFilePath));
-
-    readBundleHeader();
-
-    reader = new HibReader(imageFactory, FileSystem.get(conf), dataFilePath);
+  public void openForRead() throws IOException {
+    openForRead(0);
   }
 
   private void readBundleHeader() throws IOException {
+    assert fileMode == FILE_MODE_READ;
+    assert indexInputStream != null;
 
     // Verify signature
     int sig = indexInputStream.readInt();
     if (sig != 0x81911b18) {
       throw new IOException("Corrupted HIB header: signature mismatch.");
     }
-
-    // Read and decode name of data file
-    short dataFileNameLength = indexInputStream.readShort();
-    byte[] dataFileNameBytes = new byte[dataFileNameLength];
-    indexInputStream.readFully(dataFileNameBytes);
-    String dataFileName = new String(dataFileNameBytes, "UTF-8");
-    dataFilePath = new Path(indexFilePath.getParent(), dataFileName);
 
     // Use readLong to skip reserved fields instead of skip because
     // skip doesn't guarantee success. If readLong reaches EOF will
@@ -644,53 +733,62 @@ public class HipiImageBundle extends AbstractImageBundle {
     return offsets;
   }
   
-  /**
-   * Implemented with {@link HipiImageBundle.FileReader#getCurrentKey()}
-   */
-  @Override
-  protected HipiImageHeader readHeader() throws IOException {
-    return reader.getCurrentKey();
-  }
-
-  /**
-   * Implemented with {@link HipiImageBundle.FileReader#getCurrentValue()}
-   */
-  @Override
-  protected HipiImage readImage() throws IOException {
-    return reader.getCurrentValue();
-  }
-
-  /**
-   * Implemented with {@link HipiImageBundle.FileReader#nextKeyValue()}
-   */
-  @Override
-  protected boolean prepareNext() throws RuntimeException {
+  public boolean next() throws IOException {
     if (imageFactory == null) {
-      throw new RuntimeException("Must provide a valid factory for creating HipiImage objects in order to call this method.");
+      throw new RuntimeException("Must provide a valid image factory to the HipiImageBundle constructor in order to call this method.");
     }
-    return reader.nextKeyValue();
+    if (fileMode != FILE_MODE_READ) {
+      throw new IOException("HIB [" + indexFilePath.getName() + "] is not opened for reading. Must successfully open HIB for reading before calling this method.");
+    }
+    assert hibReader != null;
+    return hibReader.nextKeyValue();
   }
 
-  @Override
+  /**
+   * {@see HipiImageBundle.HibReader#getCurrentKey()}
+   */
+  public HipiImageHeader currentHeader() throws IOException {
+    if (fileMode != FILE_MODE_READ) {
+      throw new IOException("HIB [" + indexFilePath.getName() + "] is not opened for reading. Must successfully open HIB for reading before calling this method.");
+    }
+    assert hibReader != null;
+    return hibReader.getCurrentKey();
+  }
+
+  /**
+   * {@see HipiImageBundle.HibReader#getCurrentValue()}
+   */
+  public HipiImage currentImage() throws IOException {
+    if (fileMode != FILE_MODE_READ) {
+      throw new IOException("HIB [" + indexFilePath.getName() + "] is not opened for reading. Must successfully open HIB for reading before calling this method.");
+    }
+    assert hibReader != null;
+    return hibReader.getCurrentValue();
+  }
+
   public void close() throws IOException {
 
-    // TODO: If currently in write state, commit image count to header.
-
-    if (reader != null) {
-      reader.close();
+    if (hibReader != null) {
+      hibReader.close();
+      hibReader = null;
     }
 
     if (indexInputStream != null) {
       indexInputStream.close();
+      indexInputStream = null;
     }
 
     if (dataOutputStream != null) {
       dataOutputStream.close();
+      dataOutputStream = null;
     }
 
     if (indexOutputStream != null) {
       indexOutputStream.close();
+      indexOutputStream = null;
     }
+
+    fileMode = FILE_MODE_UNDEFINED;
   }
 
   /**
@@ -705,7 +803,7 @@ public class HipiImageBundle extends AbstractImageBundle {
   public void append(HipiImageBundle bundle) {
     // TODO: Check that bundle is in a state that supports this operation
     try {
-      bundle.open(FILE_MODE_READ, true);
+      bundle.openForRead();
       FileStatus dataFileStatus = bundle.getDataFileStatus();
       List<Long> offsets = bundle.readAllOffsets();
 

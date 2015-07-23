@@ -131,11 +131,11 @@
   </target>
 
   <!-- Extracts individual JPEG images contained within a HIB file (see http://hipi.cs.virginia.edu/examples/jpegfromhib.html) -->
-  <target name="jpegfromhib">
-    <echo message="Building jpegfromhib..."/>
+  <target name="jpegFromHib">
+    <echo message="Building jpegFromHib..."/>
     <antcall target="compile">
       <param name="srcdir" value="libsrc/hipi/util" />
-      <param name="jarfilename" value="jpegfromhib.jar" />
+      <param name="jarfilename" value="jpegFromHib.jar" />
       <param name="jardir" value="util" />
       <param name="mainclass" value="hipi.util.JpegFromHib" />
     </antcall>
@@ -150,6 +150,18 @@
       <param name="jarfilename" value="downloader.jar" />
       <param name="jardir" value="util" />
       <param name="mainclass" value="hipi.util.downloader.Downloader" />
+    </antcall>
+    <echo message="downloader built." />
+  </target>
+
+  <!-- Downloads a list of URLs and creates a single HIB (see http://hipi.cs.virginia.edu/examples/downloader.html) -->
+  <target name="flickrDownloader">
+    <echo message="Building flickrDownloader..."/>
+    <antcall target="compile">
+      <param name="srcdir" value="libsrc/hipi/util/downloader" />
+      <param name="jarfilename" value="flickrDownloader.jar" />
+      <param name="jardir" value="util" />
+      <param name="mainclass" value="hipi.util.downloader.FlickrDownloader" />
     </antcall>
     <echo message="downloader built." />
   </target>
@@ -178,7 +190,12 @@
   </target>
 
   <!-- Runs MR/HIPI unit tests -->
-  <target name="testmr" depends="setup,test_settings,hipi">
+  <target name="testmr" depends="setup,test_settings,hipi,hibimport,hibinfo,downloader,dumphib,jpegFromHib">
+
+    <!-- Clean up output directory -->
+    <delete dir = "./testout" />
+    <mkdir dir="./testout" />
+
     <javac includeantruntime="false" fork="true" srcdir="libsrc/hipi/test" destdir="./lib/hipi/test" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
     <java fork="true" maxmemory="2048m" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${slf4j.api.jar}:${log4j.jar}:${avro.jar}:./lib/hipi-${hipi.version}.jar:${twelvemonkeys.jar}">
       <arg value="hipi.test.AllHipiMapReduceTests" />
@@ -210,7 +227,7 @@
     
    </target>
   
-   <target name="all" depends="hipi,hibimport,hibinfo,downloader,dumphib,jpegfromhib,covariance" />
+   <target name="all" depends="hipi,hibimport,hibinfo,downloader,dumphib,jpegFromHib,covariance" />
 
    <!-- Clean -->
    <target name="clean">

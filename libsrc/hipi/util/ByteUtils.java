@@ -1,5 +1,8 @@
 package hipi.util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.security.MessageDigest;
@@ -35,6 +38,43 @@ public class ByteUtils {
     floatBuf.get(floatArray);
     return floatArray;
   }
+
+  /**
+   * Reads the contents of an stream until exhausted and converts contents to an array of bytes.
+   *
+   * @param stream
+   */
+  public static byte[] inputStreamToByteArray(InputStream stream) throws IOException {
+    if (stream == null) {
+      return new byte[] {};
+    }
+    byte[] buffer = new byte[1024];
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    boolean error = false;
+    try {
+      int numRead = 0;
+      while ((numRead = stream.read(buffer)) > -1) {
+        output.write(buffer, 0, numRead);
+      }
+    } catch (IOException ioe) {
+      error = true; // this error should be thrown, even if there is an error closing stream
+      throw ioe;
+    } catch (RuntimeException re) {
+      error = true; // this error should be thrown, even if there is an error closing stream
+      throw re;
+    } finally {
+      try {
+        stream.close();
+      } catch (IOException ioe) {
+        if (!error) {
+          throw ioe;
+        }
+      }
+    }
+    output.flush();
+    return output.toByteArray();
+  }
+
 
   /**
    * Convert from a byte array to one int

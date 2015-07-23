@@ -30,8 +30,8 @@ public class HibImport {
     }
 
     Configuration conf = new Configuration();
-    HipiImageBundle hib = new HipiImageBundle(null, new Path(args[1]), conf);
-    hib.open(AbstractImageBundle.FILE_MODE_WRITE, true);
+    HipiImageBundle hib = new HipiImageBundle(new Path(args[1]), conf);
+    hib.openForWrite(true);
 
     for (File file : files) {
       FileInputStream fis = new FileInputStream(file);

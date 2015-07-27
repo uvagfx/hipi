@@ -9,10 +9,10 @@ import hipi.imagebundle.HipiImageBundle;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
@@ -29,6 +29,7 @@ import java.io.BufferedInputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * A utility MapReduce program that downloads the Flickr 100 million
@@ -54,7 +55,7 @@ import java.util.ArrayList;
 public class FlickrDownloader extends Configured implements Tool {
 
     
-  private final String FLICKR_DATA_NAME = "yfcc100m_dataset"; // This string represents the root name for each of the dataset files
+  private final String FLICKR_PREFIX = "yfcc100m_dataset"; // This string represents the root name for each of the dataset files
   private final int FLICKR_IMAGE_COUNT_PER_FILE = 1000; // Number of images contained within each source file
   private final int FLICKR_DATA_COUNT = 2; // This parameter sets how many of the data files should be downloaded (used in strings which reference zero-indexed file names) (used for testing) 
   private final boolean FLICKR_TEST = true; // Set to true in order to use temporary, smaller dataset files for testing (used for testing)
@@ -132,12 +133,21 @@ public class FlickrDownloader extends Configured implements Tool {
 		if (header == null) {
 		  System.out.println("Failed to parse header, not added to HIB: " + lineArray[14]);
 		} else {
-		  
+
 		  // Passed header decode test, so reset to beginning of stream
 		  bis.reset();
 		  
+		  // Capture fields as image metadata for posterity
+		  for (int i=0; i<lineArray.length; i++) {
+		    header.addMetaData(String.format("col_%03d", i), lineArray[i]);
+		  }
+		  
+		  System.out.println(header);
+		  
 		  // Add image to hib
-		  hib.addImage(bis, type.compareTo("image/jpeg") == 0 ? HipiImageFormat.JPEG : HipiImageFormat.PNG);
+		  hib.addImage(header, bis);
+
+		  System.err.println("Added to HIB: " + lineArray[14]);
 		}
 	      } else {
 		System.out.println("Unrecognized HTTP content type or unsupported image format [" + type + "], not added to HIB: " + lineArray[14]);
@@ -260,27 +270,24 @@ public class FlickrDownloader extends Configured implements Tool {
       System.exit(0);
     }
 
-    File[] inputDirFiles = new File(args[0]).listFiles();
+    Configuration conf = new Configuration();
+    FileSystem fs = FileSystem.get(conf);
 
-    if (inputDirFiles == null || inputDirFiles.length == 0) {
+    // Obtain list of files in input directory
+    FileStatus[] inputFiles = fs.listStatus(new Path(args[0]));
+    if (inputFiles == null || inputFiles.length == 0) {
       System.err.println("Failed to find any files in directory [" + args[0] + "]");
       System.exit(0);
     }
 
-    Configuration conf = new Configuration();
-    FileSystem fs = FileSystem.get(conf);
-
+    // Filter file list for Yahoo/Flickr 100M source files (check prefix)
     ArrayList<Path> sourceFiles = new ArrayList<Path>();
-    int numImages = 0;
-
-    for (File file : inputDirFiles) {
-
-      if (file.isFile() && file.getName().startsWith(FLICKR_DATA_NAME)) {
+    for (FileStatus file : inputFiles) {
+      Path path = file.getPath();
+      if (path.getName().startsWith(FLICKR_PREFIX)) {
 	System.out.println("Will download images in: " + file.getPath());
-	sourceFiles.add(new Path(file.getPath()));
-	numImages += FLICKR_IMAGE_COUNT_PER_FILE;
+	sourceFiles.add(path);
       }
-
     }
 
     String outputFile = args[1];
@@ -313,8 +320,6 @@ public class FlickrDownloader extends Configured implements Tool {
     Job job = Job.getInstance(conf, "FlickrDownloader");
     job.setJarByClass(FlickrDownloader.class);
     job.setMapperClass(FlickrDownloaderMapper.class);
-    //    job.setReducerClass(FlickrDownloaderReducer.class);
-    //    job.setInputFormatClass(FlickrDownloaderInputFormat.class);
     job.setReducerClass(DownloaderReducer.class);
     job.setInputFormatClass(DownloaderInputFormat.class);
     job.setOutputKeyClass(BooleanWritable.class);
@@ -323,7 +328,9 @@ public class FlickrDownloader extends Configured implements Tool {
     
     FileOutputFormat.setOutputPath(job, new Path(outputFile + "_output"));
     //    FlickrDownloaderInputFormat.setInputPaths(job, sourceFiles.toArray());
-    DownloaderInputFormat.setInputPaths(job, (Path[])sourceFiles.toArray());
+    Path[] inputPaths = new Path[sourceFiles.size()];
+    inputPaths = sourceFiles.toArray(inputPaths);
+    DownloaderInputFormat.setInputPaths(job, inputPaths);
     
     return job.waitForCompletion(true) ? 0 : 1;  
   }

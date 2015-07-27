@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
@@ -17,7 +17,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 /**
  * Treats keys as index into training array and value as the training vector.
  */
-public class DownloaderRecordReader extends RecordReader<IntWritable, Text> {
+public class DownloaderRecordReader extends RecordReader<LongWritable, Text> {
 
   private boolean singletonEmit;
   private String urls;
@@ -77,8 +77,8 @@ public class DownloaderRecordReader extends RecordReader<IntWritable, Text> {
   }
 
   @Override
-  public IntWritable getCurrentKey() throws IOException, InterruptedException {
-    return new IntWritable((int) startLine);
+  public LongWritable getCurrentKey() throws IOException, InterruptedException {
+    return new LongWritable((int) startLine);
   }
 
 

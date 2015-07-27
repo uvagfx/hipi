@@ -11,7 +11,7 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BooleanWritable;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
@@ -20,11 +20,13 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
+
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.InputStream;
-import java.io.BufferedInputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
@@ -50,7 +52,7 @@ import java.util.Iterator;
  */
 public class Downloader extends Configured implements Tool {
 
-  public static class DownloaderMapper extends Mapper<IntWritable, Text, BooleanWritable, Text> {
+  public static class DownloaderMapper extends Mapper<LongWritable, Text, BooleanWritable, Text> {
 
     private static Configuration conf;
 
@@ -61,7 +63,7 @@ public class Downloader extends Configured implements Tool {
 
     // Download images at the list of input URLs and store them in a temporary HIB.
     @Override
-    public void map(IntWritable key, Text value, Context context) throws IOException, InterruptedException {
+    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
       // Create path for temporary HIB file
       String tempPath = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
@@ -73,14 +75,14 @@ public class Downloader extends Configured implements Tool {
       // line by line.
       BufferedReader reader = new BufferedReader(new StringReader(value.toString()));
       String uri;
-      int i = key.get();
-      int iprev = i;
+      long i = key.get();
+      long iprev = i;
 
       // Iterate through URLs
       while ((uri = reader.readLine()) != null) {
 
 	// Put at most 100 images in a temporary HIB
-        if (i >= iprev + 100) {
+        if (i >= iprev + 100l) {
           hib.close();
           context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
           tempPath = conf.get("downloader.outpath") + i + ".hib.tmp";
@@ -187,17 +189,37 @@ public class Downloader extends Configured implements Tool {
       System.exit(0);
     }
 
+    Configuration conf = new Configuration();
+
     String inputFile = args[0];
+
+    // Verify input and determine number of images
+    int numImages = 0;
+    try {
+      FileSystem fs = FileSystem.get(conf);
+      BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(new Path(args[0]))));
+      while (br.readLine() != null) {
+	numImages++;
+      }
+      br.close();
+    } catch (IOException ex) {
+      System.err.println("Failed to open file for reading [" + args[0] + "].");
+      ex.printStackTrace();
+      System.exit(0);
+    }
+
+    System.out.println("Will attempt to download " + numImages + " images.");
+
     String outputFile = args[1];
     String outputPath = outputFile.substring(0, outputFile.lastIndexOf('/') + 1);
     int nodes = Integer.parseInt(args[2]);
     
-    Configuration conf = new Configuration();
-    
+
     //Attaching constant values to Configuration
     conf.setInt("downloader.nodes", nodes);
     conf.setStrings("downloader.outfile", outputFile);
     conf.setStrings("downloader.outpath", outputPath);
+    conf.setInt("downloader.imagesperfile", numImages);
 
     Job job = Job.getInstance(conf, "Downloader");
     job.setJarByClass(Downloader.class);

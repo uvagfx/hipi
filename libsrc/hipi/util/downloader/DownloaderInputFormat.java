@@ -7,7 +7,7 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
@@ -23,10 +23,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> {
+public class DownloaderInputFormat extends FileInputFormat<LongWritable, Text> {
 
   @Override
-  public RecordReader<IntWritable, Text> createRecordReader(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
+  public RecordReader<LongWritable, Text> createRecordReader(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
     return new DownloaderRecordReader();
   }
 
@@ -144,7 +144,7 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text> {
       Path path = file.getPath();
       FSDataInputStream fileIn = fileSystem.open(path);
 
-      int numImages = conf.getInt("downloader.imagesperfile", 1000000);
+      int numImages = conf.getInt("downloader.imagesperfile", 1000);
 
       // Determine download schedule (number of images per node)
       int span = (int) Math.ceil(((float) numImages) / ((float) uniqueNodes.size()));

@@ -56,26 +56,33 @@ public class MapReduceTestCase {
   @BeforeClass
   public static void setup() throws IOException {
     assertEquals("Failed to create testout directory on HDFS. Check setup.", 0, runCommand("hadoop fs -mkdir -p testout"));
+    assertEquals("Failed to create testout/flickr_src directory on HDFS. Check setup.", 0, runCommand("hadoop fs -mkdir -p testout/flickr_src"));
+    assertEquals("Failed to create testout/flickr_bz2_src directory on HDFS. Check setup.", 0, runCommand("hadoop fs -mkdir -p testout/flickr_bz2_src"));
+    runCommand("hadoop fs -copyFromLocal testimages/downloader-images.txt testout/downloader-images.txt");
+    runCommand("hadoop fs -copyFromLocal testimages/yfcc100m_dataset-100-temp-0 testout/flickr_src/yfcc100m_dataset-100-temp-0");
+    runCommand("hadoop fs -copyFromLocal testimages/yfcc100m_dataset-100-temp-1 testout/flickr_src/yfcc100m_dataset-100-temp-1");
+    runCommand("hadoop fs -copyFromLocal testimages/yfcc100m_dataset-100-temp-0.bz2 testout/flickr_bz2_src/yfcc100m_dataset-100-temp-0.bz2");
+    runCommand("hadoop fs -copyFromLocal testimages/yfcc100m_dataset-100-temp-1.bz2 testout/flickr_bz2_src/yfcc100m_dataset-100-temp-1.bz2");
+    assertEquals("Failed to remove testout/import.hib and testout/import.hib.dat. Check setup.", 0, runCommand("hadoop fs -rm -r -f testout/import.hib testout/import.hib.dat"));
+    assertEquals("Failed to remove testout/downloader.hib and testout/downloader.hib.dat. Check setup.", 0, runCommand("hadoop fs -rm -r -f testout/downloader.hib testout/downloader.hib.dat testout/downloader.hib_output"));
+    assertEquals("Failed to remove testout/flickr.hib and testout/flickr.hib.dat. Check setup.", 0, runCommand("hadoop fs -rm -r -f testout/flickr.hib testout/flickr.hib.dat testout/flickr.hib_output"));
   }
 
   @Ignore
   @Test
   public void testHibImport() throws IOException {
-    assertEquals("Failed to remove testout/import.hib and testout/import.hib.dat. Check setup.", 0, runCommand("hadoop fs -rm -r -f testout/import.hib testout/import.hib.dat"));
     assertEquals("Failed to run hibimport. Check setup.", 0, runCommand("hadoop jar util/hibimport.jar ./testimages/jpeg-rgb testout/import.hib"));
   }
   
   @Ignore
   @Test
   public void testDownloader() throws IOException {
-    assertEquals("Failed to remove testout/downloader.hib and testout/downloader.hib.dat. Check setup.", 0, runCommand("hadoop fs -rm -r -f testout/downloader.hib testout/downloader.hib.dat testout/downloader.hib_output"));
-    assertEquals("Failed to remove testout/downloader-images.txt. Check setup.", 0, runCommand("hadoop fs -rm -r -f testout/downloader-images.txt"));
-    assertEquals("Failed to stage downloader-images.txt on HDFS. Check setup.", 0, runCommand("hadoop fs -copyFromLocal testimages/downloader-images.txt testout/downloader-images.txt"));
     assertEquals("Failed to run downloader. Check setup.", 0, runCommand("hadoop jar util/downloader.jar testout/downloader-images.txt testout/downloader.hib 10"));    
   }
 
   @Test
   public void testFlickrDownloader() throws IOException {
+    assertEquals("Failed to run flickrDownloader. Check setup.", 0, runCommand("hadoop jar util/flickrDownloader.jar testout/flickr_src testout/flickr.hib 10"));    
   }
 
   @Ignore

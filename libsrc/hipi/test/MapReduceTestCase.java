@@ -50,6 +50,7 @@ public class MapReduceTestCase {
     System.out.println("EXITVAL: " + exitVal);
 
     return exitVal;
+
   }
 
   @BeforeClass
@@ -57,18 +58,24 @@ public class MapReduceTestCase {
     assertEquals("Failed to create testout directory on HDFS. Check setup.", 0, runCommand("hadoop fs -mkdir -p testout"));
   }
 
+  @Ignore
   @Test
   public void testHibImport() throws IOException {
     assertEquals("Failed to remove testout/import.hib and testout/import.hib.dat. Check setup.", 0, runCommand("hadoop fs -rm -r -f testout/import.hib testout/import.hib.dat"));
     assertEquals("Failed to run hibimport. Check setup.", 0, runCommand("hadoop jar util/hibimport.jar ./testimages/jpeg-rgb testout/import.hib"));
   }
-
+  
+  @Ignore
   @Test
   public void testDownloader() throws IOException {
     assertEquals("Failed to remove testout/downloader.hib and testout/downloader.hib.dat. Check setup.", 0, runCommand("hadoop fs -rm -r -f testout/downloader.hib testout/downloader.hib.dat testout/downloader.hib_output"));
     assertEquals("Failed to remove testout/downloader-images.txt. Check setup.", 0, runCommand("hadoop fs -rm -r -f testout/downloader-images.txt"));
     assertEquals("Failed to stage downloader-images.txt on HDFS. Check setup.", 0, runCommand("hadoop fs -copyFromLocal testimages/downloader-images.txt testout/downloader-images.txt"));
     assertEquals("Failed to run downloader. Check setup.", 0, runCommand("hadoop jar util/downloader.jar testout/downloader-images.txt testout/downloader.hib 10"));    
+  }
+
+  @Test
+  public void testFlickrDownloader() throws IOException {
   }
 
   @Ignore

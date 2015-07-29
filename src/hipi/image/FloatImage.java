@@ -1,6 +1,8 @@
 package hipi.image;
 
 import hipi.image.HipiImageHeader;
+import hipi.image.HipiImageHeader.HipiImageFormat;
+import hipi.image.HipiImageHeader.HipiColorSpace;
 import hipi.image.RasterImage;
 import hipi.image.PixelArrayFloat;
 
@@ -27,6 +29,13 @@ public class FloatImage extends RasterImage {
 
   public FloatImage() {
     super((PixelArray)(new PixelArrayFloat()));
+  }
+
+  public FloatImage(int width, int height, int bands) {
+    super((PixelArray)(new PixelArrayFloat()));
+    HipiImageHeader header = new HipiImageHeader(HipiImageFormat.UNDEFINED, HipiColorSpace.UNDEFINED,
+						 width, height, bands, null, null);
+    setHeader(header);
   }
 
   /**

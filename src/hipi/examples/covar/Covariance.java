@@ -1,10 +1,10 @@
 package hipi.examples.covariance;
 
 import hipi.image.FloatImage;
-import hipi.image.ImageHeader;
-import hipi.imagebundle.mapreduce.ImageBundleInputFormat;
+import hipi.image.HipiImageHeader;
+import hipi.image.HipiImageHeader.HipiImageFormat;
+import hipi.imagebundle.mapreduce.HibInputFormat;
 import hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
-import hipi.image.ImageHeader.ImageType;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -34,9 +34,10 @@ public class Covariance extends Configured implements Tool {
   public static final int N = 48; // Patch size is NxN
   public static final float sigma = 10; // Standard deviation of Gaussian weighting function
 
-  public static class MeanMapper extends Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {
+  public static class MeanMapper extends Mapper<HipiImageHeader, FloatImage, IntWritable, FloatImage> {
+
     @Override
-    public void map(ImageHeader key, FloatImage value, Context context) throws IOException,
+    public void map(HipiImageHeader key, FloatImage value, Context context) throws IOException,
         InterruptedException {
       if (value != null && value.getWidth() > N && value.getHeight() > N) {
         context.write(new IntWritable(0), generateMeanImage(value, 100, 100));
@@ -78,7 +79,7 @@ public class Covariance extends Configured implements Tool {
   }
 
   public static class CovarianceMapper extends
-      Mapper<ImageHeader, FloatImage, IntWritable, FloatImage> {
+      Mapper<HipiImageHeader, FloatImage, IntWritable, FloatImage> {
 
     float[] gaussianArray;
     float[] mean;
@@ -126,7 +127,7 @@ public class Covariance extends Configured implements Tool {
     }
 
     @Override
-    public void map(ImageHeader key, FloatImage value, Context context) throws IOException,
+    public void map(HipiImageHeader key, FloatImage value, Context context) throws IOException,
         InterruptedException {
 
       if (value != null && value.getWidth() > N && value.getHeight() > N) {

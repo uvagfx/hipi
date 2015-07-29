@@ -8,7 +8,7 @@
     <property name="hadoop.home" value="/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop" />
     <property name="hadoop.version" value="2.6.0" />
 
-    <property name="hipi.version" value="2.0" />
+    <property name="hipi.version" value="2.1" />
 
     <!-- Hadoop dependencies -->
     <property name="hadoop.classpath" value="${hadoop.home}/common/hadoop-common-${hadoop.version}.jar:${hadoop.home}/mapreduce/hadoop-mapreduce-client-core-${hadoop.version}.jar:${hadoop.home}/common/lib/commons-cli-1.2.jar:${hadoop.home}/common/lib/commons-io-2.4.jar:${hadoop.home}/common/lib/commons-lang-2.6.jar:${hadoop.home}/common/lib/hadoop-auth-${hadoop.version}.jar:${hadoop.home}/hdfs/hadoop-hdfs-${hadoop.version}.jar:${hadoop.home}/common/hadoop-nfs-${hadoop.version}.jar" />
@@ -67,7 +67,7 @@
     <jar destfile="${jardir}/${jarfilename}" basedir="./bin">
       <zipfileset src="./lib/hipi-${hipi.version}.jar" />
       <manifest>
-	       <attribute name="Main-Class" value="${mainclass}" />
+	<attribute name="Main-Class" value="${mainclass}" />
       </manifest>
     </jar>
     
@@ -75,8 +75,10 @@
 
   <!-- Builds HIPI Library -->
   <target name="hipi" depends="setup, test_settings">
+
     <echo message="Building the HIPI library..."/>
-    <ant antfile="build.xml" dir="libsrc">
+
+    <ant antfile="build.xml" dir="src">
       <property name="hadoop.home" value="${hadoop.home}" />
       <property name="hadoop.version" value="${hadoop.version}" />
       <property name="hadoop.classpath" value="${hadoop.classpath}" />
@@ -91,118 +93,120 @@
       <!-- Unit test dependencies -->
       <property name="junit.jar" value="${hadoop.home}/common/lib/junit-4.11.jar" />
     </ant>
+
     <echo message="HIPI library built." />
+
   </target>
 
-  <!-- Builds utility 'hibimport' which creates a HIB file on the HDFS from a set of images on the local FX -->
-  <target name="hibimport">
-    <echo message="Building hibimport..."/>
+  <!-- Builds utility 'hibImport' which creates a HIB file on the HDFS from a set of images on the local FS -->
+  <target name="hibImport">
+    <echo message="Building hibImport..."/>
     <antcall target="compile">
-      <param name="srcdir" value="libsrc/hipi/util" />
-      <param name="jarfilename" value="hibimport.jar" />
-      <param name="jardir" value="util" />
+      <param name="srcdir" value="src/hipi/util" />
+      <param name="jarfilename" value="hibImport.jar" />
+      <param name="jardir" value="bin" />
       <param name="mainclass" value="hipi.util.HibImport" />
     </antcall>
-    <echo message="hibimport built." />
+    <echo message="hibImport built." />
   </target>
 
-  <!-- Builds utility 'hibinfo' which displays basic information about a HIB -->
-  <target name="hibinfo">
-    <echo message="Building hibinfo..."/>
+  <!-- Builds utility 'hibInfo' which displays basic information about a HIB -->
+  <target name="hibInfo">
+    <echo message="Building hibInfo..."/>
     <antcall target="compile">
-      <param name="srcdir" value="libsrc/hipi/util" />
-      <param name="jarfilename" value="hibinfo.jar" />
-      <param name="jardir" value="util" />
+      <param name="srcdir" value="src/hipi/util" />
+      <param name="jarfilename" value="hibInfo.jar" />
+      <param name="jardir" value="bin" />
       <param name="mainclass" value="hipi.util.HibInfo" />
     </antcall>
-    <echo message="hibinfo built." />
+    <echo message="hibInfo built." />
   </target>
 
   <!-- Display basic information about a HIB file (see http://hipi.cs.virginia.edu/examples/dumphib.html) -->
-  <target name="dumphib">
-    <echo message="Building dumphib..."/>
+  <!--
+  <target name="dumpHib">
+    <echo message="Building dumpHib..."/>
     <antcall target="compile">
-      <param name="srcdir" value="libsrc/hipi/util" />
-      <param name="jarfilename" value="dumphib.jar" />
-      <param name="jardir" value="util" />
+      <param name="srcdir" value="src/hipi/util" />
+      <param name="jarfilename" value="dumpHib.jar" />
+      <param name="jardir" value="bin" />
       <param name="mainclass" value="hipi.util.DumpHib" />
     </antcall>
-    <echo message="dumphib built." />
+    <echo message="dumpHib built." />
   </target>
+  -->
 
   <!-- Extracts individual JPEG images contained within a HIB file (see http://hipi.cs.virginia.edu/examples/jpegfromhib.html) -->
   <target name="jpegFromHib">
     <echo message="Building jpegFromHib..."/>
     <antcall target="compile">
-      <param name="srcdir" value="libsrc/hipi/util" />
+      <param name="srcdir" value="src/hipi/util" />
       <param name="jarfilename" value="jpegFromHib.jar" />
-      <param name="jardir" value="util" />
+      <param name="jardir" value="bin" />
       <param name="mainclass" value="hipi.util.JpegFromHib" />
     </antcall>
-    <echo message="jpegfromhib built." />
+    <echo message="jpegFromHib built." />
   </target>
 
   <!-- Downloads a list of URLs and creates a single HIB (see http://hipi.cs.virginia.edu/examples/downloader.html) -->
   <target name="downloader">
     <echo message="Building downloader..."/>
     <antcall target="compile">
-      <param name="srcdir" value="libsrc/hipi/util/downloader" />
+      <param name="srcdir" value="src/hipi/util/downloader" />
       <param name="jarfilename" value="downloader.jar" />
-      <param name="jardir" value="util" />
+      <param name="jardir" value="bin" />
       <param name="mainclass" value="hipi.util.downloader.Downloader" />
     </antcall>
     <echo message="downloader built." />
   </target>
 
-  <!-- Downloads a list of URLs and creates a single HIB (see http://hipi.cs.virginia.edu/examples/downloader.html) -->
+  <!-- Downloads a list of images from the Yahoo/Flickr 100M CC Dataset (see http://labs.yahoo.com/news/yfcc100m/) -->
   <target name="flickrDownloader">
     <echo message="Building flickrDownloader..."/>
     <antcall target="compile">
-      <param name="srcdir" value="libsrc/hipi/util/downloader" />
+      <param name="srcdir" value="src/hipi/util/downloader" />
       <param name="jarfilename" value="flickrDownloader.jar" />
-      <param name="jardir" value="util" />
+      <param name="jardir" value="bin" />
       <param name="mainclass" value="hipi.util.downloader.FlickrDownloader" />
     </antcall>
     <echo message="downloader built." />
   </target>
 
-
-
-
   <!-- Used to compute the principal components of natural image patches (see http://hipi.cs.virginia.edu/examples/pca.html) -->
-  <target name="covariance">
-    <echo message="Building covariance example..."/>
+  <target name="covar">
+    <echo message="Building covar..."/>
     <antcall target="compile">
-      <param name="srcdir" value="examples/hipi/examples/covariance" />
-      <param name="jarfilename" value="covariance.jar" />
-      <param name="jardir" value="examples" />
-      <param name="mainclass" value="hipi.examples.covariance.Covariance" />
+      <param name="srcdir" value="src/hipi/examples/covar" />
+      <param name="jarfilename" value="covar.jar" />
+      <param name="jardir" value="bin" />
+      <param name="mainclass" value="hipi.examples.covar.Covariance" />
     </antcall>
-    <echo message="Covariance built."/>
+    <echo message="covar built."/>
   </target>
 
   <!-- Stand-alone HIPI unit tests -->
   <target name="testhipi" depends="setup,test_settings,hipi">
-    <javac includeantruntime="false" fork="true" srcdir="libsrc/hipi/test" destdir="./lib/hipi/test" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
+    <javac includeantruntime="false" fork="true" srcdir="src/hipi/test" destdir="./lib/hipi/test" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
     <java fork="true" maxmemory="2048m" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${slf4j.api.jar}:${log4j.jar}:${avro.jar}:./lib/hipi-${hipi.version}.jar:${twelvemonkeys.jar}">
       <arg value="hipi.test.AllHipiTests"/>
     </java>
   </target>
 
   <!-- Runs MR/HIPI unit tests -->
-  <target name="testmr" depends="setup,test_settings,hipi,hibimport,hibinfo,downloader,dumphib,jpegFromHib">
+  <target name="testmr" depends="setup,test_settings,hipi,hibImport,hibInfo,jpegFromHib,downloader,flickrDownloader">
 
     <!-- Clean up output directory -->
     <delete dir = "./testout" />
     <mkdir dir="./testout" />
 
-    <javac includeantruntime="false" fork="true" srcdir="libsrc/hipi/test" destdir="./lib/hipi/test" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
+    <javac includeantruntime="false" fork="true" srcdir="src/hipi/test" destdir="./lib/hipi/test" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
     <java fork="true" maxmemory="2048m" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${slf4j.api.jar}:${log4j.jar}:${avro.jar}:./lib/hipi-${hipi.version}.jar:${twelvemonkeys.jar}">
       <arg value="hipi.test.AllHipiMapReduceTests" />
     </java>
   </target>
 
-
+  <target name="testall" depends="setup,test_settings,hipi,hibImport,hibInfo,jpegFromHib,downloader,flickrDownloader,testhipi,testmr">
+  </target>
 
   <!-- Produces HIPI javadoc documentation for HIPI -->
    <target name="doc" depends="setup,test_settings,hipi">
@@ -210,10 +214,9 @@
     <!-- Delete existing version of docs -->
     <delete dir = "./doc/api" />
     <mkdir dir="./doc/api" />
-
      <javadoc packagenames="hipi.*"
 	      excludepackagenames="hipi.container"
-	      sourcepath="./libsrc"
+	      sourcepath="./src"
 	      destdir="./doc/api"
 	      windowtitle="HIPI - Hadoop Image Processing Interface"
 	      classpath="${hadoop.classpath}:${junit.jar}:${xmpcore.jar}:${metadata.jar}">
@@ -223,19 +226,18 @@
        <link href="http://hadoop.apache.org/docs/stable/api/"/>
        <link href="http://javadoc.metadata-extractor.googlecode.com/git/2.7.0/"/>
        <link href="http://www.json.org/javadoc/"/>
+       <link href="http://www.javadocs.com/docs/com.twelvemonkeys.imageio/twelvemonkeys-imageio-batik/2.2"/>
      </javadoc>
     
    </target>
   
-   <target name="all" depends="hipi,hibimport,hibinfo,downloader,dumphib,jpegFromHib,covariance" />
+   <!-- Default target -->
+   <target name="all" depends="hipi,hibImport,hibInfo,jpegFromHib,downloader,flickrDownloader,covar" />
 
    <!-- Clean -->
    <target name="clean">
      <delete dir="lib" />
      <delete dir="bin" />
-     <delete>
-       <fileset dir="." includes="examples/*.jar,experiments/*.jar" />
-     </delete>
    </target>
    
  </project>

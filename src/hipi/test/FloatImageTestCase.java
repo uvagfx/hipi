@@ -38,8 +38,8 @@ public class FloatImageTestCase {
   public void testFloatImageWritable() throws IOException {
     ImageDecoder ppmDecoder = PpmCodec.getInstance();
 
-    File[] cmykFiles = new File("./testimages/jpeg-cmyk").listFiles();
-    File[] rgbFiles = new File("./testimages/jpeg-rgb").listFiles();
+    File[] cmykFiles = new File("./testdata/jpeg-cmyk").listFiles();
+    File[] rgbFiles = new File("./testdata/jpeg-rgb").listFiles();
     File[] files = (File[])ArrayUtils.addAll(cmykFiles,rgbFiles);
 
     for (int iter=0; iter<2; iter++) {

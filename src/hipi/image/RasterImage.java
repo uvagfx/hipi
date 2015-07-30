@@ -69,7 +69,8 @@ public abstract class RasterImage extends HipiImage {
    * @return a {@link RasterImage} containing the cropped portion of
    * the original image
    */
-  public void crop(int x, int y, int width, int height, RasterImage crop) throws IllegalArgumentException {
+  public void crop(int x, int y, int width, int height, RasterImage output)
+    throws IllegalArgumentException {
     int w = this.getWidth();
     int h = this.getHeight();
     int b = this.getNumBands();
@@ -81,17 +82,17 @@ public abstract class RasterImage extends HipiImage {
     }
 
     // Verify crop output target
-    if (width != crop.getWidth() || height != crop.getHeight() || b != crop.getNumBands()) {
+    if (width != output.getWidth() || height != output.getHeight() || b != output.getNumBands()) {
       throw new IllegalArgumentException("Mismatch between size of crop region and size of crop output target.");
     }
 
-    PixelArray pixelArrayCrop = crop.getPixelArray();
+    PixelArray pa = output.getPixelArray();
 
     // Assemble cropped output
     for (int j=y; j<y+height; j++) {
       for (int i=x; i<x+width; i++) {
 	for (int c=0; c<b; c++) {
-	  pixelArrayCrop.setElem(((j-y)*width+(i-x))*b+c,pixelArray.getElem((j*w+i)*b+c));
+	  pa.setElem(((j-y)*width+(i-x))*b+c,pixelArray.getElem((j*w+i)*b+c));
 	}
       }
     }    
@@ -105,11 +106,40 @@ public abstract class RasterImage extends HipiImage {
    * @return A {@link RasterImage} of the converted image. Returns
    * null if the conversion could not be performed.
    */
-  public RasterImage convertToColorSpace(HipiColorSpace colorSpace) throws IllegalArgumentException {
-    if (header.getColorSpace() == colorSpace) {
+  public void convertToColorSpace(HipiColorSpace colorSpace, RasterImage output)
+    throws IllegalArgumentException {
+    if (getColorSpace() == colorSpace) {
       throw new IllegalArgumentException("Cannot convert color space to itself.");
     }
-    throw new IllegalArgumentException("Not implemented.");
+    if (getColorSpace() == HipiColorSpace.RGB && output.getColorSpace() == HipiColorSpace.LUM) {
+
+      int w = this.getWidth();
+      int h = this.getHeight();
+      int b = this.getNumBands();
+
+      assert b == 3;
+
+      // Verify color conversion output target
+      if (w != output.getWidth() || h != output.getHeight() || 1 != output.getNumBands()) {
+	throw new IllegalArgumentException("Invalid dimensions in color convert output target.");
+      }
+
+      PixelArray pa = output.getPixelArray();
+
+      // Perform color conversion
+      for (int j=0; j<h; j++) {
+	for (int i=0; i<w; i++) {
+	  float red = pixelArray.getElem((j*w+i)*3+0);
+	  float grn = pixelArray.getElem((j*w+i)*3+0);
+	  float blu = pixelArray.getElem((j*w+i)*3+0);
+	  float lum = red * 0.30f + grn * 0.59f + blu * 0.11f;
+	  pa.setElemFloat((j*w+i),lum);
+	}
+      }
+      
+    } else {
+      throw new IllegalArgumentException("Not implemented.");
+    }
   }
 
   /**

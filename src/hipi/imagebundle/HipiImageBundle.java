@@ -587,7 +587,7 @@ public class HipiImageBundle {
     indexOutputStream.writeLong(currentOffset);
 
     // debug
-    //    System.out.println("Offset: " + currentOffset);
+    System.out.println("Offset: " + currentOffset);
   }
 
   public void addImage(InputStream inputStream, HipiImageFormat imageFormat, HashMap<String, String> metaData) 

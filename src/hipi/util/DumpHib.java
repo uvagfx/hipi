@@ -41,7 +41,6 @@ public class DumpHib extends Configured implements Tool {
 	int h = header.getHeight();
 	String source = header.getMetaData("source");
 	String cameraModel = header.getExifData("Model");
-	//	String hexHash = ByteUtils.asHex(ByteUtils.FloatArraytoByteArray(value.getData()));
 	output = w + "x" + h + "\t(" + source + ")\t  " + cameraModel;
       }
       

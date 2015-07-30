@@ -87,7 +87,7 @@ public class JpegCodecTestCase {
     int[] width = {640, 1024, 600, 640, 640, 640, 800, 640, 896, 640, 640, 640, 672, 3456};
     int[] height = {480, 768, 450, 480, 480, 480, 600, 480, 600, 480, 480, 480, 512, 2304};
     for (int i = 0; i < fileName.length; i++) {
-      String fname = "./testimages/jpeg-exif-test/" + fileName[i] + ".jpg";
+      String fname = "./testdata/jpeg-exif-test/" + fileName[i] + ".jpg";
       FileInputStream fis = new FileInputStream(fname);
       HipiImageHeader header = decoder.decodeHeader(fis, true);
       assertNotNull("failed to decode header: " + fname, header);
@@ -102,8 +102,8 @@ public class JpegCodecTestCase {
     ImageDecoder jpegDecoder = JpegCodec.getInstance();
     ImageEncoder ppmEncoder = PpmCodec.getInstance();
 
-    File[] cmykFiles = new File("./testimages/jpeg-cmyk").listFiles();
-    File[] rgbFiles = new File("./testimages/jpeg-rgb").listFiles();
+    File[] cmykFiles = new File("./testdata/jpeg-cmyk").listFiles();
+    File[] rgbFiles = new File("./testdata/jpeg-rgb").listFiles();
     File[] files = (File[])ArrayUtils.addAll(cmykFiles,rgbFiles);
 
     for (File file : files) {
@@ -159,7 +159,7 @@ public class JpegCodecTestCase {
     ImageDecoder jpegDecoder = JpegCodec.getInstance();
     ImageDecoder ppmDecoder = PpmCodec.getInstance();
 
-    File[] cmykFiles = new File("./testimages/jpeg-cmyk").listFiles();
+    File[] cmykFiles = new File("./testdata/jpeg-cmyk").listFiles();
     //    File[] rgbFiles = new File("./testimages/jpeg-rgb").listFiles();
     File[] rgbFiles = null;
     File[] files = (File[])ArrayUtils.addAll(cmykFiles,rgbFiles);
@@ -234,7 +234,7 @@ public class JpegCodecTestCase {
     //    File[] cmykFiles = new File("./testimages/jpeg-cmyk").listFiles();
     //    File[] rgbFiles = new File("./testimages/jpeg-rgb").listFiles();
     //    File[] files = (File[])ArrayUtils.addAll(cmykFiles,rgbFiles);
-    File[] files = new File("./testimages/jpeg-rgb").listFiles();
+    File[] files = new File("./testdata/jpeg-rgb").listFiles();
 
     // Tests PPM decode and JPEG encode routines using ByteImage
     for (File file : files) {

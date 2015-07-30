@@ -98,7 +98,8 @@
 
   </target>
 
-  <!-- Builds utility 'hibImport' which creates a HIB file on the HDFS from a set of images on the local FS -->
+  <!-- 'hibImport' is a Java program that creates a HIB from a set of
+       images on the local file system -->
   <target name="hibImport">
     <echo message="Building hibImport..."/>
     <antcall target="compile">
@@ -110,7 +111,8 @@
     <echo message="hibImport built." />
   </target>
 
-  <!-- Builds utility 'hibInfo' which displays basic information about a HIB -->
+  <!-- 'hibInfo' is a Java program that displays basic information
+       about a HIB -->
   <target name="hibInfo">
     <echo message="Building hibInfo..."/>
     <antcall target="compile">
@@ -122,8 +124,8 @@
     <echo message="hibInfo built." />
   </target>
 
-  <!-- Display basic information about a HIB file (see http://hipi.cs.virginia.edu/examples/dumphib.html) -->
-  <!--
+  <!-- 'dumpHib' is a MapReduce program that extracts basic data about
+       the images in a HIB -->
   <target name="dumpHib">
     <echo message="Building dumpHib..."/>
     <antcall target="compile">
@@ -134,9 +136,9 @@
     </antcall>
     <echo message="dumpHib built." />
   </target>
-  -->
 
-  <!-- Extracts individual JPEG images contained within a HIB file (see http://hipi.cs.virginia.edu/examples/jpegfromhib.html) -->
+  <!-- 'jpegFromHib' is a MapReduce program that extracts the images
+       in a HIB as individual JPEGs -->
   <target name="jpegFromHib">
     <echo message="Building jpegFromHib..."/>
     <antcall target="compile">
@@ -148,7 +150,8 @@
     <echo message="jpegFromHib built." />
   </target>
 
-  <!-- Downloads a list of URLs and creates a single HIB (see http://hipi.cs.virginia.edu/examples/downloader.html) -->
+  <!-- 'downloader' is a MapReduce program that creates a HIB from a
+       set of images downloaded from the Internet -->
   <target name="downloader">
     <echo message="Building downloader..."/>
     <antcall target="compile">
@@ -160,7 +163,9 @@
     <echo message="downloader built." />
   </target>
 
-  <!-- Downloads a list of images from the Yahoo/Flickr 100M CC Dataset (see http://labs.yahoo.com/news/yfcc100m/) -->
+  <!-- 'flickrDownloader' is a MapReduce program that creates a HIB
+       from the Yahoo/Flickr 100M CC Dataset (see
+       http://labs.yahoo.com/news/yfcc100m/) -->
   <target name="flickrDownloader">
     <echo message="Building flickrDownloader..."/>
     <antcall target="compile">
@@ -172,7 +177,8 @@
     <echo message="downloader built." />
   </target>
 
-  <!-- Used to compute the principal components of natural image patches (see http://hipi.cs.virginia.edu/examples/pca.html) -->
+  <!-- 'covar' is a MapReduce program that computes the mean and
+       covariance of small image patches sampled from a HIB -->
   <target name="covar">
     <echo message="Building covar..."/>
     <antcall target="compile">
@@ -186,25 +192,23 @@
 
   <!-- Stand-alone HIPI unit tests -->
   <target name="testhipi" depends="setup,test_settings,hipi">
-    <javac includeantruntime="false" fork="true" srcdir="src/hipi/test" destdir="./lib/hipi/test" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
+    <!-- <javac includeantruntime="false" fork="true" srcdir="src/hipi/test" destdir="./lib" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac> -->
     <java fork="true" maxmemory="2048m" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${slf4j.api.jar}:${log4j.jar}:${avro.jar}:./lib/hipi-${hipi.version}.jar:${twelvemonkeys.jar}">
       <arg value="hipi.test.AllHipiTests"/>
     </java>
   </target>
-
-  <!-- Runs MR/HIPI unit tests -->
+  
+  <!-- MapReduce+HIPI unit tests -->
   <target name="testmr" depends="setup,test_settings,hipi,hibImport,hibInfo,jpegFromHib,downloader,flickrDownloader">
-
-    <!-- Clean up output directory -->
     <delete dir = "./testout" />
     <mkdir dir="./testout" />
-
-    <javac includeantruntime="false" fork="true" srcdir="src/hipi/test" destdir="./lib/hipi/test" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac>
+    <!-- <javac includeantruntime="false" fork="true" srcdir="src/hipi/test" destdir="./lib" classpath="${hadoop.classpath}:./lib/hipi-${hipi.version}.jar:${junit.jar}:${hamcrest.jar}" debug="yes"></javac> -->
     <java fork="true" maxmemory="2048m" classname="org.junit.runner.JUnitCore" classpath="${hadoop.classpath}:${hamcrest.jar}:${junit.jar}:${commons.logging.jar}:${guava.jar}:${commons.collections.jar}:${commons.configuration.jar}:${commons.lang.jar}:${slf4j.api.jar}:${log4j.jar}:${avro.jar}:./lib/hipi-${hipi.version}.jar:${twelvemonkeys.jar}">
       <arg value="hipi.test.AllHipiMapReduceTests" />
     </java>
   </target>
 
+  <!-- Perform all unit tests -->
   <target name="testall" depends="setup,test_settings,hipi,hibImport,hibInfo,jpegFromHib,downloader,flickrDownloader,testhipi,testmr">
   </target>
 

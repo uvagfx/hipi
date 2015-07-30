@@ -11,7 +11,7 @@
     
     <!-- Compile -->
 <!--    <javac debug="yes" nowarn="on" includeantruntime="no" srcdir="./hipi/image:./hipi/imagebundle:./hipi/util:./hipi/test" destdir="../lib" classpath="${hadoop.classpath}:${json.jar}:${metadata.jar}:${junit.jar}"> -->
-    <javac debug="yes" nowarn="on" includeantruntime="no" srcdir="./hipi/image:./hipi/imagebundle:./hipi/util" destdir="../lib" classpath="${hadoop.classpath}:${json.jar}:${metadata.jar}:${junit.jar}">
+    <javac debug="yes" nowarn="on" includeantruntime="no" srcdir="./hipi/image:./hipi/imagebundle:./hipi/util:./hipi/test" destdir="../lib" classpath="${hadoop.classpath}:${json.jar}:${metadata.jar}:${junit.jar}">
       <compilerarg value="-Xlint:deprecation" />
       <compilerarg value="-Xlint:unchecked" />
     </javac>

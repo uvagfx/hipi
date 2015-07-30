@@ -3,6 +3,7 @@ package hipi.examples.covariance;
 import hipi.image.FloatImage;
 import hipi.image.HipiImageHeader;
 import hipi.image.HipiImageHeader.HipiImageFormat;
+import hipi.image.HipiImageHeader.HipiColorSpace;
 import hipi.imagebundle.mapreduce.HibInputFormat;
 import hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
 
@@ -46,13 +47,20 @@ public class Covariance extends Configured implements Tool {
 
     // Compute the mean of (xPatchCount * yPatchCount) patches within the input image
     private FloatImage generateMeanImage(FloatImage input, int xPatchCount, int yPatchCount) {
+      FloatImage patch = new FloatImage(N, N, input.getNumBands());
+      FloatImage patchGrayscale = new FloatImage(N, N, 1);
       FloatImage mean = new FloatImage(N, N, 1);
       for (int i = 0; i < xPatchCount; i++) {
         int x = (input.getWidth() - N) * i / xPatchCount;
         for (int j = 0; j < yPatchCount; j++) {
           int y = (input.getHeight() - N) * j / yPatchCount;
-          FloatImage patch = input.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
-          mean.add(patch);
+          input.crop(x, y, N, N, patch);
+	  if (patch.getColorSpace() != HipiColorSpace.LUM) {
+	    patch.convertToColorSpace(HipiColorSpace.LUM,patchGrayscale);
+	    mean.add(patchGrayscale);
+	  } else {
+	    mean.add(patch);
+	  }
         }
       }
       mean.scale((float) (1.0 / (xPatchCount * yPatchCount)));
@@ -131,6 +139,8 @@ public class Covariance extends Configured implements Tool {
         InterruptedException {
 
       if (value != null && value.getWidth() > N && value.getHeight() > N) {
+	FloatImage patch = new FloatImage(N, N, input.getNumBands());
+	FloatImage patchGrayscale = new FloatImage(N, N, 1);
         // Holds 100 patches as they are collected from the image
         float[][] patchArray = new float[100][N * N];
         // Generate mean-subtracted (whitened) and Gaussian weighted patches and stores them in patchArray
@@ -138,8 +148,15 @@ public class Covariance extends Configured implements Tool {
           int x = (value.getWidth() - N) * i / 10;
           for (int j = 0; j < 10; j++) {
             int y = (value.getHeight() - N) * j / 10;
-            FloatImage patch = value.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
-            float[] pels = patch.getData();
+	    //            FloatImage patch = value.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
+	    value.crop(x, y, N, N, patch);
+	    float[] pels = null;
+	    if (patch.getColorSpace() != HipiColorSpace.LUM) {
+	      patch.convertToColorSpace(HipiColorSpace.LUM,patchGrayscale);
+	      pels = patchGrayscale.getData();
+	    } else {
+	      pels = patch.getData();
+	    }
             for (int k = 0; k < N * N; k++) {
               // Subtract mean and weight using Gaussian mask
               patchArray[i * 10 + j][k] = (pels[k] - mean[k]) * gaussianArray[k];

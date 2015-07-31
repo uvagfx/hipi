@@ -39,7 +39,7 @@ public abstract class ImageCodec implements ImageDecoder, ImageEncoder {
     
     // Verify image factory
     if (!(imageFactory.getType() == HipiImageType.FLOAT || imageFactory.getType() == HipiImageType.BYTE)) {
-      throw new IllegalArgumentException("JPEG decoder supports only FloatImage and ByteImage output types.");
+      throw new IllegalArgumentException("Image decoder supports only FloatImage and ByteImage output types.");
     }
 
     DataInputStream dis = new DataInputStream(new BufferedInputStream(inputStream));

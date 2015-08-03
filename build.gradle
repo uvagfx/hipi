@@ -21,7 +21,17 @@ subprojects {
 
 }
 
+task checkJavaVersion << {
+  if (!JavaVersion.current().isJava8()) {
+    String message = "ERROR: Java 1.8 required but " + JavaVersion.current() + " found. Change your JAVA_HOME environment variable.";
+    throw new IllegalStateException(message);
+    } else {
+      println 'Found Java 1.8.'
+    }
+}
+
 task install {
+  dependsOn(checkJavaVersion)
   dependsOn(':tools:hibImport:installDist')
   dependsOn(':tools:hibInfo:installDist')
   dependsOn(':tools:dumpHib:installDist')

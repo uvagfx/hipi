@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.nio.DoubleBuffer;
 import java.security.MessageDigest;
@@ -52,22 +53,6 @@ public class ByteUtils {
     ShortBuffer shortBuf = byteBuf.asShortBuffer();
     shortBuf.put(shortArray);
     return byteArray;
-  }
-
-  /**
-   * Convert from an array of bytes to an array of shorts
-   * 
-   * @param byteArray
-   */
-  public static short[] byteArrayToShortArray(byte byteArray[]) throws IllegalArgumentException {
-    if (byteArray.length % 2 != 0) {
-      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 2, which is the number of bytes in one short.");
-    }
-    short shortArray[] = new short[byteArray.length / 2];
-    ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);
-    ShortBuffer shortBuf = byteBuf.asShortBuffer();
-    shortBuf.get(shortArray);
-    return shortArray;
   }
 
   /**
@@ -171,6 +156,76 @@ public class ByteUtils {
       }
     }
     return result;
+  }
+
+  /** 
+   * Convert from an array of bytes to an array of ints
+   * @param byteArray
+   */
+  public static int[] byteArrayToIntArray(byte[] byteArray) {
+    if(byteArray.length % 4 != 0) {
+      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 4, which is the number of bytes in one int.");
+    }
+    int intArray[] = new int[byteArray.length / 4];
+    ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);
+    IntBuffer intBuff = byteBuf.asIntBuffer();
+    intBuff.get(intArray);
+    return intArray;
+  }
+
+  /**
+   * Convert from an array of bytes to an array of shorts
+   * @param byteArray
+   */
+  public static short[] byteArrayToShortArray(byte[] byteArray) {
+    
+    if(byteArray.length % 2 != 0) {
+      throw new IllegalArgumentException("Length of byteArray (" + byteArray.length + ") is not evenly divisible by 2, which is the number of bytes in one short.");
+    }
+    short shortArray[] = new short[byteArray.length / 2];
+    ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);
+    ShortBuffer shortBuff = byteBuf.asShortBuffer();
+    shortBuff.get(shortArray);
+    return shortArray;
+  }
+
+  /**
+   * Convert from an array of bytes to an array of doubles
+   * @param byteArray
+   */
+  public static double[] byteArrayToDoubleArray(byte[] byteArray) {
+    if (byteArray.length % 8 != 0) {
+      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 8, which is the number of bytes in one double.");
+    }
+    double doubleArray[] = new double[byteArray.length / 8];
+    ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);
+    DoubleBuffer doubleBuff = byteBuf.asDoubleBuffer();
+    doubleBuff.get(doubleArray);
+    return doubleArray;
+  }
+
+  /**
+   * Convert from an array of ints to an array of bytes
+   * @param intArray
+   */
+  public static byte[] intArrayToByteArray(int[] intArray) {
+    byte[] byteArray = new byte[intArray.length*4]; // 4 bytes per int
+    ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);
+    IntBuffer intBuff = byteBuf.asIntBuffer();
+    intBuff.put(intArray);
+    return byteArray;
+  }
+
+  /**
+   * Convert from an array of doubles to an array of bytes
+   * @param doubleArray
+   */
+  public static byte[] doubleArrayToByteArray(double[] doubleArray) {
+    byte[] byteArray = new byte[doubleArray.length*8];
+    ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);
+    DoubleBuffer doubleBuff = byteBuf.asDoubleBuffer();
+    doubleBuff.put(doubleArray);
+    return byteArray;
   }
 
 }

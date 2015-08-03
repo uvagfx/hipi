@@ -1,0 +1,5 @@
+#org.springsource.ide.eclipse.gradle.core.preferences.GradleProjectPreferences
+#Mon Aug 03 14:12:27 EDT 2015
+build.family.org.gradle.tooling.model.eclipse.HierarchicalEclipseProject=;core;examples;examples/covar;tools;tools/downloader;tools/dumpHib;tools/hibImport;tools/hibInfo;tools/jpegFromHib;
+org.springsource.ide.eclipse.gradle.linkedresources=
+org.springsource.ide.eclipse.gradle.rootprojectloc=

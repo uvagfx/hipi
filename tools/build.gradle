@@ -1,0 +1,11 @@
+subprojects {
+	apply plugin: 'application'
+	dependencies {
+		compile project(':core')
+	}
+  jar {
+    manifest {
+      attributes("Class-Path" : configurations.runtime.collect { it.getAbsolutePath() }.join(' '));
+    }
+  }
+}

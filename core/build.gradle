@@ -1,0 +1,19 @@
+apply plugin: 'java-library-distribution'
+
+jar {
+	baseName = 'hipi'
+	version = '2.1.0'
+}
+
+distributions {
+    main{
+        baseName = 'hipi'
+        version = '2.1.0'
+    }
+}
+
+/*
+test {
+    testLogging.showStandardStreams = true
+}
+*/

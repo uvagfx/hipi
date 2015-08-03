@@ -1,0 +1,20 @@
+defaultTasks 'clean', 'tools:installDist', 'examples:installDist'
+
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compile 'org.apache.hadoop:hadoop-common:2.7.1'
+        compile 'org.apache.hadoop:hadoop-mapreduce-client-core:2.7.1'
+        compile 'com.googlecode.json-simple:json-simple:1.1.1'
+        compile 'com.drewnoakes:metadata-extractor:2.8.1'
+        compile 'com.twelvemonkeys.imageio:imageio-jpeg:3.1.1'
+        compile 'com.twelvemonkeys.imageio:imageio-pnm:3.1.1'
+        compile 'com.twelvemonkeys.imageio:imageio-tiff:3.1.1'
+        testCompile "junit:junit:4+"
+    }
+}

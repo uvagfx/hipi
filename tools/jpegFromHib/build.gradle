@@ -1,0 +1,6 @@
+mainClassName = "org.hipi.tools.JpegFromHib"
+jar {
+  manifest {
+    attributes("Main-Class": "org.hipi.tools.JpegFromHib")
+  }
+}

@@ -1,6 +1,6 @@
-mainClassName = "org.hipi.tools.HibInfo"
+mainClassName = "org.hipi.examples.covar.Covariance"
 jar {
   manifest {
-    attributes("Main-Class": "org.hipi.tools.HibInfo")
+    attributes("Main-Class": "org.hipi.examples.covar.Covariance")
   }
 }

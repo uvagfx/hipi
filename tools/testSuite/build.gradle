@@ -39,3 +39,11 @@ test {
 }
 
 test.mustRunAfter(dumpHibJar)
+
+task foo {
+  description 'I am foo!'
+  doLast {
+    println sourceSets.dumpHib.java.srcDirs
+    println "I'm foo!"
+  }
+}

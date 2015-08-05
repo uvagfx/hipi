@@ -22,15 +22,16 @@ public class TestUtils {
     if (fs.exists(new Path("skipsetup"))) {
       return;
     }
+    TestUtils.runCommand("hadoop fs -rm -r -f testout");
     assertEquals("Failed to create testout directory on HDFS. Check setup.", 0, TestUtils.runCommand("hadoop fs -mkdir -p testout"));
     assertEquals("Failed to create testout/downloader_src directory on HDFS. Check setup.", 0, TestUtils.runCommand("hadoop fs -mkdir -p testout/downloader_src"));
     assertEquals("Failed to create testout/flickr_src directory on HDFS. Check setup.", 0, TestUtils.runCommand("hadoop fs -mkdir -p testout/flickr_src"));
     assertEquals("Failed to create testout/flickr_bz2_src directory on HDFS. Check setup.", 0, TestUtils.runCommand("hadoop fs -mkdir -p testout/flickr_bz2_src"));
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../testdata/downloader-images.txt testout/downloader_src/downloader-images.txt");
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../testdata/yfcc100m_dataset-100-temp-0 testout/flickr_src/yfcc100m_dataset-100-temp-0");
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../testdata/yfcc100m_dataset-100-temp-1 testout/flickr_src/yfcc100m_dataset-100-temp-1");
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../testdata/yfcc100m_dataset-100-temp-0.bz2 testout/flickr_bz2_src/yfcc100m_dataset-100-temp-0.bz2");
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../testdata/yfcc100m_dataset-100-temp-1.bz2 testout/flickr_bz2_src/yfcc100m_dataset-100-temp-1.bz2");
+    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/downloader-images.txt testout/downloader_src/downloader-images.txt");
+    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/yfcc100m_dataset-100-temp-0 testout/flickr_src/yfcc100m_dataset-100-temp-0");
+    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/yfcc100m_dataset-100-temp-1 testout/flickr_src/yfcc100m_dataset-100-temp-1");
+    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/yfcc100m_dataset-100-temp-0.bz2 testout/flickr_bz2_src/yfcc100m_dataset-100-temp-0.bz2");
+    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/yfcc100m_dataset-100-temp-1.bz2 testout/flickr_bz2_src/yfcc100m_dataset-100-temp-1.bz2");
   }
 
   public static boolean checkPsnr(String imgPath, String truthPath, float thresh) 

@@ -7,6 +7,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.opencv_core;
@@ -19,6 +20,7 @@ public class OpenCVMatWritable implements Writable {
   public OpenCVMatWritable() {
     mat = new Mat();
     assert mat != null;
+    mat.dims(2);
     int dims = mat.dims();
     assert (dims == 1 || dims == 2); // handle only 1- or 2-D arrays
   }
@@ -59,20 +61,30 @@ public class OpenCVMatWritable implements Writable {
       switch (depth) {
         case opencv_core.CV_8U:
         case opencv_core.CV_8S:
-          out.write(mat.data().asByteBuffer().array());
+          byte [] data = new byte[elms];
+          mat.data().get(data);
+          out.write(data);
           break;
         case opencv_core.CV_16U:
         case opencv_core.CV_16S:      
-          out.write(mat.data().asByteBuffer().array());
+          byte [] shortData = new byte[elms * 2];
+          mat.data().get(shortData);
+          out.write(shortData);
           break;
         case opencv_core.CV_32S:
-          out.write(mat.data().asByteBuffer().array());
+          byte [] intData = new byte[elms * 4];
+          mat.data().get(intData);
+          out.write(intData);
           break;
         case opencv_core.CV_32F:
-          out.write(mat.data().asByteBuffer().array());
+          byte [] floatData = new byte[elms * 4];
+          mat.data().get(floatData);
+          out.write(floatData);
           break;
         case opencv_core.CV_64F:
-          out.write(mat.data().asByteBuffer().array());
+          byte [] doubleData = new byte[elms * 8];
+          mat.data().get(doubleData);
+          out.write(doubleData);
           break;
         default:
           throw new IOException("Unsupported matrix type [" + type + "].");
@@ -125,5 +137,6 @@ public class OpenCVMatWritable implements Writable {
         throw new IOException("Unsupported matrix type [" + type + "].");
     }
   }
+
 
 }

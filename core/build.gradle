@@ -1,5 +1,4 @@
 apply plugin: 'java-library-distribution'
-apply plugin: 'eclipse'
 
 jar {
 	baseName = 'hipi'

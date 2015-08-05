@@ -1,5 +1,9 @@
 defaultTasks 'install'
 
+allprojects {
+    
+    apply plugin: 'eclipse'
+}
 subprojects {
 
   apply plugin: 'java'
@@ -16,7 +20,10 @@ subprojects {
     compile 'com.twelvemonkeys.imageio:imageio-jpeg:3.1.1'
     compile 'com.twelvemonkeys.imageio:imageio-pnm:3.1.1'
     compile 'com.twelvemonkeys.imageio:imageio-tiff:3.1.1'
-    compile 'org.bytedeco.javacpp-presets:opencv:3.0.0-1.0'
+    compile group: 'org.bytedeco', name: 'javacpp', version: '1.0'
+    compile group: 'org.bytedeco', name: 'javacv', version: '1.0'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.0'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.0', classifier: 'macosx-x86_64'
     testCompile "junit:junit:4+"
   }
 

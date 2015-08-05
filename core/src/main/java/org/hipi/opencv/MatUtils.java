@@ -36,7 +36,7 @@ public class MatUtils {
     
     byte[] data = new byte[elms * 4];
     mat.data().get(data);
-//    image.setData(data);
+    image.setData(data);
     return image;
     
     

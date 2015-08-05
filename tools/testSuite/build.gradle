@@ -1,0 +1,41 @@
+sourceSets {
+  dumpHib {
+    java {
+      srcDir 'src/main'
+    }
+  }
+}
+
+dependencies {
+  dumpHibCompile project(":core")
+//  testCompile fileTree('build/libs')
+}
+
+task dumpHibJar(type: Jar) {
+  from sourceSets.dumpHib.output
+  description 'Creates dumpHib.jar required for testing (uses culling functionality).'
+  archiveName='dumpHib.jar'
+  manifest {
+    attributes("Class-Path" : configurations.runtime.collect { it.getAbsolutePath() }.join(' '),
+               "Main-Class": "org.hipi.tools.test.DumpHib");
+  }
+}
+
+test {
+  dependsOn(dumpHibJar)
+
+  dependsOn(':tools:hibImport:jar')
+  dependsOn(':tools:hibInfo:jar')
+  dependsOn(':tools:dumpHib:jar')
+  dependsOn(':tools:downloader:jar')
+  dependsOn(':tools:jpegFromHib:jar')
+
+  testLogging.showStandardStreams = true
+
+  doLast {
+    println "\nFinished running HIPI tools test suite."
+  }
+
+}
+
+test.mustRunAfter(dumpHibJar)

@@ -1,2 +1,3 @@
 #!/bin/bash
-./runTool.sh ./downloader/build/install/downloader/lib/downloader.jar "$@"
+TOOLS_DIR=`dirname $0`
+$TOOLS_DIR/runTool.sh $TOOLS_DIR/downloader/build/libs/downloader.jar "$@"

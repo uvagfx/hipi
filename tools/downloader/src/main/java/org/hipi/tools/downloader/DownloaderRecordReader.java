@@ -19,7 +19,6 @@ import java.io.IOException;
 
 public class DownloaderRecordReader extends RecordReader<LongWritable, Text> {
 
- private CompressionCodecFactory compressionCodecs = null;
  private long startLine;
  private long linesRead;
  private long numLines;
@@ -44,8 +43,8 @@ public class DownloaderRecordReader extends RecordReader<LongWritable, Text> {
    linesPerRecord = 100; //can be modified to change key/value pair size (may improve efficiency)
    
    //If it exists, get the relevant compression codec for the FileSplit
-   compressionCodecs = new CompressionCodecFactory(context.getConfiguration());
-   CompressionCodec codec = compressionCodecs.getCodec(path);
+   CompressionCodecFactory codecFactory = new CompressionCodecFactory(context.getConfiguration());
+   CompressionCodec codec = codecFactory.getCodec(path);
    
    // If the codec was found, use it to create an decompressed input stream.
    // Otherwise, assume input stream is already decompressed
@@ -54,6 +53,7 @@ public class DownloaderRecordReader extends RecordReader<LongWritable, Text> {
    } else {
      reader = new BufferedReader(new InputStreamReader(fileIn));
    }
+   
  }
 
  // Get the progress within the split

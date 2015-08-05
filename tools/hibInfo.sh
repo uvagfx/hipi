@@ -1,2 +1,3 @@
 #!/bin/bash
-./runTool.sh ./hibInfo/build/install/hibInfo/lib/hibInfo.jar "$@"
+TOOLS_DIR=`dirname $0`
+$TOOLS_DIR/runTool.sh $TOOLS_DIR/hibInfo/build/libs/hibInfo.jar "$@"

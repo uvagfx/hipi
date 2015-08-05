@@ -1,2 +1,3 @@
 #!/bin/bash
-./runTool.sh ./jpegFromHib/build/install/jpegFromHib/lib/jpegFromHib.jar "$@"
+TOOLS_DIR=`dirname $0`
+$TOOLS_DIR/runTool.sh $TOOLS_DIR/jpegFromHib/build/libs/jpegFromHib.jar "$@"

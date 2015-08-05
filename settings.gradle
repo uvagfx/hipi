@@ -1,1 +1,1 @@
-include ':core', ':tools:hibImport', ':tools:hibInfo', ':tools:dumpHib', ':tools:downloader', ':tools:jpegFromHib', ':examples:covar'
+include ':core', ':tools:hibImport', ':tools:hibInfo', ':tools:dumpHib', ':tools:downloader', ':tools:jpegFromHib', ':tools:testSuite', ':examples:covar'

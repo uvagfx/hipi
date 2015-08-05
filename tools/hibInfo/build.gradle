@@ -1,4 +1,3 @@
-mainClassName = "org.hipi.tools.HibInfo"
 jar {
   manifest {
     attributes("Main-Class": "org.hipi.tools.HibInfo")

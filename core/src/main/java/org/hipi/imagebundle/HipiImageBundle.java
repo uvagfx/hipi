@@ -13,6 +13,7 @@ import org.hipi.image.io.ImageDecoder;
 import org.hipi.image.io.ImageEncoder;
 import org.hipi.image.io.JpegCodec;
 import org.hipi.image.io.PngCodec;
+import org.hipi.mapreduce.Culler;
 import org.hipi.util.ByteUtils;
 
 import org.apache.hadoop.conf.Configuration;
@@ -69,6 +70,9 @@ public class HipiImageBundle {
     // Interface for creating HipiImage objects that are compatible
     // with Mapper
     private HipiImageFactory imageFactory;
+
+    // Class responsible for handling image culling
+    private Culler culler = null;
     
     // Input stream connected to HIB data file
     private DataInputStream dataInputStream = null;
@@ -101,10 +105,22 @@ public class HipiImageBundle {
      * @param end The byte offset to end of segment
      * @throws IOException
      */
-    public HibReader(HipiImageFactory imageFactory, FileSystem fs, Path path, long start, long end) throws IOException {
+    public HibReader(HipiImageFactory imageFactory, Class<? extends Culler> cullerClass, 
+      FileSystem fs, Path path, long start, long end) throws IOException {
 
       // Store reference to image factory
       this.imageFactory = imageFactory;
+
+      // Create image culler object if requested
+      if (cullerClass != null) {
+        try {
+          this.culler = (Culler)cullerClass.newInstance();
+        } catch (Exception e) {
+          System.err.println("Fatal error while attempting to instantiate image culler: " + cullerClass.getName());
+          System.err.println(e.getLocalizedMessage());
+          System.exit(1);
+        }
+      }
       
       // Create input stream for HIB data file
       dataInputStream = new DataInputStream(fs.open(path));
@@ -113,11 +129,11 @@ public class HipiImageBundle {
       // take several calls to the DataInputStream.skip() method.
       startOffset = start;
       while (start > 0) {
-	long skipped = dataInputStream.skip(start);
-	if (skipped <= 0) {
-	  break;
-	}
-	start -= skipped;
+        long skipped = dataInputStream.skip(start);
+        if (skipped <= 0) {
+          break;
+        }
+        start -= skipped;
       }
 
       // Store current byte offset along with end byte offset
@@ -125,8 +141,9 @@ public class HipiImageBundle {
       endOffset = end;
     }
 
-    public HibReader(HipiImageFactory imageFactory, FileSystem fs, Path path) throws IOException {
-      this(imageFactory, fs, path, 0, 0); // endOffset = 0 indicates read until EOF
+    public HibReader(HipiImageFactory imageFactory, Class<? extends Culler> cullerClass,
+      FileSystem fs, Path path) throws IOException {
+      this(imageFactory, cullerClass, fs, path, 0, 0); // endOffset = 0 indicates read until EOF
     }
 
     /**
@@ -135,17 +152,17 @@ public class HipiImageBundle {
      * @return Measure of progress from 0.0 (no progress) to 1.0
      * (finished).
      */
-    public float getProgress()  {
+    public float getProgress() {
       float progress = (endOffset - startOffset + 1) > 0 ? (float) (currentOffset - startOffset) / (float) (endOffset - startOffset + 1) : 0.f;
       // Clamp to handle rounding errors
       if (progress > 1.f) {
-	return 1.f;
+        return 1.f;
       } else if (progress < 0.f) {
-	return 0.f;
+        return 0.f;
       }
       return progress;
     }
-
+   
     /**
      * Closes any open objects used to read the HIB data file (e.g.,
      * DataInputStream).
@@ -154,7 +171,7 @@ public class HipiImageBundle {
      */
     public void close() throws IOException {
       if (dataInputStream != null) {
-	dataInputStream.close();
+        dataInputStream.close();
       }
     }
 
@@ -169,190 +186,185 @@ public class HipiImageBundle {
      * logs for errors.
      */
     public boolean nextKeyValue() {
-      
+
       try {
 
-	// Reset state of current key/value
-	imageFormat = HipiImageFormat.UNDEFINED;
-	imageBytes = null;
-	imageHeader = null;
-	image = null;
-	    
-	// A value of endOffset = 0 indicates "read to the end of
-	// file", otherwise check segment boundary
-	if (endOffset > 0 && currentOffset > endOffset) {
-	  // Already past end of file segment
-	  return false;
-	}
+        // Reset state of current key/value
+        imageFormat = HipiImageFormat.UNDEFINED;
+        imageBytes = null;
+        imageHeader = null;
+        image = null;
 
-	/*
-	try {
-	  dataInputStream.readFully(sig);
-	} catch (EOFException e) {
-	  // We've reached the end of the file
-	  
-	  return false;
-	}
-	*/
+        // A value of endOffset = 0 indicates "read to the end of
+        // file", otherwise check segment boundary
+        if (endOffset > 0 && currentOffset > endOffset) {
+          // Already past end of file segment
+          return false;
+        }
 
-	// Attempt to read 12-byte signature that contains length of
-	// image header, length of image data segment, and image
-	// storage format
+        // Attempt to read 12-byte signature that contains length of
+        // image header, length of image data segment, and image
+        // storage format
 
-	int sigOffset = 0;
-	int bytesRead = dataInputStream.read(sig);
-	
-	// Even reading signature might require multiple calls
-	while (bytesRead < (sig.length - sigOffset) && bytesRead > 0) {
-	  sigOffset += bytesRead;
-	  bytesRead = dataInputStream.read(sig, sigOffset, sig.length - sigOffset);
-	}
+        int sigOffset = 0;
+        int bytesRead = dataInputStream.read(sig);
+  
+        // Even reading signature might require multiple calls
+        while (bytesRead < (sig.length - sigOffset) && bytesRead > 0) {
+          sigOffset += bytesRead;
+          bytesRead = dataInputStream.read(sig, sigOffset, sig.length - sigOffset);
+        }
 
-	if (bytesRead <= 0) {
-	  // Reached end of file without error
-	  return false;
-	}
+        if (bytesRead <= 0) {
+         // Reached end of file without error
+          return false;
+        }
 
-	if (bytesRead < sig.length) {
-	  // Read part of signature before encountering EOF. Malformed file.
-	  throw new IOException(String.format("Failed to read %d-byte HIB image signature that delineates image record boundaries.", sig.length));
-	}
+        if (bytesRead < sig.length) {
+          // Read part of signature before encountering EOF. Malformed file.
+          throw new IOException(String.format("Failed to read %d-byte HIB image signature that delineates image record boundaries.", sig.length));
+        }
 
-	// Parse and validate image header length
-	int imageHeaderLength = ((sig[0] & 0xff) << 24) | ((sig[1] & 0xff) << 16) | ((sig[2] & 0xff) << 8) | (sig[3] & 0xff);
-	if (imageHeaderLength <= 0) {
-	  // Negative or zero file length, report corrupted HIB
-	  throw new IOException("Found image header length <= 0 in HIB at offset: " + currentOffset);
-	}
+        // Parse and validate image header length
+        int imageHeaderLength = ((sig[0] & 0xff) << 24) | ((sig[1] & 0xff) << 16) | ((sig[2] & 0xff) << 8) | (sig[3] & 0xff);
+        if (imageHeaderLength <= 0) {
+          // Negative or zero file length, report corrupted HIB
+          throw new IOException("Found image header length <= 0 in HIB at offset: " + currentOffset);
+        }
 
-	// Parse and validate image length
-	int imageLength = ((sig[4] & 0xff) << 24) | ((sig[5] & 0xff) << 16) | ((sig[6] & 0xff) << 8) | (sig[7] & 0xff);
-	if (imageLength <= 0) {
-	  // Negative or zero file length, report corrupted HIB
-	  throw new IOException("Found image data segment length <= 0 in HIB at offset: " + currentOffset);
-	}
+        // Parse and validate image length
+        int imageLength = ((sig[4] & 0xff) << 24) | ((sig[5] & 0xff) << 16) | ((sig[6] & 0xff) << 8) | (sig[7] & 0xff);
+        if (imageLength <= 0) {
+          // Negative or zero file length, report corrupted HIB
+          throw new IOException("Found image data segment length <= 0 in HIB at offset: " + currentOffset);
+        }
 
-	// Parse and validate image format
-	int imageFormatInt = ((sig[8] & 0xff) << 24) | ((sig[9] & 0xff) << 16) | ((sig[10] & 0xff) << 8) | (sig[11] & 0xff);
-	try {
-	  imageFormat = HipiImageFormat.fromInteger(imageFormatInt);
-	} catch (IllegalArgumentException e) {
-	  throw new IOException("Found invalid image storage format in HIB at offset: " + currentOffset);
-	}
-	if (imageFormat == HipiImageFormat.UNDEFINED) {
-	  throw new IOException("Found UNDEFINED image storage format in HIB at offset: " + currentOffset);
-	}
+        // Parse and validate image format
+        int imageFormatInt = ((sig[8] & 0xff) << 24) | ((sig[9] & 0xff) << 16) | ((sig[10] & 0xff) << 8) | (sig[11] & 0xff);
+        try {
+          imageFormat = HipiImageFormat.fromInteger(imageFormatInt);
+        } catch (IllegalArgumentException e) {
+          throw new IOException("Found invalid image storage format in HIB at offset: " + currentOffset);
+        }
+        if (imageFormat == HipiImageFormat.UNDEFINED) {
+          throw new IOException("Found UNDEFINED image storage format in HIB at offset: " + currentOffset);
+        }
 
-	/*
-	System.out.println("nextKeyValue()");
-	System.out.println("imageHeaderLength: " + imageHeaderLength);
-	System.out.println("imageLength: " + imageLength);
-	System.out.println("imageFormatInt: " + imageFormatInt);
-	System.out.println("imageFormat: " + imageFormat.toInteger());
-	*/
+        /*
+        System.out.println("nextKeyValue()");
+        System.out.println("imageHeaderLength: " + imageHeaderLength);
+        System.out.println("imageLength: " + imageLength);
+        System.out.println("imageFormatInt: " + imageFormatInt);
+        System.out.println("imageFormat: " + imageFormat.toInteger());
+        */
 
-	// Allocate byte array to hold image header data
-	byte[] imageHeaderBytes = new byte[imageHeaderLength];
+        // Allocate byte array to hold image header data
+        byte[] imageHeaderBytes = new byte[imageHeaderLength];
 
-	// Allocate byte array to hold image data
-	imageBytes = new byte[imageLength];
+        // Allocate byte array to hold image data
+        imageBytes = new byte[imageLength];
 
-	//
-	// TODO: What happens if either of these calls fails, throwing
-	// an exception? The stream position will become out of sync
-	// with currentOffset.
-	//
-	dataInputStream.readFully(imageHeaderBytes);
-	/*
-	System.out.printf("ImageHeader bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n", 
-			  imageHeaderBytes[0], imageHeaderBytes[1], imageHeaderBytes[2], imageHeaderBytes[3]);
-	*/
+        // TODO: What happens if either of these calls fails, throwing
+        // an exception? The stream position will become out of sync
+        // with currentOffset.
+        dataInputStream.readFully(imageHeaderBytes);
+        dataInputStream.readFully(imageBytes);
 
-	dataInputStream.readFully(imageBytes);
+        // Advance byte offset by length of 12-byte signature plus
+        // image header length plus image pixel data length
+        currentOffset += 12 + imageHeaderLength + imageLength;
 
-	// Advance byte offset by length of 12-byte signature plus
-	// image header length plus image pixel data length
-	currentOffset += 12 + imageHeaderLength + imageLength;
+        // Attempt to decode image header
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(imageHeaderBytes));
+        imageHeader = new HipiImageHeader(dis);
 
-	// Attempt to decode image header
-	DataInputStream dis = new DataInputStream(new ByteArrayInputStream(imageHeaderBytes));
-	imageHeader = new HipiImageHeader(dis);
+        //  System.out.println(imageHeader);
 
-	//	System.out.println(imageHeader);
+        // Wrap image bytes in stream
+        ByteArrayInputStream imageByteStream = new ByteArrayInputStream(imageBytes);
 
-	//
-	// TODO: Perform cull step here? Continue advancing
-	// dataInputStream until a valid image record is found. Would
-	// be ever better to perform cull before imageBytes are read.
-	//
+        // Obtain suitable image decoder
+        ImageDecoder decoder = CodecManager.getDecoder(imageFormat);
+        if (decoder == null) {
+          throw new IOException("Unsupported storage format in image record ending at byte offset: " + currentOffset);
+        }
 
-	ImageDecoder decoder = CodecManager.getDecoder(imageFormat);
-	if (decoder == null) {
-	  throw new IOException("Unsupported storage format in image record ending at byte offset: " + currentOffset);
-	}
+        // Check if image should be culled
+        if (culler!=null) {
+          if (culler.includeExifDataInHeader()) {
+            imageByteStream.mark(Integer.MAX_VALUE);
+            HipiImageHeader imageHeaderWithExifData = decoder.decodeHeader(imageByteStream,true);
+            imageByteStream.reset();
+            imageHeader.setExifData(imageHeaderWithExifData.getAllExifData());
+          }
+          if (culler.cull(imageHeader)) {
+              // Move onto next image
+            return nextKeyValue();
+          }
+        }
 
-	// Call appropriate decode function based on type of image object
-	switch (imageFactory.getType()) {
-	case FLOAT:
-	case BYTE:
-	  try {
-	    image = decoder.decodeImage(new ByteArrayInputStream(imageBytes), imageHeader, imageFactory, true);
-	  } catch (Exception e) {
-	    System.err.println("Runtime exception while attempting to decode image: " + e.getMessage());
-	    e.printStackTrace();
-	    //	    throw e;
-	    // Attempt to keep going
-	    return nextKeyValue();
-	  }
-	  break;
-	case RAW:
-	  throw new RuntimeException("Support for RAW image type not yet implemented.");
-	case OPENCV:
-	  throw new RuntimeException("Support for OPENCV image type not yet implemented.");
-	case UNDEFINED:
-	default:
-	  throw new IOException("Unexpected image type. Cannot proceed.");
-	}
+        // Call appropriate decode function based on type of image object
+        switch (imageFactory.getType()) {
+          case FLOAT:
+          case BYTE:
+          try {
+            image = decoder.decodeImage(imageByteStream, imageHeader, imageFactory, true);
+          } catch (Exception e) {
+            System.err.println("Runtime exception while attempting to decode image: " + e.getMessage());
+            e.printStackTrace();
+            // Attempt to keep going
+            return nextKeyValue();
+          }
+          break;
+          case RAW:
+          throw new RuntimeException("Support for RAW image type not yet implemented.");
+          case OPENCV:
+          throw new RuntimeException("Support for OPENCV image type not yet implemented.");
+          case UNDEFINED:
+          default:
+          throw new IOException("Unexpected image type. Cannot proceed.");
+        }
 
-	return true;
+        return true;
 
       } catch (EOFException e) {
-	System.err.println(String.format("EOF exception [%s] while decoding HIB image record ending at byte offset [%d]", 
-					 e.getMessage(), currentOffset, endOffset));
-	e.printStackTrace();
-	imageFormat = HipiImageFormat.UNDEFINED;
-	imageBytes = null;
-	imageHeader = null;
-	image = null;
-	return false;
+        System.err.println(String.format("EOF exception [%s] while decoding HIB image record ending at byte offset [%d]", 
+         e.getMessage(), currentOffset, endOffset));
+        e.printStackTrace();
+        imageFormat = HipiImageFormat.UNDEFINED;
+        imageBytes = null;
+        imageHeader = null;
+        image = null;
+        return false;
       } catch (IOException e) {
-	System.err.println(String.format("IO exception [%s] while decoding HIB image record ending at byte offset [%d]",
-					 e.getMessage(), currentOffset));
-	e.printStackTrace();
-	imageFormat = HipiImageFormat.UNDEFINED;
-	imageBytes = null;
-	imageHeader = null;
-	image = null;
-	return false;
+        System.err.println(String.format("IO exception [%s] while decoding HIB image record ending at byte offset [%d]",
+         e.getMessage(), currentOffset));
+        e.printStackTrace();
+        imageFormat = HipiImageFormat.UNDEFINED;
+        imageBytes = null;
+        imageHeader = null;
+        image = null;
+        return false;
       } catch (RuntimeException e) {
-	System.err.println(String.format("Runtime exception [%s] while decoding HIB image record ending at byte offset [%d]",
-					 e.getMessage(), currentOffset));
-	e.printStackTrace();
-	imageFormat = HipiImageFormat.UNDEFINED;
-	imageBytes = null;
-	imageHeader = null;
-	image = null;
-	return false;
+        System.err.println(String.format("Runtime exception [%s] while decoding HIB image record ending at byte offset [%d]",
+         e.getMessage(), currentOffset));
+        e.printStackTrace();
+        imageFormat = HipiImageFormat.UNDEFINED;
+        imageBytes = null;
+        imageHeader = null;
+        image = null;
+        return false;
       } catch (Exception e) {
-	System.err.println(String.format("Unexpected exception [%s] while decoding HIB image record ending at byte offset [%d]",
-					 e.getMessage(), currentOffset));
-	e.printStackTrace();
-	imageFormat = HipiImageFormat.UNDEFINED;
-	imageBytes = null;
-	imageHeader = null;
-	image = null;
-	return false;
+        System.err.println(String.format("Unexpected exception [%s] while decoding HIB image record ending at byte offset [%d]",
+         e.getMessage(), currentOffset));
+        e.printStackTrace();
+        imageFormat = HipiImageFormat.UNDEFINED;
+        imageBytes = null;
+        imageHeader = null;
+        image = null;
+        return false;
       }
+
     }
 
     /**
@@ -484,14 +496,14 @@ public class HipiImageBundle {
 
     try {
       if (!overwrite && fs.exists(indexFilePath) && fs.exists(dataFilePath)) {
-	// Appending => open for write and seek to end of index and data files
-	throw new IOException("Not implemented.");      
+        // Appending => open for write and seek to end of index and data files
+        throw new IOException("Not implemented.");      
       } else {
-	// Begin from scratch either because HIB doesn't yet exist or because an explicit overwrite was requested
-	indexOutputStream = new DataOutputStream(fs.create(indexFilePath));
-	dataOutputStream = new DataOutputStream(fs.create(dataFilePath, true, fs.getConf().getInt("io.file.buffer.size", 4096), replication, blockSize));
-	currentOffset = 0;
-	writeBundleHeader();
+        // Begin from scratch either because HIB doesn't yet exist or because an explicit overwrite was requested
+        indexOutputStream = new DataOutputStream(fs.create(indexFilePath));
+        dataOutputStream = new DataOutputStream(fs.create(dataFilePath, true, fs.getConf().getInt("io.file.buffer.size", 4096), replication, blockSize));
+        currentOffset = 0;
+        writeBundleHeader();
       }
     } catch (IOException ex) {
       System.err.println("I/O exception while attempting to open HIB [" + indexFilePath.getName() + "] for writing with overwrite [" + overwrite + "].");
@@ -573,9 +585,9 @@ public class HipiImageBundle {
     System.out.println("imageLength: " + imageLength);
     System.out.println("imageFormatInt: " + imageFormatInt);
     System.out.printf("ImageHeader bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n", 
-		      imageHeaderBytes[0], imageHeaderBytes[1], imageHeaderBytes[2], imageHeaderBytes[3]);
+          imageHeaderBytes[0], imageHeaderBytes[1], imageHeaderBytes[2], imageHeaderBytes[3]);
     System.out.printf("Image bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n", 
-		      imageBytes[0], imageBytes[1], imageBytes[2], imageBytes[3]);
+          imageBytes[0], imageBytes[1], imageBytes[2], imageBytes[3]);
     */
 
     dataOutputStream.write(sig);
@@ -586,25 +598,24 @@ public class HipiImageBundle {
     indexOutputStream.writeLong(currentOffset);
 
     // debug
-    System.out.println("Offset: " + currentOffset);
+  //    System.out.println("Offset: " + currentOffset);
   }
 
-  public void addImage(InputStream inputStream, HipiImageFormat imageFormat, HashMap<String, String> metaData) 
-    throws IllegalArgumentException, IOException {
+  public void addImage(InputStream inputStream, HipiImageFormat imageFormat, HashMap<String, String> metaData) throws IllegalArgumentException, IOException {
     ImageDecoder decoder = null;
     switch (imageFormat) {
       case JPEG:
-	decoder = JpegCodec.getInstance();
-	break;
+      decoder = JpegCodec.getInstance();
+      break;
       case PNG:
-	decoder = PngCodec.getInstance();
-	break;
+      decoder = PngCodec.getInstance();
+      break;
       case PPM:
-	throw new IllegalArgumentException("Not implemented.");
+      throw new IllegalArgumentException("Not implemented.");
       case UNDEFINED:
       defult:
-	throw new IllegalArgumentException("Unrecognized or unsupported image format.");
-      }
+      throw new IllegalArgumentException("Unrecognized or unsupported image format.");
+    }
 
     BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
     bufferedInputStream.mark(Integer.MAX_VALUE); // 100MB
@@ -616,8 +627,7 @@ public class HipiImageBundle {
     addImage(header, bufferedInputStream);
   }
 
-  public void addImage(InputStream inputStream, HipiImageFormat imageFormat)
-    throws IllegalArgumentException, IOException {
+  public void addImage(InputStream inputStream, HipiImageFormat imageFormat) throws IllegalArgumentException, IOException {
     addImage(inputStream, imageFormat, null);
   }
 
@@ -649,18 +659,18 @@ public class HipiImageBundle {
 
     try {
       if (seekToImageIndex == 0) {
-	indexInputStream = new DataInputStream(fs.open(indexFilePath));
-	readBundleHeader();
-	hibReader = new HibReader(imageFactory, fs, dataFilePath);
+        indexInputStream = new DataInputStream(fs.open(indexFilePath));
+        readBundleHeader();
+        hibReader = new HibReader(imageFactory, null, fs, dataFilePath);
       } else {
-	// Attempt to seek to desired image position
-	indexInputStream = new DataInputStream(fs.open(indexFilePath));
-	readBundleHeader();
-	offsets = readOffsets(seekToImageIndex);
-	if (offsets.size() == seekToImageIndex) {
-	  hibReader = new HibReader(imageFactory, fs, dataFilePath, offsets.get(offsets.size()-1), 0);
-	}
-      }
+        // Attempt to seek to desired image position
+        indexInputStream = new DataInputStream(fs.open(indexFilePath));
+        readBundleHeader();
+        offsets = readOffsets(seekToImageIndex);
+        if (offsets.size() == seekToImageIndex) {
+          hibReader = new HibReader(imageFactory, null, fs, dataFilePath, offsets.get(offsets.size()-1), 0);
+        }
+      }      
     } catch (IOException ex) {
       System.err.println("I/O exception while attempting to open HIB [" + indexFilePath.getName() + "] for reading.");
       System.err.println(ex.getMessage());
@@ -672,10 +682,10 @@ public class HipiImageBundle {
 
     if (seekToImageIndex != 0) {
       if (offsets == null) {
-	throw new IOException("Failed to read file offsets for HIB [" + indexFilePath.getName() + "].");
+        throw new IOException("Failed to read file offsets for HIB [" + indexFilePath.getName() + "].");
       }
       if (offsets.size() != seekToImageIndex) {
-	throw new IOException("Failed to seek to image index [" + seekToImageIndex + "]. Check that it is not past end of file.");
+        throw new IOException("Failed to seek to image index [" + seekToImageIndex + "]. Check that it is not past end of file.");
       }
     }
 
@@ -741,9 +751,9 @@ public class HipiImageBundle {
     ArrayList<Long> offsets = new ArrayList<Long>(maximumNumber);
     for (int i = 0; i < maximumNumber || maximumNumber == 0; i++) {
       try {
-	offsets.add(indexInputStream.readLong());
+  offsets.add(indexInputStream.readLong());
       } catch (IOException e) {
-	break;
+  break;
       }
     }
     return offsets;

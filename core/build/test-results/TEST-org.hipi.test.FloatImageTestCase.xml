@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.hipi.test.FloatImageTestCase" tests="2" skipped="0" failures="0" errors="0" timestamp="2015-08-05T18:47:04" hostname="Zacks-MacBook-Pro.local" time="11.394">
+  <properties/>
+  <testcase name="testFloatImageWritable" classname="org.hipi.test.FloatImageTestCase" time="11.394"/>
+  <testcase name="testSanity" classname="org.hipi.test.FloatImageTestCase" time="0.0"/>
+  <system-out><![CDATA[../testdata/jpeg-cmyk/christie_brinkley_cmyk_photoshop.ppm
+../testdata/jpeg-cmyk/cmyk-jpeg-format_photoshop.ppm
+../testdata/jpeg-rgb/01_photoshop.ppm
+../testdata/jpeg-rgb/02_photoshop.ppm
+../testdata/jpeg-rgb/03_photoshop.ppm
+../testdata/jpeg-rgb/04_photoshop.ppm
+../testdata/jpeg-rgb/05_photoshop.ppm
+../testdata/jpeg-rgb/canon-ixus_photoshop.ppm
+../testdata/jpeg-rgb/cat_photoshop.ppm
+../testdata/jpeg-cmyk/christie_brinkley_cmyk_photoshop.ppm
+../testdata/jpeg-cmyk/cmyk-jpeg-format_photoshop.ppm
+../testdata/jpeg-rgb/01_photoshop.ppm
+../testdata/jpeg-rgb/02_photoshop.ppm
+../testdata/jpeg-rgb/03_photoshop.ppm
+../testdata/jpeg-rgb/04_photoshop.ppm
+../testdata/jpeg-rgb/05_photoshop.ppm
+../testdata/jpeg-rgb/canon-ixus_photoshop.ppm
+../testdata/jpeg-rgb/cat_photoshop.ppm
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

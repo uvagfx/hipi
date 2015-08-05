@@ -12,8 +12,6 @@ distributions {
     }
 }
 
-/*
 test {
     testLogging.showStandardStreams = true
 }
-*/

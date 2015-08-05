@@ -4,7 +4,7 @@ JAR=$1
 if [ ! -f $JAR ];
 then
    echo "Executable JAR [$JAR] does not exist."
-   echo "Create by executing 'gradle installDist' in current directory."
+   echo "Create by executing 'gradle jar' in current directory."
 fi
 
 hadoop jar "$@"

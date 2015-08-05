@@ -6,6 +6,7 @@ import org.hipi.image.ByteImage;
 import org.hipi.image.HipiImageFactory;
 import org.hipi.image.HipiImageHeader;
 import org.hipi.imagebundle.HipiImageBundle;
+import org.hipi.mapreduce.Culler;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -31,7 +32,7 @@ public class HibRecordReader extends RecordReader<HipiImageHeader, HipiImage> {
   private HipiImageBundle.HibReader reader;
 
   @Override
-  public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
+  public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, IllegalArgumentException {
 
     HipiImageFactory imageFactory = null;
     try {
@@ -48,11 +49,13 @@ public class HibRecordReader extends RecordReader<HipiImageHeader, HipiImage> {
     Path path = bundleSplit.getPath();
     FileSystem fs = path.getFileSystem(conf);
     
+    Class<? extends Culler> cullerClass = (Class<? extends Culler>)conf.getClass(Culler.HIPI_CULLER_CLASS_ATTR, Culler.class);
+
     // Report locations of first and last byte in image segment
     System.out.println("HibRecordReader#initialize: Input split starts at byte offset " + bundleSplit.getStart() +
 		       " and ends at byte offset " + (bundleSplit.getStart() + bundleSplit.getLength() - 1));
     
-    reader = new HipiImageBundle.HibReader(imageFactory, fs, path, bundleSplit.getStart(), bundleSplit.getStart() + bundleSplit.getLength() - 1);
+    reader = new HipiImageBundle.HibReader(imageFactory, cullerClass, fs, path, bundleSplit.getStart(), bundleSplit.getStart() + bundleSplit.getLength() - 1);
   }
   
   @Override

@@ -21,6 +21,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BooleanWritable;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -222,159 +224,33 @@ public class Downloader extends Configured implements Tool {
     }
 
     // Display metadata of the image
-    private void printFlickrImageMetadata(String[] lineArray, HipiImageBundle hib) {
-      System.out.println("");
-      System.out.println("Image Metadata: ");
-      System.out.println("> Photo/Video Identifier: " + lineArray[0]);
-      System.out.println("> User NSID: " + lineArray[1]);
-      System.out.println("> User Nickname: " + lineArray[2]);
-      System.out.println("> Date Taken: " + lineArray[3]);
-      System.out.println("> Date Uploaded: " + lineArray[4]);
-      System.out.println("> Capture Device: " + lineArray[5]);
-      System.out.println("> Title: " + lineArray[6]);
-      System.out.println("> Description: " + lineArray[7]);
-      System.out.println("> User Tags: " + lineArray[8]);
-      System.out.println("> Machine Tags: " + lineArray[9]);
-      System.out.println("> Longitude: " + lineArray[10]);
-      System.out.println("> Latitude: " + lineArray[11]);
-      System.out.println("> Accuracy: " + lineArray[12]);
-      System.out.println("> Photo/Video Page URL: " + lineArray[13]);
-      System.out.println("> Photo/Video Download URL: " + lineArray[14]);
-      System.out.println("> License Name: " + lineArray[15]);
-      System.out.println("> License URL: " + lineArray[16]);
-      System.out.println("> Photo/Video Server Identifier: " + lineArray[17]);
-      System.out.println("> Photo/Video Farm Identifier: " + lineArray[18]);
-      System.out.println("> Photo/Video Secret: " + lineArray[19]);
-      System.out.println("> Photo/Video Secret Original: " + lineArray[20]);
-      System.out.println("> Extension of the Original Photo: " + lineArray[21]);
-      System.out.println("> Photos/video marker (0 = photo, 1 = video): " + lineArray[22]);
+    public static void printFlickrImageMetadata(String[] lineArray) {
+      System.out.println("  Flickr Image Metadata: ");
+      System.out.println("    > Photo/Video Identifier: " + lineArray[0]);
+      System.out.println("    > User NSID: " + lineArray[1]);
+      System.out.println("    > User Nickname: " + lineArray[2]);
+      System.out.println("    > Date Taken: " + lineArray[3]);
+      System.out.println("    > Date Uploaded: " + lineArray[4]);
+      System.out.println("    > Capture Device: " + lineArray[5]);
+      System.out.println("    > Title: " + lineArray[6]);
+      System.out.println("    > Description: " + lineArray[7]);
+      System.out.println("    > User Tags: " + lineArray[8]);
+      System.out.println("    > Machine Tags: " + lineArray[9]);
+      System.out.println("    > Longitude: " + lineArray[10]);
+      System.out.println("    > Latitude: " + lineArray[11]);
+      System.out.println("    > Accuracy: " + lineArray[12]);
+      System.out.println("    > Photo/Video Page URL: " + lineArray[13]);
+      System.out.println("    > Photo/Video Download URL: " + lineArray[14]);
+      System.out.println("    > License Name: " + lineArray[15]);
+      System.out.println("    > License URL: " + lineArray[16]);
+      System.out.println("    > Photo/Video Server Identifier: " + lineArray[17]);
+      System.out.println("    > Photo/Video Farm Identifier: " + lineArray[18]);
+      System.out.println("    > Photo/Video Secret: " + lineArray[19]);
+      System.out.println("    > Photo/Video Secret Original: " + lineArray[20]);
+      System.out.println("    > Extension of the Original Photo: " + lineArray[21]);
+      System.out.println("    > Photos/video marker (0 = photo, 1 = video): " + lineArray[22]);
     }
-  } 
-
-/*
-    // Download images at the list of input URLs and store them in a temporary HIB.
-    @Override
-    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-
-      System.out.println("value: " + value);
-
-      // Create path for temporary HIB file
-      String tempPath = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
-      HipiImageBundle hib = new HipiImageBundle(new Path(tempPath), conf);
-      hib.openForWrite(true);
-
-      // The value argument contains a list of image URLs delimited by
-      // '\n'. Setup buffered reader to allow processing this string
-      // line by line.
-      BufferedReader reader = new BufferedReader(new StringReader(value.toString()));
-      String uri;
-      long i = key.get();
-      long iprev = i;
-
-      // Iterate through URLs
-      while ((uri = reader.readLine()) != null) {
-
-	// Put at most 100 images in a temporary HIB
-        if (i >= iprev + 100l) {
-          hib.close();
-          context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
-          tempPath = conf.get("downloader.outpath") + i + ".hib.tmp";
-          hib = new HipiImageBundle(new Path(tempPath), conf);
-          hib.openForWrite(true);
-          iprev = i;
-        }
-
-	// Setup to time download
-        long startT = 0;
-        long stopT = 0;
-        startT = System.currentTimeMillis();
-
-        // Perform download and update HIB
-        try {
-
-          String type = "";
-          URLConnection conn;
-
-	  // Attempt to download image at URL using java.net
-          try {
-            URL link = new URL(uri);
-            System.err.println("Downloading " + link.toString());
-            conn = link.openConnection();
-            conn.connect();
-            type = conn.getContentType();
-          } catch (Exception e) {
-            System.err.println("Connection error while trying to download: " + uri);
-            continue;
-          }
-
-	  // Check that image format is supported, header is parsable, and add to HIB if so
-          if (type != null && (type.compareTo("image/jpeg") == 0 || type.compareTo("image/png") == 0)) {
-
-	    // Get input stream for URL connection
-	    InputStream bis = new BufferedInputStream(conn.getInputStream());
-
-	    // Mark current location in stream for later reset
-	    bis.mark(Integer.MAX_VALUE);
-
-	    // Attempt to decode the image header
-	    HipiImageHeader header = (type.compareTo("image/jpeg") == 0 ? JpegCodec.getInstance().decodeHeader(bis) : PngCodec.getInstance().decodeHeader(bis));
-
-	    if (header == null)  {
-	      System.err.println("Failed to parse header, not added to HIB: " + uri);
-	    } else {
-
-	      // Passed header decode test, so reset to beginning of stream
-	      bis.reset();
-
-	      // Add source URL as metadata for posterity
-	      header.addMetaData("source",uri);
-
-	      System.out.println(header);
-
-	      // Add image to HIB
-	      hib.addImage(header, bis);
-
-	      System.err.println("Added to HIB: " + uri);
-
-	    }
-          } else {
-	    System.err.println("Unrecognized HTTP content type or unsupported image format [" + type + "], not added to HIB: " + uri);
-	  }
-
-        } catch (Exception e) {
-          e.printStackTrace();
-          System.err.println("Encountered network error while trying to download: " + uri);
-          try {
-            Thread.sleep(1000);
-          } catch (InterruptedException ie) {
-            ie.printStackTrace();
-          }
-        }
-
-        i++;
-
-        // Report success and elapsed time
-        stopT = System.currentTimeMillis();
-        float el = (float) (stopT - startT) / 1000.0f;
-        System.err.println("> Time elapsed " + el + " seconds");
-      }
-
-      try {
-
-	// Output key/value pair to reduce layer consisting of boolean and path to HIB
-        context.write(new BooleanWritable(true), new Text(hib.getPath().toString()));
-
-	// Cleanup
-        reader.close();
-        hib.close();
-
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    
   }
-  */
 
   public int run(String[] args) throws Exception {
 
@@ -455,17 +331,31 @@ public class Downloader extends Configured implements Tool {
       }
 
       try {
+        // If it exists, get the relevant compression codec
+        CompressionCodecFactory codecFactory = new CompressionCodecFactory(conf);
+        CompressionCodec codec = codecFactory.getCodec(path);
+
         FSDataInputStream fis = fs.open(path);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+
+        // If the codec was found, use it to create an decompressed input stream.
+        // Otherwise, assume input stream is already decompressed
+        BufferedReader reader = null;
+        if (codec != null) {
+          reader = new BufferedReader(new InputStreamReader(codec.createInputStream(fis)));
+        } else {
+          reader = new BufferedReader(new InputStreamReader(fis));
+        }
+
         String fileLine = reader.readLine();
-        String[] lineFields = fileLine.split("\\s+");
+        String[] lineFields = (yfcc100m ? fileLine.split("\t") : fileLine.split("\\s+"));
+
         if (yfcc100m) {
           if (lineFields.length != 23) {
             System.out.println("  Skipping source file (does not follow YFCC100M source file format): " + file.getPath());
             String imageUri = null;
           } else {
             System.out.println("  Adding source file: " + file.getPath());
-            sourceFiles.add(path);            
+            sourceFiles.add(path);
           }
         } else {
           if (lineFields.length != 1) {

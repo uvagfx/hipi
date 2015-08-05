@@ -1,4 +1,3 @@
-mainClassName = "org.hipi.tools.HibImport"
 jar {
 	manifest {
 		attributes("Main-Class": "org.hipi.tools.HibImport")

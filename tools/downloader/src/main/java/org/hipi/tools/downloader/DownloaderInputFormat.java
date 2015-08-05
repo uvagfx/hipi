@@ -108,9 +108,6 @@ public class DownloaderInputFormat extends FileInputFormat<LongWritable, Text> {
         if (tokens == null || tokens.length < 2) {
           throw new IOException("Unable to determine image count. Check that file name follows YFCC100M convention: " + path);
         }
-        for (String t : tokens) {
-          System.out.println("token: " + t);
-        }
         try {
           numImages = Integer.parseInt(tokens[1]);
         } catch (Exception e) {

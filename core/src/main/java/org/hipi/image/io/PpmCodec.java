@@ -15,6 +15,10 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+/**
+ * Extends {@link ImageCodec} and serves as both an {@link ImageDecoder} and 
+ * {@link ImageEncoder} for the PPM image storage format.
+ */
 public class PpmCodec extends ImageCodec {
   
   private static final PpmCodec staticObject = new PpmCodec();

@@ -16,12 +16,10 @@ import java.io.IOException;
 import java.lang.IllegalArgumentException;
 
 /**
- * A raster (uncompressed) 2D image in HIPI. A raster image consists
- * of an ImageHeader (inherited from the HipiImage abstract base
- * class) and a flat array of uncompressed image pixel data stored in
- * interleaved raster-scan order (e.g., RGBRGBRGB...). The underlying
- * type used to represent the pixel data is set using the
- * @{link RasterImage#setPixelArray} method.
+ * Abstract class that represents a raster (uncompressed) 2D image. A RasterImage extends the
+ * abstract base class {@link HipiImage} and consists of a {@link HipiImageHeader} and a {@link
+ * PixelArray}, which represents a flat array of uncompressed image pixel data stored in interleaved
+ * raster-scan order (e.g., RGBRGBRGB...).
  */
 public abstract class RasterImage extends HipiImage {
 
@@ -31,7 +29,8 @@ public abstract class RasterImage extends HipiImage {
     this.pixelArray = pixelArray;
   }
 
-  public void setHeader(HipiImageHeader header) throws IllegalArgumentException {
+  public void setHeader(HipiImageHeader header) 
+  throws IllegalArgumentException {
     super.setHeader(header);
     int size = header.getWidth()*header.getHeight()*header.getNumBands();
     pixelArray.setSize(size);
@@ -63,11 +62,13 @@ public abstract class RasterImage extends HipiImage {
 
   /**
    * Crops a raster image to a (width x height) rectangular region
-   * with top-left corner at (x,y) pixel location. Note that last
-   * argument is output target.
-   * 
-   * @return a {@link RasterImage} containing the cropped portion of
-   * the original image
+   * with top-left corner at (x,y) pixel location.
+   *
+   * @param x horizontal position of upper left corner of crop rectangle
+   * @param y vertical position of upper left corner of crop rectangle
+   * @param width width of crop rectangle
+   * @param height height of crop rectangle
+   * @param output output {@link RasterImage} target (must be initialized)
    */
   public void crop(int x, int y, int width, int height, RasterImage output)
     throws IllegalArgumentException {
@@ -76,14 +77,14 @@ public abstract class RasterImage extends HipiImage {
     int b = this.getNumBands();
 
     // Verify crop dimensions
-    if (x < 0 || width <= 0 || x+width > w ||
-	y < 0 || height <= 0 || y+height > h) {
+    if (x < 0 || width <= 0 || x+width > w || y < 0 || height <= 0 || y+height > h) {
       throw new IllegalArgumentException("Invalid crop region.");
     }
 
     // Verify crop output target
     if (width != output.getWidth() || height != output.getHeight() || b != output.getNumBands()) {
-      throw new IllegalArgumentException("Mismatch between size of crop region and size of crop output target.");
+      throw new IllegalArgumentException("Mismatch between size of crop region and size of crop " + 
+        "output target.");
     }
 
     PixelArray pa = output.getPixelArray();
@@ -101,10 +102,9 @@ public abstract class RasterImage extends HipiImage {
   /**
    * Convert image to another color space.
    *
-   * @param colorSpace Indicates target color space.
+   * @param colorSpace target color space
+   * @param output output {@link RasterImage} target (must be initialized)
    * 
-   * @return A {@link RasterImage} of the converted image. Returns
-   * null if the conversion could not be performed.
    */
   public void convertToColorSpace(HipiColorSpace colorSpace, RasterImage output)
     throws IllegalArgumentException {

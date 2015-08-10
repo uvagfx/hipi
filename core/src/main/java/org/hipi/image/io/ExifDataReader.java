@@ -14,7 +14,8 @@ import java.util.Iterator;
 import java.util.HashMap;
 
 /**
- * Helper class for extracting JPEG EXIF data. 
+ * Routines for extracting EXIF data contained in a JPEG or PNG image and for flattening this type
+ * of data to produce a single key/value dictionary.
  */
 public class ExifDataReader {
 
@@ -46,17 +47,17 @@ public class ExifDataReader {
       Metadata metadata = reader.extract();
       Iterator directories = metadata.getDirectories().iterator();
       while (directories.hasNext()) {
-	Directory directory = (Directory)directories.next();
-	Iterator tags = directory.getTags().iterator();
-	while (tags.hasNext()) {
-	  Tag tag = (Tag)tags.next();
-	  exifData.put(tag.getTagName(), tag.getDescription());
-	}
-      }
-    } catch (ImageProcessingException ex) {
-      throw new IOException(String.format("Encountered error while attempting to extract image EXIF data [%s]", ex.getMessage()));
-    }
-    return exifData;
+       Directory directory = (Directory)directories.next();
+       Iterator tags = directory.getTags().iterator();
+       while (tags.hasNext()) {
+         Tag tag = (Tag)tags.next();
+         exifData.put(tag.getTagName(), tag.getDescription());
+       }
+     }
+   } catch (ImageProcessingException ex) {
+    throw new IOException(String.format("Encountered error while attempting to extract image EXIF data [%s]", ex.getMessage()));
   }
+  return exifData;
+}
 
 }

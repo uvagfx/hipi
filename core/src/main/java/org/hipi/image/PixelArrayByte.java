@@ -2,6 +2,9 @@ package org.hipi.image;
 
 import org.hipi.image.PixelArray;
 
+/**
+ * A flat array of image pixel values represented as Java bytes.
+ */
 public class PixelArrayByte extends PixelArray {
 
   byte data[];

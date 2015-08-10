@@ -4,10 +4,11 @@ import org.hipi.image.HipiImageHeader;
 import org.hipi.image.HipiImageHeader.HipiImageFormat;
 import org.hipi.image.HipiImage;
 import org.hipi.image.HipiImage.HipiImageType;
-import org.hipi.image.RasterImage;
-import org.hipi.image.FloatImage;
-import org.hipi.image.ByteImage;
 import org.hipi.image.HipiImageFactory;
+import org.hipi.image.ByteImage;
+import org.hipi.image.FloatImage;
+import org.hipi.image.RasterImage;
+import org.hipi.image.RawImage;
 import org.hipi.image.io.CodecManager;
 import org.hipi.image.io.ImageDecoder;
 import org.hipi.image.io.ImageEncoder;
@@ -59,11 +60,10 @@ public class HipiImageBundle {
 
   /**
    * This FileReader enables reading individual images from a {@link
-   * hipi.imagebundle.HipiImageBundle} and delivers them in the
+   * org.hipi.imagebundle.HipiImageBundle} and delivers them in the
    * specified image type. This class is used by the {@link
-   * hipi.imagebundle.mapreduce.HipiImageBundleInputFormat} and {@link
-   * hipi.imagebundle.mapreduce.HipiImageBundleRecordReader}.
-   *
+   * org.hipi.imagebundle.mapreduce.HibInputFormat} and {@link
+   * org.hipi.imagebundle.mapreduce.HibRecordReader} classes.
    */
   public static class HibReader {
 
@@ -103,6 +103,7 @@ public class HipiImageBundle {
      * @param path The {@link Path} to the HIB data file
      * @param start The byte offset to beginning of segment
      * @param end The byte offset to end of segment
+     *
      * @throws IOException
      */
     public HibReader(HipiImageFactory imageFactory, Class<? extends Culler> cullerClass, 
@@ -166,8 +167,6 @@ public class HipiImageBundle {
     /**
      * Closes any open objects used to read the HIB data file (e.g.,
      * DataInputStream).
-     *
-     * @throws IOException
      */
     public void close() throws IOException {
       if (dataInputStream != null) {
@@ -177,13 +176,11 @@ public class HipiImageBundle {
 
     /**
      * Reads the next image header and image body into memory. To
-     * obtain the corresponding {@link ImageHeader} and {@link
-     * RasterImage} objects, call {@link #getCurrentKey()} and {@link
+     * obtain the corresponding {@link org.hipi.image.HipiImageHeader} and {@link
+     * org.hipi.image.RasterImage} objects, call {@link #getCurrentKey()} and {@link
      * #getCurrentValue()} respectively.
      * 
-     * @return True if the next image was successfully read. False if
-     * there are no more images or if an error occurs. Check stderr
-     * logs for errors.
+     * @return true if the next image record (header + pixel data) was successfully read and decoded. False if there are no more images or if an error occurs.
      */
     public boolean nextKeyValue() {
 
@@ -310,16 +307,27 @@ public class HipiImageBundle {
           try {
             image = decoder.decodeImage(imageByteStream, imageHeader, imageFactory, true);
           } catch (Exception e) {
-            System.err.println("Runtime exception while attempting to decode image: " + e.getMessage());
+            System.err.println("Runtime exception while attempting to decode raster image: " + 
+              e.getMessage());
             e.printStackTrace();
             // Attempt to keep going
             return nextKeyValue();
           }
           break;
           case RAW:
+          try {
+            RawImage rawImage = new RawImage();
+            rawImage.setHeader(imageHeader);
+            rawImage.setRawBytes(imageBytes);
+            image = (HipiImage)rawImage;
+          } catch (Exception e) {
+            System.err.println("Runtime exception while attempting to create RawImage: " + 
+              e.getMessage());
+            e.printStackTrace();
+            // Attempt to keep going
+            return nextKeyValue();
+          }
           throw new RuntimeException("Support for RAW image type not yet implemented.");
-          case OPENCV:
-          throw new RuntimeException("Support for OPENCV image type not yet implemented.");
           case UNDEFINED:
           default:
           throw new IOException("Unexpected image type. Cannot proceed.");
@@ -459,10 +467,9 @@ public class HipiImageBundle {
   /**
    * Opens the underlying index and data files for writing.
    * 
-   * @param overwrite if either part of the HIB file (index and/or
-   *        data) exists this parameter determines whether or not to
-   *        delete the file first or throw an exception
-   * @throws IOException
+   * @param overwrite if either part of the HIB file (index and/or data) exists this parameter determines whether or not to delete the file first or throw an exception
+   *
+   * @throws IOException in the event of any I/O errors while creating and opening the index and data files for subsequent writing
    */
   public final void openForWrite(boolean overwrite) throws IOException {
 
@@ -541,9 +548,12 @@ public class HipiImageBundle {
   }
 
   /**
-   * Adds the image to the HipiImageBundle. This involves appending
-   * the image to the data file, and adding the image offset to the
-   * index file.
+   * Add image to the HIB. This involves appending the image to the data file, and adding the corresponding byte offset to the index file.
+   *
+   * @param imageHeader initialized image header
+   * @param imageStream input stream containing the image data. This data is not decoded or verified to be consistent with the provided image header. It is simply appended to the HIB data file.
+   *
+   * @throws IOException in the event of any I/O errors or if the HIB is not currently in a state that supports adding new images
    */
   public void addImage(HipiImageHeader imageHeader, InputStream imageStream) throws IOException {
 
@@ -732,7 +742,6 @@ public class HipiImageBundle {
 
   /**
    * @return The data file for the HipiImageBundle
-   * @throws IOException
    */
   public FileStatus getDataFileStatus() throws IOException {
     return FileSystem.get(conf).getFileStatus(dataFilePath);
@@ -771,7 +780,7 @@ public class HipiImageBundle {
   }
 
   /**
-   * {@see HipiImageBundle.HibReader#getCurrentKey()}
+   * @see HipiImageBundle.HibReader#getCurrentKey()
    */
   public HipiImageHeader currentHeader() throws IOException {
     if (fileMode != FILE_MODE_READ) {
@@ -782,7 +791,7 @@ public class HipiImageBundle {
   }
 
   /**
-   * {@see HipiImageBundle.HibReader#getCurrentValue()}
+   * @see HipiImageBundle.HibReader#getCurrentValue()
    */
   public HipiImage currentImage() throws IOException {
     if (fileMode != FILE_MODE_READ) {
@@ -818,13 +827,9 @@ public class HipiImageBundle {
   }
 
   /**
-   * Appends a HipiImageBundle. This involves concatenating data files as well appending offsets to
-   * the index file.
+   * Appends another HIB to the current HIB. This involves concatenating the underlying data files and index files.
    * 
-   * @param bundle HipiImageBundle to be appended
-   */
-  /*
-   * Assumes that openForWrite has been called
+   * @param bundle target HIB to be appended to the current HIB
    */
   public void append(HipiImageBundle bundle) {
     // TODO: Check that bundle is in a state that supports this operation

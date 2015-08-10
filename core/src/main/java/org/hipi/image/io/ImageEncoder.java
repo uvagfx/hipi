@@ -6,12 +6,21 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * This class provides the necessary functions for encoding an image
- * and writing to a {@link OutputStream}.  All subclasses must contain
- * methods that know how to encode the image pixel data.
+ * Interface for encoding a {@link HipiImage} in a particular storage format and writing the
+ * result to a Java {@link java.io.OutputStream}.
  */
 public interface ImageEncoder {
 
-  public abstract void encodeImage(HipiImage image, OutputStream outputStream) throws IllegalArgumentException, IOException;
+  /**
+   * Encode and write image to a Java {@link java.io.OutputStream}.
+   *
+   * @param image source image to be encoded
+   * @param outputStream output stream that will receive encoded image
+   *
+   * @throws IllegalArgumentException if parameters are null or otherwise invalid
+   * @throws IOException if an error is encountered during stream serialization
+   */
+  public abstract void encodeImage(HipiImage image, OutputStream outputStream)
+  throws IllegalArgumentException, IOException;
 
 }

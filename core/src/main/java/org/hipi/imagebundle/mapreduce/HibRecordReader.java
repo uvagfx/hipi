@@ -19,12 +19,11 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import java.io.IOException;
 
 /**
- * Main RecordReader class for HIB files. Utilizes {@link
- * hipi.imagebundle.HipiImageBundle.HibReader} to read and decode
- * portion of input HIB indicated by InputSplit. Also determines the
- * requested image type (the second "value" argument to the map method
- * in the current Mapper class) dynamically using Java reflection
- * utils.
+ * Main MapReduce {@link RecordReader} class for HIB files. Utilizes 
+ * {@link org.hipi.imagebundle.HipiImageBundle.HibReader} to read and decode
+ * the individual image records (image meta data + image pixel data) stored in a HIB. This class
+ * determines the desired image type (the second "value" parameter to the map method in the
+ * Mapper class) dynamically using the {@link HipiImageFactory} class.
  */
 public class HibRecordReader extends RecordReader<HipiImageHeader, HipiImage> {
 
@@ -32,7 +31,8 @@ public class HibRecordReader extends RecordReader<HipiImageHeader, HipiImage> {
   private HipiImageBundle.HibReader reader;
 
   @Override
-  public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, IllegalArgumentException {
+  public void initialize(InputSplit split, TaskAttemptContext context) 
+  throws IOException, IllegalArgumentException {
 
     HipiImageFactory imageFactory = null;
     try {

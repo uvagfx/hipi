@@ -64,8 +64,8 @@ import javax.imageio.ImageIO;
  */
 
 /**
- * Currently, images can only be encoded and decoded with RGB encoding. That is, black and white,
- * and grayscale encoded images cannot be used.
+ * Extends {@link ImageCodec} and serves as both an {@link ImageDecoder} and 
+ * {@link ImageEncoder} for the PNG image storage format. Currently only supports RGB encodings.
  */
 public class PngCodec extends ImageCodec { //implements ImageDecoder, ImageEncoder {
 
@@ -91,8 +91,8 @@ public class PngCodec extends ImageCodec { //implements ImageDecoder, ImageEncod
    * broken up into "chunks" (see PNG documentation), and the PNG header could be located anywhere
    * in the image
    * 
-   * @param is The {@link InputStream} that contains the PNG image
-   * @return The {@link ImageHeader} found in the input stream
+   * @param inputStream the {@link InputStream} that contains the PNG image
+   * @return {@link HipiImageHeader} found in the input stream
    */
   public HipiImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException {
 
@@ -347,11 +347,10 @@ public class PngCodec extends ImageCodec { //implements ImageDecoder, ImageEncod
   }
 
   /**
-   * Encodes an image into a PNG image
+   * Encodes an image in the PNG format.
    * 
-   * @param image The {@link FloatImage} that contains the PNG image
-   * @param header The {@link ImageHeader} for the image
-   * @param os The {@link OutputStream} that the encoded image will write to
+   * @param image the input {@link HipiImage} to be encoded
+   * @param os the {@link OutputStream} that the encoded image will be written to
    */
   public void encodeImage(HipiImage image, OutputStream os) throws IllegalArgumentException, IOException {
 

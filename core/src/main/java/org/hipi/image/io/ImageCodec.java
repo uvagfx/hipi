@@ -29,9 +29,17 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
+/**
+ * Abstract base class for objects that serve as both an {@link ImageDecoder} and 
+ * {@link ImageEncoder} for a particular storage format (e.g., JPEG, PNG, etc.).
+ */
 public abstract class ImageCodec implements ImageDecoder, ImageEncoder {
 
-  // By default use ImageIO plugins to decode image
+  /**
+   * Default image decode method that uses the available ImageIO plugins.
+   *
+   * @see ImageDecoder#decodeImage
+   */
   public HipiImage decodeImage(InputStream inputStream, HipiImageHeader imageHeader, 
 			       HipiImageFactory imageFactory, boolean includeExifData)
     throws IllegalArgumentException, IOException {
@@ -72,36 +80,39 @@ public abstract class ImageCodec implements ImageDecoder, ImageEncoder {
     for (int j=0; j<h; j++) {
       for (int i=0; i<w; i++) {
 
-	// Retrieve 8-bit non-linear sRGB value packed into int
-	int pixel = javaImage.getRGB(i,j); 
+	     // Retrieve 8-bit non-linear sRGB value packed into int
+       int pixel = javaImage.getRGB(i,j); 
 
-	int red = (pixel >> 16) & 0xff;
-	int grn = (pixel >>  8) & 0xff;
-	int blu = (pixel      ) & 0xff;
+       int red = (pixel >> 16) & 0xff;
+       int grn = (pixel >>  8) & 0xff;
+       int blu = (pixel      ) & 0xff;
 
-	// Set value in pixel array using routine designed for sRGB values
-	pa.setElemNonLinSRGB((j*w+i)*3+0, red);
-	pa.setElemNonLinSRGB((j*w+i)*3+1, grn);
-	pa.setElemNonLinSRGB((j*w+i)*3+2, blu);
+	     // Set value in pixel array using routine designed for sRGB values
+       pa.setElemNonLinSRGB((j*w+i)*3+0, red);
+       pa.setElemNonLinSRGB((j*w+i)*3+1, grn);
+       pa.setElemNonLinSRGB((j*w+i)*3+2, blu);
 
       }
-    }
+    } 
 
     if (includeExifData) {      
       // Extract EXIF data from image stream and store in image header
       dis.reset();
       try {
-	imageHeader.setExifData(ExifDataReader.extractAndFlatten(dis));
+       imageHeader.setExifData(ExifDataReader.extractAndFlatten(dis));
       } catch (IOException ex) {
-	System.err.println("Failed to extract EXIF data for image record.");
+        System.err.println("Failed to extract EXIF data for image record.");
       }
     }
 
     return image;
   }
 
-  // Use ImageIO plugins to encode raster image
-  protected void encodeRasterImage(RasterImage image, ImageWriter writer, ImageWriteParam writeParams) throws IOException {
+  /**
+   * Default method for encoding raster images that uses the available ImageIO plugins.
+   */
+  protected void encodeRasterImage(RasterImage image, ImageWriter writer,
+    ImageWriteParam writeParams) throws IOException {
 
     int w = image.getWidth();
     int h = image.getHeight();

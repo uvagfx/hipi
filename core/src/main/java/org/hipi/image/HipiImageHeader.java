@@ -15,23 +15,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * The header information for a 2D image. HipiImageHeader encapsulates
- * universally available information about a 2D image (width, height,
- * storage format, color space) along with variable meta data and EXIF
- * data.
+ * The header information for a HipiImage. HipiImageHeader encapsulates universally available
+ * information about a 2D image: width, height, storage format, color space, number of color bands 
+ * (also called "channels") along with optional image meta data and EXIF data represented
+ * as key/value String dictionaries.
  *
- * The {@link hipi.image.io} package provides classes for reading
- * (decoding) and writing (encoding) ImageHeader objects in various
- * image formats such as JPEG and PNG.
+ * The {@link org.hipi.image.io} package provides classes for reading (decoding) HipiImageHeader
+ * from both {@link org.hipi.imagebundle.HipiImageBundle} files and various standard image storage
+ * foramts such as JPEG and PNG.
  *
- * Note that this class implements {@link
- * org.apache.hadoop.io.WritableComparable}, allowing it to be used as
- * a key/value object in MapReduce.
+ * Note that this class implements the {@link org.apache.hadoop.io.WritableComparable} interface,
+ * allowing it to be used as a key/value object in MapReduce programs.
  */
 public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
 
   /**
-   * Image storage formats supported in HIPI.
+   * Enumeration of the image storage formats supported in HIPI (e.g, JPEG, PNG, etc.).
    */
   public enum HipiImageFormat {
     UNDEFINED(0x0), JPEG(0x1), PNG(0x2), PPM(0x3);
@@ -50,9 +49,12 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
     /**
      * Creates an ImageFormat from an int.
      *
-     * @param val Integer representation of ImageFormat.
+     * @param format Integer representation of ImageFormat.
      *
      * @return Associated ImageFormat.
+     *
+     * @throws IllegalArgumentException if the parameter value does not correspond to a valid
+     * HipiImageFormat.
      */
     public static HipiImageFormat fromInteger(int format) throws IllegalArgumentException {
       for (HipiImageFormat fmt : values()) {
@@ -60,7 +62,8 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
           return fmt;
         }
       }
-      throw new IllegalArgumentException(String.format("There is no HipiImageFormat enum value associated with integer [%d]", format));
+      throw new IllegalArgumentException(String.format("There is no HipiImageFormat enum value " +
+        "associated with integer [%d]", format));
     }
 
     /** 
@@ -82,7 +85,7 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
   } // public enum ImageFormat
 
   /**
-   * Color spaces supported in HIPI.
+   * Enumeration of the color spaces supported in HIPI.
    */
   public enum HipiColorSpace {
     UNDEFINED(0x0), RGB(0x1), LUM(0x2);
@@ -101,9 +104,11 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
     /**
      * Creates a HipiColorSpace from an int.
      *
-     * @param val Integer representation of ColorSpace.
+     * @param cspace Integer representation of ColorSpace.
      *
-     * @return Associated ColorSpace.
+     * @return Associated HipiColorSpace value.
+     *
+     * @throws IllegalArgumentException if parameter does not correspond to a valid HipiColorSpace.
      */
     public static HipiColorSpace fromInteger(int cspace) throws IllegalArgumentException {
       for (HipiColorSpace cs : values()) {
@@ -111,7 +116,8 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
 	  return cs;
         }
       }
-      throw new IllegalArgumentException(String.format("There is no HipiColorSpace enum value with an associated integer value of %d", cspace));
+      throw new IllegalArgumentException(String.format("There is no HipiColorSpace enum value " +
+        "with an associated integer value of %d", cspace));
     }
 
     /** 
@@ -167,7 +173,8 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
 			 int bands, byte[] metaDataBytes, Map<String,String> exifData)
     throws IllegalArgumentException {
     if (width < 1 || height < 1 || bands < 1) {
-      throw new IllegalArgumentException(String.format("Invalid spatial dimensions or number of bands: (%d,%d,%d)", width, height, bands));
+      throw new IllegalArgumentException(String.format("Invalid spatial dimensions or number " + 
+        "of bands: (%d,%d,%d)", width, height, bands));
     }
     this.storageFormat = storageFormat;
     this.colorSpace = colorSpace;
@@ -370,10 +377,11 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
   }  
 
   /**
-   * Writes ImageHeader in a simple uncompressed binary
-   * format.
-   * @see org.apache.hadoop.io.WritableComparable#write
+   * Serializes the HipiImageHeader object into a simple uncompressed binary format using the
+   * {@link java.io.DataOutput} interface.
+   *
    * @see #readFields
+   * @see org.apache.hadoop.io.WritableComparable#write
    */
   @Override
   public void write(DataOutput out) throws IOException {
@@ -392,11 +400,11 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
   }
 
   /**
-   * Reads ImageHeader stored in a simple uncompressed binary
-   * format. The first twenty bytes are the image type, width, height,
-   * bit depth, and number of color bands (aka channels), all stored
-   * as ints, followed by the meta data stored as a set of key/value
-   * pairs.
+   * Deserializes HipiImageHeader object stored in a simple uncompressed binary format using the
+   * {@link java.io.DataInput} interface. The first twenty bytes are the image storage type,
+   * color space, width, height, and number of color bands (aka channels), all stored as ints,
+   * followed by the meta data stored as a set of key/value pairs in JSON UTF-8 format.
+   *
    * @see org.apache.hadoop.io.WritableComparable#readFields
    */
   @Override
@@ -415,13 +423,16 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
   }
 
   /**
-   * Compare method from the {@link java.util.Comparator}
-   * interface. This method reads both {@link BinaryComparable}
-   * objects into byte arrays and calls {@link #compare}.
+   * Compare method inherited from the {@link java.lang.Comparable} interface. This method is
+   * currently incomplete and uses only the storage format to determine order.
+   *
+   * @param that another {@link HipiImageHeader} to compare with the current object
    *
    * @return An integer result of the comparison.
-   * @see #compare
+   *
+   * @see java.lang.Comparable#compareTo
    */
+  @Override
   public int compareTo(HipiImageHeader that) {
 
     int thisFormat = this.storageFormat.toInteger();
@@ -431,7 +442,11 @@ public class HipiImageHeader implements WritableComparable<HipiImageHeader> {
   }
 
   /**
-   * Returns hash code value for object.
+   * Hash method inherited from the {@link java.lang.Object} base class. This method is
+   * currently incomplete and uses only the storage format to determine this hash.
+   *
+   * @return hash code for this object
+   *
    * @see java.lang.Object#hashCode
    */
   @Override

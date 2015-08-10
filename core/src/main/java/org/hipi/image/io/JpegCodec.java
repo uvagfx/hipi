@@ -29,6 +29,10 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
+/**
+ * Extends {@link ImageCodec} and serves as both an {@link ImageDecoder} and 
+ * {@link ImageEncoder} for the JPEG image storage format.
+ */
 public class JpegCodec extends ImageCodec {
 
   private static final JpegCodec staticObject = new JpegCodec();

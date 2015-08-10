@@ -14,12 +14,11 @@ import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.Writable;
 
 /**
- * A 2D image represented as an array of bytes. A ByteImage consists
- * of a flat array of pixel values represented as Java bytes through
- * the {@link PixelArrayByte} class in addition to an {@link
- * ImageHeader} object.<br/><br/>
+ * A raster image represented as an array of Java bytes. A ByteImage consists
+ * of a flat array of pixel values represented as a {@link PixelArrayByte} 
+ * object along with a {@link HipiImageHeader} object.
  *
- * The {@link hipi.image.io} package provides classes for reading
+ * The {@link org.hipi.image.io} package provides classes for reading
  * (decoding) and writing (encoding) ByteImage objects in various
  * compressed and uncompressed image formats such as JPEG and PNG.
  */
@@ -53,19 +52,22 @@ public class ByteImage extends RasterImage {
    * spaces, and are found to deviate by less than a maximum
    * difference, false otherwise.
    */
-  public boolean equalsWithTolerance(RasterImage thatImage, float maxDifference) {
+  public boolean equalsWithTolerance(RasterImage thatImage, 
+    float maxDifference) {
+    
     if (thatImage == null) {
       return false;
     }
+
     // Verify dimensions in headers are equal
     int w = this.getWidth();
     int h = this.getHeight();
     int b = this.getNumBands();
     if (this.getColorSpace() != thatImage.getColorSpace() ||
-	thatImage.getWidth() != w || thatImage.getHeight() != h || 
-	thatImage.getNumBands() != b) {
+     thatImage.getWidth() != w || thatImage.getHeight() != h || 
+     thatImage.getNumBands() != b) {
       return false;
-    }
+  }
 
     // Get pointers to pixel arrays
     PixelArray thisPA = this.getPixelArray();
@@ -74,7 +76,7 @@ public class ByteImage extends RasterImage {
     // Check that pixel data is equal.
     for (int i = 0; i < w*h*b; i++) {
       if ((float)Math.abs(thisPA.getElem(i) - thatPA.getElem(i)) > maxDifference) {
-	return false;
+       return false;
       }
     }
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.hipi.test.PpmCodecTestCase" tests="2" skipped="1" failures="0" errors="0" timestamp="2015-08-06T18:20:18" hostname="Zacks-MacBook-Pro.local" time="0.002">
+  <properties/>
+  <testcase name="testTwelveMonkeysPlugIn" classname="org.hipi.test.PpmCodecTestCase" time="0.001"/>
+  <testcase name="testEncodeImage" classname="org.hipi.test.PpmCodecTestCase" time="0.0">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

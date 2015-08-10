@@ -5,41 +5,53 @@ import java.io.IOException;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.indexer.FloatIndexer;
+import org.bytedeco.javacpp.indexer.Indexer;
 import org.hipi.image.FloatImage;
 import org.hipi.image.HipiImage;
 import org.hipi.image.HipiImage.HipiImageType;
+import org.hipi.image.HipiImageHeader;
 import org.hipi.image.HipiImageHeader.HipiColorSpace;
+import org.hipi.image.HipiImageHeader.HipiImageFormat;
 import org.hipi.util.ByteUtils;
 
 public class MatUtils {
   
   public static FloatImage convertMatToFloatImage(Mat mat) throws IOException {
+   
+    mat.convertTo(mat, opencv_core.CV_32F);
+    
     
     FloatImage image; 
     
-    int rows = mat.rows();
-    int cols = mat.cols();
+    int height = mat.rows();
+    int width = mat.cols();
     
     int channels = mat.channels();
+    int type = mat.type();
     int elms = (int)(mat.total() * mat.channels());
+    image = new FloatImage(width, height, channels);
     switch(channels) {
       case 1:
-        image = new FloatImage(rows, cols, 1);
+        image.setHeader(new HipiImageHeader(HipiImageFormat.UNDEFINED, HipiColorSpace.LUM,
+            width, height, channels, null, null));
         break;
       case 3:
-        image = new FloatImage(rows, cols, 3);
+        image.setHeader(new HipiImageHeader(HipiImageFormat.UNDEFINED, HipiColorSpace.RGB,
+            width, height, channels, null, null));
         break;
        default:
-         throw new IOException("Unsupported Number of channels in input image [" + channels + "].");
-        
+         throw new IOException("Unsupported Number of channels in input image [" + channels + "].");  
     }
     
-    byte[] data = new byte[elms * 4];
-    mat.data().get(data);
+    float[] data = new float[elms];
+    FloatIndexer floatIndexer = (FloatIndexer)mat.createIndexer();
+    for(int i = 0; i < mat.total() * mat.channels(); i++) {
+          data[i] = floatIndexer.get(i);
+    }
+    
     image.setData(data);
     return image;
-    
-    
   }
   
   public static Mat convertFloatImageToMat(FloatImage image) throws IOException {
@@ -59,7 +71,12 @@ public class MatUtils {
       default:
         throw new IOException("Unsupported HipiColorSpace [" + colorSpace + "].");
     }
-    mat.data(new BytePointer(ByteUtils.floatArrayToByteArray(image.getData())));
+    
+    FloatIndexer floatIndexer = (FloatIndexer)mat.createIndexer();
+    for(int i = 0; i < mat.total() * mat.channels(); i++) {
+          floatIndexer.put(i, image.getData()[i]);     
+    }
+    
     return mat;
   }
     

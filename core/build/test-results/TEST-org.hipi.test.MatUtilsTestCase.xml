@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.hipi.test.MatUtilsTestCase" tests="2" skipped="0" failures="0" errors="0" timestamp="2015-08-06T18:20:04" hostname="Zacks-MacBook-Pro.local" time="14.162">
+  <properties/>
+  <testcase name="testCreateFloatImageFromValidMat" classname="org.hipi.test.MatUtilsTestCase" time="5.988"/>
+  <testcase name="testCreateMatFromValidFloatImage" classname="org.hipi.test.MatUtilsTestCase" time="8.174"/>
+  <system-out><![CDATA[Testing mat number 1
+Testing image dimensions
+Testing image channels
+Testing image contents
+
+Testing mat number 2
+Testing image dimensions
+Testing image channels
+Testing image contents
+
+Testing mat number 3
+Testing image dimensions
+Testing image channels
+Testing image contents
+
+Testing mat number 4
+Testing image dimensions
+Testing image channels
+Testing image contents
+
+Testing mat number 5
+Testing image dimensions
+Testing image channels
+Testing image contents
+
+Testing mat number 6
+Testing image dimensions
+Testing image channels
+Testing image contents
+
+Testing mat number 7
+Testing image dimensions
+Testing image channels
+Testing image contents
+
+../testdata/jpeg-rgb/01_photoshop.ppm
+../testdata/jpeg-rgb/02_photoshop.ppm
+../testdata/jpeg-rgb/03_photoshop.ppm
+../testdata/jpeg-rgb/04_photoshop.ppm
+../testdata/jpeg-rgb/05_photoshop.ppm
+../testdata/jpeg-rgb/canon-ixus_photoshop.ppm
+../testdata/jpeg-rgb/cat_photoshop.ppm
+Testing floatImage number 1
+Testing image dimensions
+Testing image channels / data type
+Testing image contents
+
+Testing floatImage number 2
+Testing image dimensions
+Testing image channels / data type
+Testing image contents
+
+Testing floatImage number 3
+Testing image dimensions
+Testing image channels / data type
+Testing image contents
+
+Testing floatImage number 4
+Testing image dimensions
+Testing image channels / data type
+Testing image contents
+
+Testing floatImage number 5
+Testing image dimensions
+Testing image channels / data type
+Testing image contents
+
+Testing floatImage number 6
+Testing image dimensions
+Testing image channels / data type
+Testing image contents
+
+Testing floatImage number 7
+Testing image dimensions
+Testing image channels / data type
+Testing image contents
+
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

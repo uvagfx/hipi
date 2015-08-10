@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.hipi.examples.test.CovarTest" tests="6" skipped="6" failures="0" errors="0" timestamp="2015-08-10T20:56:47" hostname="Zacks-MacBook-Pro.local" time="0.007">
+  <properties/>
+  <testcase name="testComputeMeanInvalidNumberOfInputs" classname="org.hipi.examples.test.CovarTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <testcase name="testComputeCovarianceInvalidInputPath" classname="org.hipi.examples.test.CovarTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <testcase name="testComputeMean" classname="org.hipi.examples.test.CovarTest" time="0.001">
+    <skipped/>
+  </testcase>
+  <testcase name="testComputeCovariance" classname="org.hipi.examples.test.CovarTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <testcase name="testComputeCovarianceInvalidNumberOfInputs" classname="org.hipi.examples.test.CovarTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <testcase name="testComputeMeanInvalidInputPath" classname="org.hipi.examples.test.CovarTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[log4j:WARN No appenders could be found for logger (org.apache.hadoop.util.Shell).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+]]></system-err>
+</testsuite>

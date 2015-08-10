@@ -1,0 +1,65 @@
+sourceSets {
+  computeMeanTestDriver {
+    java {
+      srcDir 'src/main'
+      exclude 'src/main/java/org/hipi/examples/test/ComputeCovarianceTestDriver.java'
+    }
+    compileClasspath += sourceSets.main.runtimeClasspath
+  }
+  computeCovarianceTestDriver {
+    java {
+      srcDir 'src/main'
+      exclude 'src/main/java/org/hipi/examples/test/ComputeMeanTestDriver.java'
+    }
+  }
+}
+
+dependencies {
+   computeMeanTestDriverCompile project(":core")
+   computeMeanTestDriverCompile project(":examples:covar") 
+   
+   computeCovarianceTestDriverCompile project(":core")
+   computeCovarianceTestDriverCompile project(":examples:covar") 
+   
+   compile project(":core")
+   compile project(":examples:covar")
+}
+
+task computeMeanTestDriverJar(type: Jar) {
+  from sourceSets.computeMeanTestDriver.output
+  description 'Creates computeMeanTestDriver.jar required for testing.'
+  group  'build'
+  archiveName='computeMeanTestDriver.jar'
+  println configurations.runtime.collect { it.getAbsolutePath() }.join(' ')
+  manifest {
+    attributes("Class-Path" : configurations.compile.collect { it.getAbsolutePath() }.join(' '),
+               "Main-Class": "org.hipi.examples.test.ComputeMeanTestDriver");
+  }
+}
+
+task computeCovarianceTestDriverJar(type: Jar) {
+  from sourceSets.computeCovarianceTestDriver.output
+  description 'Creates computeCovarianceTestDriver.jar required for testing.'
+  group 'build'
+  archiveName='computeCovarianceTestDriver.jar'
+  manifest {
+    attributes("Class-Path" : configurations.compile.collect { it.getAbsolutePath() }.join(' '),
+               "Main-Class": "org.hipi.examples.test.ComputeCovarianceTestDriver");
+  }
+}
+
+test {
+  dependsOn(computeMeanTestDriverJar)
+  dependsOn(computeCovarianceTestDriverJar)
+
+  dependsOn(':examples:covar:jar')
+
+  testLogging.showStandardStreams = true
+  doLast {
+    println "\nFinished running HIPI examples test suite."
+  }
+
+}
+
+test.mustRunAfter(computeMeanTestDriverJar)
+test.mustRunAfter(computeCovarianceTestDriverJar)

@@ -3,6 +3,7 @@ sourceSets {
     java {
       srcDir 'src/main'
     }
+    compileClasspath += sourceSets.main.runtimeClasspath
   }
 }
 
@@ -36,14 +37,6 @@ test {
     println "\nFinished running HIPI tools test suite."
   }
 
-}
-
-task foo << {
-  description "test"
-  
-  doLast {
-    println "I'm foo!"
-  }
 }
 
 test.mustRunAfter(dumpHibJar)

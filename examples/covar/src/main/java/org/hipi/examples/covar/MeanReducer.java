@@ -33,7 +33,6 @@ public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, IntWrit
         fi.put(k, (fi.get(k) * (1.0f / (float) total)));
       }
     }
-    opencv_highgui.imshow("arsar", mean);
     context.write(key, new OpenCVMatWritable(mean));
   }
 

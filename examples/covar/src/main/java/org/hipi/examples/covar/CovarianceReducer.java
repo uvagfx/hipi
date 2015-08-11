@@ -23,21 +23,8 @@ public class CovarianceReducer extends
       throws IOException, InterruptedException {
     Mat cov = new Mat(N * N, N * N, opencv_core.CV_32FC1, new Scalar(0.0));
     for(OpenCVMatWritable value : values) {
-      opencv_highgui.imshow("arstsr", value.getMat());
-      
-      FloatIndexer fis = value.getMat().createIndexer();
-      for(int i = 0; i < 10; i++) {
-        System.out.println(fis.get(i));
-      }
-      
       opencv_core.add(value.getMat(), cov, cov);
     }
-    opencv_highgui.imshow("arstsr", cov);
-    System.out.println("");
-      FloatIndexer fi = cov.createIndexer();
-      for(int i = 0; i < 3000; i++) {
-        System.out.println(fi.get(i));
-      }
       
     context.write(key, new OpenCVMatWritable(cov));
   }

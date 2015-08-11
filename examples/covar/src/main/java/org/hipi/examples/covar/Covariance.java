@@ -40,7 +40,7 @@ public class Covariance extends Configured implements Tool {
     }
   }
 
-  public static void validateArgs(String[] args, Configuration conf) throws IllegalArgumentException, IOException {
+  public static void validateArgs(String[] args, Configuration conf) throws IOException {
     
     if (args.length != 2) {
       System.out.println("Usage: covariance <input HIB> <output directory>");
@@ -50,7 +50,8 @@ public class Covariance extends Configured implements Tool {
     Path inputPath = new Path(args[0]);
     FileSystem fileSystem = FileSystem.get(conf);
     if (!fileSystem.exists(inputPath)) {
-        throw new IllegalArgumentException("Invalid path (does not exist): " + inputPath);
+      System.out.println("Path to <input HIB> does not exist: " + inputPath);
+      System.exit(0);
     }
   }
 

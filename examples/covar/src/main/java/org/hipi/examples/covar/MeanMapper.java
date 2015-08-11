@@ -51,8 +51,6 @@ public class MeanMapper extends Mapper<HipiImageHeader, FloatImage, IntWritable,
       fi.put(k, (float)(fi.get(k) * (1.0 / (100 * 100))));
     }
     
-    opencv_highgui.imshow("arsar", mean);
-
     context.write(new IntWritable(0), new OpenCVMatWritable(mean));
   }
 }

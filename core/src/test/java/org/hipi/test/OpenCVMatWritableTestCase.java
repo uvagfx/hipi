@@ -39,7 +39,7 @@ public class OpenCVMatWritableTestCase {
     OpenCVMatWritable openCvMatWritable = new OpenCVMatWritable();
     Mat defaultMat = openCvMatWritable.getMat();
     int dims = defaultMat.dims();
-    assert (dims == 1 || dims == 2);
+    assertEquals("Dims are invalid (not 1 or 2): " + dims, true, (dims == 1 || dims == 2));
   }
   
   @Test

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.hipi.test.JpegCodecTestCase" tests="5" skipped="0" failures="0" errors="0" timestamp="2015-08-06T18:17:54" hostname="Zacks-MacBook-Pro.local" time="130.131">
+<testsuite name="org.hipi.test.JpegCodecTestCase" tests="5" skipped="0" failures="0" errors="0" timestamp="2015-08-11T15:11:33" hostname="Zacks-MacBook-Pro.local" time="130.427">
   <properties/>
-  <testcase name="testDecodeHeader" classname="org.hipi.test.JpegCodecTestCase" time="0.037"/>
+  <testcase name="testDecodeHeader" classname="org.hipi.test.JpegCodecTestCase" time="0.05"/>
   <testcase name="testTwelveMonkeysPlugIn" classname="org.hipi.test.JpegCodecTestCase" time="0.001"/>
-  <testcase name="testSRGBConversions" classname="org.hipi.test.JpegCodecTestCase" time="40.273"/>
-  <testcase name="testDecodeImage" classname="org.hipi.test.JpegCodecTestCase" time="6.617"/>
-  <testcase name="testEncodeImage" classname="org.hipi.test.JpegCodecTestCase" time="83.201"/>
+  <testcase name="testSRGBConversions" classname="org.hipi.test.JpegCodecTestCase" time="41.111"/>
+  <testcase name="testDecodeImage" classname="org.hipi.test.JpegCodecTestCase" time="6.713"/>
+  <testcase name="testEncodeImage" classname="org.hipi.test.JpegCodecTestCase" time="82.552"/>
   <system-out><![CDATA[Testing linear RGB color conversion for: ../testdata/jpeg-cmyk/christie_brinkley_cmyk.jpg
 wrote: ../testdata/jpeg-cmyk/christie_brinkley_cmyk_hipi.ppm
 compare -metric PSNR ../testdata/jpeg-cmyk/christie_brinkley_cmyk_hipi.ppm ../testdata/jpeg-cmyk/christie_brinkley_cmyk_photoshop.ppm /tmp/psnr.png
@@ -43,59 +43,59 @@ Testing JPEG decoder (ByteImage) for: ../testdata/jpeg-cmyk/cmyk-jpeg-format.jpg
 Testing JPEG decoder (FloatImage) for: ../testdata/jpeg-cmyk/christie_brinkley_cmyk.jpg
 Testing JPEG decoder (FloatImage) for: ../testdata/jpeg-cmyk/cmyk-jpeg-format.jpg
 Testing JPEG encoder (ByteImage) for: ../testdata/jpeg-rgb/01_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@67a2af64
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@62e8200
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/01_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 45.8651
 Testing JPEG encoder (ByteImage) for: ../testdata/jpeg-rgb/02_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@3e97c3f8
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@77ecfb67
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/02_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 39.7205
 Testing JPEG encoder (ByteImage) for: ../testdata/jpeg-rgb/03_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@46a633f5
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@6e732980
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/03_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 41.8169
 Testing JPEG encoder (ByteImage) for: ../testdata/jpeg-rgb/04_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@5c1b3835
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@600f9c72
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/04_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 42.3087
 Testing JPEG encoder (ByteImage) for: ../testdata/jpeg-rgb/05_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@5ac342cb
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@2645b23f
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/05_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 46.1269
 Testing JPEG encoder (ByteImage) for: ../testdata/jpeg-rgb/canon-ixus_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@1a3e8170
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@7ae6a841
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/canon-ixus_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 42.2112
 Testing JPEG encoder (ByteImage) for: ../testdata/jpeg-rgb/cat_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@12b78cb5
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@65899c41
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/cat_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 38.4318
 Testing JPEG encoder (FloatImage) for: ../testdata/jpeg-rgb/01_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@753f2f17
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@72ba8f5
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/01_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 43.8176
 Testing JPEG encoder (FloatImage) for: ../testdata/jpeg-rgb/02_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@4b088ccc
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@5be665d0
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/02_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 39.1081
 Testing JPEG encoder (FloatImage) for: ../testdata/jpeg-rgb/03_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@3b343dbd
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@5a0f4564
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/03_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 40.9046
 Testing JPEG encoder (FloatImage) for: ../testdata/jpeg-rgb/04_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@816d6c7
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@566d75f5
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/04_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 41.2763
 Testing JPEG encoder (FloatImage) for: ../testdata/jpeg-rgb/05_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@45c27e52
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@4211a6af
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/05_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 43.8866
 Testing JPEG encoder (FloatImage) for: ../testdata/jpeg-rgb/canon-ixus_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@2bde642c
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@546670c9
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/canon-ixus_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 41.1112
 Testing JPEG encoder (FloatImage) for: ../testdata/jpeg-rgb/cat_photoshop.ppm
-Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@78115850
+Using JPEG encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@13db6dde
 cmd: compare -metric PSNR ../testdata/jpeg-rgb/cat_photoshop.ppm /tmp/hipi_enc.jpg /tmp/psnr.png
 PSNR: 37.9775
 ]]></system-out>

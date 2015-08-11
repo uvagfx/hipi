@@ -18,13 +18,12 @@ public class ComputeMean {
 
     System.out.println("Starting to run mean job...");
 
-    
-
     Job job = Job.getInstance();
     Covariance.validateArgs(args, job.getConfiguration());
 
     String inputPath = args[0];
-    String outputPath = args[1];
+    String outputDir = args[1];
+    String outputSubDir = outputDir + "/mean-output/";
 
     job.setJarByClass(Covariance.class);
 
@@ -41,11 +40,11 @@ public class ComputeMean {
     job.getConfiguration().setBoolean("mapreduce.map.output.compress", true);
     job.setSpeculativeExecution(true);
 
-    FileInputFormat.setInputPaths(job, new Path(args[0]));
-    Covariance.mkdir(args[1], job.getConfiguration());
-    Covariance.rmdir(args[1] + "/mean-output/", job.getConfiguration());
-    FileOutputFormat.setOutputPath(job, new Path(args[1] + "/mean-output/"));
-    job.getConfiguration().setStrings("mean.outpath", args[1] + "/mean-output/");
+    FileInputFormat.setInputPaths(job, new Path(inputPath));
+    Covariance.mkdir(outputDir, job.getConfiguration());
+    Covariance.rmdir(outputSubDir, job.getConfiguration());
+    FileOutputFormat.setOutputPath(job, new Path(outputSubDir));
+    job.getConfiguration().setStrings("mean.outpath", outputSubDir);
 
 
     return job.waitForCompletion(true) ? 0 : 1;

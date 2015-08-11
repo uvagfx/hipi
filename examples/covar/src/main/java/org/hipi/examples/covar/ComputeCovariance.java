@@ -1,11 +1,17 @@
 package org.hipi.examples.covar;
 
+import java.io.IOException;
 import java.net.URI;
 
 
 
 
+
+
+
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Job;
@@ -23,12 +29,24 @@ public class ComputeCovariance {
     
     System.out.println("Starting to run covariance job...");
    
-    
     Job job = Job.getInstance();
-
+    Covariance.validateArgs(args, job.getConfiguration());
+    
+    String inputPath = args[0];
+    String outputDir = args[1];
+    String outputSubDir = outputDir + "/covariance-output/";
+    
+    String cachePath = outputDir + "/mean-output/part-r-00000";
+    validateMeanCachePath(cachePath, job.getConfiguration());
+    
+    if(cachePath.startsWith("/")) {
+      job.addCacheFile(new URI(job.getConfiguration().get("fs.default.name") + cachePath));
+    } else {
+      job.addCacheFile(new URI(job.getConfiguration().get("fs.default.name") + "/" + cachePath));
+    }
+    
     job.setJarByClass(Covariance.class);
 
-    job.addCacheFile(new URI("hdfs://" + args[1] + "/mean-output/part-r-00000"));
 
     job.setInputFormatClass(HibInputFormat.class);
     
@@ -43,13 +61,22 @@ public class ComputeCovariance {
     job.getConfiguration().setBoolean("mapreduce.map.output.compress", true);
     job.setSpeculativeExecution(true);
 
-    FileInputFormat.setInputPaths(job, new Path(args[0]));
-    Covariance.mkdir(args[1], job.getConfiguration());
-    Covariance.rmdir(args[1] + "/covariance-output/", job.getConfiguration());
-    FileOutputFormat.setOutputPath(job, new Path(args[1] + "/covariance-output/"));
+    FileInputFormat.setInputPaths(job, new Path(inputPath));
+    Covariance.mkdir(outputDir, job.getConfiguration());
+    Covariance.rmdir(outputSubDir, job.getConfiguration());
+    FileOutputFormat.setOutputPath(job, new Path(outputSubDir));
     
-    job.getConfiguration().setStrings("covariance.outpath" , args[1] + "/covariance-output/");
+    job.getConfiguration().setStrings("covariance.outpath" , outputSubDir);
 
     return job.waitForCompletion(true) ? 0 : 1;
+  }
+  
+  private static void validateMeanCachePath(String cachePathString, Configuration conf) throws IOException {
+    Path cachePath = new Path(cachePathString);
+    FileSystem fileSystem = FileSystem.get(conf);
+    if (!fileSystem.exists(cachePath)) {
+      System.out.println("Path to mean does not exist: " + cachePath);
+      System.exit(0);
+    }
   }
 }

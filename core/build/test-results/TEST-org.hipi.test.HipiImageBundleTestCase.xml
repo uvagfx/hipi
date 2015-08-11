@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.hipi.test.HipiImageBundleTestCase" tests="3" skipped="0" failures="0" errors="0" timestamp="2015-08-06T18:17:36" hostname="Zacks-MacBook-Pro.local" time="17.047">
+<testsuite name="org.hipi.test.HipiImageBundleTestCase" tests="3" skipped="0" failures="0" errors="0" timestamp="2015-08-11T15:11:16" hostname="Zacks-MacBook-Pro.local" time="17.716">
   <properties/>
-  <testcase name="testOffsets" classname="org.hipi.test.HipiImageBundleTestCase" time="0.039"/>
-  <testcase name="testAppend" classname="org.hipi.test.HipiImageBundleTestCase" time="5.146"/>
-  <testcase name="testIterator" classname="org.hipi.test.HipiImageBundleTestCase" time="11.861"/>
+  <testcase name="testOffsets" classname="org.hipi.test.HipiImageBundleTestCase" time="0.043"/>
+  <testcase name="testAppend" classname="org.hipi.test.HipiImageBundleTestCase" time="5.318"/>
+  <testcase name="testIterator" classname="org.hipi.test.HipiImageBundleTestCase" time="12.351"/>
   <system-out><![CDATA[HipiImageBundle#setup
 HIPI: Using default blockSize of [33554432].
 HIPI: Using default replication factor of [1].

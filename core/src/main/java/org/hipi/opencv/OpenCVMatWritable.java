@@ -37,11 +37,18 @@ public class OpenCVMatWritable implements Writable {
     if (!(dims == 1 || dims == 2)) {
       throw new IllegalArgumentException("Currently supports only 1D or 2D arrays. Input mat dims: " + dims);
     }
-    this.mat = mat;
+    
+    Mat inputMat = new Mat();
+    mat.copyTo(inputMat);
+    inputMat.dims(mat.dims());
+    this.mat = inputMat;
   }
 
   public Mat getMat() {
-    return mat;
+    Mat outputMat = new Mat();
+    mat.copyTo(outputMat);
+    outputMat.dims(mat.dims());
+    return outputMat;
   }
 
   public void write(DataOutput out) throws IOException {

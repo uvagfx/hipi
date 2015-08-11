@@ -53,16 +53,6 @@ public class CovarianceMapper extends
       OpenCVMatWritable meanWritable = new OpenCVMatWritable();
       meanWritable.readFields(dis);
       mean = meanWritable.getMat().clone();
-      FloatIndexer meanIndexer = mean.createIndexer();
-      
-      System.out.println("mean info: ");
-      System.out.println(mean.rows());
-      System.out.println(mean.cols());
-      
-      for(int i = 0; i < 10; i++) {
-        System.out.println(meanIndexer.get(i));
-      }
-     
 
     } catch (IOException ioe) {
       System.err.println(ioe);
@@ -89,22 +79,12 @@ public class CovarianceMapper extends
         gaussianIndexer.put(index, gaussianIndexer.get(index) * ((N * N) / gaussianSum));
       }
     }
-//    opencv_highgui.imshow("mean", mean);
-//    opencv_highgui.imshow("rst", gaussian);
   }
 
   @Override
   public void map(HipiImageHeader key, FloatImage value, Context context) throws IOException,
       InterruptedException {
     Mat cvValue = MatUtils.convertFloatImageToMat(value);
-    opencv_highgui.imshow("test", cvValue);
-    
-    System.out.println("MEAN");
-    
-    FloatIndexer s = mean.createIndexer();
-    for(int m = 0; m < 10; m++) {
-      System.out.println(s.get(m));
-    }
 
     ArrayList<Mat> patches = new ArrayList<Mat>();
     ArrayList<FloatIndexer> patchIndexers = new ArrayList<FloatIndexer>();
@@ -119,42 +99,10 @@ public class CovarianceMapper extends
         Mat grayPatch = new Mat(patch.rows(), patch.cols(), opencv_core.CV_32FC1, new Scalar(0.0));
         cvtColor(patch, grayPatch, CV_RGB2GRAY);
         
-//        System.out.println("PATCH BEFORE");
-//        FloatIndexer w = patch.createIndexer();
-//        for(int m = 0; m < 10; m++) {
-//          System.out.println(w.get(m));
-//        }
-//        
-//        System.out.println("GRAY PATCH BEFORE");
-//        FloatIndexer q = grayPatch.createIndexer();
-//        for(int m = 0; m < 10; m++) {
-//          System.out.println(q.get(m));
-//        }
-        
-//        System.out.println("MEAN");
-//        
-//        FloatIndexer s = mean.createIndexer();
-//        for(int m = 0; m < 10; m++) {
-//          System.out.println(s.get(m));
-//        }
-        
-//        System.out.println("GAUSSIAN");
-//        
-//        FloatIndexer h = gaussian.createIndexer();
-//        for(int m = 0; m < 10; m++) {
-//          System.out.println(h.get(m));
-//        }
-
         opencv_core.subtract(grayPatch, mean, grayPatch);
         opencv_core.multiply(grayPatch, gaussian, grayPatch);
 
         Mat clonedGrayPatch = grayPatch.clone();
-        //opencv_highgui.imshow("test", clonedGrayPatch);
-//        System.out.println("PATCH");
-//        FloatIndexer p = clonedGrayPatch.createIndexer();
-//        for(int m = 0; m < 10; m++) {
-//          System.out.println(p.get(m));
-//        }
         patches.add(clonedGrayPatch);
         patchIndexers.add((FloatIndexer) clonedGrayPatch.createIndexer()); //pre-creating mat indexers speeds up running time
       }
@@ -174,14 +122,9 @@ public class CovarianceMapper extends
 
     Mat covarianceMat = new Mat(N * N, N * N, opencv_core.CV_32FC1, new Scalar(0.0));
     FloatIndexer fi = covarianceMat.createIndexer();
-    System.out.println("Covariance array:");
     for (int i = 0; i < covarianceArray.length; i++) {
       fi.put(i, covarianceArray[i]);
     }
-    for (int i = 0; i < 10; i++) {
-      System.out.println(fi.get(i));
-    }
-    opencv_highgui.imshow("test", covarianceMat);
 
     context.write(new IntWritable(0), new OpenCVMatWritable(covarianceMat));
   }

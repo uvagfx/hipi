@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.hipi.test.OpenCVMatWritableTestCase" tests="12" skipped="1" failures="0" errors="0" timestamp="2015-08-12T17:38:08" hostname="Zacks-MacBook-Pro.local" time="0.014">
+<testsuite name="org.hipi.test.OpenCVMatWritableTestCase" tests="12" skipped="1" failures="0" errors="0" timestamp="2015-08-12T22:02:17" hostname="Zacks-MacBook-Pro.local" time="0.238">
   <properties/>
-  <testcase name="serializeAndRecreateSignedByteMat" classname="org.hipi.test.OpenCVMatWritableTestCase" time="0.007"/>
+  <testcase name="serializeAndRecreateSignedByteMat" classname="org.hipi.test.OpenCVMatWritableTestCase" time="0.233"/>
   <testcase name="testMatConstructor" classname="org.hipi.test.OpenCVMatWritableTestCase" time="0.0"/>
   <testcase name="serializeAndRecreateFloatMat" classname="org.hipi.test.OpenCVMatWritableTestCase" time="0.0"/>
   <testcase name="serializeAndRecreateUnsignedShortMat" classname="org.hipi.test.OpenCVMatWritableTestCase" time="0.0"/>

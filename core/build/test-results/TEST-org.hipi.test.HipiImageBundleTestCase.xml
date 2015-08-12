@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.hipi.test.HipiImageBundleTestCase" tests="3" skipped="0" failures="0" errors="0" timestamp="2015-08-12T17:35:21" hostname="Zacks-MacBook-Pro.local" time="17.234">
+<testsuite name="org.hipi.test.HipiImageBundleTestCase" tests="3" skipped="0" failures="0" errors="0" timestamp="2015-08-12T21:59:48" hostname="Zacks-MacBook-Pro.local" time="18.09">
   <properties/>
-  <testcase name="testOffsets" classname="org.hipi.test.HipiImageBundleTestCase" time="0.034"/>
-  <testcase name="testAppend" classname="org.hipi.test.HipiImageBundleTestCase" time="5.016"/>
-  <testcase name="testIterator" classname="org.hipi.test.HipiImageBundleTestCase" time="12.18"/>
+  <testcase name="testOffsets" classname="org.hipi.test.HipiImageBundleTestCase" time="0.033"/>
+  <testcase name="testAppend" classname="org.hipi.test.HipiImageBundleTestCase" time="5.471"/>
+  <testcase name="testIterator" classname="org.hipi.test.HipiImageBundleTestCase" time="12.585"/>
   <system-out><![CDATA[HipiImageBundle#setup
-HIPI: Using default blockSize of [33554432].
-HIPI: Using default replication factor of [1].
 ADDING IMAGE: ../testdata/jpeg-rgb/01.JPEG
 ImageHeader: (1 1) 3456 x 2304 x 3 meta: {"path":"..\/testdata\/jpeg-rgb\/01.JPEG"}
 ADDING IMAGE: ../testdata/jpeg-rgb/02.JPG
@@ -32,12 +30,6 @@ testOffsets
 14574029
 14700480
 testAppend
-HIPI: Using default blockSize of [33554432].
-HIPI: Using default replication factor of [1].
-HIPI: Using default blockSize of [33554432].
-HIPI: Using default replication factor of [1].
-HIPI: Using default blockSize of [33554432].
-HIPI: Using default replication factor of [1].
 VERIFYING IMAGE: 01.JPEG
 ImageHeader: (1 1) 3456 x 2304 x 3 meta: {}
 ByteImage: 3456 x 2304 x 3 [(182 192 194) (181 191 193) (181 189 192) (182 190 193) (183 191 194) (183 191 194) (181 189 192) (180 188 191) (181 189 192) (181 189 192)]

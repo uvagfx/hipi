@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.hipi.test.PngCodecTestCase" tests="3" skipped="2" failures="0" errors="0" timestamp="2015-08-12T17:38:08" hostname="Zacks-MacBook-Pro.local" time="0.006">
+<testsuite name="org.hipi.test.PngCodecTestCase" tests="3" skipped="2" failures="0" errors="0" timestamp="2015-08-12T22:02:31" hostname="Zacks-MacBook-Pro.local" time="0.009">
   <properties/>
-  <testcase name="testDecodeImageHeader" classname="org.hipi.test.PngCodecTestCase" time="0.006"/>
+  <testcase name="testDecodeImageHeader" classname="org.hipi.test.PngCodecTestCase" time="0.009"/>
   <testcase name="testDecodeImage" classname="org.hipi.test.PngCodecTestCase" time="0.0">
     <skipped/>
   </testcase>

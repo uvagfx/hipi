@@ -17,18 +17,19 @@ import org.bytedeco.javacpp.indexer.FloatIndexer;
 import org.hipi.image.FloatImage;
 import org.hipi.image.HipiImageHeader;
 import org.hipi.opencv.OpenCVMatWritable;
+import org.hipi.opencv.
 
 public class CovarianceMapper extends
     Mapper<HipiImageHeader, FloatImage, IntWritable, OpenCVMatWritable> {
-
-  public static final int N = Covariance.N;
-  public static final float sigma = Covariance.sigma;
 
   Mat mean; //stores result of computeMean job which has been stored in the job's cache.
   Mat gaussian; //stores gaussian matrix computed in mapper setup
 
   @Override
   public void setup(Context job) {
+    
+    int N = Covariance.patchSize;
+    float sigma = Covariance.sigma;
     
     //access mean from cache
     try {
@@ -75,17 +76,19 @@ public class CovarianceMapper extends
   }
 
   @Override
-  public void map(HipiImageHeader key, FloatImage value, Context context) throws IOException,
+  public void map(HipiImageHeader header, FloatImage image, Context context) throws IOException,
       InterruptedException {
     
+    int N = Covariance.patchSize;
+    
     //convert input FloatImage to grayscale mat
-    Mat cvValue = Covariance.covertFloatImageToGrayScaleMat(value);
+    Mat cvValue = OpenCVUtils.convertFloatImageToMat(image, opencv_core.CV_32FC1);
     
     ArrayList<Mat> patches = new ArrayList<Mat>(); //stores patches computed from image
     ArrayList<FloatIndexer> patchIndexers = new ArrayList<FloatIndexer>(); //stores indexer objects for patches
     
     
-    // specify number of 2-D covariance patches to creates (iMax * jMax partitions)
+    // specify number of 2-D covariance patches to creates (iMax * jMax patches)
     int iMax = 10;
     int jMax = 10;
 

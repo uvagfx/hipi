@@ -17,15 +17,17 @@ import java.util.HashMap;
 import javax.imageio.metadata.IIOMetadata;
 
 /**
- * A 2D image object in HIPI. This class implements the Writable
- * interface so that it can be used as a value object in MapReduce.
- * @see org.apache.hadoop.io.Writable
+ * An abstract base class from which all concrete image classes in HIPI must be derived. This class
+ * implements the {@link org.apache.hadoop.io.Writable} interface so that it can be used as a value
+ * object in a MapReduce program.
  */
-
 public abstract class HipiImage implements Writable {
 
+  /**
+   * Enumeration of the supported image object types in HIPI (e.g., FloatImage, ByteImage, etc.).
+   */
   public enum HipiImageType {
-    UNDEFINED(0x0), FLOAT(0x1), BYTE(0x2), RAW(0x3), OPENCV(0x4);
+    UNDEFINED(0x0), FLOAT(0x1), BYTE(0x2), RAW(0x3);
 
     private int type;
 
@@ -41,17 +43,21 @@ public abstract class HipiImage implements Writable {
     /**
      * Creates a HipiImageType from an int.
      *
-     * @param val Integer representation of HipiImageType.
+     * @param type integer representation of HipiImageType
      *
      * @return Associated HipiImageType.
+     *
+     * @throws IllegalArgumentException if the parameter does not correspond to a valid
+     * HipiImageType.
      */
     public static HipiImageType fromInteger(int type) throws IllegalArgumentException {
       for (HipiImageType typ : values()) {
-	if (typ.type == type) {
-	  return typ;
-	}
+        if (typ.type == type) {
+         return typ;
+        }
       }
-      throw new IllegalArgumentException(String.format("There is no HipiImageType enum value associated with integer [%d]", type));
+      throw new IllegalArgumentException(String.format("There is no HipiImageType enum value " +
+        "associated with integer [%d]", type));
     }
 
     /** 
@@ -72,12 +78,26 @@ public abstract class HipiImage implements Writable {
 
   } // public enum HipiImageType
 
+  /**
+   * Every HipiImage contains a HipiImageHeader that stores universally available information about
+   * the image such as its spatial dimensions and color space.
+   */
   protected HipiImageHeader header;
 
+  /**
+   * Default constructor. Sets header field to null.
+   */
   protected HipiImage() {
     this.header = null;
   }
 
+  /**
+   * Set value of header field.
+   *
+   * @param header header object to use as source of assignment
+   *
+   * @throws IllegalArgumentException of the provided header is null or contains invalid values
+   */
   public void setHeader(HipiImageHeader header) throws IllegalArgumentException {
     if (header == null) {
       throw new IllegalArgumentException("Image header must not be null.");
@@ -90,9 +110,9 @@ public abstract class HipiImage implements Writable {
   }
 
   /**
-   * Get object type identifier.
+   * Get image type identifier.
    *
-   * @return Type of object.
+   * @return HipiImageType.UNDEFINED
    */
   public HipiImageType getType() {
     return HipiImageType.UNDEFINED;
@@ -101,7 +121,7 @@ public abstract class HipiImage implements Writable {
   /**
    * Get storage format of image.
    *
-   * @return Storage format of image.
+   * @return storage format of image
    */
   public HipiImageFormat getStorageFormat() {
     return header.getStorageFormat();
@@ -110,7 +130,7 @@ public abstract class HipiImage implements Writable {
   /**
    * Get color space of image.
    *
-   * @return Color space of image.
+   * @return color space of image
    */
   public HipiColorSpace getColorSpace() {
     return header.getColorSpace();
@@ -119,7 +139,7 @@ public abstract class HipiImage implements Writable {
   /**
    * Get width of image.
    *
-   * @return Width of image.
+   * @return width of image
    */
   public int getWidth() {
     return header.getWidth();
@@ -128,35 +148,34 @@ public abstract class HipiImage implements Writable {
   /**
    * Get height of image.
    *
-   * @return Height of image.
+   * @return height of image
    */
   public int getHeight() {
     return header.getHeight();
   }
 
   /**
-   * Get number of bands in image.
+   * Get number of bands (also called "channels") in image.
    *
-   * @return Number of bands in image.
+   * @return number of color bands in image
    */
   public int getNumBands() {
     return header.getNumBands();
   }
 
   /**
-   * Get meta data for particular key.
+   * Get meta data value for particular key.
    *
-   * @return meta data value as String
+   * @return meta data value as String (null if key does not exist in meta data dictionary)
    */
   public String getMetaData(String key) {
     return header.getMetaData(key);
   }
 
   /**
-   * Get all of the metadata associated with this image as {@link
-   * HashMap}.
+   * Get the entire image meta data dictionary as a {@link HashMap}.
    *
-   * @return a hash map containing the keys and values of the metadata
+   * @return a hash map containing the image meta data key/value pairs
    */
   public HashMap<String, String> getAllMetaData() {
     return header.getAllMetaData();
@@ -165,27 +184,25 @@ public abstract class HipiImage implements Writable {
   /**
    * Get EXIF data value for particular key.
    *
-   * @return EXIF data object as String
+   * @return EXIF data object as String (null if key does not exist in EXIF data dictionary)
    */
   public String getExifData(String key) {
     return header.getExifData(key);
   }
 
   /**
-   * Get the entire map of EXIF data.
+   * Get the entire EXIF dictionary as a {@link HashMap}.
    *
-   * @return a hash map containing the keys and values of the metadata
+   * @return a hash map containing the EXIF image data key/value pairs
    */
   public HashMap<String, String> getAllExifData() {
     return header.getAllExifData();
   }
 
   /**
-   * Computes hash of array of image pixel data.
+   * Hash of image data.
    *
-   * @return Hash of pixel data represented as a string.
-   *
-   * @see ByteUtils#asHex is used to compute the hash.
+   * @return hash of pixel data as String
    */
   public abstract String hex();
 

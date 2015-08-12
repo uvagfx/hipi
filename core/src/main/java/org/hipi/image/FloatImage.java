@@ -16,11 +16,18 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * A 2D image represented as an array of floats. A FloatImage consists
- * of a flat array of pixel values represented as Java floats in
- * addition to an {@link ImageHeader} object.<br/><br/>
+ * A raster image represented as an array of Java floats. A FloatImage consists
+ * of a flat array of pixel values represented as a {@link PixelArrayFloat} 
+ * object along with a {@link HipiImageHeader} object.
  *
- * The {@link hipi.image.io} package provides classes for reading
+ * Note that individual pixel values in a FloatImage are understood to be in a linear
+ * color space. We suggest using the {@link PixelArray#setElemNonLinSRGB} method to
+ * set pixel values from 8-bit pixel values that are read from an image as these are
+ * usually represented in a non-linear gamma-compressed color space. The {@link PixelArrayFloat}
+ * class has routines for performing the conversion between linear and non-linear
+ * color spaces (e.g., sRGB and linear RGB).
+ *
+ * The {@link org.hipi.image.io} package provides classes for reading
  * (decoding) and writing (encoding) FloatImage objects in various
  * compressed and uncompressed image formats such as JPEG and PNG.
  */
@@ -30,11 +37,25 @@ public class FloatImage extends RasterImage {
     super((PixelArray)(new PixelArrayFloat()));
   }
 
-  public FloatImage(int width, int height, int bands) {
+  public FloatImage(int width, int height, int bands) throws IllegalArgumentException {
     super((PixelArray)(new PixelArrayFloat()));
     HipiImageHeader header = new HipiImageHeader(HipiImageFormat.UNDEFINED, HipiColorSpace.UNDEFINED,
 						 width, height, bands, null, null);
     setHeader(header);
+  }
+
+  public FloatImage(int width, int height, int bands, float[] data) 
+  throws IllegalArgumentException {
+    super((PixelArray)(new PixelArrayFloat()));
+    HipiImageHeader header = new HipiImageHeader(HipiImageFormat.UNDEFINED, HipiColorSpace.UNDEFINED,
+             width, height, bands, null, null);
+    setHeader(header);
+    if (data == null || data.length != width*height*bands) {
+      throw new IllegalArgumentException("Size of data buffer does not match image dimensions.");
+    }
+    for (int i=0; i<width*height*bands; i++) {
+      pixelArray.setElemFloat(i,data[i]);
+    }
   }
 
   /**
@@ -124,10 +145,9 @@ public class FloatImage extends RasterImage {
   /**
    * Performs in-place addition with another {@link FloatImage}.
    * 
-   * @param image Target image to add to the current object.
+   * @param thatImage target image to add to current image
    *
-   * @throws IllegalArgumentException If the image dimensions do not
-   * match.
+   * @throws IllegalArgumentException if the image dimensions do not match
    */
   public void add(FloatImage thatImage) throws IllegalArgumentException {
     // Verify input
@@ -146,10 +166,9 @@ public class FloatImage extends RasterImage {
   }
 
   /**
-   * Performs in-place addition of a scalar to each band of every
-   * pixel.
+   * Performs in-place addition of a scalar to each band of every pixel.
    * 
-   * @param number Scalar to add to each band of each pixel.
+   * @param number scalar value to add to each band of each pixel
    */
   public void add(float number) {
     int w = this.getWidth();
@@ -162,10 +181,9 @@ public class FloatImage extends RasterImage {
   }
 
   /**
-   * Performs in-place elementwise multiplication of {@link
-   * FloatImage} and the current image.
+   * Performs in-place elementwise multiplication of {@link FloatImage} and the current image.
    *
-   * @param image Target image to use for  multiplication.
+   * @param thatImage target image to use for multiplication
    */
   public void multiply(FloatImage thatImage) throws IllegalArgumentException {
 

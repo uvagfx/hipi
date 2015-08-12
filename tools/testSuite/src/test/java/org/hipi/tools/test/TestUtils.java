@@ -18,7 +18,12 @@ import java.util.Scanner;
 
 public class TestUtils {
 
+  private static boolean setupOnce = false;
+
   public static void setupTestoutDirectory(FileSystem fs) throws IOException {
+    if (setupOnce) {
+      return;
+    }
     if (fs.exists(new Path("skipsetup"))) {
       return;
     }
@@ -32,6 +37,7 @@ public class TestUtils {
     TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/yfcc100m_dataset-100-temp-1 testout/flickr_src/yfcc100m_dataset-100-temp-1");
     TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/yfcc100m_dataset-100-temp-0.bz2 testout/flickr_bz2_src/yfcc100m_dataset-100-temp-0.bz2");
     TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/yfcc100m_dataset-100-temp-1.bz2 testout/flickr_bz2_src/yfcc100m_dataset-100-temp-1.bz2");
+    setupOnce = true;
   }
 
   public static boolean checkPsnr(String imgPath, String truthPath, float thresh) 
@@ -43,7 +49,6 @@ public class TestUtils {
     Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));
     float psnr = scanner.hasNextFloat() ? scanner.nextFloat() : 0;
     System.out.println("PSNR: " + psnr);
-    //    assertTrue("PSNR is too low : " + psnr, psnr > 30);
     return (psnr >= thresh);
   } 
 

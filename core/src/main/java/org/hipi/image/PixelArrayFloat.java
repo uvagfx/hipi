@@ -3,6 +3,10 @@ package org.hipi.image;
 import org.hipi.image.PixelArray;
 import org.hipi.util.ByteUtils;
 
+/**
+ * A flat array of image pixel values represented as Java floats. This class includes routines
+ * for converting between non-linear gamma-compressed sRGB values and linear RGB values.
+ */
 public class PixelArrayFloat extends PixelArray {
 
   float data[];

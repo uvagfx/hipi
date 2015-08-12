@@ -9,24 +9,71 @@ import java.io.InputStream;
 import java.io.BufferedInputStream;
 
 /**
- * This class provides the necessary functions for decoding an image
- * from an {@link InputStream}. All subclasses must contain methods
- * that know how to read and decode the image header and the image
- * pixel data.
+ * Interface for decoding a {@link HipiImageHeader} and {@link HipiImage} from a Java
+ * {@link java.io.InputStream}.
  */
 public interface ImageDecoder {
 
-  public HipiImageHeader decodeHeader(InputStream inputStream, boolean includeExifData) throws IOException;
+  /**
+   * Read and decode header for image accessed through a Java {@link java.io.InputStream}.
+   * Optionally extracts image EXIF data, if available.
+   *
+   * @param inputStream input stream containing serialized image data
+   * @param includeExifData if true attempts to extract image EXIF data
+   *
+   * @return image header data represented as a {@link HipiImageHeader}
+   *
+   * @throws IOException if an error is encountered while reading from input stream
+   */
+  public HipiImageHeader decodeHeader(InputStream inputStream, boolean includeExifData)
+  throws IOException;
 
+  /**
+   * Read and decode header for image accessed through a Java {@link java.io.InputStream}.
+   * Does not attempt to extract image EXIF data.
+   *
+   * @param inputStream input stream containing serialized image data
+   *
+   * @return image header data represented as a {@link HipiImageHeader}
+   *
+   * @throws IOException if an error is encountered while reading from input stream
+   */
   public default HipiImageHeader decodeHeader(InputStream inputStream) 
     throws IOException {
     return decodeHeader(inputStream, false);
   }
   
+  /**
+   * Read and decode image from a Java {@link java.io.InputStream}.
+   *
+   * @param inputStream input stream containing serialized image data
+   * @param imageHeader image header that was previously initialized
+   * @param imageFactory factory object capable of creating objects of desired HipiImage type
+   * @param includeExifData if true attempts to extract image EXIF data
+   *
+   * @return image represented as a {@link HipiImage}
+   *
+   * @throws IllegalArgumentException if parameters are invalid or do not agree with image data
+   * @throws IOException if an error is encountered while reading from the input stream
+   */
   public HipiImage decodeImage(InputStream inputStream, HipiImageHeader imageHeader, 
 			       HipiImageFactory imageFactory, boolean includeExifData)
     throws IllegalArgumentException, IOException;
 
+  /**
+   * Read and decode both image header and image pixel data from a Java {@link java.io.InputStream}.
+   * Both of these decoded objects can be accessed through the {@link HipiImage} object returned
+   * by this method.
+   *
+   * @param inputStream input stream containing serialized image data
+   * @param imageFactory factory object capable of creating objects of desired HipiImage type
+   * @param includeExifData if true attempts to extract image EXIF data
+   *
+   * @return image represented as a {@link HipiImage}
+   *
+   * @throws IllegalArgumentException if parameters are invalid
+   * @throws IOException if an error is encountered while reading from the input stream
+   */
   public default HipiImage decodeHeaderAndImage(InputStream inputStream,
 						HipiImageFactory imageFactory, boolean includeExifData) 
     throws IOException, IllegalArgumentException 

@@ -35,11 +35,12 @@ import java.util.Set;
 public class HibInputFormat extends FileInputFormat<HipiImageHeader, HipiImage> {
 
   /**
-   * Creates an {@link ImageBundleRecordReader}
+   * Creates a {@link HibRecordReader}
    */
   @Override
-  public RecordReader<HipiImageHeader, HipiImage> createRecordReader(InputSplit split, TaskAttemptContext context) 
-    throws IOException, InterruptedException {
+  public RecordReader<HipiImageHeader, HipiImage> createRecordReader(InputSplit split,
+    TaskAttemptContext context) 
+  throws IOException, InterruptedException {
     return new HibRecordReader();
   }
 

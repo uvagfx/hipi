@@ -1,5 +1,5 @@
 sourceSets {
-  dumpHib {
+  hibDump {
     java {
       srcDir 'src/main'
     }
@@ -8,28 +8,29 @@ sourceSets {
 }
 
 dependencies {
-  dumpHibCompile project(":core")
-//  testCompile fileTree('build/libs')
+  hibDumpCompile project(":core")
 }
 
-task dumpHibJar(type: Jar) {
-  from sourceSets.dumpHib.output
-  description 'Creates dumpHib.jar required for testing (uses culling functionality).'
-  archiveName='dumpHib.jar'
+task hibDumpJar(type: Jar) {
+  from sourceSets.hibDump.output
+  description 'Creates hibDump.jar required for testing (uses culling functionality).'
+  archiveName='hibDump.jar'
   manifest {
-    attributes("Class-Path" : configurations.runtime.collect { it.getAbsolutePath() }.join(' '),
-               "Main-Class": "org.hipi.tools.test.DumpHib");
+//    attributes("Class-Path" : configurations.runtime.collect { it.getAbsolutePath() }.join(' '),
+//               "Main-Class": "org.hipi.tools.test.HibDump");
+      attributes("Class-Path" : configurations.runtime.collect { it.toURI() }.join(' '),
+                 "Main-Class": "org.hipi.tools.test.HibDump");
   }
 }
 
 test {
-  dependsOn(dumpHibJar)
+  dependsOn(hibDumpJar)
 
   dependsOn(':tools:hibImport:jar')
   dependsOn(':tools:hibInfo:jar')
-  dependsOn(':tools:dumpHib:jar')
-  dependsOn(':tools:downloader:jar')
-  dependsOn(':tools:jpegFromHib:jar')
+  dependsOn(':tools:hibDump:jar')
+  dependsOn(':tools:hibDownload:jar')
+  dependsOn(':tools:hibToJpeg:jar')
 
   testLogging.showStandardStreams = true
 
@@ -39,4 +40,4 @@ test {
 
 }
 
-test.mustRunAfter(dumpHibJar)
+test.mustRunAfter(hibDumpJar)

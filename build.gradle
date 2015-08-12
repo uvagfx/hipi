@@ -40,13 +40,16 @@ task checkJavaVersion << {
 
 task install {
   dependsOn(checkJavaVersion)
+
   dependsOn(':tools:hibImport:jar')
+  dependsOn(':tools:hibDownload:jar')
   dependsOn(':tools:hibInfo:jar')
-  dependsOn(':tools:dumpHib:jar')
-  dependsOn(':tools:downloader:jar')
-  dependsOn(':tools:jpegFromHib:jar')
+  dependsOn(':tools:hibToJpeg:jar')
+  dependsOn(':tools:hibDump:jar')
+
   //  dependsOn(':examples:covar:jar')
+
   doLast {
-    println 'Finished building the HIPI library along with all tools and examples.'
+    println '\nFinished building the HIPI library along with all tools and examples.'
   }
 }

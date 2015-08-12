@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="Description" content="Hadoop Image Processing Interface example for dumping information from a HIB." />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="../include/main.css" />
+    <link rel="stylesheet" type="text/css" href="../include/javasyntax.css" />
+    <title>HIPI - Hadoop Image Processing Interface :: tools/hibInfo</title>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-23539446-1']);
+      _gaq.push(['_trackPageview']);  
+      (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>  
+    <style> pre.prettyprint {padding:20px 20px 0px 20px;} </style>
+
+  </head>
+  
+  <body>
+    <div class="header">
+      <h1>HIPI - Hadoop Image Processing Framework</h1>
+    </div>
+    <div class="navigation_menu">
+      <ul>
+	<li><a href="../index.html">Overview</a></li>
+	<li><a href="../gettingstarted.html">Getting Started</a></li>
+	<li><a href="../documentation.html">Documentation</a></li>
+	<li><a href="../examples.html">Tools and Examples</a></li>
+	<li><a href="../downloads.html">Downloads</a></li>
+	<li><a href="../contribute.html">Contribute</a></li>
+	<li><a href="../about.html">About</a></li>
+      </ul>
+    </div>
+    
+    <!-- Begin Content -->
+    <div class="content">
+      
+      <h2 class="title">tools/hibInfo</h2>
+
+      <div class="section">
+      <b>hibInfo</b> is a simple tool for querying basic information about a HIB. It takes as input a <a href="../javadoc/org/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) and displays to the console basic information about the images within the HIB such as their width and height along with user meta data and image EXIF data. It can also be used to extract individual images from a HIB as a stand-alone JPEG or PNG.
+
+      <h3>Compiling</h3>
+
+      Compile <b>hibInfo</b> by executing the following command in the HIPI tools directory (see our <a href="../gettingstarted.html">general notes</a> on setting up HIPI on your system):
+	
+      <pre class="console">
+$> cd tools
+$> gradle hibInfo:jar
+	    </pre>
+
+     <h3>Usage</h3>
+
+     Run <b>hibInfo</b> by executing the hibInfo.sh script located in the tools directory. As with all of the tools scripts, running it without any arguments shows its usage:
+	
+     <pre class="console">
+$> ./hibInfo.sh
+usage: hibInfo.jar &#60;input HIB&#62; [--show-exif] [--show-meta] [#index [--extract file.png] [--meta key]]
+ -e,--extract &#60;arg&#62;   extract image to disk
+ -h,--show-meta       display any image meta data
+ -m,--meta &#60;arg&#62;      extract meta data value
+ -x,--show-exif       display any image EXIF data 
+     </pre>
+
+     <b>hibInfo</b> takes a single required argument and a number of oprtional arguments. The only required argument is the path to a HIB on the HDFS.
+
+     <h3>Example</h3>
+
+     If you specify only the required path to a HIB, then <b>hibInfo</b> will list basic information about all of the images that it contains (this may take a while if the HIB contains many images):
+
+     <pre class="console">
+$> ./hibInfo.sh tigers.hib
+Input HIB: tigers.hib
+Display meta data: false
+Display EXIF data: false
+IMAGE INDEX: 0
+   640 x 480
+   format: 1
+IMAGE INDEX: 1
+   3210 x 2500
+   format: 1
+IMAGE INDEX: 2
+   3810 x 2540
+   format: 1
+IMAGE INDEX: 3
+   3210 x 2500
+   format: 2
+Found [4] images.
+      </pre>
+
+      <b>hibInfo</b> can also be used to query information about a specific image in a HIB. This mode of operation avoids scanning the entire file, but rather performs a seek to the desired image offset. Here is an example of how <b>hibInfo</b> can be used to examine the image with index 1 and display the user meta data that was stored in the HIB when it was created:
+
+     <pre class="console">
+$> ./hibInfo.sh tigers.hib 1 --show-meta
+Input HIB: tigers.hib
+Display meta data: true
+Display EXIF data: false
+Image index: 1
+Extract image path: none
+Meta data key: none
+   3210 x 2500
+   format: 1
+   meta: {source=/Users/hipiuser/Desktop/Tigers/2.JPG}
+     </pre>
+
+     In this case, <tt>tigers.hib</tt> was created with the <a href="hibImport.html"><b>hibImport</b></a> tool, which stores the original path to the image on the local file system for the "source" key in the image meta data.<br/><br/>
+
+     <b>hibInfo</b> also allows querying the image EXIF data:
+
+     <pre class="console">
+$> ./hibInfo.sh tigers.hib 0 --show-exif
+Input HIB: tigers.hib
+Display meta data: false
+Display EXIF data: true
+Image index: 0
+Extract image path: none
+Meta data key: none
+   640 x 480
+   format: 1
+   exif: {Resolution Units=inch, Compression Type=Baseline, Data Precision=8 bits, Number of Components=3, ... }
+      </pre>      
+
+      Finally, <b>hibInfo</b> can be used to extract an individual image as a stand-alone JPEG or PNG:
+
+      <pre class="console">
+$> ./hibInfo.sh tigers.hib 1 --extract one.jpg
+Input HIB: tigers.hib
+Display meta data: false
+Display EXIF data: false
+Image index: 1
+Extract image path: one.jpg
+Meta data key: none
+   3210 x 2500
+   format: 1
+Using image encoder: com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter@33b1c5c5
+Wrote [one.jpg]
+      </pre>
+
+      Experiment with the other command line arguments to discover additional functionality.
+
+      <h3>Next</h3>
+
+      Read about <a href="../examples/hibDump.html"><b>tools/hibDump</b></a>, which provides an alternative MapReduce program for querying basic information from a HIB.
+
+      </div>
+
+    </div>
+
+  </body>
+</html>

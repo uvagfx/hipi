@@ -11,6 +11,11 @@ import java.nio.DoubleBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Various static helper methods that come in handy when serializing and deserializing arrays of
+ * different Java types and performing certain operations with byte arrays like conversion to
+ * string and computing hashes.
+ */
 public class ByteUtils {
 
   /**
@@ -45,7 +50,7 @@ public class ByteUtils {
   /**
    * Convert from an array of shorts to an array of bytes
    * 
-   * @param floatArray
+   * @param shortArray
    */
   public static byte[] shortArrayToByteArray(short shortArray[]) {
     byte byteArray[] = new byte[shortArray.length*2]; // 2 bytes per short
@@ -129,6 +134,9 @@ public class ByteUtils {
    * @return SHA-1 hash of the input byte array
    */
   public static String asHex(byte[] vals) {
+    if (vals == null) {
+      return null;
+    }
     try {
       MessageDigest sha1;
       sha1 = MessageDigest.getInstance("SHA-1");

@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="Description" content="Hadoop Image Processing Interface example for dumping information from a HIB." />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="../include/main.css" />
+    <link rel="stylesheet" type="text/css" href="../include/javasyntax.css" />
+    <title>HIPI - Hadoop Image Processing Interface :: tools/hibImport</title>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-23539446-1']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();      
+    </script>
+  
+  </head>
+  
+  <body>
+
+    <div class="header">
+      <h1>HIPI - Hadoop Image Processing Framework</h1>
+    </div>
+    <div class="navigation_menu">
+      <ul>
+	<li><a href="../index.html">Overview</a></li>
+	<li><a href="../gettingstarted.html">Getting Started</a></li>
+	<li><a href="../documentation.html">Documentation</a></li>
+	<li><a href="../examples.html">Tools and Examples</a></li>
+	<li><a href="../downloads.html">Downloads</a></li>
+	<li><a href="../contribute.html">Contribute</a></li>
+	<li><a href="../about.html">About</a></li>
+      </ul>
+    </div>
+    
+    <!-- Begin Content -->
+    <div class="content">
+      
+      <h2 class="title">tools/hibImport</h2>
+
+      <div class="section">
+	
+       <b>hibImport</b> is a tool for creating a <a href="../javadoc/org/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) from a folder of images on your local file system. Note that this tool does not use the MapReduce framework, but does write to the Hadoop Distributed File System (HDFS).
+	
+       <h3>Compiling</h3>
+	
+       Compile <b>hibImport</b> by executing the following command in the HIPI tools directory (see our <a href="../gettingstarted.html">general notes</a> on setting up HIPI on your system):
+	
+        <pre class="console">
+$> cd tools
+$> gradle hibImport:jar
+        </pre>
+	
+        If successful, this command will create <tt>hibImport.jar</tt> at the following location:
+        <pre class="console">
+$> ls hibImport/build/libs
+hibImport.jar
+        </pre>
+
+        <h3>Usage</h3> 
+	
+        Run <b>hibImport</b> by executing the <tt>hibImport.sh</tt> script located in the tools directory. As with all of the tools scripts, running it without any arguments shows its usage:
+	
+        <pre class="console">
+$> ./hibImport.sh
+usage: hibImport.jar [options] &#60;image directory&#62; &#60;output HIB&#62;
+ -f,--force   force overwrite if output HIB already exists
+        </pre>
+
+        <b>hibImport</b> takes two arguments. The first argument is the path to a directory of images on the local file system. The second argument is the HDFS path to the output HIB that will be created once the program has finished. You may optionally specify the <tt>-f</tt> or <tt>--force</tt> argument which will cause the destination HIB to be overwritten if it exists.
+
+        <h3>Example</h3>
+
+        For this example, suppose the directory <tt>~/Desktop/Tigers</tt> on the local file system contains four images (three JPEGs and one PNG). The following command would generate a HIB named <tt>tiger.hib</tt> on the HDFS consisting of this set of images:
+
+        <pre class="console">
+$> ./hibImport.sh ~/Desktop/Tigers tigers.hib
+Input image directory: /Users/hipiuser/Desktop/Tigers
+Output HIB: tigers.hib
+Overwrite HIB if it exists: false
+ ** added: 1.jpg
+ ** added: 2.jpg
+ ** added: 3.jpg
+ ** added: 4.png
+Created: tigers.hib and tigers.hib.dat    	   
+        </pre>
+
+        You can verify that the HDFS was updated correctly by listing the contents of the current working directory:
+
+        <pre class="console">
+$> hadoop fs -ls
+Found 2 items
+-rw-r--r--   1 user group         80 2015-03-11 16:55 tigers.hib
+-rw-r--r--   1 user group   16493828 2015-03-11 16:55 tigers.hib.dat
+	      </pre>
+
+       Note that <b>hibimport</b> has actually created two files: <tt>tigers.hib</tt> and <tt>tigers.hib.dat</tt>. This is the structure for all HIB files. The <tt>tigers.hib</tt> file is an index into the data file and stores byte offsets to the beginning of each image segment. The <tt>tigers.hib.dat</tt> file contains the image data itself. HIPI expects both of these files to be present and named consistently.
+
+       <h3>Next</h3>
+
+       Read about <a href="../examples/hibInfo.html"><b>tools/hibInfo</b></a>, which lets you query basic information about a HIB and verify its integrity.
+
+      </div>
+
+    </div>
+
+  </body>
+</html>

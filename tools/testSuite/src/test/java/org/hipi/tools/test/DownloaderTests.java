@@ -26,7 +26,7 @@ public class DownloaderTests {
 
   @Test
   public void testDownloader() throws IOException {
-    assertEquals("Failed to run downloader.", 0, TestUtils.runCommand("../downloader.sh -f --num-nodes 5 testout/downloader_src testout/downloader.hib"));
+    assertEquals("Failed to run downloader.", 0, TestUtils.runCommand("../hibDownload.sh -f --num-nodes 5 testout/downloader_src testout/downloader.hib"));
     assertEquals("Failed to extract image 0 from testout/downloader.hib.", 0, TestUtils.runCommand("../hibInfo.sh testout/downloader.hib 0 --extract /tmp/test.jpg"));
     assertTrue("Image 0 in testout/downloader.hib does match expected value.", TestUtils.checkPsnr("../../testdata/testimages/01.jpg", "/tmp/test.jpg", 30.0f));
     assertEquals("Failed to extract image 4 from testout/downloader.hib.", 0, TestUtils.runCommand("../hibInfo.sh testout/downloader.hib 4 --extract /tmp/test.jpg"));
@@ -37,8 +37,8 @@ public class DownloaderTests {
 
   @Test
   public void testFlickrDownloader() throws IOException {
-    assertEquals("Failed to run flickrDownloader.", 0, TestUtils.runCommand("../downloader.sh --yfcc100m -f testout/flickr_src testout/flickr.hib"));
-    assertEquals("Failed to run flickrDownloader.", 0, TestUtils.runCommand("../downloader.sh --yfcc100m -f testout/flickr_bz2_src testout/flickr_bz2.hib"));
+    assertEquals("Failed to run flickrDownloader.", 0, TestUtils.runCommand("../hibDownload.sh --yfcc100m -f testout/flickr_src testout/flickr.hib"));
+    assertEquals("Failed to run flickrDownloader.", 0, TestUtils.runCommand("../hibDownload.sh --yfcc100m -f testout/flickr_bz2_src testout/flickr_bz2.hib"));
   }
 
 }

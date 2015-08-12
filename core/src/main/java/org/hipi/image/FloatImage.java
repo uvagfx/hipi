@@ -37,11 +37,25 @@ public class FloatImage extends RasterImage {
     super((PixelArray)(new PixelArrayFloat()));
   }
 
-  public FloatImage(int width, int height, int bands) {
+  public FloatImage(int width, int height, int bands) throws IllegalArgumentException {
     super((PixelArray)(new PixelArrayFloat()));
     HipiImageHeader header = new HipiImageHeader(HipiImageFormat.UNDEFINED, HipiColorSpace.UNDEFINED,
 						 width, height, bands, null, null);
     setHeader(header);
+  }
+
+  public FloatImage(int width, int height, int bands, float[] data) 
+  throws IllegalArgumentException {
+    super((PixelArray)(new PixelArrayFloat()));
+    HipiImageHeader header = new HipiImageHeader(HipiImageFormat.UNDEFINED, HipiColorSpace.UNDEFINED,
+             width, height, bands, null, null);
+    setHeader(header);
+    if (data == null || data.length != width*height*bands) {
+      throw new IllegalArgumentException("Size of data buffer does not match image dimensions.");
+    }
+    for (int i=0; i<width*height*bands; i++) {
+      pixelArray.setElemFloat(i,data[i]);
+    }
   }
 
   /**

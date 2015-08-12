@@ -493,12 +493,12 @@ public class HipiImageBundle {
 
     if (blockSize <= 0) {
       blockSize = fs.getDefaultBlockSize(dataFilePath);
-      System.out.println("HIPI: Using default blockSize of [" + blockSize + "].");
+//      System.out.println("HIPI: Using default blockSize of [" + blockSize + "].");
     }
 
     if (replication <= 0) {
       replication = fs.getDefaultReplication(dataFilePath);
-      System.out.println("HIPI: Using default replication factor of [" + replication + "].");
+//      System.out.println("HIPI: Using default replication factor of [" + replication + "].");
     }
 
     try {

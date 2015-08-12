@@ -3,7 +3,7 @@ package org.hipi.tools.test;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 
-import org.hipi.tools.test.DumpHib;
+import org.hipi.tools.test.HibDump;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -39,11 +39,12 @@ public class HibImportTests {
     assertEquals("Failed to run hibimport. Check setup.", 0, TestUtils.runCommand("../hibImport.sh -f ../../testdata/jpeg-rgb testout/import.hib"));
     assertEquals("Failed to extract image 4 from testout/import.hib. Check setup.", 0, TestUtils.runCommand("../hibInfo.sh testout/import.hib 4 --extract /tmp/test.png"));
     assertTrue("Image 4 in testout/import.hib does match expected value.", TestUtils.checkPsnr("../../testdata/jpeg-rgb/05.jpg", "/tmp/test.png", 30.0f));
-    TestUtils.runCommand("../runTool.sh ./build/libs/dumpHib.jar testout/import.hib testout/import_dump");
+    TestUtils.runCommand("../runTool.sh ./build/libs/hibDump.jar testout/import.hib testout/import_dump");
+    TestUtils.runCommand("rm -rf import_dump");
     TestUtils.runCommand("hadoop fs -copyToLocal testout/import_dump");
     File truthFile = new File("../../testdata/culltest_dump");
     File outputFile = new File("./import_dump/part-r-00000");
-    assertTrue("Output of dumpHib with cull did not meet expectation.", FileUtils.contentEquals(truthFile,outputFile));
+    assertTrue("Output of hibDump with cull did not meet expectation.", FileUtils.contentEquals(truthFile,outputFile));
   }
   
 }

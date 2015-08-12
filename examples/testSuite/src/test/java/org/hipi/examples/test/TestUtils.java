@@ -63,7 +63,6 @@ public class TestUtils {
       System.out.println("Images are identical (psnr == Float.MAX_VALUE)");
     }
     System.out.println("PSNR: " + psnr);
-    //    assertTrue("PSNR is too low : " + psnr, psnr > 30);
     return (psnr >= thresh);
   }
   
@@ -86,7 +85,7 @@ public class TestUtils {
   }
   
   
-  //used to create test hibs - kept here for record-keeping purposes but shouldn't be run in normal testing
+  //used to create test data - kept here for record-keeping purposes but shouldn't be run in normal testing
   public static void createTestData(FileSystem fs) throws IOException {
     if (fs.exists(new Path("skipsetup"))) {
       return;

@@ -3,22 +3,13 @@ package org.hipi.examples.covar;
 import java.io.IOException;
 import java.net.URI;
 
-
-
-
-
-
-
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
-import org.hipi.image.FloatImage;
 import org.hipi.imagebundle.mapreduce.HibInputFormat;
 import org.hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
 import org.hipi.opencv.OpenCVMatWritable;
@@ -27,7 +18,7 @@ public class ComputeCovariance {
   
   public static int run(String[] args) throws Exception {
     
-    System.out.println("Starting to run covariance job...");
+    System.out.println("Running compute covariance.");
    
     Job job = Job.getInstance();
     Covariance.validateArgs(args, job.getConfiguration());
@@ -46,7 +37,6 @@ public class ComputeCovariance {
     }
     
     job.setJarByClass(Covariance.class);
-
 
     job.setInputFormatClass(HibInputFormat.class);
     

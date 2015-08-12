@@ -1,13 +1,10 @@
 package org.hipi.examples.covar;
 
-import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
-import org.hipi.image.FloatImage;
 import org.hipi.imagebundle.mapreduce.HibInputFormat;
 import org.hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
 import org.hipi.opencv.OpenCVMatWritable;
@@ -16,7 +13,7 @@ public class ComputeMean {
 
   public static int run(String[] args) throws Exception {
 
-    System.out.println("Starting to run mean job...");
+    System.out.println("Running compute mean.");
 
     Job job = Job.getInstance();
     Covariance.validateArgs(args, job.getConfiguration());

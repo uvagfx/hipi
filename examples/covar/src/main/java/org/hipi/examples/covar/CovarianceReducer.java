@@ -5,12 +5,8 @@ import java.io.IOException;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_highgui;
-import org.bytedeco.javacpp.indexer.FloatIndexer;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Scalar;
-import org.hipi.image.FloatImage;
-import org.hipi.opencv.MatUtils;
 import org.hipi.opencv.OpenCVMatWritable;
 
 public class CovarianceReducer extends

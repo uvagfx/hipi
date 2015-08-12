@@ -19,16 +19,15 @@ import org.junit.Test;
 
 public class CovarTest {
   
-  @Ignore
+  //configuring hdfs for test run (creating benchmark data and loading it onto hdfs)
   @BeforeClass
   public static void setup() throws IOException {
     Configuration conf = new Configuration();
     FileSystem fs = FileSystem.get(conf);
-    TestUtils.createTestData(fs);
     TestUtils.setupTestoutDirectory(fs);
   }
   
-  //Input Error handling tests
+  //Input Error handling tests (should silently handle invalid inputs and return 0 before job runs)
   @Test
   public void testComputeMeanInvalidNumberOfInputs() throws IOException {
       assertEquals("Failed to run mean. Check setup.", 0, TestUtils.runCommand("./computeMean.sh onlyOneInput"));
@@ -59,6 +58,8 @@ public class CovarTest {
     assertEquals("Images are not equivalent.", true, TestUtils.checkPsnr("/tmp/mean-output.jpg", "../../testdata/covar/images/mean.jpg", 30.0f));
   }
   
+  
+  //Compute covariance implementation tests
   @Test
   public void testComputeCovarianceWithSmallTestHib() throws IOException {
     assertEquals("Failed to run mean. Check setup.", 0, TestUtils.runCommand("./computeMean.sh /testout/covar/smalltesthib.hib /tmp/covar"));
@@ -69,7 +70,7 @@ public class CovarTest {
     assertEquals("Images are not equivalent.", true, TestUtils.checkPsnr("/tmp/covariance-output.jpg", "../../testdata/covar/images/covariance-benchmark.jpg", 30.0f));
   }
   
-  //psnr on this test should indicate that new covariance value is appoximate to benchmark, but will not be identical because input images are different.
+  //psnr on this test should indicate that new covariance value is appoximate to benchmark, but will not be identical because input hibs are different.
   @Test
   public void testComputeCovarianceWithMediumTestHib() throws IOException {
     assertEquals("Failed to run mean. Check setup.", 0, TestUtils.runCommand("./computeMean.sh /testout/covar/mediumtesthib.hib /tmp/covar"));

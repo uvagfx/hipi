@@ -1,9 +1,5 @@
 package org.hipi.examples.covar;
 
-import static org.bytedeco.javacpp.opencv_imgproc.CV_RGB2GRAY;
-import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
-
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -14,14 +10,12 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_highgui;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Rect;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.indexer.FloatIndexer;
 import org.hipi.image.FloatImage;
 import org.hipi.image.HipiImageHeader;
-import org.hipi.opencv.MatUtils;
 import org.hipi.opencv.OpenCVMatWritable;
 
 public class CovarianceMapper extends
@@ -30,8 +24,8 @@ public class CovarianceMapper extends
   public static final int N = Covariance.N;
   public static final float sigma = Covariance.sigma;
 
-  Mat mean;
-  Mat gaussian;
+  Mat mean; //stores result of computeMean job which has been stored in the job's cache.
+  Mat gaussian; //stores gaussian matrix computed in mapper setup
 
   @Override
   public void setup(Context job) {
@@ -52,8 +46,7 @@ public class CovarianceMapper extends
       dis.skip(4);
       OpenCVMatWritable meanWritable = new OpenCVMatWritable();
       meanWritable.readFields(dis);
-      mean = meanWritable.getMat().clone();
-
+      mean = meanWritable.getMat();
     } catch (IOException ioe) {
       System.err.println(ioe);
     }
@@ -72,7 +65,7 @@ public class CovarianceMapper extends
       }
     }
 
-    // Normalize Gaussian mask
+    // Normalize gaussian mask
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
         int index = i * N + j;
@@ -84,48 +77,48 @@ public class CovarianceMapper extends
   @Override
   public void map(HipiImageHeader key, FloatImage value, Context context) throws IOException,
       InterruptedException {
-    Mat cvValue = MatUtils.convertFloatImageToMat(value);
+    
+    //convert input FloatImage to grayscale mat
+    Mat cvValue = Covariance.covertFloatImageToGrayScaleMat(value);
+    
+    ArrayList<Mat> patches = new ArrayList<Mat>(); //stores patches computed from image
+    ArrayList<FloatIndexer> patchIndexers = new ArrayList<FloatIndexer>(); //stores indexer objects for patches
+    
+    
+    // specify number of 2-D covariance patches to creates (iMax * jMax partitions)
+    int iMax = 10;
+    int jMax = 10;
 
-    ArrayList<Mat> patches = new ArrayList<Mat>();
-    ArrayList<FloatIndexer> patchIndexers = new ArrayList<FloatIndexer>();
-
-    for (int i = 0; i < 10; i++) {
-      int x = (cvValue.cols() - N) * i / 10;
-      for (int j = 0; j < 10; j++) {
-        int y = (cvValue.rows() - N) * j / 10;
+    for (int i = 0; i < iMax; i++) {
+      int x = (cvValue.cols() - N) * i / iMax;
+      for (int j = 0; j < jMax; j++) {
+        int y = (cvValue.rows() - N) * j / jMax;
         Rect roi = new Rect(x, y, N, N);
         Mat patch = cvValue.apply(roi).clone();
-
-        Mat grayPatch = new Mat(patch.rows(), patch.cols(), opencv_core.CV_32FC1, new Scalar(0.0));
-        cvtColor(patch, grayPatch, CV_RGB2GRAY);
         
-        opencv_core.subtract(grayPatch, mean, grayPatch);
-        opencv_core.multiply(grayPatch, gaussian, grayPatch);
+        opencv_core.subtract(patch, mean, patch);
+        opencv_core.multiply(patch, gaussian, patch);
 
-        Mat clonedGrayPatch = grayPatch.clone();
-        patches.add(clonedGrayPatch);
-        patchIndexers.add((FloatIndexer) clonedGrayPatch.createIndexer()); //pre-creating mat indexers speeds up running time
+        Mat clonedPatch = patch.clone();
+        patches.add(clonedPatch);
+        patchIndexers.add((FloatIndexer) clonedPatch.createIndexer()); //pre-creating mat indexers speeds up running time
       }
     }
 
     // Stores the (N^2 x N^2) covariance matrix AAt
-    float[] covarianceArray = new float[N * N * N * N];
+    Mat covarianceMat = new Mat(N * N, N * N, opencv_core.CV_32FC1, new Scalar(0.0));
+    FloatIndexer covarianceIndexer = covarianceMat.createIndexer();
     for (int i = 0; i < N * N; i++) {
       for (int j = 0; j < N * N; j++) {
-        covarianceArray[i * N * N + j] = 0;
+        float accumulatedValue = 0.0f;
         for (int k = 0; k < patches.size(); k++) {
-          covarianceArray[i * N * N + j] +=
-              patchIndexers.get(k).get(i) * patchIndexers.get(k).get(j);
+          accumulatedValue += patchIndexers.get(k).get(i) * patchIndexers.get(k).get(j);
         }
+        covarianceIndexer.put(i * N * N + j, accumulatedValue);
       }
     }
-
-    Mat covarianceMat = new Mat(N * N, N * N, opencv_core.CV_32FC1, new Scalar(0.0));
-    FloatIndexer fi = covarianceMat.createIndexer();
-    for (int i = 0; i < covarianceArray.length; i++) {
-      fi.put(i, covarianceArray[i]);
-    }
-
+    
+    // Write out mat encapsulated in openCVMatWritable object
     context.write(new IntWritable(0), new OpenCVMatWritable(covarianceMat));
   }
 }

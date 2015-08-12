@@ -6,7 +6,6 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.hipi.imagebundle.mapreduce.HibInputFormat;
-import org.hipi.imagebundle.mapreduce.output.BinaryOutputFormat;
 import org.hipi.opencv.OpenCVMatWritable;
 
 public class ComputeMean {
@@ -33,7 +32,6 @@ public class ComputeMean {
     job.setReducerClass(MeanReducer.class);
     job.setNumReduceTasks(1);
 
-    job.setOutputFormatClass(BinaryOutputFormat.class);
     job.getConfiguration().setBoolean("mapreduce.map.output.compress", true);
     job.setSpeculativeExecution(true);
 

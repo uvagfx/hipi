@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.hipi.test.ByteUtilsTestCase" tests="8" skipped="0" failures="0" errors="0" timestamp="2015-08-11T15:11:03" hostname="Zacks-MacBook-Pro.local" time="0.013">
+<testsuite name="org.hipi.test.ByteUtilsTestCase" tests="8" skipped="0" failures="0" errors="0" timestamp="2015-08-12T17:35:10" hostname="Zacks-MacBook-Pro.local" time="0.009">
   <properties/>
-  <testcase name="testIntArrayToByteArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.004"/>
+  <testcase name="testIntArrayToByteArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.003"/>
   <testcase name="testFloatArrayToByteArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.001"/>
   <testcase name="testByteArrayToFloatArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.001"/>
-  <testcase name="testShortArrayToByteArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.0"/>
-  <testcase name="testDoubleArrayToByteArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.0"/>
-  <testcase name="testByteArrayToDoubleArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.001"/>
+  <testcase name="testShortArrayToByteArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.001"/>
+  <testcase name="testDoubleArrayToByteArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.001"/>
+  <testcase name="testByteArrayToDoubleArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.0"/>
   <testcase name="testByteArrayToShortArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.0"/>
-  <testcase name="testByteArrayToIntArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.0"/>
+  <testcase name="testByteArrayToIntArray" classname="org.hipi.test.ByteUtilsTestCase" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

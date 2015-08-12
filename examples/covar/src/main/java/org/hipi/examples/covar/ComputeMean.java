@@ -5,6 +5,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileAsBinaryOutputFormat;
 import org.hipi.imagebundle.mapreduce.HibInputFormat;
 import org.hipi.opencv.OpenCVMatWritable;
 
@@ -15,7 +16,6 @@ public class ComputeMean {
     System.out.println("Running compute mean.");
 
     Job job = Job.getInstance();
-    Covariance.validateArgs(args, job.getConfiguration());
 
     String inputPath = args[0];
     String outputDir = args[1];
@@ -32,6 +32,7 @@ public class ComputeMean {
     job.setReducerClass(MeanReducer.class);
     job.setNumReduceTasks(1);
 
+    job.setOutputFormatClass(SequenceFileAsBinaryOutputFormat.class);
     job.getConfiguration().setBoolean("mapreduce.map.output.compress", true);
     job.setSpeculativeExecution(true);
 

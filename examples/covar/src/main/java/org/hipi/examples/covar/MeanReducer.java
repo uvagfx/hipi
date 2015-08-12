@@ -11,28 +11,32 @@ import org.bytedeco.javacpp.indexer.FloatIndexer;
 import org.hipi.opencv.OpenCVMatWritable;
 
 public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, IntWritable, OpenCVMatWritable> {
-
-  public static final int N = Covariance.N;
   
   @Override
-  public void reduce(IntWritable key, Iterable<OpenCVMatWritable> values, Context context)
+  public void reduce(IntWritable key, Iterable<OpenCVMatWritable> meanPatches, Context context)
       throws IOException, InterruptedException {
+    
+    int N = Covariance.patchSize;
     
     //consolidate each mean patch computed in mappers
     Mat mean = new Mat(N, N, opencv_core.CV_32FC1, new Scalar(0.0));
     int total = 0;
-    for (OpenCVMatWritable val : values) {
-      opencv_core.add(val.getMat(), mean, mean);
+    for (OpenCVMatWritable patch : meanPatches) {
+      opencv_core.add(patch.getMat(), mean, mean);
       total++;
     }
     
     //normalize consolidated mean patch
     if (total > 0) {
-      int elms = (int) (mean.total() * mean.channels());
-      FloatIndexer fi = mean.createIndexer();
-      for (int k = 0; k < elms; k++) {
-        fi.put(k, (fi.get(k) * (1.0f / (float) total)));
-      }
+//      int elms = (int) (mean.total() * mean.channels());
+//      FloatIndexer fi = mean.createIndexer();
+//      
+//      mean = opencv_core.multiplyPut(mean, (1.0 / (double) total));
+//      for (int k = 0; k < elms; k++) {
+//        fi.put(k, (fi.get(k) * (1.0f / (float) total)));
+//      }
+      
+      mean = opencv_core.multiply(mean, (1.0 / (double) total)).asMat();
     }
     
     //write out consolidated patch

@@ -15,17 +15,12 @@ import org.hipi.opencv.OpenCVMatWritable;
 
 public class ComputeCovariance {
   
-  public static int run(String[] args) throws Exception {
+  public static int run(String[] args, String inputHibPath, String outputDir) throws Exception {
     
     System.out.println("Running compute covariance.");
    
     Job job = Job.getInstance();
-    Covariance.validateArgs(args, job.getConfiguration());
-    
-    String inputPath = args[0];
-    String outputDir = args[1];
-    String outputSubDir = outputDir + "/covariance-output/";
-    
+
     String cachePath = outputDir + "/mean-output/part-r-00000";
     validateMeanCachePath(cachePath, job.getConfiguration());
     
@@ -48,6 +43,8 @@ public class ComputeCovariance {
 
     job.getConfiguration().setBoolean("mapreduce.map.output.compress", true);
     job.setSpeculativeExecution(true);
+    
+    job.setOutputFormatClass(FileOutputFormat.class);
 
     FileInputFormat.setInputPaths(job, new Path(inputPath));
     Covariance.mkdir(outputDir, job.getConfiguration());

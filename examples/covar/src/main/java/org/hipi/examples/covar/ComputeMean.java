@@ -11,15 +11,11 @@ import org.hipi.opencv.OpenCVMatWritable;
 
 public class ComputeMean {
 
-  public static int run(String[] args) throws Exception {
+  public static int run(String[] args, String inputHibPath, String outputDir) throws Exception {
 
     System.out.println("Running compute mean.");
 
     Job job = Job.getInstance();
-
-    String inputPath = args[0];
-    String outputDir = args[1];
-    String outputSubDir = outputDir + "/mean-output/";
 
     job.setJarByClass(Covariance.class);
 
@@ -32,16 +28,12 @@ public class ComputeMean {
     job.setReducerClass(MeanReducer.class);
     job.setNumReduceTasks(1);
 
-    job.setOutputFormatClass(SequenceFileAsBinaryOutputFormat.class);
+    job.setOutputFormatClass(BinaryOutputFormat.class);
     job.getConfiguration().setBoolean("mapreduce.map.output.compress", true);
     job.setSpeculativeExecution(true);
 
-    FileInputFormat.setInputPaths(job, new Path(inputPath));
-    Covariance.mkdir(outputDir, job.getConfiguration());
-    Covariance.rmdir(outputSubDir, job.getConfiguration());
-    FileOutputFormat.setOutputPath(job, new Path(outputSubDir));
-    job.getConfiguration().setStrings("mean.outpath", outputSubDir);
-
+    FileInputFormat.setInputPaths(job, new Path(inputHibPath));
+    FileOutputFormat.setOutputPath(job, new Path(outputDir));
 
     return job.waitForCompletion(true) ? 0 : 1;
   }

@@ -15,20 +15,13 @@ import org.hipi.opencv.OpenCVMatWritable;
 
 public class ComputeCovariance {
   
-  public static int run(String[] args, String inputHibPath, String outputDir) throws Exception {
+  public static int run(String[] args, String inputHibPath, String outputDir, String meanCachePath) throws Exception {
     
     System.out.println("Running compute covariance.");
    
     Job job = Job.getInstance();
-
-    String cachePath = outputDir + "/mean-output/part-r-00000";
-    validateMeanCachePath(cachePath, job.getConfiguration());
     
-    if(cachePath.startsWith("/")) {
-      job.addCacheFile(new URI(job.getConfiguration().get("fs.default.name") + cachePath));
-    } else {
-      job.addCacheFile(new URI(job.getConfiguration().get("fs.default.name") + "/" + cachePath));
-    }
+    job.addCacheFile(new URI(job.getConfiguration().get("fs.default.name") + meanCachePath));
     
     job.setJarByClass(Covariance.class);
 
@@ -42,26 +35,12 @@ public class ComputeCovariance {
     job.setNumReduceTasks(1);
 
     job.getConfiguration().setBoolean("mapreduce.map.output.compress", true);
-    job.setSpeculativeExecution(true);
     
-    job.setOutputFormatClass(FileOutputFormat.class);
+    job.setOutputFormatClass(BinaryOutputFormat.class);
 
-    FileInputFormat.setInputPaths(job, new Path(inputPath));
-    Covariance.mkdir(outputDir, job.getConfiguration());
-    Covariance.rmdir(outputSubDir, job.getConfiguration());
-    FileOutputFormat.setOutputPath(job, new Path(outputSubDir));
-    
-    job.getConfiguration().setStrings("covariance.outpath" , outputSubDir);
+    FileInputFormat.setInputPaths(job, new Path(inputHibPath));
+    FileOutputFormat.setOutputPath(job, new Path(outputDir));
 
     return job.waitForCompletion(true) ? 0 : 1;
-  }
-  
-  private static void validateMeanCachePath(String cachePathString, Configuration conf) throws IOException {
-    Path cachePath = new Path(cachePathString);
-    FileSystem fileSystem = FileSystem.get(conf);
-    if (!fileSystem.exists(cachePath)) {
-      System.out.println("Path to mean does not exist: " + cachePath);
-      System.exit(0);
-    }
   }
 }

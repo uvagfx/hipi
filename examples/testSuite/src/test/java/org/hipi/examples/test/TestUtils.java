@@ -31,22 +31,32 @@ import java.util.Scanner;
 public class TestUtils {
 
   public static void setupTestoutDirectory(FileSystem fs) throws IOException {
+   
+    //shortcut to skip hdfs setup
     if (fs.exists(new Path("skipsetup"))) {
       return;
     }
+    
+    //constructing directory hierarchy
     TestUtils.runCommand("hadoop fs -rm -r -f /testout");
     TestUtils.runCommand("hadoop fs -rm -r -f /tmp");
-    assertEquals("Failed to create testout directory on HDFS. Check setup.", 0, TestUtils.runCommand("hadoop fs -mkdir -p /testout"));
-    assertEquals("Failed to create testout directory on HDFS. Check setup.", 0, TestUtils.runCommand("hadoop fs -mkdir -p /tmp"));
-    assertEquals("Failed to create testout/covar directory on HDFS. Check setup.", 0, TestUtils.runCommand("hadoop fs -mkdir -p /testout/covar"));
+    assertEquals("Failed to create testout directory on HDFS. Check setup.", 0, TestUtils.runCommand("hadoop fs -mkdir -p /testout/covar"));
+    assertEquals("Failed to create tmp directory on HDFS. Check setup.", 0, TestUtils.runCommand("hadoop fs -mkdir -p /tmp"));
+    
+    //adding test hibs to hdfs
+    
+    //used to test mean computation (contains one black image, and one white image)
     TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/white-black.hib /testout/covar/white-black.hib");
     TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/white-black.hib.dat /testout/covar/white-black.hib.dat");
+    
+    //used to test covariance computation (contains 7 images)
+    //used to create hipi/testdata/covar/images/covariance-benchmark.jpg
     TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/smalltesthib.hib /testout/covar/smalltesthib.hib");
     TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/smalltesthib.hib.dat /testout/covar/smalltesthib.hib.dat");
+    
+    //used to test covariance computation (contains 25 images)
     TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/mediumtesthib.hib /testout/covar/mediumtesthib.hib");
     TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/mediumtesthib.hib.dat /testout/covar/mediumtesthib.hib.dat");
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/images/mean.jpg /testout/covar/mean.jpg");
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/images/covariance-benchmark.jpg /testout/covar/covariance-benchmark.jpg");
   }
 
   public static boolean checkPsnr(String imgPath, String truthPath, float thresh) 
@@ -67,50 +77,19 @@ public class TestUtils {
   }
   
   public static boolean convertOpenCVMatWritableToJpg(String inputPath, String outputPath) throws IOException {
+    
     DataInputStream dis = new DataInputStream(new FileInputStream(inputPath));  
     dis.skip(4);
     OpenCVMatWritable openCVMatWritable = new OpenCVMatWritable();
     openCVMatWritable.readFields(dis);
-    Mat mat = openCVMatWritable.getMat();
     
-    //convert mat to unsigned byte for saving as jpg in order to check psnr
-    FloatIndexer floatIndexer = mat.createIndexer();
-    for(int i = 0; i < (int)(mat.total() * mat.channels()); i++) {
-      floatIndexer.put(i, floatIndexer.get(i) * 255.0f);
-    }
+    Mat mat = openCVMatWritable.getMat();
+    mat = opencv_core.multiply(mat, 255.0).asMat();
     mat.convertTo(mat, opencv_core.CV_8UC1);
     
     opencv_imgcodecs.imwrite(outputPath, mat);
+    
     return true;
-  }
-  
-  
-  //used to create test data - kept here for record-keeping purposes but shouldn't be run in normal testing
-  public static void createTestData(FileSystem fs) throws IOException {
-    if (fs.exists(new Path("skipsetup"))) {
-      return;
-    }
-    //used to create white-black.hib and a mean benchmark image
-    Mat whiteMat = new Mat(500, 500, opencv_core.CV_8UC1, new Scalar(255.0));
-    Mat blackMat = new Mat(500, 500, opencv_core.CV_8UC1, new Scalar(0.0));
-    Mat meanMat = new Mat(48, 48, opencv_core.CV_8UC1, new Scalar(127.5f));
-    opencv_imgcodecs.imwrite("../../testData/covar/images/white.jpg", whiteMat);
-    opencv_imgcodecs.imwrite("../../testData/covar/images/black.jpg", blackMat);
-    opencv_imgcodecs.imwrite("../../testData/covar/images/mean.jpg", meanMat);
-    
-    DataInputStream dis = new DataInputStream(new FileInputStream("../../testData/covar/covariance-benchmark-opencvmatwritable")); 
-    dis.skip(4);
-    OpenCVMatWritable openCVMatWritable = new OpenCVMatWritable();
-    openCVMatWritable.readFields(dis);
-    Mat mat = openCVMatWritable.getMat();
-    //convert mat to unsigned byte for saving as jpg in order to check psnr
-    FloatIndexer floatIndexer = mat.createIndexer();
-    for(int i = 0; i < (int)(mat.total() * mat.channels()); i++) {
-      floatIndexer.put(i, floatIndexer.get(i) * 255.0f);
-    }
-    mat.convertTo(mat, opencv_core.CV_8UC1);
-    opencv_imgcodecs.imwrite("../../testData/covar/images/covariance-benchmark.jpg", mat);
-    
   }
 
   public static int runCommand(String cmd) throws IOException {
@@ -152,7 +131,36 @@ public class TestUtils {
 
     return exitVal;
   }
-
-
-
+  
+  
+  //used to create test data - kept here for record-keeping purposes but shouldn't be run in normal testing.
+  //the results of this method are already stored in hipi/testdata/covar
+  public static void createTestData(FileSystem fs) throws IOException {
+    
+    return;
+    
+    //  if (fs.exists(new Path("skipsetup"))) {
+    //    return;
+    //  }
+    //  //used to create white-black.hib and a mean benchmark image
+    //  Mat whiteMat = new Mat(500, 500, opencv_core.CV_8UC1, new Scalar(255.0));
+    //  Mat blackMat = new Mat(500, 500, opencv_core.CV_8UC1, new Scalar(0.0));
+    //  Mat meanMat = new Mat(48, 48, opencv_core.CV_8UC1, new Scalar(127.5f));
+    //  opencv_imgcodecs.imwrite("../../testData/covar/images/white.jpg", whiteMat);
+    //  opencv_imgcodecs.imwrite("../../testData/covar/images/black.jpg", blackMat);
+    //  opencv_imgcodecs.imwrite("../../testData/covar/images/mean.jpg", meanMat);
+    //  
+    //  DataInputStream dis = new DataInputStream(new FileInputStream("../../testData/covar/covariance-benchmark-opencvmatwritable")); 
+    //  dis.skip(4);
+    //  OpenCVMatWritable openCVMatWritable = new OpenCVMatWritable();
+    //  openCVMatWritable.readFields(dis);
+    //
+    //  Mat mat = openCVMatWritable.getMat();
+    //  mat = opencv_core.multiply(mat, 255.0).asMat();
+    //  mat.convertTo(mat, opencv_core.CV_8UC1);
+    //  
+    //  opencv_imgcodecs.imwrite("../../testData/covar/images/covariance-benchmark.jpg", mat);
+    
+  }
+  
 }

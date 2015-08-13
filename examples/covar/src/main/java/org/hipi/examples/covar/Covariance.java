@@ -17,16 +17,14 @@ import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.hipi.image.FloatImage;
-import org.hipi.opencv.MatUtils;
+import org.hipi.opencv.OpenCVUtils;
 
 public class Covariance extends Configured implements Tool {
-
-  //Constants and methods which are used by both ComputeMean and ComputeCovariance
   
-  public static final int patchSize = 48; // Patch size is NxN
+  public static final int patchSize = 48; // Patch dimensions: patchSize x patchSize
   public static final float sigma = 10; // Standard deviation of Gaussian weighting function
   
-  public static void rmdir(String path, Configuration conf) throws IOException {
+  private static void rmdir(String path, Configuration conf) throws IOException {
     Path outputPath = new Path(path);
     FileSystem fileSystem = FileSystem.get(conf);
     if (fileSystem.exists(outputPath)) {
@@ -34,29 +32,15 @@ public class Covariance extends Configured implements Tool {
     }
   }
 
-  public static void mkdir(String path, Configuration conf) throws IOException {
+  private static void mkdir(String path, Configuration conf) throws IOException {
     Path outputPath = new Path(path);
     FileSystem fileSystem = FileSystem.get(conf);
     if (!fileSystem.exists(outputPath)) {
       fileSystem.mkdirs(outputPath);
     }
   }
-  
-  public static Mat covertFloatImageToGrayScaleMat(FloatImage value) throws IOException {
-    //Convert input float image to opencv mat
-    Mat srcImage = MatUtils.convertFloatImageToMat(value);
-    
-    //Convert opencv mat to grayscale, if necessary.
-    Mat grayScaleSrcImage = new Mat(srcImage.rows(), srcImage.cols(), opencv_core.CV_32FC1, new Scalar(0.0));
-    if (srcImage.type() != opencv_core.CV_32FC1) {
-      cvtColor(srcImage, grayScaleSrcImage, CV_BGR2GRAY);
-    } else {
-      grayScaleSrcImage = srcImage;
-    }
-    return grayScaleSrcImage;
-  }
 
-  public static void validateArgs(String[] args, Configuration conf) throws IOException {
+  private static void validateArgs(String[] args, Configuration conf) throws IOException {
     
     if (args.length != 2) {
       System.out.println("Usage: covar.jar <input HIB> <output directory>");
@@ -70,31 +54,45 @@ public class Covariance extends Configured implements Tool {
       System.exit(1);
     }
   }
+  
+  private static void validateMeanCachePath(String cachePathString, Configuration conf) throws IOException {
+    Path cachePath = new Path(cachePathString);
+    FileSystem fileSystem = FileSystem.get(conf);
+    if (!fileSystem.exists(cachePath)) {
+      System.out.println("Path to mean does not exist: " + cachePath);
+      System.exit(0);
+    }
+  }
 
   
   public int run(String[] args) throws Exception {
     
+    Configuration conf = Job.getInstance().getConfiguration();
+    
     // Validate arguments before any work is done
-    Job configJob = Job.getInstance();
-    validateArgs(args, configJob.getConfiguration());
+    validateArgs(args, conf);
     
     // Build I/O directory strings
-    String inputPath = args[0];
+    String inputHibPath = args[0];
     String outputBaseDir = args[1];
-    String outputMeanDir = outputDir + "/mean-output/";
-    String outputCovarianceDir = outputDir + "/covariance-output/";
+    String outputMeanDir = outputBaseDir + "/mean-output/";
+    String outputCovarianceDir = outputBaseDir + "/covariance-output/";
+    String meanCachePath = outputMeanDir + "part-r-00000"; //used by ComputeCovariance to find ComputeMean result
     
-    mkdir(outputBaseDir, configJob.getConfiguration());
-    rmdir(outputMeanDir, configJob.getConfiguration());
-    rmdir(outputCovarianceDir, configJob.getConfiguration());
+    // Set up directory structure
+    mkdir(outputBaseDir, conf);
+    rmdir(outputMeanDir, conf);
+    rmdir(outputCovarianceDir, conf);
 
     // Run compute mean
-    if (ComputeMean.run(args, inputPath, outputMeanDir) == 1) {
+    if (ComputeMean.run(args, inputHibPath, outputMeanDir) == 1) {
       return 1;
     }
     
+    validateMeanCachePath(meanCachePath, conf);
+    
     // Run compute covariance
-    if (ComputeCovariance.run(args, inputPath, outputCovarianceDir) == 1) {
+    if (ComputeCovariance.run(args, inputHibPath, outputCovarianceDir, meanCachePath) == 1) {
       return 1;
     }
 

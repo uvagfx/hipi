@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.hipi.test.OpenCVUtilsTestCase" tests="2" skipped="0" failures="0" errors="0" timestamp="2015-08-12T22:02:17" hostname="Zacks-MacBook-Pro.local" time="14.05">
+<testsuite name="org.hipi.test.OpenCVUtilsTestCase" tests="2" skipped="0" failures="0" errors="0" timestamp="2015-08-13T16:24:38" hostname="Zacks-MacBook-Pro.local" time="6.434">
   <properties/>
-  <testcase name="testCreateFloatImageFromValidMat" classname="org.hipi.test.OpenCVUtilsTestCase" time="5.433"/>
-  <testcase name="testCreateMatFromValidFloatImage" classname="org.hipi.test.OpenCVUtilsTestCase" time="8.617"/>
+  <testcase name="testCreateFloatImageFromValidMat" classname="org.hipi.test.OpenCVUtilsTestCase" time="2.024"/>
+  <testcase name="testCreateMatFromValidFloatImage" classname="org.hipi.test.OpenCVUtilsTestCase" time="4.41"/>
   <system-out><![CDATA[Testing mat number 1
 Testing image dimensions
 Testing image channels

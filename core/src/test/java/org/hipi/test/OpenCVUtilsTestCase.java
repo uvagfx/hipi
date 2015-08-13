@@ -9,9 +9,11 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.bytedeco.javacpp.opencv_highgui;
 import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
@@ -20,10 +22,12 @@ import org.hipi.image.ByteImage;
 import org.hipi.image.FloatImage;
 import org.hipi.image.HipiImageFactory;
 import org.hipi.image.HipiImageHeader.HipiColorSpace;
+import org.hipi.image.HipiImageHeader.HipiImageFormat;
 import org.hipi.image.RasterImage;
 import org.hipi.image.io.ImageDecoder;
 import org.hipi.image.io.PpmCodec;
 import org.hipi.opencv.OpenCVUtils;
+import org.hipi.util.ByteUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -44,6 +48,7 @@ public class OpenCVUtilsTestCase {
         String ppmPath = file.getPath();
         Mat mat = opencv_imgcodecs.imread(ppmPath);
         mats.add(mat);
+       
       }
     }
     
@@ -79,8 +84,9 @@ public class OpenCVUtilsTestCase {
   public void testCreateFloatImageFromValidMat() throws IOException {
     int imageCount = 1;
     for(Mat mat : createTestMatImages()) {
+ 
       System.out.println("Testing mat number " + imageCount);
-      FloatImage image = OpenCVUtils.convertMatToFloatImage(mat);
+      FloatImage image = OpenCVUtils.convertMatToFloatImage(mat, HipiColorSpace.RGB, HipiImageFormat.UNDEFINED);
       
       System.out.println("Testing image dimensions");
       assertEquals("Widths of float image and mat are not equivalent.", mat.cols(), image.getWidth());
@@ -101,17 +107,13 @@ public class OpenCVUtilsTestCase {
       }
       
       System.out.println("Testing image contents");
-      int elms = (int)(mat.total()*mat.channels());
       float[] imageData = image.getData();
-     
-      FloatIndexer floatIndexer = (FloatIndexer)mat.createIndexer();
-      float [] baselineData = new float[elms];
-      for(int i = 0; i < baselineData.length; i++) {
-        baselineData[i] = floatIndexer.get(i);
-      }
       
-      assertEquals("Data arrays have different lengths.", baselineData.length, imageData.length);
-      assertArrayEquals("Data arrays are not equivalent.", baselineData, imageData, delta);
+      float[] baselineDataAsFloatArray = new float[imageData.length];
+      ((FloatBuffer)mat.createBuffer()).get(baselineDataAsFloatArray);
+      
+      assertEquals("Data arrays have different lengths.", baselineDataAsFloatArray.length, imageData.length);
+      assertArrayEquals("Data arrays are not equivalent.", baselineDataAsFloatArray, imageData, delta);
       
       imageCount++;    
       System.out.println("");
@@ -128,10 +130,10 @@ public class OpenCVUtilsTestCase {
       
       switch(image.getColorSpace()) {
         case RGB:
-          mat = OpenCVUtils.convertFloatImageToMat(image, opencv_core.CV_32FC3);
+          mat = OpenCVUtils.convertFloatImageToMat(image, OpenCVUtils.OpenCVOutputColorSpace.OPENCV_RGB);
           break;
         case LUM:
-          mat = OpenCVUtils.convertFloatImageToMat(image, opencv_core.CV_32FC1);
+          mat = OpenCVUtils.convertFloatImageToMat(image, OpenCVUtils.OpenCVOutputColorSpace.OPENCV_GRAY);
           break;
         default:
           throw new IOException("Unsupported HipiColorSpace [" + image.getColorSpace() + "].");
@@ -158,17 +160,13 @@ public class OpenCVUtilsTestCase {
       }
       
       System.out.println("Testing image contents");
-      int elms = (int)(mat.total()*mat.channels());
       float[] baselineData = image.getData();
      
-      FloatIndexer floatIndexer = (FloatIndexer)mat.createIndexer();
-      float [] matData = new float[elms];
-      for(int i = 0; i < matData.length; i++) {
-        matData[i] = floatIndexer.get(i);
-      }
+      float[] matDataAsFloatArray = new float[baselineData.length];
+      ((FloatBuffer)mat.createBuffer()).get(matDataAsFloatArray);
       
-      assertEquals("Data arrays have different lengths.", baselineData.length, matData.length);
-      assertArrayEquals("Data arrays are not equivalent.", baselineData, matData, delta);
+      assertEquals("Data arrays have different lengths.", baselineData.length, matDataAsFloatArray.length);
+      assertArrayEquals("Data arrays are not equivalent.", baselineData, matDataAsFloatArray, delta);
       
       imageCount++;    
       System.out.println("");

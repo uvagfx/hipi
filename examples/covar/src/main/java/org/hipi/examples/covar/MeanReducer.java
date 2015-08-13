@@ -28,14 +28,6 @@ public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, IntWrit
     
     //normalize consolidated mean patch
     if (total > 0) {
-//      int elms = (int) (mean.total() * mean.channels());
-//      FloatIndexer fi = mean.createIndexer();
-//      
-//      mean = opencv_core.multiplyPut(mean, (1.0 / (double) total));
-//      for (int k = 0; k < elms; k++) {
-//        fi.put(k, (fi.get(k) * (1.0f / (float) total)));
-//      }
-      
       mean = opencv_core.multiply(mean, (1.0 / (double) total)).asMat();
     }
     

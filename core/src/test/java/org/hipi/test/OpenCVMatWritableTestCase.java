@@ -29,12 +29,6 @@ public class OpenCVMatWritableTestCase {
   private final double delta = 0.01;
   
   @Test
-  public void testOpenCVImport() {
-    Mat mat = new Mat(new Size(5, 3), opencv_core.CV_32F);
-    assertEquals(new Size(5, 3).width(), mat.size().width(), delta);
-  }
-  
-  @Test
   public void testDefaultConstructorMatDimensions() {
     OpenCVMatWritable openCvMatWritable = new OpenCVMatWritable();
     Mat defaultMat = openCvMatWritable.getMat();

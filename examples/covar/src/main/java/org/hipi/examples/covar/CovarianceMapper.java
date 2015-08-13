@@ -17,7 +17,7 @@ import org.bytedeco.javacpp.indexer.FloatIndexer;
 import org.hipi.image.FloatImage;
 import org.hipi.image.HipiImageHeader;
 import org.hipi.opencv.OpenCVMatWritable;
-import org.hipi.opencv.
+import org.hipi.opencv.OpenCVUtils;
 
 public class CovarianceMapper extends
     Mapper<HipiImageHeader, FloatImage, IntWritable, OpenCVMatWritable> {

@@ -13,6 +13,7 @@ import org.bytedeco.javacpp.indexer.FloatIndexer;
 import org.hipi.image.FloatImage;
 import org.hipi.image.HipiImageHeader;
 import org.hipi.opencv.OpenCVMatWritable;
+import org.hipi.opencv.OpenCVUtils;
 
 public class MeanMapper extends Mapper<HipiImageHeader, FloatImage, IntWritable, OpenCVMatWritable> {
 
@@ -42,17 +43,7 @@ public class MeanMapper extends Mapper<HipiImageHeader, FloatImage, IntWritable,
       }
     }
     
-    
-
     mean = opencv_core.multiply(mean, (1.0 / (double)(iMax * jMax))).asMat();
-    
-    
-//    //normalize mean (divide by number of patch)
-//    int elms = (int)mean.total();
-//    FloatIndexer fi = mean.createIndexer();
-//    for(int k = 0; k < elms; k++) {
-//      fi.put(k, (float)(fi.get(k) * (1.0f / (float)(iMax * jMax))));
-//    }
     
     context.write(new IntWritable(0), new OpenCVMatWritable(mean));
   }

@@ -7,6 +7,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.Arrays;
 
 import org.bytedeco.javacpp.BytePointer;
@@ -38,17 +42,15 @@ public class OpenCVMatWritable implements Writable {
       throw new IllegalArgumentException("Currently supports only 1D or 2D arrays. Input mat dims: " + dims);
     }
     
-    Mat inputMat = new Mat();
-    mat.copyTo(inputMat);
-    inputMat.dims(mat.dims());
-    this.mat = inputMat;
+    Mat matCopy = new Mat(mat.rows(), mat.cols(), mat.type());
+    mat.copyTo(matCopy);
+    this.mat = matCopy;
   }
 
   public Mat getMat() {
-    Mat outputMat = new Mat();
-    mat.copyTo(outputMat);
-    outputMat.dims(mat.dims());
-    return outputMat;
+    Mat matCopy = new Mat(mat.rows(), mat.cols(), mat.type());
+    mat.copyTo(matCopy);
+    return matCopy;
   }
 
   public void write(DataOutput out) throws IOException {
@@ -69,29 +71,29 @@ public class OpenCVMatWritable implements Writable {
         case opencv_core.CV_8U:
         case opencv_core.CV_8S:
           byte [] data = new byte[elms];
-          mat.data().get(data);
+          ((ByteBuffer)mat.createBuffer()).get(data);
           out.write(data);
           break;
         case opencv_core.CV_16U:
         case opencv_core.CV_16S:      
-          byte [] shortData = new byte[elms * 2];
-          mat.data().get(shortData);
-          out.write(shortData);
+          short [] shortData = new short[elms];
+          ((ShortBuffer)mat.createBuffer()).get(shortData);
+          out.write(ByteUtils.shortArrayToByteArray(shortData));
           break;
         case opencv_core.CV_32S:
-          byte [] intData = new byte[elms * 4];
-          mat.data().get(intData);
-          out.write(intData);
+          int [] intData = new int[elms];
+          ((IntBuffer)mat.createBuffer()).get(intData);
+          out.write(ByteUtils.intArrayToByteArray(intData));
           break;
         case opencv_core.CV_32F:
-          byte [] floatData = new byte[elms * 4];
-          mat.data().get(floatData);
-          out.write(floatData);
+          float [] floatData = new float[elms];
+          ((FloatBuffer)mat.createBuffer()).get(floatData);
+          out.write(ByteUtils.floatArrayToByteArray(floatData));
           break;
         case opencv_core.CV_64F:
-          byte [] doubleData = new byte[elms * 8];
-          mat.data().get(doubleData);
-          out.write(doubleData);
+          double [] doubleData = new double[elms];
+          ((DoubleBuffer)mat.createBuffer()).get(doubleData);
+          out.write(ByteUtils.doubleArrayToByteArray(doubleData));
           break;
         default:
           throw new IOException("Unsupported matrix type [" + type + "].");
@@ -110,35 +112,33 @@ public class OpenCVMatWritable implements Writable {
     
     int elms = (int)(mat.total() * mat.channels());
     
-    
-    
     switch (depth) {
       case opencv_core.CV_8U:
       case opencv_core.CV_8S:
         byte[] data = new byte[elms];
         in.readFully(data);
-        mat = mat.data(new BytePointer(data));
+        ((ByteBuffer)mat.createBuffer()).put(data);
         break;
       case opencv_core.CV_16U:
       case opencv_core.CV_16S:
         byte[] shortDataAsBytes = new byte[elms * 2]; // 2 bytes per short
         in.readFully(shortDataAsBytes);
-        mat = mat.data(new BytePointer(shortDataAsBytes));
+        ((ShortBuffer)mat.createBuffer()).put(ByteUtils.byteArrayToShortArray(shortDataAsBytes));
         break;
       case opencv_core.CV_32S:
         byte[] intDataAsBytes = new byte[elms * 4]; // 4 bytes per int
         in.readFully(intDataAsBytes);
-        mat = mat.data(new BytePointer(intDataAsBytes));
+        ((IntBuffer)mat.createBuffer()).put(ByteUtils.byteArrayToIntArray(intDataAsBytes));
         break;
       case opencv_core.CV_32F:
         byte[] floatDataAsBytes = new byte[elms * 4]; // 4 bytes per float
         in.readFully(floatDataAsBytes);
-        mat = mat.data(new BytePointer(floatDataAsBytes));
+        ((FloatBuffer)mat.createBuffer()).put(ByteUtils.byteArrayToFloatArray(floatDataAsBytes));
         break;
       case opencv_core.CV_64F:
         byte[] doubleDataAsBytes = new byte[elms * 8]; // 8 bytes per double
         in.readFully(doubleDataAsBytes);
-        mat = mat.data(new BytePointer(doubleDataAsBytes));
+        ((DoubleBuffer)mat.createBuffer()).put(ByteUtils.byteArrayToDoubleArray(doubleDataAsBytes));
         break;
       default:
         throw new IOException("Unsupported matrix type [" + type + "].");

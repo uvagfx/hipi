@@ -1,273 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.hipi.examples.test.CovarTest" tests="7" skipped="0" failures="5" errors="0" timestamp="2015-08-12T21:00:32" hostname="Zacks-MacBook-Pro.local" time="30.594">
+<testsuite name="org.hipi.examples.test.CovarTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2015-08-13T13:52:26" hostname="Zacks-MacBook-Pro.local" time="216.63">
   <properties/>
-  <testcase name="testComputeCovarianceWithSmallTestHib" classname="org.hipi.examples.test.CovarTest" time="13.419">
-    <failure message="java.lang.AssertionError: Failed to run mean. Check setup. expected:&lt;0&gt; but was:&lt;1&gt;" type="java.lang.AssertionError">java.lang.AssertionError: Failed to run mean. Check setup. expected:&lt;0&gt; but was:&lt;1&gt;
-	at org.junit.Assert.fail(Assert.java:93)
-	at org.junit.Assert.failNotEquals(Assert.java:647)
-	at org.junit.Assert.assertEquals(Assert.java:128)
-	at org.junit.Assert.assertEquals(Assert.java:472)
-	at org.hipi.examples.test.CovarTest.testComputeCovarianceWithSmallTestHib(CovarTest.java:65)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:45)
-	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:15)
-	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:42)
-	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:20)
-	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:263)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:68)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:47)
-	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:231)
-	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:60)
-	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:229)
-	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:50)
-	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:222)
-	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:28)
-	at org.junit.runners.ParentRunner.run(ParentRunner.java:300)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:86)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:49)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:64)
-	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:50)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.messaging.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
-	at org.gradle.messaging.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
-	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:106)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.messaging.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:360)
-	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:54)
-	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:40)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-	at java.lang.Thread.run(Thread.java:745)
-</failure>
-  </testcase>
-  <testcase name="testComputeCovarianceWithMediumTestHib" classname="org.hipi.examples.test.CovarTest" time="5.991">
-    <failure message="java.lang.AssertionError: Failed to run mean. Check setup. expected:&lt;0&gt; but was:&lt;1&gt;" type="java.lang.AssertionError">java.lang.AssertionError: Failed to run mean. Check setup. expected:&lt;0&gt; but was:&lt;1&gt;
-	at org.junit.Assert.fail(Assert.java:93)
-	at org.junit.Assert.failNotEquals(Assert.java:647)
-	at org.junit.Assert.assertEquals(Assert.java:128)
-	at org.junit.Assert.assertEquals(Assert.java:472)
-	at org.hipi.examples.test.CovarTest.testComputeCovarianceWithMediumTestHib(CovarTest.java:76)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:45)
-	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:15)
-	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:42)
-	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:20)
-	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:263)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:68)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:47)
-	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:231)
-	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:60)
-	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:229)
-	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:50)
-	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:222)
-	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:28)
-	at org.junit.runners.ParentRunner.run(ParentRunner.java:300)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:86)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:49)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:64)
-	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:50)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.messaging.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
-	at org.gradle.messaging.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
-	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:106)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.messaging.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:360)
-	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:54)
-	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:40)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-	at java.lang.Thread.run(Thread.java:745)
-</failure>
-  </testcase>
-  <testcase name="testComputeMeanInvalidNumberOfInputs" classname="org.hipi.examples.test.CovarTest" time="1.423">
-    <failure message="java.lang.AssertionError: Failed to run mean. Check setup. expected:&lt;0&gt; but was:&lt;1&gt;" type="java.lang.AssertionError">java.lang.AssertionError: Failed to run mean. Check setup. expected:&lt;0&gt; but was:&lt;1&gt;
-	at org.junit.Assert.fail(Assert.java:93)
-	at org.junit.Assert.failNotEquals(Assert.java:647)
-	at org.junit.Assert.assertEquals(Assert.java:128)
-	at org.junit.Assert.assertEquals(Assert.java:472)
-	at org.hipi.examples.test.CovarTest.testComputeMeanInvalidNumberOfInputs(CovarTest.java:33)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:45)
-	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:15)
-	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:42)
-	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:20)
-	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:263)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:68)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:47)
-	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:231)
-	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:60)
-	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:229)
-	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:50)
-	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:222)
-	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:28)
-	at org.junit.runners.ParentRunner.run(ParentRunner.java:300)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:86)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:49)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:64)
-	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:50)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.messaging.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
-	at org.gradle.messaging.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
-	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:106)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.messaging.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:360)
-	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:54)
-	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:40)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-	at java.lang.Thread.run(Thread.java:745)
-</failure>
-  </testcase>
-  <testcase name="testComputeCovarianceInvalidNumberOfInputs" classname="org.hipi.examples.test.CovarTest" time="1.07">
-    <failure message="java.lang.AssertionError: Failed to run covariance. Check setup. expected:&lt;0&gt; but was:&lt;1&gt;" type="java.lang.AssertionError">java.lang.AssertionError: Failed to run covariance. Check setup. expected:&lt;0&gt; but was:&lt;1&gt;
-	at org.junit.Assert.fail(Assert.java:93)
-	at org.junit.Assert.failNotEquals(Assert.java:647)
-	at org.junit.Assert.assertEquals(Assert.java:128)
-	at org.junit.Assert.assertEquals(Assert.java:472)
-	at org.hipi.examples.test.CovarTest.testComputeCovarianceInvalidNumberOfInputs(CovarTest.java:38)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:45)
-	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:15)
-	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:42)
-	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:20)
-	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:263)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:68)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:47)
-	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:231)
-	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:60)
-	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:229)
-	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:50)
-	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:222)
-	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:28)
-	at org.junit.runners.ParentRunner.run(ParentRunner.java:300)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:86)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:49)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:64)
-	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:50)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.messaging.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
-	at org.gradle.messaging.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
-	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:106)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.messaging.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:360)
-	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:54)
-	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:40)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-	at java.lang.Thread.run(Thread.java:745)
-</failure>
-  </testcase>
-  <testcase name="testComputeMeanInvalidInputPath" classname="org.hipi.examples.test.CovarTest" time="2.059"/>
-  <testcase name="testComputeCovarianceInvalidInputPath" classname="org.hipi.examples.test.CovarTest" time="1.863"/>
-  <testcase name="testComputeMean" classname="org.hipi.examples.test.CovarTest" time="4.738">
-    <failure message="java.lang.AssertionError: Failed to run mean. Check setup. expected:&lt;0&gt; but was:&lt;1&gt;" type="java.lang.AssertionError">java.lang.AssertionError: Failed to run mean. Check setup. expected:&lt;0&gt; but was:&lt;1&gt;
-	at org.junit.Assert.fail(Assert.java:93)
-	at org.junit.Assert.failNotEquals(Assert.java:647)
-	at org.junit.Assert.assertEquals(Assert.java:128)
-	at org.junit.Assert.assertEquals(Assert.java:472)
-	at org.hipi.examples.test.CovarTest.testComputeMean(CovarTest.java:54)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:45)
-	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:15)
-	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:42)
-	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:20)
-	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:263)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:68)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:47)
-	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:231)
-	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:60)
-	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:229)
-	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:50)
-	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:222)
-	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:28)
-	at org.junit.runners.ParentRunner.run(ParentRunner.java:300)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:86)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:49)
-	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:64)
-	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:50)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.messaging.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
-	at org.gradle.messaging.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
-	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
-	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:106)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
-	at org.gradle.messaging.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
-	at org.gradle.messaging.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:360)
-	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:54)
-	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:40)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-	at java.lang.Thread.run(Thread.java:745)
-</failure>
-  </testcase>
+  <testcase name="testCovarOneInput" classname="org.hipi.examples.test.CovarTest" time="1.066"/>
+  <testcase name="testCovarThreeInputs" classname="org.hipi.examples.test.CovarTest" time="0.983"/>
+  <testcase name="testCovarInvalidInputHibPath" classname="org.hipi.examples.test.CovarTest" time="1.809"/>
+  <testcase name="testComputeMean" classname="org.hipi.examples.test.CovarTest" time="15.884"/>
+  <testcase name="testComputeCovariancWithSmallTestHib" classname="org.hipi.examples.test.CovarTest" time="60.688"/>
+  <testcase name="testComputeCovariancWithMediumTestHib" classname="org.hipi.examples.test.CovarTest" time="136.195"/>
   <system-out><![CDATA[hadoop fs -rm -r -f /testout
 <STDOUT>
 /usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
@@ -275,8 +14,8 @@
 Deleted /testout
 </STDOUT>
 <STDERR>
-15/08/12 17:00:10 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-15/08/12 17:00:11 INFO fs.TrashPolicyDefault: Namenode trash configuration: Deletion interval = 0 minutes, Emptier interval = 0 minutes.
+15/08/13 09:52:08 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:08 INFO fs.TrashPolicyDefault: Namenode trash configuration: Deletion interval = 0 minutes, Emptier interval = 0 minutes.
 </STDERR>
 EXITVAL: 0
 hadoop fs -rm -r -f /tmp
@@ -286,26 +25,8 @@ hadoop fs -rm -r -f /tmp
 Deleted /tmp
 </STDOUT>
 <STDERR>
-15/08/12 17:00:12 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-15/08/12 17:00:12 INFO fs.TrashPolicyDefault: Namenode trash configuration: Deletion interval = 0 minutes, Emptier interval = 0 minutes.
-</STDERR>
-EXITVAL: 0
-hadoop fs -mkdir -p /testout
-<STDOUT>
-/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
-/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -mkdir -p /testout
-</STDOUT>
-<STDERR>
-15/08/12 17:00:13 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-</STDERR>
-EXITVAL: 0
-hadoop fs -mkdir -p /tmp
-<STDOUT>
-/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
-/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -mkdir -p /tmp
-</STDOUT>
-<STDERR>
-15/08/12 17:00:15 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:09 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:10 INFO fs.TrashPolicyDefault: Namenode trash configuration: Deletion interval = 0 minutes, Emptier interval = 0 minutes.
 </STDERR>
 EXITVAL: 0
 hadoop fs -mkdir -p /testout/covar
@@ -314,7 +35,16 @@ hadoop fs -mkdir -p /testout/covar
 /Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -mkdir -p /testout/covar
 </STDOUT>
 <STDERR>
-15/08/12 17:00:17 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:11 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+</STDERR>
+EXITVAL: 0
+hadoop fs -mkdir -p /tmp
+<STDOUT>
+/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
+/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -mkdir -p /tmp
+</STDOUT>
+<STDERR>
+15/08/13 09:52:12 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 </STDERR>
 EXITVAL: 0
 hadoop fs -copyFromLocal ../../testdata/covar/hibs/white-black.hib /testout/covar/white-black.hib
@@ -323,7 +53,7 @@ hadoop fs -copyFromLocal ../../testdata/covar/hibs/white-black.hib /testout/cova
 /Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -copyFromLocal ../../testdata/covar/hibs/white-black.hib /testout/covar/white-black.hib
 </STDOUT>
 <STDERR>
-15/08/12 17:00:18 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:14 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 </STDERR>
 EXITVAL: 0
 hadoop fs -copyFromLocal ../../testdata/covar/hibs/white-black.hib.dat /testout/covar/white-black.hib.dat
@@ -332,7 +62,7 @@ hadoop fs -copyFromLocal ../../testdata/covar/hibs/white-black.hib.dat /testout/
 /Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -copyFromLocal ../../testdata/covar/hibs/white-black.hib.dat /testout/covar/white-black.hib.dat
 </STDOUT>
 <STDERR>
-15/08/12 17:00:20 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:16 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 </STDERR>
 EXITVAL: 0
 hadoop fs -copyFromLocal ../../testdata/covar/hibs/smalltesthib.hib /testout/covar/smalltesthib.hib
@@ -341,7 +71,7 @@ hadoop fs -copyFromLocal ../../testdata/covar/hibs/smalltesthib.hib /testout/cov
 /Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -copyFromLocal ../../testdata/covar/hibs/smalltesthib.hib /testout/covar/smalltesthib.hib
 </STDOUT>
 <STDERR>
-15/08/12 17:00:22 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:18 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 </STDERR>
 EXITVAL: 0
 hadoop fs -copyFromLocal ../../testdata/covar/hibs/smalltesthib.hib.dat /testout/covar/smalltesthib.hib.dat
@@ -350,7 +80,7 @@ hadoop fs -copyFromLocal ../../testdata/covar/hibs/smalltesthib.hib.dat /testout
 /Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -copyFromLocal ../../testdata/covar/hibs/smalltesthib.hib.dat /testout/covar/smalltesthib.hib.dat
 </STDOUT>
 <STDERR>
-15/08/12 17:00:23 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:21 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 </STDERR>
 EXITVAL: 0
 hadoop fs -copyFromLocal ../../testdata/covar/hibs/mediumtesthib.hib /testout/covar/mediumtesthib.hib
@@ -359,7 +89,7 @@ hadoop fs -copyFromLocal ../../testdata/covar/hibs/mediumtesthib.hib /testout/co
 /Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -copyFromLocal ../../testdata/covar/hibs/mediumtesthib.hib /testout/covar/mediumtesthib.hib
 </STDOUT>
 <STDERR>
-15/08/12 17:00:25 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:23 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 </STDERR>
 EXITVAL: 0
 hadoop fs -copyFromLocal ../../testdata/covar/hibs/mediumtesthib.hib.dat /testout/covar/mediumtesthib.hib.dat
@@ -368,445 +98,132 @@ hadoop fs -copyFromLocal ../../testdata/covar/hibs/mediumtesthib.hib.dat /testou
 /Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -copyFromLocal ../../testdata/covar/hibs/mediumtesthib.hib.dat /testout/covar/mediumtesthib.hib.dat
 </STDOUT>
 <STDERR>
-15/08/12 17:00:27 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:25 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 </STDERR>
 EXITVAL: 0
-hadoop fs -copyFromLocal ../../testdata/covar/images/mean.jpg /testout/covar/mean.jpg
+../covar.sh /one
 <STDOUT>
 /usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
-/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -copyFromLocal ../../testdata/covar/images/mean.jpg /testout/covar/mean.jpg
-</STDOUT>
-<STDERR>
-15/08/12 17:00:29 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-</STDERR>
-EXITVAL: 0
-hadoop fs -copyFromLocal ../../testdata/covar/images/covariance-benchmark.jpg /testout/covar/covariance-benchmark.jpg
-<STDOUT>
-/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
-/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -copyFromLocal ../../testdata/covar/images/covariance-benchmark.jpg /testout/covar/covariance-benchmark.jpg
-</STDOUT>
-<STDERR>
-15/08/12 17:00:31 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-</STDERR>
-EXITVAL: 0
-./computeMean.sh /testout/covar/smalltesthib.hib /tmp/covar
-<STDOUT>
-/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
-/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ./build/libs/computeMeanTestDriver.jar /testout/covar/smalltesthib.hib /tmp/covar
-Running compute mean.
-Spawned 1map tasks
-HibRecordReader#initialize: Input split starts at byte offset 0 and ends at byte offset 14700465
-</STDOUT>
-<STDERR>
-15/08/12 17:00:33 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-15/08/12 17:00:33 INFO Configuration.deprecation: session.id is deprecated. Instead, use dfs.metrics.session-id
-15/08/12 17:00:33 INFO jvm.JvmMetrics: Initializing JVM Metrics with processName=JobTracker, sessionId=
-15/08/12 17:00:34 WARN mapreduce.JobSubmitter: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
-15/08/12 17:00:34 INFO input.FileInputFormat: Total input paths to process : 1
-15/08/12 17:00:34 INFO mapreduce.JobSubmitter: number of splits:1
-15/08/12 17:00:34 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_local1128619564_0001
-15/08/12 17:00:34 INFO mapreduce.Job: The url to track the job: http://localhost:8080/
-15/08/12 17:00:34 INFO mapreduce.Job: Running job: job_local1128619564_0001
-15/08/12 17:00:34 INFO mapred.LocalJobRunner: OutputCommitter set in config null
-15/08/12 17:00:34 INFO mapred.LocalJobRunner: OutputCommitter is org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
-15/08/12 17:00:34 INFO mapred.LocalJobRunner: Waiting for map tasks
-15/08/12 17:00:34 INFO mapred.LocalJobRunner: Starting task: attempt_local1128619564_0001_m_000000_0
-15/08/12 17:00:34 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
-15/08/12 17:00:34 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
-15/08/12 17:00:34 INFO mapred.MapTask: Processing split: hdfs://localhost:9000/testout/covar/smalltesthib.hib.dat:0+14700466
-15/08/12 17:00:35 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
-15/08/12 17:00:35 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
-15/08/12 17:00:35 INFO mapred.MapTask: soft limit at 83886080
-15/08/12 17:00:35 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
-15/08/12 17:00:35 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
-15/08/12 17:00:35 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
-15/08/12 17:00:35 INFO mapreduce.Job: Job job_local1128619564_0001 running in uber mode : false
-15/08/12 17:00:35 INFO mapreduce.Job:  map 0% reduce 0%
-15/08/12 17:00:40 INFO mapred.LocalJobRunner: map > map
-15/08/12 17:00:41 INFO mapreduce.Job:  map 42% reduce 0%
-15/08/12 17:00:43 INFO mapred.LocalJobRunner: map > map
-15/08/12 17:00:44 INFO mapred.LocalJobRunner: map > map
-15/08/12 17:00:44 INFO mapred.MapTask: Starting flush of map output
-15/08/12 17:00:44 INFO mapred.MapTask: Spilling map output
-15/08/12 17:00:44 INFO mapred.MapTask: bufstart = 0; bufend = 64624; bufvoid = 104857600
-15/08/12 17:00:44 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26214372(104857488); length = 25/6553600
-15/08/12 17:00:44 INFO compress.CodecPool: Got brand-new compressor [.deflate]
-15/08/12 17:00:44 INFO mapred.MapTask: Finished spill 0
-15/08/12 17:00:44 INFO mapred.Task: Task:attempt_local1128619564_0001_m_000000_0 is done. And is in the process of committing
-15/08/12 17:00:44 INFO mapred.LocalJobRunner: map
-15/08/12 17:00:44 INFO mapred.Task: Task 'attempt_local1128619564_0001_m_000000_0' done.
-15/08/12 17:00:44 INFO mapred.LocalJobRunner: Finishing task: attempt_local1128619564_0001_m_000000_0
-15/08/12 17:00:44 INFO mapred.LocalJobRunner: map task executor complete.
-15/08/12 17:00:44 INFO mapred.LocalJobRunner: Waiting for reduce tasks
-15/08/12 17:00:44 INFO mapred.LocalJobRunner: Starting task: attempt_local1128619564_0001_r_000000_0
-15/08/12 17:00:44 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
-15/08/12 17:00:44 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
-15/08/12 17:00:44 INFO mapred.ReduceTask: Using ShuffleConsumerPlugin: org.apache.hadoop.mapreduce.task.reduce.Shuffle@1084b588
-15/08/12 17:00:44 INFO reduce.MergeManagerImpl: MergerManager: memoryLimit=367735584, maxSingleShuffleLimit=91933896, mergeThreshold=242705488, ioSortFactor=10, memToMemMergeOutputsThreshold=10
-15/08/12 17:00:44 INFO reduce.EventFetcher: attempt_local1128619564_0001_r_000000_0 Thread started: EventFetcher for fetching Map Completion Events
-15/08/12 17:00:44 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
-15/08/12 17:00:44 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local1128619564_0001_m_000000_0 decomp: 64654 len: 49658 to MEMORY
-15/08/12 17:00:44 INFO reduce.InMemoryMapOutput: Read 64654 bytes from map-output for attempt_local1128619564_0001_m_000000_0
-15/08/12 17:00:44 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 64654, inMemoryMapOutputs.size() -> 1, commitMemory -> 0, usedMemory ->64654
-15/08/12 17:00:44 INFO reduce.EventFetcher: EventFetcher is interrupted.. Returning
-15/08/12 17:00:44 INFO mapred.LocalJobRunner: 1 / 1 copied.
-15/08/12 17:00:44 INFO reduce.MergeManagerImpl: finalMerge called with 1 in-memory map-outputs and 0 on-disk map-outputs
-15/08/12 17:00:44 INFO mapred.Merger: Merging 1 sorted segments
-15/08/12 17:00:44 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 64646 bytes
-15/08/12 17:00:44 INFO reduce.MergeManagerImpl: Merged 1 segments, 64654 bytes to disk to satisfy reduce memory limit
-15/08/12 17:00:44 INFO reduce.MergeManagerImpl: Merging 1 files, 49666 bytes from disk
-15/08/12 17:00:44 INFO reduce.MergeManagerImpl: Merging 0 segments, 0 bytes from memory into reduce
-15/08/12 17:00:44 INFO mapred.Merger: Merging 1 sorted segments
-15/08/12 17:00:44 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 64646 bytes
-15/08/12 17:00:44 INFO mapred.LocalJobRunner: 1 / 1 copied.
-15/08/12 17:00:44 INFO Configuration.deprecation: mapred.skip.on is deprecated. Instead, use mapreduce.job.skiprecords
-15/08/12 17:00:44 INFO mapred.LocalJobRunner: reduce task executor complete.
-15/08/12 17:00:44 WARN mapred.LocalJobRunner: job_local1128619564_0001
-java.lang.Exception: java.lang.ClassCastException: org.apache.hadoop.io.IntWritable cannot be cast to org.apache.hadoop.io.BytesWritable
-	at org.apache.hadoop.mapred.LocalJobRunner$Job.runTasks(LocalJobRunner.java:462)
-	at org.apache.hadoop.mapred.LocalJobRunner$Job.run(LocalJobRunner.java:529)
-Caused by: java.lang.ClassCastException: org.apache.hadoop.io.IntWritable cannot be cast to org.apache.hadoop.io.BytesWritable
-	at org.apache.hadoop.mapreduce.lib.output.SequenceFileAsBinaryOutputFormat$1.write(SequenceFileAsBinaryOutputFormat.java:140)
-	at org.apache.hadoop.mapred.ReduceTask$NewTrackingRecordWriter.write(ReduceTask.java:558)
-	at org.apache.hadoop.mapreduce.task.TaskInputOutputContextImpl.write(TaskInputOutputContextImpl.java:89)
-	at org.apache.hadoop.mapreduce.lib.reduce.WrappedReducer$Context.write(WrappedReducer.java:105)
-	at org.hipi.examples.covar.MeanReducer.reduce(MeanReducer.java:39)
-	at org.hipi.examples.covar.MeanReducer.reduce(MeanReducer.java:13)
-	at org.apache.hadoop.mapreduce.Reducer.run(Reducer.java:171)
-	at org.apache.hadoop.mapred.ReduceTask.runNewReducer(ReduceTask.java:627)
-	at org.apache.hadoop.mapred.ReduceTask.run(ReduceTask.java:389)
-	at org.apache.hadoop.mapred.LocalJobRunner$Job$ReduceTaskRunnable.run(LocalJobRunner.java:319)
-	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-	at java.lang.Thread.run(Thread.java:745)
-15/08/12 17:00:44 INFO mapreduce.Job:  map 100% reduce 0%
-15/08/12 17:00:44 INFO mapreduce.Job: Job job_local1128619564_0001 failed with state FAILED due to: NA
-15/08/12 17:00:44 INFO mapreduce.Job: Counters: 35
-	File System Counters
-		FILE: Number of bytes read=18569
-		FILE: Number of bytes written=332935
-		FILE: Number of read operations=0
-		FILE: Number of large read operations=0
-		FILE: Number of write operations=0
-		HDFS: Number of bytes read=14700546
-		HDFS: Number of bytes written=0
-		HDFS: Number of read operations=14
-		HDFS: Number of large read operations=0
-		HDFS: Number of write operations=2
-	Map-Reduce Framework
-		Map input records=7
-		Map output records=7
-		Map output bytes=64624
-		Map output materialized bytes=49658
-		Input split bytes=121
-		Combine input records=0
-		Combine output records=0
-		Reduce input groups=0
-		Reduce shuffle bytes=49658
-		Reduce input records=0
-		Reduce output records=0
-		Spilled Records=7
-		Shuffled Maps =1
-		Failed Shuffles=0
-		Merged Map outputs=1
-		GC time elapsed (ms)=485
-		Total committed heap usage (bytes)=525336576
-	Shuffle Errors
-		BAD_ID=0
-		CONNECTION=0
-		IO_ERROR=0
-		WRONG_LENGTH=0
-		WRONG_MAP=0
-		WRONG_REDUCE=0
-	File Input Format Counters 
-		Bytes Read=14700466
-	File Output Format Counters 
-		Bytes Written=0
-</STDERR>
-EXITVAL: 1
-./computeMean.sh /testout/covar/mediumtesthib.hib /tmp/covar
-<STDOUT>
-/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
-/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ./build/libs/computeMeanTestDriver.jar /testout/covar/mediumtesthib.hib /tmp/covar
-Running compute mean.
-Spawned 1map tasks
-HibRecordReader#initialize: Input split starts at byte offset 0 and ends at byte offset 348336
-</STDOUT>
-<STDERR>
-15/08/12 17:00:46 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-15/08/12 17:00:47 INFO Configuration.deprecation: session.id is deprecated. Instead, use dfs.metrics.session-id
-15/08/12 17:00:47 INFO jvm.JvmMetrics: Initializing JVM Metrics with processName=JobTracker, sessionId=
-15/08/12 17:00:47 WARN mapreduce.JobSubmitter: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
-15/08/12 17:00:47 INFO input.FileInputFormat: Total input paths to process : 1
-15/08/12 17:00:47 INFO mapreduce.JobSubmitter: number of splits:1
-15/08/12 17:00:47 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_local1412947190_0001
-15/08/12 17:00:47 INFO mapreduce.Job: The url to track the job: http://localhost:8080/
-15/08/12 17:00:47 INFO mapreduce.Job: Running job: job_local1412947190_0001
-15/08/12 17:00:47 INFO mapred.LocalJobRunner: OutputCommitter set in config null
-15/08/12 17:00:47 INFO mapred.LocalJobRunner: OutputCommitter is org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
-15/08/12 17:00:47 INFO mapred.LocalJobRunner: Waiting for map tasks
-15/08/12 17:00:47 INFO mapred.LocalJobRunner: Starting task: attempt_local1412947190_0001_m_000000_0
-15/08/12 17:00:48 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
-15/08/12 17:00:48 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
-15/08/12 17:00:48 INFO mapred.MapTask: Processing split: hdfs://localhost:9000/testout/covar/mediumtesthib.hib.dat:0+348337
-15/08/12 17:00:48 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
-15/08/12 17:00:48 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
-15/08/12 17:00:48 INFO mapred.MapTask: soft limit at 83886080
-15/08/12 17:00:48 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
-15/08/12 17:00:48 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
-15/08/12 17:00:48 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
-15/08/12 17:00:48 INFO mapreduce.Job: Job job_local1412947190_0001 running in uber mode : false
-15/08/12 17:00:48 INFO mapreduce.Job:  map 0% reduce 0%
-15/08/12 17:00:50 INFO mapred.LocalJobRunner: 
-15/08/12 17:00:50 INFO mapred.MapTask: Starting flush of map output
-15/08/12 17:00:50 INFO mapred.MapTask: Spilling map output
-15/08/12 17:00:50 INFO mapred.MapTask: bufstart = 0; bufend = 230800; bufvoid = 104857600
-15/08/12 17:00:50 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26214300(104857200); length = 97/6553600
-15/08/12 17:00:50 INFO compress.CodecPool: Got brand-new compressor [.deflate]
-15/08/12 17:00:50 INFO mapred.MapTask: Finished spill 0
-15/08/12 17:00:50 INFO mapred.Task: Task:attempt_local1412947190_0001_m_000000_0 is done. And is in the process of committing
-15/08/12 17:00:50 INFO mapred.LocalJobRunner: map
-15/08/12 17:00:50 INFO mapred.Task: Task 'attempt_local1412947190_0001_m_000000_0' done.
-15/08/12 17:00:50 INFO mapred.LocalJobRunner: Finishing task: attempt_local1412947190_0001_m_000000_0
-15/08/12 17:00:50 INFO mapred.LocalJobRunner: map task executor complete.
-15/08/12 17:00:50 INFO mapred.LocalJobRunner: Waiting for reduce tasks
-15/08/12 17:00:50 INFO mapred.LocalJobRunner: Starting task: attempt_local1412947190_0001_r_000000_0
-15/08/12 17:00:50 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
-15/08/12 17:00:50 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
-15/08/12 17:00:50 INFO mapred.ReduceTask: Using ShuffleConsumerPlugin: org.apache.hadoop.mapreduce.task.reduce.Shuffle@45ba59f4
-15/08/12 17:00:50 INFO reduce.MergeManagerImpl: MergerManager: memoryLimit=334338464, maxSingleShuffleLimit=83584616, mergeThreshold=220663392, ioSortFactor=10, memToMemMergeOutputsThreshold=10
-15/08/12 17:00:50 INFO reduce.EventFetcher: attempt_local1412947190_0001_r_000000_0 Thread started: EventFetcher for fetching Map Completion Events
-15/08/12 17:00:50 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
-15/08/12 17:00:50 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local1412947190_0001_m_000000_0 decomp: 230902 len: 185910 to MEMORY
-15/08/12 17:00:50 INFO reduce.InMemoryMapOutput: Read 230902 bytes from map-output for attempt_local1412947190_0001_m_000000_0
-15/08/12 17:00:50 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 230902, inMemoryMapOutputs.size() -> 1, commitMemory -> 0, usedMemory ->230902
-15/08/12 17:00:50 INFO reduce.EventFetcher: EventFetcher is interrupted.. Returning
-15/08/12 17:00:50 INFO mapred.LocalJobRunner: 1 / 1 copied.
-15/08/12 17:00:50 INFO reduce.MergeManagerImpl: finalMerge called with 1 in-memory map-outputs and 0 on-disk map-outputs
-15/08/12 17:00:50 INFO mapred.Merger: Merging 1 sorted segments
-15/08/12 17:00:50 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 230894 bytes
-15/08/12 17:00:50 INFO reduce.MergeManagerImpl: Merged 1 segments, 230902 bytes to disk to satisfy reduce memory limit
-15/08/12 17:00:50 INFO reduce.MergeManagerImpl: Merging 1 files, 185918 bytes from disk
-15/08/12 17:00:50 INFO reduce.MergeManagerImpl: Merging 0 segments, 0 bytes from memory into reduce
-15/08/12 17:00:50 INFO mapred.Merger: Merging 1 sorted segments
-15/08/12 17:00:50 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 230894 bytes
-15/08/12 17:00:50 INFO mapred.LocalJobRunner: 1 / 1 copied.
-15/08/12 17:00:50 INFO Configuration.deprecation: mapred.skip.on is deprecated. Instead, use mapreduce.job.skiprecords
-15/08/12 17:00:50 INFO mapred.LocalJobRunner: reduce task executor complete.
-15/08/12 17:00:50 WARN mapred.LocalJobRunner: job_local1412947190_0001
-java.lang.Exception: java.lang.ClassCastException: org.apache.hadoop.io.IntWritable cannot be cast to org.apache.hadoop.io.BytesWritable
-	at org.apache.hadoop.mapred.LocalJobRunner$Job.runTasks(LocalJobRunner.java:462)
-	at org.apache.hadoop.mapred.LocalJobRunner$Job.run(LocalJobRunner.java:529)
-Caused by: java.lang.ClassCastException: org.apache.hadoop.io.IntWritable cannot be cast to org.apache.hadoop.io.BytesWritable
-	at org.apache.hadoop.mapreduce.lib.output.SequenceFileAsBinaryOutputFormat$1.write(SequenceFileAsBinaryOutputFormat.java:140)
-	at org.apache.hadoop.mapred.ReduceTask$NewTrackingRecordWriter.write(ReduceTask.java:558)
-	at org.apache.hadoop.mapreduce.task.TaskInputOutputContextImpl.write(TaskInputOutputContextImpl.java:89)
-	at org.apache.hadoop.mapreduce.lib.reduce.WrappedReducer$Context.write(WrappedReducer.java:105)
-	at org.hipi.examples.covar.MeanReducer.reduce(MeanReducer.java:39)
-	at org.hipi.examples.covar.MeanReducer.reduce(MeanReducer.java:13)
-	at org.apache.hadoop.mapreduce.Reducer.run(Reducer.java:171)
-	at org.apache.hadoop.mapred.ReduceTask.runNewReducer(ReduceTask.java:627)
-	at org.apache.hadoop.mapred.ReduceTask.run(ReduceTask.java:389)
-	at org.apache.hadoop.mapred.LocalJobRunner$Job$ReduceTaskRunnable.run(LocalJobRunner.java:319)
-	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-	at java.lang.Thread.run(Thread.java:745)
-15/08/12 17:00:50 INFO mapreduce.Job:  map 100% reduce 0%
-15/08/12 17:00:50 INFO mapreduce.Job: Job job_local1412947190_0001 failed with state FAILED due to: NA
-15/08/12 17:00:50 INFO mapreduce.Job: Counters: 35
-	File System Counters
-		FILE: Number of bytes read=18570
-		FILE: Number of bytes written=469190
-		FILE: Number of read operations=0
-		FILE: Number of large read operations=0
-		FILE: Number of write operations=0
-		HDFS: Number of bytes read=348561
-		HDFS: Number of bytes written=0
-		HDFS: Number of read operations=14
-		HDFS: Number of large read operations=0
-		HDFS: Number of write operations=2
-	Map-Reduce Framework
-		Map input records=25
-		Map output records=25
-		Map output bytes=230800
-		Map output materialized bytes=185910
-		Input split bytes=122
-		Combine input records=0
-		Combine output records=0
-		Reduce input groups=0
-		Reduce shuffle bytes=185910
-		Reduce input records=0
-		Reduce output records=0
-		Spilled Records=25
-		Shuffled Maps =1
-		Failed Shuffles=0
-		Merged Map outputs=1
-		GC time elapsed (ms)=55
-		Total committed heap usage (bytes)=355467264
-	Shuffle Errors
-		BAD_ID=0
-		CONNECTION=0
-		IO_ERROR=0
-		WRONG_LENGTH=0
-		WRONG_MAP=0
-		WRONG_REDUCE=0
-	File Input Format Counters 
-		Bytes Read=348337
-	File Output Format Counters 
-		Bytes Written=0
-</STDERR>
-EXITVAL: 1
-./computeMean.sh onlyOneInput
-<STDOUT>
-/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
-/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ./build/libs/computeMeanTestDriver.jar onlyOneInput
-Running compute mean.
+/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ../covar/build/libs/covar.jar /one
 Usage: covar.jar <input HIB> <output directory>
 </STDOUT>
 <STDERR>
-15/08/12 17:00:52 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:27 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 </STDERR>
 EXITVAL: 1
-./computeCovariance.sh onlyOneInput
+../covar.sh /one /two /three
 <STDOUT>
 /usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
-/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ./build/libs/computeCovarianceTestDriver.jar onlyOneInput
-Running compute covariance.
+/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ../covar/build/libs/covar.jar /one /two /three
 Usage: covar.jar <input HIB> <output directory>
 </STDOUT>
 <STDERR>
-15/08/12 17:00:53 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:28 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 </STDERR>
 EXITVAL: 1
-./computeMean.sh invalidInput invalidOutput
+../covar.sh /badPath /testOutDir
 <STDOUT>
 /usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
-/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ./build/libs/computeMeanTestDriver.jar invalidInput invalidOutput
-Running compute mean.
-Input HIB does not exist: invalidInput
+/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ../covar/build/libs/covar.jar /badPath /testOutDir
+Input HIB does not exist: /badPath
 </STDOUT>
 <STDERR>
-15/08/12 17:00:55 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:29 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 </STDERR>
 EXITVAL: 1
-./computeCovariance.sh invalidInput invalidOutput
+../covar.sh /testout/covar/white-black.hib /tmp/covar
 <STDOUT>
 /usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
-/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ./build/libs/computeCovarianceTestDriver.jar invalidInput invalidOutput
+/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ../covar/build/libs/covar.jar /testout/covar/white-black.hib /tmp/covar
+Running compute mean.
+Spawned 1map tasks
+HibRecordReader#initialize: Input split starts at byte offset 0 and ends at byte offset 6791
 Running compute covariance.
-Input HIB does not exist: invalidInput
-</STDOUT>
-<STDERR>
-15/08/12 17:00:57 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-</STDERR>
-EXITVAL: 1
-./computeMean.sh /testout/covar/white-black.hib /tmp/covar
-<STDOUT>
-/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
-/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ./build/libs/computeMeanTestDriver.jar /testout/covar/white-black.hib /tmp/covar
-Running compute mean.
 Spawned 1map tasks
 HibRecordReader#initialize: Input split starts at byte offset 0 and ends at byte offset 6791
 </STDOUT>
 <STDERR>
-15/08/12 17:00:58 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-15/08/12 17:00:59 INFO Configuration.deprecation: session.id is deprecated. Instead, use dfs.metrics.session-id
-15/08/12 17:00:59 INFO jvm.JvmMetrics: Initializing JVM Metrics with processName=JobTracker, sessionId=
-15/08/12 17:00:59 WARN mapreduce.JobSubmitter: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
-15/08/12 17:00:59 INFO input.FileInputFormat: Total input paths to process : 1
-15/08/12 17:00:59 INFO mapreduce.JobSubmitter: number of splits:1
-15/08/12 17:01:00 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_local2128483869_0001
-15/08/12 17:01:00 INFO mapreduce.Job: The url to track the job: http://localhost:8080/
-15/08/12 17:01:00 INFO mapreduce.Job: Running job: job_local2128483869_0001
-15/08/12 17:01:00 INFO mapred.LocalJobRunner: OutputCommitter set in config null
-15/08/12 17:01:00 INFO mapred.LocalJobRunner: OutputCommitter is org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
-15/08/12 17:01:00 INFO mapred.LocalJobRunner: Waiting for map tasks
-15/08/12 17:01:00 INFO mapred.LocalJobRunner: Starting task: attempt_local2128483869_0001_m_000000_0
-15/08/12 17:01:00 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
-15/08/12 17:01:00 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
-15/08/12 17:01:00 INFO mapred.MapTask: Processing split: hdfs://localhost:9000/testout/covar/white-black.hib.dat:0+6792
-15/08/12 17:01:00 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
-15/08/12 17:01:00 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
-15/08/12 17:01:00 INFO mapred.MapTask: soft limit at 83886080
-15/08/12 17:01:00 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
-15/08/12 17:01:00 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
-15/08/12 17:01:00 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
-15/08/12 17:01:01 INFO mapred.LocalJobRunner: 
-15/08/12 17:01:01 INFO mapred.MapTask: Starting flush of map output
-15/08/12 17:01:01 INFO mapred.MapTask: Spilling map output
-15/08/12 17:01:01 INFO mapred.MapTask: bufstart = 0; bufend = 18464; bufvoid = 104857600
-15/08/12 17:01:01 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26214392(104857568); length = 5/6553600
-15/08/12 17:01:01 INFO mapreduce.Job: Job job_local2128483869_0001 running in uber mode : false
-15/08/12 17:01:01 INFO mapreduce.Job:  map 0% reduce 0%
-15/08/12 17:01:01 INFO compress.CodecPool: Got brand-new compressor [.deflate]
-15/08/12 17:01:01 INFO mapred.MapTask: Finished spill 0
-15/08/12 17:01:01 INFO mapred.Task: Task:attempt_local2128483869_0001_m_000000_0 is done. And is in the process of committing
-15/08/12 17:01:01 INFO mapred.LocalJobRunner: map
-15/08/12 17:01:01 INFO mapred.Task: Task 'attempt_local2128483869_0001_m_000000_0' done.
-15/08/12 17:01:01 INFO mapred.LocalJobRunner: Finishing task: attempt_local2128483869_0001_m_000000_0
-15/08/12 17:01:01 INFO mapred.LocalJobRunner: map task executor complete.
-15/08/12 17:01:01 INFO mapred.LocalJobRunner: Waiting for reduce tasks
-15/08/12 17:01:01 INFO mapred.LocalJobRunner: Starting task: attempt_local2128483869_0001_r_000000_0
-15/08/12 17:01:01 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
-15/08/12 17:01:01 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
-15/08/12 17:01:01 INFO mapred.ReduceTask: Using ShuffleConsumerPlugin: org.apache.hadoop.mapreduce.task.reduce.Shuffle@2c69dac0
-15/08/12 17:01:01 INFO reduce.MergeManagerImpl: MergerManager: memoryLimit=334338464, maxSingleShuffleLimit=83584616, mergeThreshold=220663392, ioSortFactor=10, memToMemMergeOutputsThreshold=10
-15/08/12 17:01:01 INFO reduce.EventFetcher: attempt_local2128483869_0001_r_000000_0 Thread started: EventFetcher for fetching Map Completion Events
-15/08/12 17:01:01 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
-15/08/12 17:01:01 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local2128483869_0001_m_000000_0 decomp: 18474 len: 76 to MEMORY
-15/08/12 17:01:01 INFO reduce.InMemoryMapOutput: Read 18474 bytes from map-output for attempt_local2128483869_0001_m_000000_0
-15/08/12 17:01:01 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 18474, inMemoryMapOutputs.size() -> 1, commitMemory -> 0, usedMemory ->18474
-15/08/12 17:01:01 INFO reduce.EventFetcher: EventFetcher is interrupted.. Returning
-15/08/12 17:01:01 INFO mapred.LocalJobRunner: 1 / 1 copied.
-15/08/12 17:01:01 INFO reduce.MergeManagerImpl: finalMerge called with 1 in-memory map-outputs and 0 on-disk map-outputs
-15/08/12 17:01:01 INFO mapred.Merger: Merging 1 sorted segments
-15/08/12 17:01:01 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 18466 bytes
-15/08/12 17:01:01 INFO reduce.MergeManagerImpl: Merged 1 segments, 18474 bytes to disk to satisfy reduce memory limit
-15/08/12 17:01:01 INFO reduce.MergeManagerImpl: Merging 1 files, 84 bytes from disk
-15/08/12 17:01:01 INFO reduce.MergeManagerImpl: Merging 0 segments, 0 bytes from memory into reduce
-15/08/12 17:01:01 INFO mapred.Merger: Merging 1 sorted segments
-15/08/12 17:01:01 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 18466 bytes
-15/08/12 17:01:01 INFO mapred.LocalJobRunner: 1 / 1 copied.
-15/08/12 17:01:01 INFO Configuration.deprecation: mapred.skip.on is deprecated. Instead, use mapreduce.job.skiprecords
-15/08/12 17:01:01 INFO mapred.LocalJobRunner: reduce task executor complete.
-15/08/12 17:01:01 WARN mapred.LocalJobRunner: job_local2128483869_0001
-java.lang.Exception: java.lang.ClassCastException: org.apache.hadoop.io.IntWritable cannot be cast to org.apache.hadoop.io.BytesWritable
-	at org.apache.hadoop.mapred.LocalJobRunner$Job.runTasks(LocalJobRunner.java:462)
-	at org.apache.hadoop.mapred.LocalJobRunner$Job.run(LocalJobRunner.java:529)
-Caused by: java.lang.ClassCastException: org.apache.hadoop.io.IntWritable cannot be cast to org.apache.hadoop.io.BytesWritable
-	at org.apache.hadoop.mapreduce.lib.output.SequenceFileAsBinaryOutputFormat$1.write(SequenceFileAsBinaryOutputFormat.java:140)
-	at org.apache.hadoop.mapred.ReduceTask$NewTrackingRecordWriter.write(ReduceTask.java:558)
-	at org.apache.hadoop.mapreduce.task.TaskInputOutputContextImpl.write(TaskInputOutputContextImpl.java:89)
-	at org.apache.hadoop.mapreduce.lib.reduce.WrappedReducer$Context.write(WrappedReducer.java:105)
-	at org.hipi.examples.covar.MeanReducer.reduce(MeanReducer.java:39)
-	at org.hipi.examples.covar.MeanReducer.reduce(MeanReducer.java:13)
-	at org.apache.hadoop.mapreduce.Reducer.run(Reducer.java:171)
-	at org.apache.hadoop.mapred.ReduceTask.runNewReducer(ReduceTask.java:627)
-	at org.apache.hadoop.mapred.ReduceTask.run(ReduceTask.java:389)
-	at org.apache.hadoop.mapred.LocalJobRunner$Job$ReduceTaskRunnable.run(LocalJobRunner.java:319)
-	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-	at java.lang.Thread.run(Thread.java:745)
-15/08/12 17:01:02 INFO mapreduce.Job:  map 100% reduce 0%
-15/08/12 17:01:02 INFO mapreduce.Job: Job job_local2128483869_0001 failed with state FAILED due to: NA
-15/08/12 17:01:02 INFO mapreduce.Job: Counters: 35
+15/08/13 09:52:31 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:31 INFO Configuration.deprecation: session.id is deprecated. Instead, use dfs.metrics.session-id
+15/08/13 09:52:31 INFO jvm.JvmMetrics: Initializing JVM Metrics with processName=JobTracker, sessionId=
+15/08/13 09:52:32 WARN mapreduce.JobSubmitter: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+15/08/13 09:52:32 INFO input.FileInputFormat: Total input paths to process : 1
+15/08/13 09:52:32 INFO mapreduce.JobSubmitter: number of splits:1
+15/08/13 09:52:32 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_local1505339150_0001
+15/08/13 09:52:32 INFO mapreduce.Job: The url to track the job: http://localhost:8080/
+15/08/13 09:52:32 INFO mapreduce.Job: Running job: job_local1505339150_0001
+15/08/13 09:52:32 INFO mapred.LocalJobRunner: OutputCommitter set in config null
+15/08/13 09:52:32 INFO mapred.LocalJobRunner: OutputCommitter is org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
+15/08/13 09:52:32 INFO mapred.LocalJobRunner: Waiting for map tasks
+15/08/13 09:52:32 INFO mapred.LocalJobRunner: Starting task: attempt_local1505339150_0001_m_000000_0
+15/08/13 09:52:32 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:52:32 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:52:32 INFO mapred.MapTask: Processing split: hdfs://localhost:9000/testout/covar/white-black.hib.dat:0+6792
+15/08/13 09:52:32 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+15/08/13 09:52:32 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+15/08/13 09:52:32 INFO mapred.MapTask: soft limit at 83886080
+15/08/13 09:52:32 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+15/08/13 09:52:32 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+15/08/13 09:52:32 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: 
+15/08/13 09:52:33 INFO mapred.MapTask: Starting flush of map output
+15/08/13 09:52:33 INFO mapred.MapTask: Spilling map output
+15/08/13 09:52:33 INFO mapred.MapTask: bufstart = 0; bufend = 18464; bufvoid = 104857600
+15/08/13 09:52:33 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26214392(104857568); length = 5/6553600
+15/08/13 09:52:33 INFO mapreduce.Job: Job job_local1505339150_0001 running in uber mode : false
+15/08/13 09:52:33 INFO mapreduce.Job:  map 0% reduce 0%
+15/08/13 09:52:33 INFO compress.CodecPool: Got brand-new compressor [.deflate]
+15/08/13 09:52:33 INFO mapred.MapTask: Finished spill 0
+15/08/13 09:52:33 INFO mapred.Task: Task:attempt_local1505339150_0001_m_000000_0 is done. And is in the process of committing
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: map
+15/08/13 09:52:33 INFO mapred.Task: Task 'attempt_local1505339150_0001_m_000000_0' done.
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: Finishing task: attempt_local1505339150_0001_m_000000_0
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: map task executor complete.
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: Waiting for reduce tasks
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: Starting task: attempt_local1505339150_0001_r_000000_0
+15/08/13 09:52:33 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:52:33 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:52:33 INFO mapred.ReduceTask: Using ShuffleConsumerPlugin: org.apache.hadoop.mapreduce.task.reduce.Shuffle@5e20626c
+15/08/13 09:52:33 INFO reduce.MergeManagerImpl: MergerManager: memoryLimit=334338464, maxSingleShuffleLimit=83584616, mergeThreshold=220663392, ioSortFactor=10, memToMemMergeOutputsThreshold=10
+15/08/13 09:52:33 INFO reduce.EventFetcher: attempt_local1505339150_0001_r_000000_0 Thread started: EventFetcher for fetching Map Completion Events
+15/08/13 09:52:33 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
+15/08/13 09:52:33 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local1505339150_0001_m_000000_0 decomp: 18474 len: 76 to MEMORY
+15/08/13 09:52:33 INFO reduce.InMemoryMapOutput: Read 18474 bytes from map-output for attempt_local1505339150_0001_m_000000_0
+15/08/13 09:52:33 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 18474, inMemoryMapOutputs.size() -> 1, commitMemory -> 0, usedMemory ->18474
+15/08/13 09:52:33 INFO reduce.EventFetcher: EventFetcher is interrupted.. Returning
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:52:33 INFO reduce.MergeManagerImpl: finalMerge called with 1 in-memory map-outputs and 0 on-disk map-outputs
+15/08/13 09:52:33 INFO mapred.Merger: Merging 1 sorted segments
+15/08/13 09:52:33 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 18466 bytes
+15/08/13 09:52:33 INFO reduce.MergeManagerImpl: Merged 1 segments, 18474 bytes to disk to satisfy reduce memory limit
+15/08/13 09:52:33 INFO reduce.MergeManagerImpl: Merging 1 files, 84 bytes from disk
+15/08/13 09:52:33 INFO reduce.MergeManagerImpl: Merging 0 segments, 0 bytes from memory into reduce
+15/08/13 09:52:33 INFO mapred.Merger: Merging 1 sorted segments
+15/08/13 09:52:33 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 18466 bytes
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:52:33 INFO Configuration.deprecation: mapred.skip.on is deprecated. Instead, use mapreduce.job.skiprecords
+15/08/13 09:52:33 INFO mapred.Task: Task:attempt_local1505339150_0001_r_000000_0 is done. And is in the process of committing
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:52:33 INFO mapred.Task: Task attempt_local1505339150_0001_r_000000_0 is allowed to commit now
+15/08/13 09:52:33 INFO output.FileOutputCommitter: Saved output of task 'attempt_local1505339150_0001_r_000000_0' to hdfs://localhost:9000/tmp/covar/mean-output/_temporary/0/task_local1505339150_0001_r_000000
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: reduce > reduce
+15/08/13 09:52:33 INFO mapred.Task: Task 'attempt_local1505339150_0001_r_000000_0' done.
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: Finishing task: attempt_local1505339150_0001_r_000000_0
+15/08/13 09:52:33 INFO mapred.LocalJobRunner: reduce task executor complete.
+15/08/13 09:52:34 INFO mapreduce.Job:  map 100% reduce 100%
+15/08/13 09:52:34 INFO mapreduce.Job: Job job_local1505339150_0001 completed successfully
+15/08/13 09:52:34 INFO mapreduce.Job: Counters: 35
 	File System Counters
-		FILE: Number of bytes read=18567
-		FILE: Number of bytes written=283349
+		FILE: Number of bytes read=45338
+		FILE: Number of bytes written=572978
 		FILE: Number of read operations=0
 		FILE: Number of large read operations=0
 		FILE: Number of write operations=0
-		HDFS: Number of bytes read=6832
-		HDFS: Number of bytes written=0
-		HDFS: Number of read operations=14
+		HDFS: Number of bytes read=13664
+		HDFS: Number of bytes written=9232
+		HDFS: Number of read operations=33
 		HDFS: Number of large read operations=0
-		HDFS: Number of write operations=2
+		HDFS: Number of write operations=6
 	Map-Reduce Framework
 		Map input records=2
 		Map output records=2
@@ -815,16 +232,16 @@ Caused by: java.lang.ClassCastException: org.apache.hadoop.io.IntWritable cannot
 		Input split bytes=120
 		Combine input records=0
 		Combine output records=0
-		Reduce input groups=0
+		Reduce input groups=1
 		Reduce shuffle bytes=76
-		Reduce input records=0
-		Reduce output records=0
-		Spilled Records=2
+		Reduce input records=2
+		Reduce output records=1
+		Spilled Records=4
 		Shuffled Maps =1
 		Failed Shuffles=0
 		Merged Map outputs=1
-		GC time elapsed (ms)=5
-		Total committed heap usage (bytes)=318242816
+		GC time elapsed (ms)=17
+		Total committed heap usage (bytes)=670040064
 	Shuffle Errors
 		BAD_ID=0
 		CONNECTION=0
@@ -835,9 +252,747 @@ Caused by: java.lang.ClassCastException: org.apache.hadoop.io.IntWritable cannot
 	File Input Format Counters 
 		Bytes Read=6792
 	File Output Format Counters 
-		Bytes Written=0
+		Bytes Written=9232
+15/08/13 09:52:34 INFO Configuration.deprecation: fs.default.name is deprecated. Instead, use fs.defaultFS
+15/08/13 09:52:34 INFO jvm.JvmMetrics: Cannot initialize JVM Metrics with processName=JobTracker, sessionId= - already initialized
+15/08/13 09:52:34 WARN mapreduce.JobSubmitter: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+15/08/13 09:52:34 INFO input.FileInputFormat: Total input paths to process : 1
+15/08/13 09:52:34 INFO mapreduce.JobSubmitter: number of splits:1
+15/08/13 09:52:34 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_local332264086_0002
+15/08/13 09:52:34 INFO mapred.LocalDistributedCacheManager: Creating symlink: /usr/local/Cellar/hadoop/hdfs/tmp/mapred/local/1439473954848/part-r-00000 <- /Users/zverham/Documents/School/4thYear/Research/hipi-covariance-update/hipi/examples/testSuite/part-r-00000
+15/08/13 09:52:34 INFO mapred.LocalDistributedCacheManager: Localized hdfs://localhost:9000/tmp/covar/mean-output/part-r-00000 as file:/usr/local/Cellar/hadoop/hdfs/tmp/mapred/local/1439473954848/part-r-00000
+15/08/13 09:52:35 INFO mapreduce.Job: The url to track the job: http://localhost:8080/
+15/08/13 09:52:35 INFO mapreduce.Job: Running job: job_local332264086_0002
+15/08/13 09:52:35 INFO mapred.LocalJobRunner: OutputCommitter set in config null
+15/08/13 09:52:35 INFO mapred.LocalJobRunner: OutputCommitter is org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
+15/08/13 09:52:35 INFO mapred.LocalJobRunner: Waiting for map tasks
+15/08/13 09:52:35 INFO mapred.LocalJobRunner: Starting task: attempt_local332264086_0002_m_000000_0
+15/08/13 09:52:35 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:52:35 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:52:35 INFO mapred.MapTask: Processing split: hdfs://localhost:9000/testout/covar/white-black.hib.dat:0+6792
+15/08/13 09:52:35 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+15/08/13 09:52:35 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+15/08/13 09:52:35 INFO mapred.MapTask: soft limit at 83886080
+15/08/13 09:52:35 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+15/08/13 09:52:35 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+15/08/13 09:52:35 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+15/08/13 09:52:36 INFO mapreduce.Job: Job job_local332264086_0002 running in uber mode : false
+15/08/13 09:52:36 INFO mapreduce.Job:  map 0% reduce 0%
+15/08/13 09:52:39 INFO mapred.LocalJobRunner: 
+15/08/13 09:52:39 INFO mapred.MapTask: Starting flush of map output
+15/08/13 09:52:39 INFO mapred.MapTask: Spilling map output
+15/08/13 09:52:39 INFO mapred.MapTask: bufstart = 0; bufend = 42467360; bufvoid = 104857600
+15/08/13 09:52:39 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26214392(104857568); length = 5/6553600
+15/08/13 09:52:40 INFO mapred.MapTask: Finished spill 0
+15/08/13 09:52:40 INFO mapred.Task: Task:attempt_local332264086_0002_m_000000_0 is done. And is in the process of committing
+15/08/13 09:52:40 INFO mapred.LocalJobRunner: map
+15/08/13 09:52:40 INFO mapred.Task: Task 'attempt_local332264086_0002_m_000000_0' done.
+15/08/13 09:52:40 INFO mapred.LocalJobRunner: Finishing task: attempt_local332264086_0002_m_000000_0
+15/08/13 09:52:40 INFO mapred.LocalJobRunner: map task executor complete.
+15/08/13 09:52:40 INFO mapred.LocalJobRunner: Waiting for reduce tasks
+15/08/13 09:52:40 INFO mapred.LocalJobRunner: Starting task: attempt_local332264086_0002_r_000000_0
+15/08/13 09:52:40 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:52:40 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:52:40 INFO mapred.ReduceTask: Using ShuffleConsumerPlugin: org.apache.hadoop.mapreduce.task.reduce.Shuffle@569fd514
+15/08/13 09:52:40 INFO reduce.MergeManagerImpl: MergerManager: memoryLimit=334705440, maxSingleShuffleLimit=83676360, mergeThreshold=220905600, ioSortFactor=10, memToMemMergeOutputsThreshold=10
+15/08/13 09:52:40 INFO reduce.EventFetcher: attempt_local332264086_0002_r_000000_0 Thread started: EventFetcher for fetching Map Completion Events
+15/08/13 09:52:40 INFO reduce.LocalFetcher: localfetcher#2 about to shuffle output of map attempt_local332264086_0002_m_000000_0 decomp: 42467374 len: 9506901 to MEMORY
+15/08/13 09:52:40 INFO reduce.InMemoryMapOutput: Read 42467374 bytes from map-output for attempt_local332264086_0002_m_000000_0
+15/08/13 09:52:40 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 42467374, inMemoryMapOutputs.size() -> 1, commitMemory -> 0, usedMemory ->42467374
+15/08/13 09:52:40 INFO reduce.EventFetcher: EventFetcher is interrupted.. Returning
+15/08/13 09:52:40 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:52:40 INFO reduce.MergeManagerImpl: finalMerge called with 1 in-memory map-outputs and 0 on-disk map-outputs
+15/08/13 09:52:40 INFO mapred.Merger: Merging 1 sorted segments
+15/08/13 09:52:40 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 42467364 bytes
+15/08/13 09:52:41 INFO mapreduce.Job:  map 100% reduce 0%
+15/08/13 09:52:42 INFO reduce.MergeManagerImpl: Merged 1 segments, 42467374 bytes to disk to satisfy reduce memory limit
+15/08/13 09:52:42 INFO reduce.MergeManagerImpl: Merging 1 files, 9506909 bytes from disk
+15/08/13 09:52:42 INFO reduce.MergeManagerImpl: Merging 0 segments, 0 bytes from memory into reduce
+15/08/13 09:52:42 INFO mapred.Merger: Merging 1 sorted segments
+15/08/13 09:52:42 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 42467364 bytes
+15/08/13 09:52:42 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:52:42 INFO mapred.Task: Task:attempt_local332264086_0002_r_000000_0 is done. And is in the process of committing
+15/08/13 09:52:42 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:52:42 INFO mapred.Task: Task attempt_local332264086_0002_r_000000_0 is allowed to commit now
+15/08/13 09:52:42 INFO output.FileOutputCommitter: Saved output of task 'attempt_local332264086_0002_r_000000_0' to hdfs://localhost:9000/tmp/covar/covariance-output/_temporary/0/task_local332264086_0002_r_000000
+15/08/13 09:52:42 INFO mapred.LocalJobRunner: reduce > reduce
+15/08/13 09:52:42 INFO mapred.Task: Task 'attempt_local332264086_0002_r_000000_0' done.
+15/08/13 09:52:42 INFO mapred.LocalJobRunner: Finishing task: attempt_local332264086_0002_r_000000_0
+15/08/13 09:52:42 INFO mapred.LocalJobRunner: reduce task executor complete.
+15/08/13 09:52:43 INFO mapreduce.Job:  map 100% reduce 100%
+15/08/13 09:52:43 INFO mapreduce.Job: Job job_local332264086_0002 completed successfully
+15/08/13 09:52:43 INFO mapreduce.Job: Counters: 35
+	File System Counters
+		FILE: Number of bytes read=19104518
+		FILE: Number of bytes written=29686125
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=64248
+		HDFS: Number of bytes written=21252144
+		HDFS: Number of read operations=101
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=18
+	Map-Reduce Framework
+		Map input records=2
+		Map output records=2
+		Map output bytes=42467360
+		Map output materialized bytes=9506901
+		Input split bytes=120
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=1
+		Reduce shuffle bytes=9506901
+		Reduce input records=2
+		Reduce output records=1
+		Spilled Records=4
+		Shuffled Maps =1
+		Failed Shuffles=0
+		Merged Map outputs=1
+		GC time elapsed (ms)=100
+		Total committed heap usage (bytes)=916455424
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=6792
+	File Output Format Counters 
+		Bytes Written=21233680
 </STDERR>
-EXITVAL: 1
+EXITVAL: 0
+rm /tmp/mean-output-opencvmatwritable
+<STDOUT>
+</STDOUT>
+<STDERR>
+</STDERR>
+EXITVAL: 0
+hadoop fs -copyToLocal /tmp/covar/mean-output/part-r-00000 /tmp/mean-output-opencvmatwritable
+<STDOUT>
+/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
+/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -copyToLocal /tmp/covar/mean-output/part-r-00000 /tmp/mean-output-opencvmatwritable
+</STDOUT>
+<STDERR>
+15/08/13 09:52:44 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+</STDERR>
+EXITVAL: 0
+compare -metric PSNR /tmp/mean-output.jpg ../../testdata/covar/images/mean-benchmark.jpg /tmp/psnr.png
+Images are identical (psnr == Float.MAX_VALUE)
+PSNR: 3.4028235E38
+../covar.sh /testout/covar/smalltesthib.hib /tmp/covar
+<STDOUT>
+/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
+/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ../covar/build/libs/covar.jar /testout/covar/smalltesthib.hib /tmp/covar
+Running compute mean.
+Spawned 1map tasks
+HibRecordReader#initialize: Input split starts at byte offset 0 and ends at byte offset 14700465
+Running compute covariance.
+Spawned 1map tasks
+HibRecordReader#initialize: Input split starts at byte offset 0 and ends at byte offset 14700465
+</STDOUT>
+<STDERR>
+15/08/13 09:52:47 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:52:48 INFO Configuration.deprecation: session.id is deprecated. Instead, use dfs.metrics.session-id
+15/08/13 09:52:48 INFO jvm.JvmMetrics: Initializing JVM Metrics with processName=JobTracker, sessionId=
+15/08/13 09:52:48 WARN mapreduce.JobSubmitter: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+15/08/13 09:52:48 INFO input.FileInputFormat: Total input paths to process : 1
+15/08/13 09:52:48 INFO mapreduce.JobSubmitter: number of splits:1
+15/08/13 09:52:48 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_local262024159_0001
+15/08/13 09:52:48 INFO mapred.LocalJobRunner: OutputCommitter set in config null
+15/08/13 09:52:48 INFO mapreduce.Job: The url to track the job: http://localhost:8080/
+15/08/13 09:52:48 INFO mapreduce.Job: Running job: job_local262024159_0001
+15/08/13 09:52:48 INFO mapred.LocalJobRunner: OutputCommitter is org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
+15/08/13 09:52:48 INFO mapred.LocalJobRunner: Waiting for map tasks
+15/08/13 09:52:48 INFO mapred.LocalJobRunner: Starting task: attempt_local262024159_0001_m_000000_0
+15/08/13 09:52:48 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:52:48 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:52:48 INFO mapred.MapTask: Processing split: hdfs://localhost:9000/testout/covar/smalltesthib.hib.dat:0+14700466
+15/08/13 09:52:48 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+15/08/13 09:52:48 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+15/08/13 09:52:48 INFO mapred.MapTask: soft limit at 83886080
+15/08/13 09:52:48 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+15/08/13 09:52:48 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+15/08/13 09:52:48 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+15/08/13 09:52:49 INFO mapreduce.Job: Job job_local262024159_0001 running in uber mode : false
+15/08/13 09:52:49 INFO mapreduce.Job:  map 0% reduce 0%
+15/08/13 09:52:54 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:52:55 INFO mapreduce.Job:  map 42% reduce 0%
+15/08/13 09:52:57 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:52:58 INFO mapred.MapTask: Starting flush of map output
+15/08/13 09:52:58 INFO mapred.MapTask: Spilling map output
+15/08/13 09:52:58 INFO mapred.MapTask: bufstart = 0; bufend = 64624; bufvoid = 104857600
+15/08/13 09:52:58 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26214372(104857488); length = 25/6553600
+15/08/13 09:52:58 INFO compress.CodecPool: Got brand-new compressor [.deflate]
+15/08/13 09:52:58 INFO mapred.MapTask: Finished spill 0
+15/08/13 09:52:58 INFO mapred.Task: Task:attempt_local262024159_0001_m_000000_0 is done. And is in the process of committing
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: map
+15/08/13 09:52:58 INFO mapred.Task: Task 'attempt_local262024159_0001_m_000000_0' done.
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: Finishing task: attempt_local262024159_0001_m_000000_0
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: map task executor complete.
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: Waiting for reduce tasks
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: Starting task: attempt_local262024159_0001_r_000000_0
+15/08/13 09:52:58 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:52:58 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:52:58 INFO mapred.ReduceTask: Using ShuffleConsumerPlugin: org.apache.hadoop.mapreduce.task.reduce.Shuffle@7a974cf7
+15/08/13 09:52:58 INFO reduce.MergeManagerImpl: MergerManager: memoryLimit=365533600, maxSingleShuffleLimit=91383400, mergeThreshold=241252192, ioSortFactor=10, memToMemMergeOutputsThreshold=10
+15/08/13 09:52:58 INFO reduce.EventFetcher: attempt_local262024159_0001_r_000000_0 Thread started: EventFetcher for fetching Map Completion Events
+15/08/13 09:52:58 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
+15/08/13 09:52:58 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local262024159_0001_m_000000_0 decomp: 64654 len: 49658 to MEMORY
+15/08/13 09:52:58 INFO reduce.InMemoryMapOutput: Read 64654 bytes from map-output for attempt_local262024159_0001_m_000000_0
+15/08/13 09:52:58 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 64654, inMemoryMapOutputs.size() -> 1, commitMemory -> 0, usedMemory ->64654
+15/08/13 09:52:58 INFO reduce.EventFetcher: EventFetcher is interrupted.. Returning
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:52:58 INFO reduce.MergeManagerImpl: finalMerge called with 1 in-memory map-outputs and 0 on-disk map-outputs
+15/08/13 09:52:58 INFO mapred.Merger: Merging 1 sorted segments
+15/08/13 09:52:58 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 64646 bytes
+15/08/13 09:52:58 INFO reduce.MergeManagerImpl: Merged 1 segments, 64654 bytes to disk to satisfy reduce memory limit
+15/08/13 09:52:58 INFO reduce.MergeManagerImpl: Merging 1 files, 49666 bytes from disk
+15/08/13 09:52:58 INFO reduce.MergeManagerImpl: Merging 0 segments, 0 bytes from memory into reduce
+15/08/13 09:52:58 INFO mapred.Merger: Merging 1 sorted segments
+15/08/13 09:52:58 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 64646 bytes
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:52:58 INFO Configuration.deprecation: mapred.skip.on is deprecated. Instead, use mapreduce.job.skiprecords
+15/08/13 09:52:58 INFO mapreduce.Job:  map 100% reduce 0%
+15/08/13 09:52:58 INFO mapred.Task: Task:attempt_local262024159_0001_r_000000_0 is done. And is in the process of committing
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:52:58 INFO mapred.Task: Task attempt_local262024159_0001_r_000000_0 is allowed to commit now
+15/08/13 09:52:58 INFO output.FileOutputCommitter: Saved output of task 'attempt_local262024159_0001_r_000000_0' to hdfs://localhost:9000/tmp/covar/mean-output/_temporary/0/task_local262024159_0001_r_000000
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: reduce > reduce
+15/08/13 09:52:58 INFO mapred.Task: Task 'attempt_local262024159_0001_r_000000_0' done.
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: Finishing task: attempt_local262024159_0001_r_000000_0
+15/08/13 09:52:58 INFO mapred.LocalJobRunner: reduce task executor complete.
+15/08/13 09:52:59 INFO mapreduce.Job:  map 100% reduce 100%
+15/08/13 09:52:59 INFO mapreduce.Job: Job job_local262024159_0001 completed successfully
+15/08/13 09:52:59 INFO mapreduce.Job: Counters: 35
+	File System Counters
+		FILE: Number of bytes read=144506
+		FILE: Number of bytes written=719016
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=29401092
+		HDFS: Number of bytes written=9232
+		HDFS: Number of read operations=33
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=8
+	Map-Reduce Framework
+		Map input records=7
+		Map output records=7
+		Map output bytes=64624
+		Map output materialized bytes=49658
+		Input split bytes=121
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=1
+		Reduce shuffle bytes=49658
+		Reduce input records=7
+		Reduce output records=1
+		Spilled Records=14
+		Shuffled Maps =1
+		Failed Shuffles=0
+		Merged Map outputs=1
+		GC time elapsed (ms)=367
+		Total committed heap usage (bytes)=1044381696
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=14700466
+	File Output Format Counters 
+		Bytes Written=9232
+15/08/13 09:52:59 INFO Configuration.deprecation: fs.default.name is deprecated. Instead, use fs.defaultFS
+15/08/13 09:52:59 INFO jvm.JvmMetrics: Cannot initialize JVM Metrics with processName=JobTracker, sessionId= - already initialized
+15/08/13 09:52:59 WARN mapreduce.JobSubmitter: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+15/08/13 09:52:59 INFO input.FileInputFormat: Total input paths to process : 1
+15/08/13 09:52:59 INFO mapreduce.JobSubmitter: number of splits:1
+15/08/13 09:53:00 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_local1632827639_0002
+15/08/13 09:53:00 INFO mapred.LocalDistributedCacheManager: Creating symlink: /usr/local/Cellar/hadoop/hdfs/tmp/mapred/local/1439473980161/part-r-00000 <- /Users/zverham/Documents/School/4thYear/Research/hipi-covariance-update/hipi/examples/testSuite/part-r-00000
+15/08/13 09:53:00 INFO mapred.LocalDistributedCacheManager: Localized hdfs://localhost:9000/tmp/covar/mean-output/part-r-00000 as file:/usr/local/Cellar/hadoop/hdfs/tmp/mapred/local/1439473980161/part-r-00000
+15/08/13 09:53:00 INFO mapreduce.Job: The url to track the job: http://localhost:8080/
+15/08/13 09:53:00 INFO mapreduce.Job: Running job: job_local1632827639_0002
+15/08/13 09:53:00 INFO mapred.LocalJobRunner: OutputCommitter set in config null
+15/08/13 09:53:00 INFO mapred.LocalJobRunner: OutputCommitter is org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
+15/08/13 09:53:00 INFO mapred.LocalJobRunner: Waiting for map tasks
+15/08/13 09:53:00 INFO mapred.LocalJobRunner: Starting task: attempt_local1632827639_0002_m_000000_0
+15/08/13 09:53:00 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:53:00 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:53:00 INFO mapred.MapTask: Processing split: hdfs://localhost:9000/testout/covar/smalltesthib.hib.dat:0+14700466
+15/08/13 09:53:00 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+15/08/13 09:53:00 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+15/08/13 09:53:00 INFO mapred.MapTask: soft limit at 83886080
+15/08/13 09:53:00 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+15/08/13 09:53:00 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+15/08/13 09:53:00 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+15/08/13 09:53:01 INFO mapreduce.Job: Job job_local1632827639_0002 running in uber mode : false
+15/08/13 09:53:01 INFO mapreduce.Job:  map 0% reduce 0%
+15/08/13 09:53:06 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:53:06 INFO mapreduce.Job:  map 31% reduce 0%
+15/08/13 09:53:09 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:53:11 INFO mapreduce.Job:  map 42% reduce 0%
+15/08/13 09:53:12 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:53:14 INFO mapreduce.Job:  map 56% reduce 0%
+15/08/13 09:53:15 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:53:18 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:53:18 INFO mapred.MapTask: Spilling map output
+15/08/13 09:53:18 INFO mapred.MapTask: bufstart = 0; bufend = 84934720; bufvoid = 104857600
+15/08/13 09:53:18 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26214384(104857536); length = 13/6553600
+15/08/13 09:53:18 INFO mapred.MapTask: (EQUATOR) 84934751 kvi 21233680(84934720)
+15/08/13 09:53:18 INFO mapreduce.Job:  map 66% reduce 0%
+15/08/13 09:53:21 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:53:23 INFO mapred.MapTask: Finished spill 0
+15/08/13 09:53:23 INFO mapred.MapTask: (RESET) equator 84934751 kv 21233680(84934720) kvi 21233680(84934720)
+15/08/13 09:53:25 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:53:27 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:53:27 INFO mapred.MapTask: Starting flush of map output
+15/08/13 09:53:27 INFO mapred.MapTask: Spilling map output
+15/08/13 09:53:27 INFO mapred.MapTask: bufstart = 84934751; bufend = 43778191; bufvoid = 104857600
+15/08/13 09:53:27 INFO mapred.MapTask: kvstart = 21233680(84934720); kvend = 21233672(84934688); length = 9/6553600
+15/08/13 09:53:28 INFO mapred.LocalJobRunner: map > sort
+15/08/13 09:53:28 INFO mapreduce.Job:  map 67% reduce 0%
+15/08/13 09:53:30 INFO mapred.MapTask: Finished spill 1
+15/08/13 09:53:30 INFO mapred.Merger: Merging 2 sorted segments
+15/08/13 09:53:30 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
+15/08/13 09:53:30 INFO mapred.Merger: Down to the last merge-pass, with 2 segments left of total size: 138771172 bytes
+15/08/13 09:53:31 INFO mapred.LocalJobRunner: map > sort > 
+15/08/13 09:53:31 INFO mapreduce.Job:  map 72% reduce 0%
+15/08/13 09:53:37 INFO mapred.LocalJobRunner: map > sort > 
+15/08/13 09:53:37 INFO mapreduce.Job:  map 97% reduce 0%
+15/08/13 09:53:39 INFO mapred.Task: Task:attempt_local1632827639_0002_m_000000_0 is done. And is in the process of committing
+15/08/13 09:53:39 INFO mapred.LocalJobRunner: map > sort
+15/08/13 09:53:39 INFO mapred.Task: Task 'attempt_local1632827639_0002_m_000000_0' done.
+15/08/13 09:53:39 INFO mapred.LocalJobRunner: Finishing task: attempt_local1632827639_0002_m_000000_0
+15/08/13 09:53:39 INFO mapred.LocalJobRunner: map task executor complete.
+15/08/13 09:53:39 INFO mapred.LocalJobRunner: Waiting for reduce tasks
+15/08/13 09:53:39 INFO mapred.LocalJobRunner: Starting task: attempt_local1632827639_0002_r_000000_0
+15/08/13 09:53:39 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:53:39 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:53:39 INFO mapred.ReduceTask: Using ShuffleConsumerPlugin: org.apache.hadoop.mapreduce.task.reduce.Shuffle@4fc4ef3a
+15/08/13 09:53:39 INFO reduce.MergeManagerImpl: MergerManager: memoryLimit=364799584, maxSingleShuffleLimit=91199896, mergeThreshold=240767728, ioSortFactor=10, memToMemMergeOutputsThreshold=10
+15/08/13 09:53:39 INFO reduce.EventFetcher: attempt_local1632827639_0002_r_000000_0 Thread started: EventFetcher for fetching Map Completion Events
+15/08/13 09:53:39 INFO reduce.MergeManagerImpl: attempt_local1632827639_0002_m_000000_0: Shuffling to disk since 148635804 is greater than maxSingleShuffleLimit (91199896)
+15/08/13 09:53:39 INFO reduce.LocalFetcher: localfetcher#2 about to shuffle output of map attempt_local1632827639_0002_m_000000_0 decomp: 148635804 len: 138770865 to DISK
+15/08/13 09:53:39 INFO reduce.OnDiskMapOutput: Read 138770865 bytes from map-output for attempt_local1632827639_0002_m_000000_0
+15/08/13 09:53:39 INFO reduce.EventFetcher: EventFetcher is interrupted.. Returning
+15/08/13 09:53:39 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:53:39 INFO reduce.MergeManagerImpl: finalMerge called with 0 in-memory map-outputs and 1 on-disk map-outputs
+15/08/13 09:53:39 INFO reduce.MergeManagerImpl: Merging 1 files, 138770865 bytes from disk
+15/08/13 09:53:39 INFO reduce.MergeManagerImpl: Merging 0 segments, 0 bytes from memory into reduce
+15/08/13 09:53:39 INFO mapred.Merger: Merging 1 sorted segments
+15/08/13 09:53:39 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 148635794 bytes
+15/08/13 09:53:39 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:53:40 INFO mapreduce.Job:  map 100% reduce 0%
+15/08/13 09:53:40 INFO mapred.Task: Task:attempt_local1632827639_0002_r_000000_0 is done. And is in the process of committing
+15/08/13 09:53:40 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:53:40 INFO mapred.Task: Task attempt_local1632827639_0002_r_000000_0 is allowed to commit now
+15/08/13 09:53:40 INFO output.FileOutputCommitter: Saved output of task 'attempt_local1632827639_0002_r_000000_0' to hdfs://localhost:9000/tmp/covar/covariance-output/_temporary/0/task_local1632827639_0002_r_000000
+15/08/13 09:53:40 INFO mapred.LocalJobRunner: reduce > reduce
+15/08/13 09:53:40 INFO mapred.Task: Task 'attempt_local1632827639_0002_r_000000_0' done.
+15/08/13 09:53:40 INFO mapred.LocalJobRunner: Finishing task: attempt_local1632827639_0002_r_000000_0
+15/08/13 09:53:40 INFO mapred.LocalJobRunner: reduce task executor complete.
+15/08/13 09:53:41 INFO mapreduce.Job:  map 100% reduce 100%
+15/08/13 09:53:41 INFO mapreduce.Job: Job job_local1632827639_0002 completed successfully
+15/08/13 09:53:41 INFO mapreduce.Job: Counters: 35
+	File System Counters
+		FILE: Number of bytes read=555373158
+		FILE: Number of bytes written=696302901
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=58839104
+		HDFS: Number of bytes written=21252144
+		HDFS: Number of read operations=101
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=20
+	Map-Reduce Framework
+		Map input records=7
+		Map output records=7
+		Map output bytes=148635760
+		Map output materialized bytes=138770865
+		Input split bytes=121
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=1
+		Reduce shuffle bytes=138770865
+		Reduce input records=7
+		Reduce output records=1
+		Spilled Records=21
+		Shuffled Maps =1
+		Failed Shuffles=0
+		Merged Map outputs=1
+		GC time elapsed (ms)=481
+		Total committed heap usage (bytes)=1041760256
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=14700466
+	File Output Format Counters 
+		Bytes Written=21233680
+</STDERR>
+EXITVAL: 0
+rm /tmp/covariance-output-opencvmatwritable
+<STDOUT>
+</STDOUT>
+<STDERR>
+</STDERR>
+EXITVAL: 0
+hadoop fs -copyToLocal /tmp/covar/covariance-output/part-r-00000 /tmp/covariance-output-opencvmatwritable
+<STDOUT>
+/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
+/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -copyToLocal /tmp/covar/covariance-output/part-r-00000 /tmp/covariance-output-opencvmatwritable
+</STDOUT>
+<STDERR>
+15/08/13 09:53:42 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+</STDERR>
+EXITVAL: 0
+compare -metric PSNR /tmp/covariance-output.jpg ../../testdata/covar/images/covariance-benchmark.jpg /tmp/psnr.png
+PSNR: 47.5601
+../covar.sh /testout/covar/mediumtesthib.hib /tmp/covar
+<STDOUT>
+/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
+/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.util.RunJar ../covar/build/libs/covar.jar /testout/covar/mediumtesthib.hib /tmp/covar
+Running compute mean.
+Spawned 1map tasks
+HibRecordReader#initialize: Input split starts at byte offset 0 and ends at byte offset 348336
+Running compute covariance.
+Spawned 1map tasks
+HibRecordReader#initialize: Input split starts at byte offset 0 and ends at byte offset 348336
+</STDOUT>
+<STDERR>
+15/08/13 09:53:47 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+15/08/13 09:53:48 INFO Configuration.deprecation: session.id is deprecated. Instead, use dfs.metrics.session-id
+15/08/13 09:53:48 INFO jvm.JvmMetrics: Initializing JVM Metrics with processName=JobTracker, sessionId=
+15/08/13 09:53:48 WARN mapreduce.JobSubmitter: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+15/08/13 09:53:48 INFO input.FileInputFormat: Total input paths to process : 1
+15/08/13 09:53:49 INFO mapreduce.JobSubmitter: number of splits:1
+15/08/13 09:53:49 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_local1490044672_0001
+15/08/13 09:53:49 INFO mapreduce.Job: The url to track the job: http://localhost:8080/
+15/08/13 09:53:49 INFO mapred.LocalJobRunner: OutputCommitter set in config null
+15/08/13 09:53:49 INFO mapreduce.Job: Running job: job_local1490044672_0001
+15/08/13 09:53:49 INFO mapred.LocalJobRunner: OutputCommitter is org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
+15/08/13 09:53:49 INFO mapred.LocalJobRunner: Waiting for map tasks
+15/08/13 09:53:49 INFO mapred.LocalJobRunner: Starting task: attempt_local1490044672_0001_m_000000_0
+15/08/13 09:53:49 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:53:49 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:53:49 INFO mapred.MapTask: Processing split: hdfs://localhost:9000/testout/covar/mediumtesthib.hib.dat:0+348337
+15/08/13 09:53:49 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+15/08/13 09:53:49 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+15/08/13 09:53:49 INFO mapred.MapTask: soft limit at 83886080
+15/08/13 09:53:49 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+15/08/13 09:53:49 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+15/08/13 09:53:49 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+15/08/13 09:53:50 INFO mapreduce.Job: Job job_local1490044672_0001 running in uber mode : false
+15/08/13 09:53:50 INFO mapreduce.Job:  map 0% reduce 0%
+15/08/13 09:53:51 INFO mapred.LocalJobRunner: 
+15/08/13 09:53:51 INFO mapred.MapTask: Starting flush of map output
+15/08/13 09:53:51 INFO mapred.MapTask: Spilling map output
+15/08/13 09:53:51 INFO mapred.MapTask: bufstart = 0; bufend = 230800; bufvoid = 104857600
+15/08/13 09:53:51 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26214300(104857200); length = 97/6553600
+15/08/13 09:53:51 INFO compress.CodecPool: Got brand-new compressor [.deflate]
+15/08/13 09:53:51 INFO mapred.MapTask: Finished spill 0
+15/08/13 09:53:51 INFO mapred.Task: Task:attempt_local1490044672_0001_m_000000_0 is done. And is in the process of committing
+15/08/13 09:53:51 INFO mapred.LocalJobRunner: map
+15/08/13 09:53:51 INFO mapred.Task: Task 'attempt_local1490044672_0001_m_000000_0' done.
+15/08/13 09:53:51 INFO mapred.LocalJobRunner: Finishing task: attempt_local1490044672_0001_m_000000_0
+15/08/13 09:53:51 INFO mapred.LocalJobRunner: map task executor complete.
+15/08/13 09:53:51 INFO mapred.LocalJobRunner: Waiting for reduce tasks
+15/08/13 09:53:51 INFO mapred.LocalJobRunner: Starting task: attempt_local1490044672_0001_r_000000_0
+15/08/13 09:53:51 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:53:51 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:53:51 INFO mapred.ReduceTask: Using ShuffleConsumerPlugin: org.apache.hadoop.mapreduce.task.reduce.Shuffle@6341c200
+15/08/13 09:53:51 INFO reduce.MergeManagerImpl: MergerManager: memoryLimit=334338464, maxSingleShuffleLimit=83584616, mergeThreshold=220663392, ioSortFactor=10, memToMemMergeOutputsThreshold=10
+15/08/13 09:53:51 INFO reduce.EventFetcher: attempt_local1490044672_0001_r_000000_0 Thread started: EventFetcher for fetching Map Completion Events
+15/08/13 09:53:51 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
+15/08/13 09:53:51 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local1490044672_0001_m_000000_0 decomp: 230902 len: 185910 to MEMORY
+15/08/13 09:53:51 INFO reduce.InMemoryMapOutput: Read 230902 bytes from map-output for attempt_local1490044672_0001_m_000000_0
+15/08/13 09:53:51 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 230902, inMemoryMapOutputs.size() -> 1, commitMemory -> 0, usedMemory ->230902
+15/08/13 09:53:51 INFO reduce.EventFetcher: EventFetcher is interrupted.. Returning
+15/08/13 09:53:51 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:53:51 INFO reduce.MergeManagerImpl: finalMerge called with 1 in-memory map-outputs and 0 on-disk map-outputs
+15/08/13 09:53:51 INFO mapred.Merger: Merging 1 sorted segments
+15/08/13 09:53:51 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 230894 bytes
+15/08/13 09:53:51 INFO reduce.MergeManagerImpl: Merged 1 segments, 230902 bytes to disk to satisfy reduce memory limit
+15/08/13 09:53:51 INFO reduce.MergeManagerImpl: Merging 1 files, 185918 bytes from disk
+15/08/13 09:53:51 INFO reduce.MergeManagerImpl: Merging 0 segments, 0 bytes from memory into reduce
+15/08/13 09:53:51 INFO mapred.Merger: Merging 1 sorted segments
+15/08/13 09:53:51 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 230894 bytes
+15/08/13 09:53:51 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:53:51 INFO Configuration.deprecation: mapred.skip.on is deprecated. Instead, use mapreduce.job.skiprecords
+15/08/13 09:53:52 INFO mapred.Task: Task:attempt_local1490044672_0001_r_000000_0 is done. And is in the process of committing
+15/08/13 09:53:52 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:53:52 INFO mapred.Task: Task attempt_local1490044672_0001_r_000000_0 is allowed to commit now
+15/08/13 09:53:52 INFO output.FileOutputCommitter: Saved output of task 'attempt_local1490044672_0001_r_000000_0' to hdfs://localhost:9000/tmp/covar/mean-output/_temporary/0/task_local1490044672_0001_r_000000
+15/08/13 09:53:52 INFO mapred.LocalJobRunner: reduce > reduce
+15/08/13 09:53:52 INFO mapred.Task: Task 'attempt_local1490044672_0001_r_000000_0' done.
+15/08/13 09:53:52 INFO mapred.LocalJobRunner: Finishing task: attempt_local1490044672_0001_r_000000_0
+15/08/13 09:53:52 INFO mapred.LocalJobRunner: reduce task executor complete.
+15/08/13 09:53:52 INFO mapreduce.Job:  map 100% reduce 100%
+15/08/13 09:53:52 INFO mapreduce.Job: Job job_local1490044672_0001 completed successfully
+15/08/13 09:53:52 INFO mapreduce.Job: Counters: 35
+	File System Counters
+		FILE: Number of bytes read=417012
+		FILE: Number of bytes written=1130494
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=697122
+		HDFS: Number of bytes written=9232
+		HDFS: Number of read operations=33
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=8
+	Map-Reduce Framework
+		Map input records=25
+		Map output records=25
+		Map output bytes=230800
+		Map output materialized bytes=185910
+		Input split bytes=122
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=1
+		Reduce shuffle bytes=185910
+		Reduce input records=25
+		Reduce output records=1
+		Spilled Records=50
+		Shuffled Maps =1
+		Failed Shuffles=0
+		Merged Map outputs=1
+		GC time elapsed (ms)=190
+		Total committed heap usage (bytes)=886046720
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=348337
+	File Output Format Counters 
+		Bytes Written=9232
+15/08/13 09:53:52 INFO Configuration.deprecation: fs.default.name is deprecated. Instead, use fs.defaultFS
+15/08/13 09:53:52 INFO jvm.JvmMetrics: Cannot initialize JVM Metrics with processName=JobTracker, sessionId= - already initialized
+15/08/13 09:53:52 WARN mapreduce.JobSubmitter: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+15/08/13 09:53:52 INFO input.FileInputFormat: Total input paths to process : 1
+15/08/13 09:53:52 INFO mapreduce.JobSubmitter: number of splits:1
+15/08/13 09:53:52 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_local264112906_0002
+15/08/13 09:53:52 INFO mapred.LocalDistributedCacheManager: Creating symlink: /usr/local/Cellar/hadoop/hdfs/tmp/mapred/local/1439474032642/part-r-00000 <- /Users/zverham/Documents/School/4thYear/Research/hipi-covariance-update/hipi/examples/testSuite/part-r-00000
+15/08/13 09:53:52 INFO mapred.LocalDistributedCacheManager: Localized hdfs://localhost:9000/tmp/covar/mean-output/part-r-00000 as file:/usr/local/Cellar/hadoop/hdfs/tmp/mapred/local/1439474032642/part-r-00000
+15/08/13 09:53:52 INFO mapreduce.Job: The url to track the job: http://localhost:8080/
+15/08/13 09:53:52 INFO mapreduce.Job: Running job: job_local264112906_0002
+15/08/13 09:53:52 INFO mapred.LocalJobRunner: OutputCommitter set in config null
+15/08/13 09:53:52 INFO mapred.LocalJobRunner: OutputCommitter is org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
+15/08/13 09:53:52 INFO mapred.LocalJobRunner: Waiting for map tasks
+15/08/13 09:53:52 INFO mapred.LocalJobRunner: Starting task: attempt_local264112906_0002_m_000000_0
+15/08/13 09:53:52 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:53:52 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:53:52 INFO mapred.MapTask: Processing split: hdfs://localhost:9000/testout/covar/mediumtesthib.hib.dat:0+348337
+15/08/13 09:53:52 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+15/08/13 09:53:52 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+15/08/13 09:53:52 INFO mapred.MapTask: soft limit at 83886080
+15/08/13 09:53:52 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+15/08/13 09:53:52 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+15/08/13 09:53:52 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+15/08/13 09:53:53 INFO mapreduce.Job: Job job_local264112906_0002 running in uber mode : false
+15/08/13 09:53:53 INFO mapreduce.Job:  map 0% reduce 0%
+15/08/13 09:53:59 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:00 INFO mapreduce.Job:  map 8% reduce 0%
+15/08/13 09:54:02 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:02 INFO mapreduce.Job:  map 15% reduce 0%
+15/08/13 09:54:03 INFO mapred.MapTask: Spilling map output
+15/08/13 09:54:03 INFO mapred.MapTask: bufstart = 0; bufend = 84934720; bufvoid = 104857600
+15/08/13 09:54:03 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26214384(104857536); length = 13/6553600
+15/08/13 09:54:03 INFO mapred.MapTask: (EQUATOR) 84934751 kvi 21233680(84934720)
+15/08/13 09:54:05 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:07 INFO mapred.MapTask: Finished spill 0
+15/08/13 09:54:07 INFO mapred.MapTask: (RESET) equator 84934751 kv 21233680(84934720) kvi 21233680(84934720)
+15/08/13 09:54:08 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:08 INFO mapreduce.Job:  map 17% reduce 0%
+15/08/13 09:54:11 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:13 INFO mapreduce.Job:  map 20% reduce 0%
+15/08/13 09:54:14 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:15 INFO mapreduce.Job:  map 26% reduce 0%
+15/08/13 09:54:15 INFO mapred.MapTask: Spilling map output
+15/08/13 09:54:15 INFO mapred.MapTask: bufstart = 84934751; bufend = 65011871; bufvoid = 104857600
+15/08/13 09:54:15 INFO mapred.MapTask: kvstart = 21233680(84934720); kvend = 21233668(84934672); length = 13/6553600
+15/08/13 09:54:15 INFO mapred.MapTask: (EQUATOR) 65011902 kvi 16252968(65011872)
+15/08/13 09:54:17 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:20 INFO mapred.MapTask: Finished spill 1
+15/08/13 09:54:20 INFO mapred.MapTask: (RESET) equator 65011902 kv 16252968(65011872) kvi 16252968(65011872)
+15/08/13 09:54:20 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:20 INFO mapreduce.Job:  map 28% reduce 0%
+15/08/13 09:54:23 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:23 INFO mapreduce.Job:  map 30% reduce 0%
+15/08/13 09:54:26 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:27 INFO mapreduce.Job:  map 38% reduce 0%
+15/08/13 09:54:28 INFO mapred.MapTask: Spilling map output
+15/08/13 09:54:28 INFO mapred.MapTask: bufstart = 65011902; bufend = 45089022; bufvoid = 104857600
+15/08/13 09:54:28 INFO mapred.MapTask: kvstart = 16252968(65011872); kvend = 16252956(65011824); length = 13/6553600
+15/08/13 09:54:28 INFO mapred.MapTask: (EQUATOR) 45089053 kvi 11272256(45089024)
+15/08/13 09:54:29 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:32 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:33 INFO mapred.MapTask: Finished spill 2
+15/08/13 09:54:33 INFO mapred.MapTask: (RESET) equator 45089053 kv 11272256(45089024) kvi 11272256(45089024)
+15/08/13 09:54:38 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:39 INFO mapreduce.Job:  map 45% reduce 0%
+15/08/13 09:54:41 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:41 INFO mapred.MapTask: Spilling map output
+15/08/13 09:54:41 INFO mapred.MapTask: bufstart = 45089053; bufend = 25166173; bufvoid = 104857600
+15/08/13 09:54:41 INFO mapred.MapTask: kvstart = 11272256(45089024); kvend = 11272244(45088976); length = 13/6553600
+15/08/13 09:54:41 INFO mapred.MapTask: (EQUATOR) 25166204 kvi 6291544(25166176)
+15/08/13 09:54:42 INFO mapreduce.Job:  map 47% reduce 0%
+15/08/13 09:54:44 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:46 INFO mapred.MapTask: Finished spill 3
+15/08/13 09:54:46 INFO mapred.MapTask: (RESET) equator 25166204 kv 6291544(25166176) kvi 6291544(25166176)
+15/08/13 09:54:47 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:48 INFO mapreduce.Job:  map 50% reduce 0%
+15/08/13 09:54:50 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:52 INFO mapreduce.Job:  map 54% reduce 0%
+15/08/13 09:54:53 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:54 INFO mapreduce.Job:  map 58% reduce 0%
+15/08/13 09:54:54 INFO mapred.MapTask: Spilling map output
+15/08/13 09:54:54 INFO mapred.MapTask: bufstart = 25166204; bufend = 5243324; bufvoid = 104857600
+15/08/13 09:54:54 INFO mapred.MapTask: kvstart = 6291544(25166176); kvend = 6291532(25166128); length = 13/6553600
+15/08/13 09:54:54 INFO mapred.MapTask: (EQUATOR) 5243355 kvi 1310832(5243328)
+15/08/13 09:54:56 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:54:58 INFO mapred.MapTask: Finished spill 4
+15/08/13 09:54:58 INFO mapred.MapTask: (RESET) equator 5243355 kv 1310832(5243328) kvi 1310832(5243328)
+15/08/13 09:54:59 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:55:00 INFO mapreduce.Job:  map 61% reduce 0%
+15/08/13 09:55:02 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:55:03 INFO mapreduce.Job:  map 62% reduce 0%
+15/08/13 09:55:05 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:55:06 INFO mapreduce.Job:  map 67% reduce 0%
+15/08/13 09:55:07 INFO mapred.MapTask: Spilling map output
+15/08/13 09:55:07 INFO mapred.MapTask: bufstart = 5243355; bufend = 90178075; bufvoid = 104857600
+15/08/13 09:55:07 INFO mapred.MapTask: kvstart = 1310832(5243328); kvend = 1310820(5243280); length = 13/6553600
+15/08/13 09:55:07 INFO mapred.MapTask: (EQUATOR) 90178106 kvi 22544520(90178080)
+15/08/13 09:55:08 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:55:11 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:55:11 INFO mapred.MapTask: Finished spill 5
+15/08/13 09:55:11 INFO mapred.MapTask: (RESET) equator 90178106 kv 22544520(90178080) kvi 22544520(90178080)
+15/08/13 09:55:11 INFO mapred.LocalJobRunner: map > map
+15/08/13 09:55:11 INFO mapred.MapTask: Starting flush of map output
+15/08/13 09:55:11 INFO mapred.MapTask: Spilling map output
+15/08/13 09:55:11 INFO mapred.MapTask: bufstart = 90178106; bufend = 6554186; bufvoid = 104857600
+15/08/13 09:55:11 INFO mapred.MapTask: kvstart = 22544520(90178080); kvend = 22544520(90178080); length = 1/6553600
+15/08/13 09:55:13 INFO mapred.MapTask: Finished spill 6
+15/08/13 09:55:13 INFO mapred.Merger: Merging 7 sorted segments
+15/08/13 09:55:13 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
+15/08/13 09:55:13 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
+15/08/13 09:55:13 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
+15/08/13 09:55:13 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
+15/08/13 09:55:13 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
+15/08/13 09:55:13 INFO compress.CodecPool: Got brand-new decompressor [.deflate]
+15/08/13 09:55:13 INFO mapred.Merger: Down to the last merge-pass, with 7 segments left of total size: 496597007 bytes
+15/08/13 09:55:17 INFO mapred.LocalJobRunner: map > sort > 
+15/08/13 09:55:18 INFO mapreduce.Job:  map 72% reduce 0%
+15/08/13 09:55:50 INFO mapred.Task: Task:attempt_local264112906_0002_m_000000_0 is done. And is in the process of committing
+15/08/13 09:55:50 INFO mapred.LocalJobRunner: map > sort
+15/08/13 09:55:50 INFO mapred.Task: Task 'attempt_local264112906_0002_m_000000_0' done.
+15/08/13 09:55:50 INFO mapred.LocalJobRunner: Finishing task: attempt_local264112906_0002_m_000000_0
+15/08/13 09:55:50 INFO mapred.LocalJobRunner: map task executor complete.
+15/08/13 09:55:50 INFO mapred.LocalJobRunner: Waiting for reduce tasks
+15/08/13 09:55:50 INFO mapred.LocalJobRunner: Starting task: attempt_local264112906_0002_r_000000_0
+15/08/13 09:55:50 INFO util.ProcfsBasedProcessTree: ProcfsBasedProcessTree currently is supported only on Linux.
+15/08/13 09:55:50 INFO mapred.Task:  Using ResourceCalculatorProcessTree : null
+15/08/13 09:55:50 INFO mapred.ReduceTask: Using ShuffleConsumerPlugin: org.apache.hadoop.mapreduce.task.reduce.Shuffle@3fe497d3
+15/08/13 09:55:51 INFO mapreduce.Job:  map 100% reduce 0%
+15/08/13 09:55:51 INFO reduce.MergeManagerImpl: MergerManager: memoryLimit=334338464, maxSingleShuffleLimit=83584616, mergeThreshold=220663392, ioSortFactor=10, memToMemMergeOutputsThreshold=10
+15/08/13 09:55:51 INFO reduce.EventFetcher: attempt_local264112906_0002_r_000000_0 Thread started: EventFetcher for fetching Map Completion Events
+15/08/13 09:55:51 INFO reduce.MergeManagerImpl: attempt_local264112906_0002_m_000000_0: Shuffling to disk since 530842152 is greater than maxSingleShuffleLimit (83584616)
+15/08/13 09:55:51 INFO reduce.LocalFetcher: localfetcher#2 about to shuffle output of map attempt_local264112906_0002_m_000000_0 decomp: 530842152 len: 496596213 to DISK
+15/08/13 09:55:53 INFO reduce.OnDiskMapOutput: Read 496596213 bytes from map-output for attempt_local264112906_0002_m_000000_0
+15/08/13 09:55:53 INFO reduce.EventFetcher: EventFetcher is interrupted.. Returning
+15/08/13 09:55:53 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:55:53 INFO reduce.MergeManagerImpl: finalMerge called with 0 in-memory map-outputs and 1 on-disk map-outputs
+15/08/13 09:55:53 INFO reduce.MergeManagerImpl: Merging 1 files, 496596213 bytes from disk
+15/08/13 09:55:53 INFO reduce.MergeManagerImpl: Merging 0 segments, 0 bytes from memory into reduce
+15/08/13 09:55:53 INFO mapred.Merger: Merging 1 sorted segments
+15/08/13 09:55:53 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 530842142 bytes
+15/08/13 09:55:53 INFO mapred.LocalJobRunner: 1 / 1 copied.
+15/08/13 09:55:56 INFO mapred.LocalJobRunner: reduce > reduce
+15/08/13 09:55:57 INFO mapred.Task: Task:attempt_local264112906_0002_r_000000_0 is done. And is in the process of committing
+15/08/13 09:55:57 INFO mapred.LocalJobRunner: reduce > reduce
+15/08/13 09:55:57 INFO mapred.Task: Task attempt_local264112906_0002_r_000000_0 is allowed to commit now
+15/08/13 09:55:57 INFO output.FileOutputCommitter: Saved output of task 'attempt_local264112906_0002_r_000000_0' to hdfs://localhost:9000/tmp/covar/covariance-output/_temporary/0/task_local264112906_0002_r_000000
+15/08/13 09:55:57 INFO mapred.LocalJobRunner: reduce > reduce
+15/08/13 09:55:57 INFO mapred.Task: Task 'attempt_local264112906_0002_r_000000_0' done.
+15/08/13 09:55:57 INFO mapred.LocalJobRunner: Finishing task: attempt_local264112906_0002_r_000000_0
+15/08/13 09:55:57 INFO mapred.LocalJobRunner: reduce task executor complete.
+15/08/13 09:55:57 INFO mapreduce.Job:  map 100% reduce 100%
+15/08/13 09:55:57 INFO mapreduce.Job: Job job_local264112906_0002 completed successfully
+15/08/13 09:55:57 INFO mapreduce.Job: Counters: 35
+	File System Counters
+		FILE: Number of bytes read=1987220636
+		FILE: Number of bytes written=2488771239
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=1431164
+		HDFS: Number of bytes written=21252144
+		HDFS: Number of read operations=101
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=20
+	Map-Reduce Framework
+		Map input records=25
+		Map output records=25
+		Map output bytes=530842000
+		Map output materialized bytes=496596213
+		Input split bytes=122
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=1
+		Reduce shuffle bytes=496596213
+		Reduce input records=25
+		Reduce output records=1
+		Spilled Records=75
+		Shuffled Maps =1
+		Failed Shuffles=0
+		Merged Map outputs=1
+		GC time elapsed (ms)=449
+		Total committed heap usage (bytes)=981467136
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=348337
+	File Output Format Counters 
+		Bytes Written=21233680
+</STDERR>
+EXITVAL: 0
+rm /tmp/covariance-output-opencvmatwritable
+<STDOUT>
+</STDOUT>
+<STDERR>
+</STDERR>
+EXITVAL: 0
+hadoop fs -copyToLocal /tmp/covar/covariance-output/part-r-00000 /tmp/covariance-output-opencvmatwritable
+<STDOUT>
+/usr/local/Cellar/hadoop/2.6.0/libexec/etc/hadoop:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/common/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/hdfs/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/yarn/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/lib/*:/usr/local/Cellar/hadoop/2.6.0/libexec/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar
+/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home/bin/java -Xmx1000m -Djava.net.preferIPv4Stack=true -Djava.security.krb5.realm= -Djava.security.krb5.kdc= -Dhadoop.log.dir=/usr/local/Cellar/hadoop/2.6.0/libexec/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/usr/local/Cellar/hadoop/2.6.0/libexec -Dhadoop.id.str=zverham -Dhadoop.root.logger=INFO,console -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Xmx512m -Dhadoop.security.logger=INFO,NullAppender org.apache.hadoop.fs.FsShell -copyToLocal /tmp/covar/covariance-output/part-r-00000 /tmp/covariance-output-opencvmatwritable
+</STDOUT>
+<STDERR>
+15/08/13 09:55:59 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+</STDERR>
+EXITVAL: 0
+compare -metric PSNR /tmp/covariance-output.jpg ../../testdata/covar/images/covariance-benchmark.jpg /tmp/psnr.png
+PSNR: 14.8925
 ]]></system-out>
   <system-err><![CDATA[log4j:WARN No appenders could be found for logger (org.apache.hadoop.util.Shell).
 log4j:WARN Please initialize the log4j system properly.

@@ -1,8 +1,7 @@
 defaultTasks 'install'
 
-allprojects {
-    
-    apply plugin: 'eclipse'
+allprojects {  
+  apply plugin: 'eclipse'
 }
 subprojects {
 
@@ -47,7 +46,7 @@ task install {
   dependsOn(':tools:hibToJpeg:jar')
   dependsOn(':tools:hibDump:jar')
 
-  //  dependsOn(':examples:covar:jar')
+  dependsOn(':examples:covar:jar')
 
   doLast {
     println '\nFinished building the HIPI library along with all tools and examples.'

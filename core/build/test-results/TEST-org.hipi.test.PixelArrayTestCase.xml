@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.hipi.test.PixelArrayTestCase" tests="8" skipped="1" failures="0" errors="0" timestamp="2015-08-12T22:02:31" hostname="Zacks-MacBook-Pro.local" time="0.001">
+<testsuite name="org.hipi.test.PixelArrayTestCase" tests="8" skipped="1" failures="0" errors="0" timestamp="2015-08-13T16:24:44" hostname="Zacks-MacBook-Pro.local" time="0.016">
   <properties/>
-  <testcase name="testPrintSRGBLUT" classname="org.hipi.test.PixelArrayTestCase" time="0.0">
+  <testcase name="testPrintSRGBLUT" classname="org.hipi.test.PixelArrayTestCase" time="0.005">
     <skipped/>
   </testcase>
-  <testcase name="testClamp" classname="org.hipi.test.PixelArrayTestCase" time="0.0"/>
-  <testcase name="testOutOfBounds" classname="org.hipi.test.PixelArrayTestCase" time="0.0"/>
+  <testcase name="testClamp" classname="org.hipi.test.PixelArrayTestCase" time="0.001"/>
+  <testcase name="testOutOfBounds" classname="org.hipi.test.PixelArrayTestCase" time="0.001"/>
   <testcase name="testInvalidSizePixelArrayByte" classname="org.hipi.test.PixelArrayTestCase" time="0.001"/>
   <testcase name="testAllocations" classname="org.hipi.test.PixelArrayTestCase" time="0.0"/>
   <testcase name="testInvalidSizePixelArrayFloat" classname="org.hipi.test.PixelArrayTestCase" time="0.0"/>

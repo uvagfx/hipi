@@ -77,12 +77,10 @@ public class FloatImage extends RasterImage {
   
   /** 
    * Allows setting of underlying pixel array.
-   * @param bytes
+   * @param floatArray
    */
   public void setData(float[] floatArray) {
-    for(int i = 0; i < this.pixelArray.size; i++) {
-      ((PixelArrayFloat)this.pixelArray).setElemFloat(i, floatArray[i]);
-    }
+    ((PixelArrayFloat)this.pixelArray).setFromByteArray(ByteUtils.floatArrayToByteArray(floatArray));
   }
 
   /**

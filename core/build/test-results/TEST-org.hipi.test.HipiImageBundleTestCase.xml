@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.hipi.test.HipiImageBundleTestCase" tests="3" skipped="0" failures="0" errors="0" timestamp="2015-08-12T21:59:48" hostname="Zacks-MacBook-Pro.local" time="18.09">
+<testsuite name="org.hipi.test.HipiImageBundleTestCase" tests="3" skipped="0" failures="0" errors="0" timestamp="2015-08-13T16:22:08" hostname="Zacks-MacBook-Pro.local" time="17.878">
   <properties/>
-  <testcase name="testOffsets" classname="org.hipi.test.HipiImageBundleTestCase" time="0.033"/>
-  <testcase name="testAppend" classname="org.hipi.test.HipiImageBundleTestCase" time="5.471"/>
-  <testcase name="testIterator" classname="org.hipi.test.HipiImageBundleTestCase" time="12.585"/>
+  <testcase name="testOffsets" classname="org.hipi.test.HipiImageBundleTestCase" time="0.03"/>
+  <testcase name="testAppend" classname="org.hipi.test.HipiImageBundleTestCase" time="5.283"/>
+  <testcase name="testIterator" classname="org.hipi.test.HipiImageBundleTestCase" time="12.564"/>
   <system-out><![CDATA[HipiImageBundle#setup
 ADDING IMAGE: ../testdata/jpeg-rgb/01.JPEG
 ImageHeader: (1 1) 3456 x 2304 x 3 meta: {"path":"..\/testdata\/jpeg-rgb\/01.JPEG"}

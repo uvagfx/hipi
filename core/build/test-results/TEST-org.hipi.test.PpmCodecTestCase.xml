@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.hipi.test.PpmCodecTestCase" tests="2" skipped="1" failures="0" errors="0" timestamp="2015-08-12T22:02:31" hostname="Zacks-MacBook-Pro.local" time="0.0">
+<testsuite name="org.hipi.test.PpmCodecTestCase" tests="2" skipped="1" failures="0" errors="0" timestamp="2015-08-13T16:24:44" hostname="Zacks-MacBook-Pro.local" time="0.002">
   <properties/>
-  <testcase name="testTwelveMonkeysPlugIn" classname="org.hipi.test.PpmCodecTestCase" time="0.0"/>
-  <testcase name="testEncodeImage" classname="org.hipi.test.PpmCodecTestCase" time="0.0">
+  <testcase name="testTwelveMonkeysPlugIn" classname="org.hipi.test.PpmCodecTestCase" time="0.001"/>
+  <testcase name="testEncodeImage" classname="org.hipi.test.PpmCodecTestCase" time="0.001">
     <skipped/>
   </testcase>
   <system-out><![CDATA[]]></system-out>

@@ -1,21 +1,13 @@
 package org.hipi.examples.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.hipi.image.FloatImage;
-import org.hipi.image.HipiImageFactory;
-import org.hipi.image.io.ImageEncoder;
-import org.hipi.image.io.JpegCodec;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.IOException;
 
 public class CovarTest {
   
@@ -54,7 +46,7 @@ public class CovarTest {
  
   //psnr on this test should indicate that new covariance image is identical to covariance benchmark because input hibs are identical.
   @Test
-  public void testComputeCovariancWithSmallTestHib() throws IOException {
+  public void testComputeCovarianceWithSmallTestHib() throws IOException {
     assertEquals("Failed to run covariance job. Check setup.", 0, TestUtils.runCommand("../covar.sh /testout/covar/smalltesthib.hib /tmp/covar"));
     TestUtils.runCommand("rm /tmp/covariance-output-opencvmatwritable");
     assertEquals("Failed to copy covariance output to local filesystem. Check setup.", 0, TestUtils.runCommand("hadoop fs -copyToLocal /tmp/covar/covariance-output/part-r-00000 /tmp/covariance-output-opencvmatwritable"));

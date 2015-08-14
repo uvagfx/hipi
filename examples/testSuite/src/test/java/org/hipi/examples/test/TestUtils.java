@@ -1,31 +1,22 @@
 package org.hipi.examples.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-import org.bytedeco.javacpp.opencv_highgui;
-import org.bytedeco.javacpp.opencv_imgproc;
+import org.hipi.opencv.OpenCVMatWritable;
+
 import org.bytedeco.javacpp.opencv_imgcodecs;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.util.RunJar;
-import org.apache.hadoop.util.ToolRunner;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.Scalar;
-import org.bytedeco.javacpp.indexer.FloatIndexer;
-import org.bytedeco.javacpp.indexer.UByteBufferIndexer;
-import org.hipi.opencv.OpenCVMatWritable;
 import org.junit.Test;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class TestUtils {

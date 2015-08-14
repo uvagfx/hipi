@@ -1,19 +1,17 @@
 package org.hipi.examples.covar;
 
-import java.io.IOException;
+import org.hipi.image.FloatImage;
+import org.hipi.image.HipiImageHeader;
+import org.hipi.opencv.OpenCVMatWritable;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.MatExpr;
 import org.bytedeco.javacpp.opencv_core.Rect;
 import org.bytedeco.javacpp.opencv_core.Scalar;
-import org.bytedeco.javacpp.indexer.FloatIndexer;
-import org.hipi.image.FloatImage;
-import org.hipi.image.HipiImageHeader;
-import org.hipi.opencv.OpenCVMatWritable;
-import org.hipi.opencv.OpenCVUtils;
+
+import java.io.IOException;
 
 public class MeanMapper extends Mapper<HipiImageHeader, FloatImage, IntWritable, OpenCVMatWritable> {
 
@@ -21,29 +19,43 @@ public class MeanMapper extends Mapper<HipiImageHeader, FloatImage, IntWritable,
   public void map(HipiImageHeader header, FloatImage image, Context context) throws IOException,
       InterruptedException {
     
-    int N = Covariance.patchSize;
+    /////
+    // Perform conversion to OpenCV
+    /////
     
-    //convert input FloatImage to grayscale mat
-    Mat cvValue = OpenCVUtils.convertFloatImageToMat(image, opencv_core.CV_32FC1);
-
-    //compute mean patch from input image
+    Mat cvImage = new Mat(image.getHeight(), image.getWidth(), opencv_core.CV_32FC1);
+    
+    // if unable to convert input FloatImage to grayscale Mat, skip image and move on
+    if(!Covariance.convertFloatImageToGrayscaleMat(image, cvImage)) {
+      return;
+    }
+    
+    /////
+    // Compute mean using OpenCV
+    /////
+    
+    //patch dimensions (N X N)
+    int N = Covariance.patchSize;
+ 
     Mat mean = new Mat(N, N, opencv_core.CV_32FC1, new Scalar(0.0));
     
-    //specify number of patches to use to compute mean patch (iMax * jMax patches)
+    //specify number of patches to use in mean patch computation (iMax * jMax patches)
     int iMax = 100;
     int jMax = 100;
 
     //collect patches and add their values to mean patch mat
     for (int i = 0; i < iMax; i++) {
-      int x = ((cvValue.cols() - N) * i) / iMax;
+      int x = ((cvImage.cols() - N) * i) / iMax;
       for (int j = 0; j < jMax; j++) {
-        int y = ((cvValue.rows() - N) * j) / jMax;
-        Mat patch = cvValue.apply(new Rect(x, y, N, N));
+        int y = ((cvImage.rows() - N) * j) / jMax;
+        Mat patch = cvImage.apply(new Rect(x, y, N, N));
         opencv_core.add(patch, mean, mean);
       }
     }
     
-    mean = opencv_core.multiply(mean, (1.0 / (double)(iMax * jMax))).asMat();
+    //scale mean patch mat based on total number of patches
+    int numPatches = iMax * jMax;
+    mean = opencv_core.divide(mean, (double) numPatches).asMat();
     
     context.write(new IntWritable(0), new OpenCVMatWritable(mean));
   }

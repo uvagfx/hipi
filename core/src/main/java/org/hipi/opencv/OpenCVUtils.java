@@ -1,40 +1,16 @@
 package org.hipi.opencv;
 
+import org.hipi.image.RasterImage;
+import org.hipi.util.ByteUtils;
 
-import static org.hipi.image.PixelArray.TYPE_BYTE;
-import static org.hipi.image.PixelArray.TYPE_SHORT;
-import static org.hipi.image.PixelArray.TYPE_USHORT;
-import static org.hipi.image.PixelArray.TYPE_INT;
-import static org.hipi.image.PixelArray.TYPE_FLOAT;
-import static org.hipi.image.PixelArray.TYPE_DOUBLE;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_RGB2GRAY;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_GRAY2RGB;
-import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
+import org.bytedeco.javacpp.opencv_core;
+import org.bytedeco.javacpp.opencv_core.Mat;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-
-import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_highgui;
-import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.Size;
-import org.bytedeco.javacpp.opencv_core.Scalar;
-import org.bytedeco.javacpp.indexer.FloatIndexer;
-import org.bytedeco.javacpp.indexer.Indexer;
-import org.hipi.image.FloatImage;
-import org.hipi.image.HipiImage;
-import org.hipi.image.HipiImage.HipiImageType;
-import org.hipi.image.HipiImageHeader;
-import org.hipi.image.HipiImageHeader.HipiColorSpace;
-import org.hipi.image.HipiImageHeader.HipiImageFormat;
-import org.hipi.image.PixelArray;
-import org.hipi.image.RasterImage;
-import org.hipi.util.ByteUtils;
 
 public class OpenCVUtils {
   
@@ -62,13 +38,15 @@ public class OpenCVUtils {
   
   public static Mat convertRasterImageToMat(RasterImage image) throws IllegalArgumentException {
     
+    // Check for invalid input
     if(image == null) {
-      throw new IllegalArgumentException("Input RasterImage is null");
+      throw new IllegalArgumentException("Input RasterImage is null.");
     }
     if(image.getWidth() <= 0 || image.getHeight() <= 0) {
       throw new IllegalArgumentException("Input RasterImage has invalid dimensions [" + image.getWidth() + "," + image.getHeight() + "]");
     }
     
+    // Generate opencv data type based on input pixel array data type / number of bands
     int numBands = image.getNumBands();
     int pixelArrayDataType = image.getPixelArray().getDataType();
     int openCVType = generateOpenCVType(pixelArrayDataType, numBands);
@@ -76,10 +54,13 @@ public class OpenCVUtils {
       throw new IllegalArgumentException("Invalid PixelArray data type [" + pixelArrayDataType + "] and / or RasterImage numBands [" + numBands + "]");
     }
     
+    // Create output mat
     Mat mat = new Mat(image.getHeight(), image.getWidth(), openCVType);
     
+    // Access raster image data
     byte[] data = image.getPixelArray().getByteArray();
     
+    // Transfer data into mat
     switch(opencv_core.CV_MAT_DEPTH(mat.type())) {
       case opencv_core.CV_8U:
       case opencv_core.CV_8S:
@@ -103,52 +84,5 @@ public class OpenCVUtils {
     }
     
     return mat;
-  }
-  
-//  public static Mat convertFloatImageToMat(FloatImage inputImage, OpenCVOutputColorSpace openCVOutputColorSpace) throws IOException {
-//    
-//    //Step 1: convert FloatImage to a Mat of comparable type
-//    Mat unconvertedMat;
-//    
-//    int rows = inputImage.getHeight();
-//    int cols = inputImage.getWidth();
-//    HipiColorSpace colorSpace = inputImage.getColorSpace();
-//    switch(colorSpace) {
-//      case RGB:
-//        unconvertedMat = new Mat(rows, cols, opencv_core.CV_32FC3);
-//        break;
-//      case LUM:
-//        unconvertedMat = new Mat(rows, cols, opencv_core.CV_32FC1);
-//        break;
-//      default:
-//        throw new IOException("Unsupported HipiColorSpace [" + colorSpace + "].");
-//    }
-//    
-//    ((FloatBuffer) unconvertedMat.createBuffer()).put(inputImage.getData());
-//    
-//    
-//    //Step 2: perform mat conversion (if necessary)
-//    
-//    switch(openCVOutputColorSpace) {
-//      case OPENCV_RGB:
-//        if(colorSpace != HipiColorSpace.RGB) { //convert to rgb only if mat isn't already rgb
-//          Mat rgbMat = new Mat(unconvertedMat.rows(), unconvertedMat.cols(), opencv_core.CV_32FC3, new Scalar(0.0));
-//          cvtColor(unconvertedMat, rgbMat, CV_GRAY2RGB);
-//          return rgbMat;
-//        } else {
-//          return unconvertedMat;
-//        }
-//      case OPENCV_GRAY:
-//        if(colorSpace != HipiColorSpace.LUM) { //convert to grayscale only if mat isn't already lum
-//          Mat grayMat = new Mat(unconvertedMat.rows(), unconvertedMat.cols(), opencv_core.CV_32FC1, new Scalar(0.0));
-//          cvtColor(unconvertedMat, grayMat, CV_RGB2GRAY);
-//          return grayMat;
-//        } else {
-//          return unconvertedMat;
-//        }
-//      default:
-//        throw new IOException("Unsupported opencv color space specified for output mat [" + openCVOutputColorSpace + "].");
-//    }
-//  }
-    
+  } 
 }

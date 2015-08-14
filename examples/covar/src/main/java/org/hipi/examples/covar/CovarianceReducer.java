@@ -1,13 +1,14 @@
 package org.hipi.examples.covar;
 
-import java.io.IOException;
+import org.hipi.opencv.OpenCVMatWritable;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Scalar;
-import org.hipi.opencv.OpenCVMatWritable;
+
+import java.io.IOException;
 
 public class CovarianceReducer extends
     Reducer<IntWritable, OpenCVMatWritable, IntWritable, OpenCVMatWritable> {

@@ -1,7 +1,10 @@
 package org.hipi.opencv;
 
-import org.apache.hadoop.io.Writable;
 import org.hipi.util.ByteUtils;
+
+import org.apache.hadoop.io.Writable;
+import org.bytedeco.javacpp.opencv_core;
+import org.bytedeco.javacpp.opencv_core.Mat;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -11,11 +14,6 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.Arrays;
-
-import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_core.Mat;
 
 public class OpenCVMatWritable implements Writable {
 
@@ -96,7 +94,7 @@ public class OpenCVMatWritable implements Writable {
           out.write(ByteUtils.doubleArrayToByteArray(doubleData));
           break;
         default:
-          throw new IOException("Unsupported matrix type [" + type + "].");
+          throw new IOException("Unsupported matrix depth [" + depth + "].");
       }
     }
 
@@ -141,7 +139,7 @@ public class OpenCVMatWritable implements Writable {
         ((DoubleBuffer)mat.createBuffer()).put(ByteUtils.byteArrayToDoubleArray(doubleDataAsBytes));
         break;
       default:
-        throw new IOException("Unsupported matrix type [" + type + "].");
+        throw new IOException("Unsupported matrix depth [" + depth + "].");
     }
   }
 

@@ -1,14 +1,14 @@
 package org.hipi.examples.covar;
 
-import java.io.IOException;
+import org.hipi.opencv.OpenCVMatWritable;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Scalar;
-import org.bytedeco.javacpp.indexer.FloatIndexer;
-import org.hipi.opencv.OpenCVMatWritable;
+
+import java.io.IOException;
 
 public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, IntWritable, OpenCVMatWritable> {
   
@@ -18,8 +18,9 @@ public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, IntWrit
     
     int N = Covariance.patchSize;
     
-    //consolidate each mean patch computed in mappers
+    //consolidate each mean patch computed in map step
     Mat mean = new Mat(N, N, opencv_core.CV_32FC1, new Scalar(0.0));
+    
     int total = 0;
     for (OpenCVMatWritable patch : meanPatches) {
       opencv_core.add(patch.getMat(), mean, mean);
@@ -27,8 +28,8 @@ public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, IntWrit
     }
     
     //normalize consolidated mean patch
-    if (total > 0) {
-      mean = opencv_core.multiply(mean, (1.0 / (double) total)).asMat();
+    if (total > 1) {
+      mean = opencv_core.divide(mean, (double) total).asMat();
     }
     
     //write out consolidated patch

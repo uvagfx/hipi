@@ -102,8 +102,6 @@ public class Downloader extends Configured implements Tool {
       // Use line number and a unique key assigned to each map task to generate a unique filename.
       String tempPath = conf.get("downloader.outpath") + key.get() + uniqueMapperKey +  ".hib.tmp";
 
-      // TODO: Add sanity check here that tempPath does not exist on HDFS
-
       boolean yfcc100m = conf.getBoolean("downloader.yfcc100m", false);
 
       // Create new temporary HIB

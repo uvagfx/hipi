@@ -94,7 +94,7 @@ public class HibToJpeg extends Configured implements Tool {
 
     // Check arguments
     if (args.length != 2) {
-      System.out.println("Usage: hibToJpeg <input HIB> <output directory>");
+      System.out.println("Usage: hibToJpeg.jar <input HIB> <output directory>");
       System.exit(0);
     }
 

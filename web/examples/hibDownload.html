@@ -73,9 +73,7 @@ usage: hibDownload.jar &#60;directory containing source files&#62; &#60;output H
 
       <h3>Example</h3>
 
-      This section will walk you through a few examples that illustrate how <b>hibDownload</b> works.<br/><br/>
-
-      First, let's use <b>hibDownload</b> to create a HIB from the small set of sample images that are available at <a href="http://hipi.cs.virginia.edu">http://hipi.cs.virginia.edu</a>. The first step is to copy a text file that lists these image URLs to a directory on the HDFS. This can be done by issuing the following commands from within the tools directory:
+      This section will walk you through a few examples that illustrate how <b>hibDownload</b> works. First, we will use <b>hibDownload</b> to create a HIB from the small set of sample images that are available at <a href="http://hipi.cs.virginia.edu">http://hipi.cs.virginia.edu</a>. The first step is to copy a text file that lists these image URLs to a directory on the HDFS. This can be done by issuing the following commands from within the tools directory:
 
       <pre class="console">
 $> cd tools
@@ -543,7 +541,9 @@ source: http://farm4.staticflickr.com/3171/2297552664_1ee0e8855d.jpg
             ...
 	</pre>
 
-	After all of the URLs have been processed, the HIB is finalized and a record indicating its location on the filesystem is sent to the reduce task:
+  Note that the <tt>addMetaData()</tt> method is used to store the source URL (along with any other fields in the input file in the case of the YFCC100M dataset). This preserves this information in the HIB along with the image pixel data.<br/><br/>
+
+	After all of the URLs have been processed, the mapper's output HIB is finalized and a record indicating its location on the filesystem is sent to the reduce task:
 
 	<pre class="prettyprint">
     // Output key/value pair to reduce layer consisting of boolean and path to HIB
@@ -555,7 +555,7 @@ source: http://farm4.staticflickr.com/3171/2297552664_1ee0e8855d.jpg
 
 	<h3>DownloaderReducer class</h3>
 
-	The DownloaderReducer class (which is defined in <tt>DownloaderReducer.java</tt>) is pretty straightforward, it simply appends each of the HIBs produced by the map tasks into a single HIB at the path specified by the user:
+	The DownloaderReducer class (which is defined in <tt>DownloaderReducer.java</tt>) is pretty straightforward. It concatenates the HIBs produced by the map tasks into a single monolithic HIB at the path specified by the user:
 
 	<pre class="prettyprint">
   public void reduce(BooleanWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
@@ -573,23 +573,24 @@ source: http://farm4.staticflickr.com/3171/2297552664_1ee0e8855d.jpg
       // Iterate over the temporary HIB files created by map tasks
       for (Text tempString : values) {
   
-  // Open the temporary HIB file
-  Path tempPath = new Path(tempString.toString());
-  HipiImageBundle inputBundle = new HipiImageBundle(tempPath, conf);
+        // Open the temporary HIB file
+        Path tempPath = new Path(tempString.toString());
+        HipiImageBundle inputBundle = new HipiImageBundle(tempPath, conf);
   
-  // Append temporary HIB file to output HIB (this is fast)
-  hib.append(inputBundle);
+        // Append temporary HIB file to output HIB (this is fast)
+        hib.append(inputBundle);
   
-  // Remove temporary HIB (both .hib and .hib.dat files)
-  Path indexPath = inputBundle.getPath();
-  Path dataPath = new Path(indexPath.toString() + ".dat");
-  fileSystem.delete(indexPath, false);
-  fileSystem.delete(dataPath, false);
+        // Remove temporary HIB (both .hib and .hib.dat files)
+        Path indexPath = inputBundle.getPath();
+        Path dataPath = new Path(indexPath.toString() + ".dat");
+        fileSystem.delete(indexPath, false);
+        fileSystem.delete(dataPath, false);
   
-  // Emit output key/value pair indicating temporary HIB has been processed
-  Text outputPath = new Text(inputBundle.getPath().toString());
-  context.write(new BooleanWritable(true), outputPath);
-  context.progress();
+        // Emit output key/value pair indicating temporary HIB has been processed
+        Text outputPath = new Text(inputBundle.getPath().toString());
+        context.write(new BooleanWritable(true), outputPath);
+        context.progress();
+
       }
       
       // Finalize output HIB
@@ -602,7 +603,7 @@ source: http://farm4.staticflickr.com/3171/2297552664_1ee0e8855d.jpg
 
 	<h3>Next</h3>
 
-	Learn about the <a href="../examples/jpegfromhib.html">JpegFromHib example program</a> that extracts the images in a HIB as individual JPEGs.
+	Read about <a href="../examples/hibToJpeg.html">tools/jpegToHib</a>, which extracts the images in a HIB as individual JPEGs.
 
       </div>
     </div>

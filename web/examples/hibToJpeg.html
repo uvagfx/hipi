@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="../include/main.css" />
     <link rel="stylesheet" type="text/css" href="../include/javasyntax.css" />
-    <title>HIPI - Hadoop Image Processing Interface :: JpegFromHib</title>
+    <title>HIPI - Hadoop Image Processing Interface :: tools/hibToJpeg</title>
 
     <script type="text/javascript">
         var _gaq = _gaq || [];
@@ -46,116 +46,68 @@
     <!-- Begin Content -->
     <div class="content">
       
-      <h2 class="title">JpegFromHib</h2>
+      <h2 class="title">tools/hibToJpeg</h2>
       
       <div class="section">
 	
-        JpegFromHib is a MapReduce/HIPI program that extracts the images in a <a href="../doc/api/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) as a set of individual files stored on the HDFS. This is a simple program that can help learn the HIPI API and a useful tool for verifying HIBs are being created properly.
+        <b>hibToJpeg</b> is a MapReduce/HIPI program that extracts the images in a <a href="../javadoc/org/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) as a set of individual JPEGs stored on the HDFS.
  
-	<h3>Compiling</h3>
+        <h3>Compiling</h3>
 
-	Compile <b>jpegfromhib</b> by executing the following command in the HIPI root directory (see our <a href="../gettingstarted.html">general notes</a> on setting up HIPI on your system and using Ant for compilation):
-	
-	<pre class="console">
-$> ant jpegfromhib
-	</pre>
+        Compile <b>hibToJpeg</b> by executing the following Gradle command in the HIPI tools directory (see our <a href="../gettingstarted.html">general notes</a> on setting up HIPI on your system):
+  
+      <pre class="console">
+$> cd tools
+$> gradle hibToJpeg:jar
+      </pre>
        
         <h3>Usage</h3>
 
-	Run <b>jpegfromhib</b> by executing the following command in the HIPI root directory:
+      Run <b>hibToJpeg</b> by executing the <tt>hibToJpeg.sh</tt> script located in the tools directory. Running it without any arguments shows its usage:
+  
+      <pre class="console">
+$> ./hibToJpeg.sh
+Usage: hibToJpeg.jar &#60;input HIB&#62; &#60;output directory&#62;
+      </pre>
+
+      <b>hibToJpeg</b> takes two arguments. The first argument is the path to a HIB on the HDFS. The second is the path to a directory on the HDFS that will be created once the program has finished. The images in the input HIB will be stored as individual JPEGs in this directory.
+
+      <h3>Example</h3>
+
+      Let's use the <tt>download.hib</tt> file that was created in the <b><a href="hibDownload.html">hibDownload</a></b> example:
+
+      <pre class="console">
+$> ./hibToJpeg.sh download.hib download_extract
+	    </pre>
+
+	After the program finishes, we can inspect the newly created <tt>download_extract</tt> directory on the HDFS:
 
 	<pre class="console">
-$> hadoop jar examples/jpegfromhib.jar &#60;input HIB&#62; &#60;output directory&#62;
-	</pre>
-	
-	There is also a convenience script located in the examples directory:
-
-	<pre class="console">
-$> cd examples
-$> ./runJpegFromHib.sh &#60;input HIB&#62; &#60;output directory&#62;
-	</pre>
-
-	<b>jpegfromhib</b> takes two arguments. The first argument is the path to a HIB on the HDFS. The second argument is the HDFS path to the output directory that will be created once the program has finished. The resulting JPEG files will be stored in this directory.
-
-	<h3>Example</h3>
-
-	    We will walk you through an example using the <tt>testimages.hib</tt> file that was created during the example for the <a href="../examples/downloader.html">Distributed Downloader</a>:
-
-	<pre class="console">
-$> hadoop jar examples/jpegfromhib.jar testimages.hib testimages_extract
+$> hadoop fs -ls download_extract
+Found 14 items
+-rw-r--r--   1 hipiuser supergroup    2520970 2015-08-14 17:05 download_extract/01.jpg
+-rw-r--r--   1 hipiuser supergroup    3437882 2015-08-14 17:05 download_extract/02.jpg
+-rw-r--r--   1 hipiuser supergroup    1814641 2015-08-14 17:05 download_extract/03.jpg
+-rw-r--r--   1 hipiuser supergroup    2474565 2015-08-14 17:05 download_extract/04.jpg
+-rw-r--r--   1 hipiuser supergroup    2255832 2015-08-14 17:05 download_extract/05.jpg
+-rw-r--r--   1 hipiuser supergroup    3705417 2015-08-14 17:05 download_extract/06.jpg
+-rw-r--r--   1 hipiuser supergroup     955944 2015-08-14 17:05 download_extract/07.jpg
+-rw-r--r--   1 hipiuser supergroup    1073753 2015-08-14 17:05 download_extract/08.jpg
+-rw-r--r--   1 hipiuser supergroup     325019 2015-08-14 17:05 download_extract/09.jpg
+-rw-r--r--   1 hipiuser supergroup     412266 2015-08-14 17:05 download_extract/10.jpg
+-rw-r--r--   1 hipiuser supergroup    1259357 2015-08-14 17:05 download_extract/11.jpg
+-rw-r--r--   1 hipiuser supergroup     262038 2015-08-14 17:05 download_extract/12.jpg
+-rw-r--r--   1 hipiuser supergroup          0 2015-08-14 17:05 download_extract/_SUCCESS
+-rw-r--r--   1 hipiuser supergroup         96 2015-08-14 17:05 download_extract/part-r-00000
 	</pre>
 
-	After the program successfully finishes, we can inspect the <tt>testimages_extract</tt> directory on the HDFS:
-
-	<pre class="console">
-$> hadoop fs -ls testimages_extract
-Found 13 items
--rw-r--r--   1 user group    2175025 2015-03-13 09:52 testimages_extract/16f1a871fe51bd44883f68192ee5a1d5863413.jpg
--rw-r--r--   1 user group    2096360 2015-03-13 09:52 testimages_extract/46a57217d3c35980f5b636297c453e417da5854.jpg
--rw-r--r--   1 user group    2485871 2015-03-13 09:52 testimages_extract/61a089366c66fbfb2127a215cc66a393cf7114.jpg
--rw-r--r--   1 user group     880460 2015-03-13 09:52 testimages_extract/62c43cc0c822b91da2bd126de5c6f6f96ba1cef0.jpg
--rw-r--r--   1 user group    1798873 2015-03-13 09:52 testimages_extract/79661b90eb93e081e457ca2b8ce96f6a7f8312ac.jpg
--rw-r--r--   1 user group     196282 2015-03-13 09:52 testimages_extract/81d849118e4cb75eb39ded9eff4a4d16bb0a3a3.jpg
--rw-r--r--   1 user group          0 2015-03-13 09:52 testimages_extract/_SUCCESS
--rw-r--r--   1 user group    5009807 2015-03-13 09:52 testimages_extract/abab15f4fa55ce4cbb9ac212825ffffb2c8d731.jpg
--rw-r--r--   1 user group     239803 2015-03-13 09:52 testimages_extract/b99f45e7d338957b5501476de346ad91e37264d.jpg
--rw-r--r--   1 user group    4648460 2015-03-13 09:52 testimages_extract/c17b2dfd3a151e964aec3920315e42c89366cbca.jpg
--rw-r--r--   1 user group    3039805 2015-03-13 09:52 testimages_extract/e795c0118de27e675331114bb389894c7c95ca3.jpg
--rw-r--r--   1 user group    1182389 2015-03-13 09:52 testimages_extract/ebfaec6a0ea6eb66328d8807fcdc47de317061.png
--rw-r--r--   1 user group        495 2015-03-13 09:52 testimages_extract/part-r-00000
-	</pre>
-
-	Note that the correct file extensions are preserved (11 JPEGs and 1 PNG). Copy these images to your local file system using <tt>hadoop fs -copyToLocal</tt> and open them using an image viewer. This is what <tt>62c43cc0c822b91da2bd126de5c6f6f96ba1cef0.jpg</tt> should look like:<br /><br />
+	Note that the source filenames are preserved. This is possible because the source path is stored as meta data along with each image in the HIB. Next, copy these images to your local file system using <tt>hadoop fs -copyToLocal</tt> and open them using an image viewer. This is what <tt>07.jpg</tt> should look like:<br /><br />
 
 	<img class="centered_image" src="../examples/testimages/07.jpg" width="600" alt="" />
 
-        <h2 class="title">How JpegFromHib works</h2>
-
-	JpegFromHib is actually a very simple MapReduce/HIPI program. First, take a look at JpegFromHibInputFormat.java and JpegFromHibRecordReader.java. These define the <a class="external_link" href="http://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapred/InputFormat.html">InputFormat</a> and <a class="external_link" href="http://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapred/RecordReader.html">RecordReader</a> interfaces that are responsible for spawning one map task for each image in the input HIB whose arguments are an <a href="../doc/api/hipi/image/ImageHeader.html">ImageHeader</a> object (the key) and a byte array of the compressed and encoded image data (the value). Note that unlike the <a href="../examples/dumphib.html">dumphib example program</a>, the image data is never decoded. This avoids an expensive operation which isn't necessary in this case since the images are going to be written back to the HDFS.<br /><br />
-
-	Next, take a look at the JpegFromHib.java class which defines the JpegFromHibMapper class. In particular, all of the interesting work happens in the <tt>map()</tt> method:
-
-	<pre class="prettyprint">
-    public void map(ImageHeader key, BytesWritable value, Context context) throws IOException,
-        InterruptedException {
-
-      // Check for null image (malformed HIB segment of failure to decode header)
-      if (value == null) {
-	System.err.println("Null byte array, skipping image."); 
-        return;
-      }
-
-      // Determine file type
-      String ext = "";
-      if (key.getImageType() == ImageType.JPEG_IMAGE) {
-	ext = ".jpg";
-      } else if (key.getImageType() == ImageType.PNG_IMAGE) {
-	ext = ".png";
-      } else {
-	System.err.println("Unsupported image type, skipping image.");
-	return;
-      }
-
-      // Compute hash of byte stream to use as filename
-      String hashval = ByteUtils.asHex(value.getBytes());
-      Path outpath = new Path(path + "/" + hashval + ext);
-
-      // Write image file to HDFS
-      FSDataOutputStream os = fileSystem.create(outpath);
-      os.write(value.getBytes());
-      os.flush();
-      os.close();
-
-      // Report success to reduce task
-      context.write(new BooleanWritable(true), new Text(hashval));
-    }
-	</pre>
-
-	This method checks that the image was properly read from the HIB, determines its file type from the key (ImageHeader), computes a hash of the raw image data, and writes the image file to the HDFS using the hash and image type to produce a unique path. The reduce task is the default implementation provided by MapReduce which simply passes the output from the map task onto the output of the job where it is written to the HDFS. Take a look at the file <tt>part-r-00000</tt> in the example above and note that it consists of a list of key/value pairs returned by the map task.
-
 	<h3>Next</h3>
 
-	Read about a HIPI example program that computes the <a href="../examples/pca.html">Principal Components of Natural Image Patches</a>. This reproduces a famous computer vision result that originally used only 15 grayscale image. MapReduce and HIPI make it easy to study these types of statistical properties over much larger image collections.
+	Read about a HIPI program that computes the <a href="../examples/pca.html">Principal Components of Natural Image Patches</a>. This reproduces a famous computer vision result that originally used only 15 grayscale image. MapReduce and HIPI make it easy to study these types of statistical properties over much larger image collections.
 
       </div>
     </div>

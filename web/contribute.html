@@ -59,23 +59,17 @@
 
 	<h3>Unit Tests</h3>
 
-	Any new feature or bug fix must be accompanied by a comprehensive set of unit tests. You can run HIPI's suite of unit tests by executing the following <tt>ant</tt> build command in the HIPI root directory:
+  The HIPI distribution includes extensive unit tests both for the core library along with the accompanying tools and example programs. Any new feature or bug fix must be accompanied by a comprehensive set of unit tests. You can run HIPI's suite of unit tests by executing the following Gradle command in the HIPI root directory:
 
 	<pre class="console">
-$> ant test
-...
-test:
-     [java] JUnit version 4.11
-     [java] ..............
-     [java] Time: 3.439
-     [java] 
-     [java] OK (17 tests)
-     [java] 
-
-BUILD SUCCESSFUL
-Total time: 5 seconds
+$> gradle core:test
 	</pre>	
 	
+  And you can run the unit tests for the tools with the command:
+
+  <pre class="console">
+$> gradle tools:testSuite:test
+  </pre>  
 
     </div>
     <!-- End Content -->

@@ -30,7 +30,8 @@ public interface ImageDecoder {
 
   /**
    * Read and decode header for image accessed through a Java {@link java.io.InputStream}.
-   * Does not attempt to extract image EXIF data.
+   * Does not attempt to extract image EXIF data. Default implementation in {@link ImageCodec}
+   * calls {@link ImageDecoder#decodeHeader} with includeExifData parameter set to false.
    *
    * @param inputStream input stream containing serialized image data
    *
@@ -38,11 +39,8 @@ public interface ImageDecoder {
    *
    * @throws IOException if an error is encountered while reading from input stream
    */
-  public default HipiImageHeader decodeHeader(InputStream inputStream) 
-    throws IOException {
-    return decodeHeader(inputStream, false);
-  }
-  
+  public HipiImageHeader decodeHeader(InputStream inputStream) throws IOException;
+
   /**
    * Read and decode image from a Java {@link java.io.InputStream}.
    *
@@ -63,7 +61,7 @@ public interface ImageDecoder {
   /**
    * Read and decode both image header and image pixel data from a Java {@link java.io.InputStream}.
    * Both of these decoded objects can be accessed through the {@link HipiImage} object returned
-   * by this method.
+   * by this method. See default implementation in {@link ImageCodec}.
    *
    * @param inputStream input stream containing serialized image data
    * @param imageFactory factory object capable of creating objects of desired HipiImage type
@@ -74,15 +72,8 @@ public interface ImageDecoder {
    * @throws IllegalArgumentException if parameters are invalid
    * @throws IOException if an error is encountered while reading from the input stream
    */
-  public default HipiImage decodeHeaderAndImage(InputStream inputStream,
-						HipiImageFactory imageFactory, boolean includeExifData) 
-    throws IOException, IllegalArgumentException 
-  {
-    BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-    bufferedInputStream.mark(Integer.MAX_VALUE);
-    HipiImageHeader header = decodeHeader(bufferedInputStream, includeExifData);
-    bufferedInputStream.reset();
-    return decodeImage(bufferedInputStream, header, imageFactory, false);
-  }
+  public HipiImage decodeHeaderAndImage(InputStream inputStream,
+            HipiImageFactory imageFactory, boolean includeExifData) 
+    throws IOException, IllegalArgumentException;  
 
 }

@@ -110,6 +110,9 @@ public class HipiImageBundleTestCase {
 
   }
 
+  // Skip test because hard-coded byte offsets may not match due to differences in image encodings
+  // (i.e. different versions of ImageIO plugins will produce different compressed byte streams)
+  @Ignore
   @Test
   public void testOffsets() throws IOException {
     System.out.println("testOffsets");

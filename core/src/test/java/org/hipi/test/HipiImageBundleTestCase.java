@@ -47,20 +47,21 @@ public class HipiImageBundleTestCase {
     JpegCodec jpegCodec = JpegCodec.getInstance();
 
     File[] files = new File("../testdata/jpeg-rgb").listFiles();
+    Arrays.sort(files);
 
     for (File file : files) {
       String ext = FilenameUtils.getExtension(file.getName());
       if (file.isFile() && (ext.equalsIgnoreCase("jpg") || ext.equalsIgnoreCase("jpeg"))) {
-	String path = file.getPath();
-	System.out.println("ADDING IMAGE: " + path);
+       String path = file.getPath();
+       System.out.println("ADDING IMAGE: " + path);
 
-	HipiImageHeader imageHeader = jpegCodec.decodeHeader(new FileInputStream(path));
-	imageHeader.addMetaData("path",path);
-	System.out.println(imageHeader);
-	hib.addImage(imageHeader, new FileInputStream(path));
+       HipiImageHeader imageHeader = jpegCodec.decodeHeader(new FileInputStream(path));
+       imageHeader.addMetaData("path",path);
+       System.out.println(imageHeader);
+       hib.addImage(imageHeader, new FileInputStream(path));
 
-      }
-    }
+     }
+   }
 
     System.out.println("DONE");
 

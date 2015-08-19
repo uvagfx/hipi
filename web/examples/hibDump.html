@@ -77,20 +77,20 @@ $> ./hibDump.sh tigers.hib tigers
 [output ommitted]
       </pre>
       <pre class="console">
-$> hadoop -fs ls tigers
+$> hadoop fs -ls tigers
 Found 2 items
 -rw-r--r--   1 user group          0 2015-03-11 20:46 tigers/_SUCCESS
 -rw-r--r--   1 user group        249 2015-03-11 20:46 tigers/part-r-00000
       </pre>
       <pre class="console">
-$> hadoop -fs cat tigers/part-r-00000
+$> hadoop fs -cat tigers/part-r-00000
 1 3210x2500 (/Users/hipiuser/Desktop/Tigers/4.PNG)   null
 1 3810x2540 (/Users/hipiuser/Desktop/Tigers/3.jpg)   Canon EOS 450D
 1 3210x2500 (/Users/hipiuser/Desktop/Tigers/2.JPG)   Canon EOS 450D
 1 640x480   (/Users/hipiuser/Desktop/Tigers/1.jpg)   null
 	    </pre>
 	
-      Note that the text file part-r-00000 contains four lines, one for each image in tigers.hib. The first column is always 1, the second column reports the resolution of each image as width x height, the third column is the value of the "source" key/value pair in the image meta data, and the fourth column lists the camera model stored in the image EXIF data (if available).
+      Note that the text file part-r-00000 contains four lines, one for each image in tigers.hib (the order in which the images are listed may vary). The first column is always 1, the second column reports the resolution of each image as width x height, the third column is the value of the "source" key/value pair in the image meta data, and the fourth column lists the camera model stored in the image EXIF data (if available).
 	
       <h2 class="title">How hibDump works</h2>
  

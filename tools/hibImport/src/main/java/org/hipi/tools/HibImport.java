@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 
 public class HibImport {
@@ -86,6 +87,7 @@ public class HibImport {
         System.err.println(String.format("Did not find any files in the HDFS directory [%s]", imageDir));
         System.exit(0);
       }
+      Arrays.sort(files);
 
       HipiImageBundle hib = new HipiImageBundle(new Path(outputHib), conf);
       hib.openForWrite(overwrite);
@@ -112,6 +114,7 @@ public class HibImport {
 
       File folder = new File(imageDir);
       File[] files = folder.listFiles();
+      Arrays.sort(files);
 
       if (files == null) {
         System.err.println(String.format("Did not find any files in the local FS directory [%s]", imageDir));

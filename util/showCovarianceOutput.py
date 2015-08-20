@@ -25,10 +25,12 @@ try:
     type = header[0]
     rows = header[1]
     cols = header[2]
+
     mat = np.fromfile(f, dtype=np.dtype('>f'))
     
     print "opencv type: ", type
     print "rows: ", rows, " cols: ", cols
+    print mat
     
     if (cols==psize):
         print "Displaying Mean Image." # just display

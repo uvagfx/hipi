@@ -18,9 +18,6 @@ public class CovarianceReducer extends
 
 import java.io.IOException;
 
-public class CovarianceReducer extends
-    Reducer<IntWritable, OpenCVMatWritable, IntWritable, OpenCVMatWritable> {
-  
   @Override
   public void reduce(IntWritable key, Iterable<OpenCVMatWritable> values, Context context)
       throws IOException, InterruptedException {

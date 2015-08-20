@@ -8,15 +8,11 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Scalar;
-<<<<<<< HEAD:tools/covar/src/main/java/org/hipi/tools/covar/CovarianceReducer.java
 
 import java.io.IOException;
 
 public class CovarianceReducer extends
     Reducer<IntWritable, OpenCVMatWritable, NullWritable, OpenCVMatWritable> {
-=======
-
-import java.io.IOException;
 
   @Override
   public void reduce(IntWritable key, Iterable<OpenCVMatWritable> values, Context context)

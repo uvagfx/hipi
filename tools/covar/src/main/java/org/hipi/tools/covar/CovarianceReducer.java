@@ -32,6 +32,7 @@ public class CovarianceReducer extends
       opencv_core.add(value.getMat(), cov, cov);
     }
       
+    
     context.write(NullWritable.get(), new OpenCVMatWritable(cov));
   }
 }

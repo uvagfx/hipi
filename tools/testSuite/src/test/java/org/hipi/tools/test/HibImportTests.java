@@ -28,16 +28,23 @@ public class HibImportTests {
   }
 
   @Test
-  public void testHibImport() throws IOException {
-    assertEquals("Failed to run hibimport. Check setup.", 0, TestUtils.runCommand("../hibImport.sh -f ../../testdata/jpeg-and-png testout/import.hib"));
-    assertEquals("Failed to extract image 1 from testout/import.hib. Check setup.", 0, TestUtils.runCommand("../hibInfo.sh testout/import.hib 1 --extract /tmp/test.jpg"));
+  public void testHibImportLocalFS() throws IOException {
+    assertEquals("Failed to run hibImport. Check setup.", 0, TestUtils.runCommand("../hibImport.sh -f ../../testdata/jpeg-and-png testout/import.hib"));
+    assertEquals("Failed to extract image 1 from testout/import.hib. Check setup.", 0, TestUtils.runCommand("../hibInfo.sh testout/import.hib --show-meta 1 --extract /tmp/test.jpg"));
     assertTrue("Image 1 in testout/import.hib does match expected value.", TestUtils.checkPsnr("../../testdata/jpeg-and-png/01.png", "/tmp/test.jpg", 30.0f));
   }
 
   @Test
+  public void testHibImportHDFS() throws IOException {
+    assertEquals("Failed to run hibImport. Check setup.", 0, TestUtils.runCommand("../hibImport.sh -f -h testout/jpeg-rgb testout/import.hib"));
+    assertEquals("Failed to extract image 1 from testout/import.hib. Check setup.", 0, TestUtils.runCommand("../hibInfo.sh testout/import.hib --show-meta 6 --extract /tmp/test.jpg"));
+    assertTrue("Image 6 in testout/import.hib does match expected value.", TestUtils.checkPsnr("../../testdata/jpeg-rgb/cat.jpg", "/tmp/test.jpg", 30.0f));
+  }
+
+  @Test
   public void testHibImportAndCull() throws IOException {
-    assertEquals("Failed to run hibimport. Check setup.", 0, TestUtils.runCommand("../hibImport.sh -f ../../testdata/jpeg-rgb testout/import.hib"));
-    assertEquals("Failed to extract image 4 from testout/import.hib. Check setup.", 0, TestUtils.runCommand("../hibInfo.sh testout/import.hib 4 --extract /tmp/test.png"));
+    assertEquals("Failed to run hibImport. Check setup.", 0, TestUtils.runCommand("../hibImport.sh -f ../../testdata/jpeg-rgb testout/import.hib"));
+    assertEquals("Failed to extract image 4 from testout/import.hib. Check setup.", 0, TestUtils.runCommand("../hibInfo.sh testout/import.hib --show-meta 4 --extract /tmp/test.png"));
     assertTrue("Image 4 in testout/import.hib does match expected value.", TestUtils.checkPsnr("../../testdata/jpeg-rgb/05.jpg", "/tmp/test.png", 30.0f));
     TestUtils.runCommand("../runTool.sh ./build/libs/hibDump.jar testout/import.hib testout/import_dump");
     TestUtils.runCommand("rm -rf import_dump");

@@ -67,7 +67,7 @@ public class HibDump extends Configured implements Tool {
       System.exit(0);
     }
 
-    Configuration conf = new Configuration();
+    Configuration conf = this.getConf();//new Configuration();
 
     Job job = Job.getInstance(conf, "hibDump");
 
@@ -102,7 +102,7 @@ public class HibDump extends Configured implements Tool {
   }
 
   public static void main(String[] args) throws Exception {
-    int res = ToolRunner.run(new HibDump(), args);
+    int res = ToolRunner.run(new Configuration(), new HibDump(), args);
     System.exit(res);
   }
 

@@ -35,6 +35,22 @@ import javax.imageio.stream.ImageOutputStream;
  */
 public abstract class ImageCodec implements ImageDecoder, ImageEncoder {
 
+  public HipiImageHeader decodeHeader(InputStream inputStream) 
+    throws IOException {
+    return decodeHeader(inputStream, false);
+  }
+
+  public HipiImage decodeHeaderAndImage(InputStream inputStream,
+            HipiImageFactory imageFactory, boolean includeExifData) 
+    throws IOException, IllegalArgumentException 
+  {
+    BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+    bufferedInputStream.mark(Integer.MAX_VALUE);
+    HipiImageHeader header = decodeHeader(bufferedInputStream, includeExifData);
+    bufferedInputStream.reset();
+    return decodeImage(bufferedInputStream, header, imageFactory, false);
+  }
+
   /**
    * Default image decode method that uses the available ImageIO plugins.
    *

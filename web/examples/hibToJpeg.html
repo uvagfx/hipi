@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta name="Description" content="Hadoop Image Processing Interface example for creating a set of JPEG images from a HipiImageBundle." />
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../include/main.css" />
+    <link rel="stylesheet" type="text/css" href="../include/javasyntax.css" />
+    <title>HIPI - Hadoop Image Processing Interface :: tools/hibToJpeg</title>
+
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-23539446-1']);
+        _gaq.push(['_trackPageview']);
+        (function () {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+    <style> pre.prettyprint {padding:20px 20px 0px 20px;} </style>
+
+</head>
+
+    <body>
+      <div class="header">
+        <h1>HIPI - Hadoop Image Processing Framework</h1>
+      </div>
+    <div class="navigation_menu">
+      <ul>
+	<li><a href="../index.html">Overview</a></li>
+	<li><a href="../gettingstarted.html">Getting Started</a></li>
+	<li><a href="../documentation.html">Documentation</a></li>
+	<li><a href="../examples.html">Tools and Examples</a></li>
+	<li><a href="../downloads.html">Downloads</a></li>
+	<li><a href="../contribute.html">Contribute</a></li>
+	<li><a href="../about.html">About</a></li>
+      </ul>
+    </div>
+
+    <!-- Begin Content -->
+    <div class="content">
+      
+      <h2 class="title">tools/hibToJpeg</h2>
+      
+      <div class="section">
+	
+        <b>hibToJpeg</b> is a MapReduce/HIPI program that extracts the images in a <a href="../javadoc/org/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) as a set of individual JPEGs stored on the HDFS.
+ 
+        <h3>Compiling</h3>
+
+        Compile <b>hibToJpeg</b> by executing the following Gradle command in the HIPI tools directory (see our <a href="../gettingstarted.html">general notes</a> on setting up HIPI on your system):
+  
+      <pre class="console">
+$> cd tools
+$> gradle hibToJpeg:jar
+      </pre>
+       
+        <h3>Usage</h3>
+
+      Run <b>hibToJpeg</b> by executing the <tt>hibToJpeg.sh</tt> script located in the tools directory. Running it without any arguments shows its usage:
+  
+      <pre class="console">
+$> ./hibToJpeg.sh
+Usage: hibToJpeg.jar &#60;input HIB&#62; &#60;output directory&#62;
+      </pre>
+
+      <b>hibToJpeg</b> takes two arguments. The first argument is the path to a HIB on the HDFS. The second is the path to a directory on the HDFS that will be created once the program has finished. The images in the input HIB will be stored as individual JPEGs in this directory.
+
+      <h3>Example</h3>
+
+      Let's use the <tt>download.hib</tt> file that was created in the <b><a href="hibDownload.html">hibDownload</a></b> example:
+
+      <pre class="console">
+$> ./hibToJpeg.sh download.hib download_extract
+	    </pre>
+
+	After the program finishes, we can inspect the newly created <tt>download_extract</tt> directory on the HDFS:
+
+	<pre class="console">
+$> hadoop fs -ls download_extract
+Found 14 items
+-rw-r--r--   1 hipiuser supergroup    2520970 2015-08-14 17:05 download_extract/01.jpg
+-rw-r--r--   1 hipiuser supergroup    3437882 2015-08-14 17:05 download_extract/02.jpg
+-rw-r--r--   1 hipiuser supergroup    1814641 2015-08-14 17:05 download_extract/03.jpg
+-rw-r--r--   1 hipiuser supergroup    2474565 2015-08-14 17:05 download_extract/04.jpg
+-rw-r--r--   1 hipiuser supergroup    2255832 2015-08-14 17:05 download_extract/05.jpg
+-rw-r--r--   1 hipiuser supergroup    3705417 2015-08-14 17:05 download_extract/06.jpg
+-rw-r--r--   1 hipiuser supergroup     955944 2015-08-14 17:05 download_extract/07.jpg
+-rw-r--r--   1 hipiuser supergroup    1073753 2015-08-14 17:05 download_extract/08.jpg
+-rw-r--r--   1 hipiuser supergroup     325019 2015-08-14 17:05 download_extract/09.jpg
+-rw-r--r--   1 hipiuser supergroup     412266 2015-08-14 17:05 download_extract/10.jpg
+-rw-r--r--   1 hipiuser supergroup    1259357 2015-08-14 17:05 download_extract/11.jpg
+-rw-r--r--   1 hipiuser supergroup     262038 2015-08-14 17:05 download_extract/12.jpg
+-rw-r--r--   1 hipiuser supergroup          0 2015-08-14 17:05 download_extract/_SUCCESS
+-rw-r--r--   1 hipiuser supergroup         96 2015-08-14 17:05 download_extract/part-r-00000
+	</pre>
+
+	Note that the source filenames are preserved. This is possible because the source path is stored as meta data along with each image in the HIB. Next, copy these images to your local file system using <tt>hadoop fs -copyToLocal</tt> and open them using an image viewer. This is what <tt>07.jpg</tt> should look like:<br /><br />
+
+	<img class="centered_image" src="../examples/testimages/07.jpg" width="600" alt="" />
+
+	<h3>Next</h3>
+
+	Read about a HIPI program that computes the <a href="../examples/pca.html">Principal Components of Natural Image Patches</a>. This reproduces a famous computer vision result that originally used only 15 grayscale image. MapReduce and HIPI make it easy to study these types of statistical properties over much larger image collections.
+
+      </div>
+    </div>
+    <!-- End Content -->
+</body>
+
+</html>

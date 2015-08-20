@@ -60,7 +60,6 @@ public class DownloaderRecordReader extends RecordReader<LongWritable, Text> {
  @Override
  public float getProgress() {
    float percent = (numLines == 0 ? 0.0f : ((float)linesRead)/((float)numLines));
-   System.out.println(String.format("DownloaderRecordReader progress %d of %d (%.2f%%)", linesRead, numLines, percent*100.0f));
    return percent;
  }
  

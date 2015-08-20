@@ -49,9 +49,9 @@
 
       <div class="section">
       
-        <h3>1. Setup Java 8</h3>
+        <h3>1. Setup Java >=7</h3>
 
-        HIPI is written in Java and uses features that became available in version 8. Check your version of Java with the following command:
+        HIPI is written in Java and has been tested with Java 7 and 8. Check your version of Java with the following command:
 
         <pre class="console">
 $> java -version
@@ -60,7 +60,7 @@ Java(TM) SE Runtime Environment (build 1.8.0_45-b14)
 Java HotSpot(TM) 64-Bit Server VM (build 25.45-b02, mixed mode)
         </pre>
 
-        Visit Oracle's <a class="external_link" href="http://docs.oracle.com/javase/8/">Java 8 page</a> to install Java 8 or upgrade an older version.
+        Visit Oracle's <a class="external_link" href="http://docs.oracle.com/javase/8/">Java page</a> to install the latest version.
 
         <h3>2. Setup Hadoop</h3>
 
@@ -138,7 +138,7 @@ Total time: 2.058 secs
 
         If the build fails, first carefully review the steps above. If you are convinced that you are doing everything correctly and that you've found an issue with the HIPI distribution or documentation please post a question to the <a class="external_link" href="https://groups.google.com/forum/#!forum/hipi-users">HIPI Users Group</a> or <a class="external_link" href="https://github.com/uvagfx/hipi/issues">file a bug report</a>.<br /><br />
 
-        After the build finishes, you may want to inspect the <tt>settings.gradle</tt> file in the root directory and the <tt>build.gradle</tt> files in each directory to familiarize yourself with the various build targets. If you're new to Gradle, we recommend reviewing this <a class="external_link" href="https://docs.gradle.org/current/userguide/tutorial_java_projects.html">tutorial</a>. For example, to build only the <a href="examples/hibimport.html">hibImport</a> tool from scratch:
+        After the build finishes, you may want to inspect the <tt>settings.gradle</tt> file in the root directory and the <tt>build.gradle</tt> files in each directory to familiarize yourself with the various build targets. If you're new to Gradle, we recommend reviewing this <a class="external_link" href="https://docs.gradle.org/current/userguide/tutorial_java_projects.html">tutorial</a>. For example, to build only the <a href="tools/hibImport.html">hibImport</a> tool from scratch:
 
         <pre class="console">
 $> gradle clean tools:hibImport:jar

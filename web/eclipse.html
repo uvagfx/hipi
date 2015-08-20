@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="Description" content="HIPI - Hadoop Image Processing Interface getting started page tells you what you need to know to start using HIPI on Hadoop MapReduce." />
+    <meta charset="UTF-8">
+    
+    <link rel="stylesheet" type="text/css" href="include/main.css" />
+    <link rel="stylesheet" type="text/css" href="include/javasyntax.css" />
+    <title>HIPI - Hadoop Image Processing Interface :: Getting Started</title>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-23539446-1']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+      </script>
+
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+    <style> pre.prettyprint {padding:20px 20px 0px 20px;} </style>
+
+  </head>
+  
+  <body>
+    <div class="header">
+      <h1>HIPI - Hadoop Image Processing Framework</h1>
+    </div>
+    <div class="navigation_menu">
+      <ul>
+	<li><a href="index.html">Overview</a></li>
+	<li><a href="gettingstarted.html">Getting Started</a></li>
+	<li><a href="documentation.html">Documentation</a></li>
+	<li><a href="examples.html">Tools and Examples</a></li>
+	<li><a href="downloads.html">Downloads</a></li>
+	<li><a href="contribute.html">Contribute</a></li>
+	<li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+    
+    <!-- Begin Content -->
+    <div class="content">
+
+      <h2 class="title">Eclipse Setup Tutorial</h2>
+      
+      This brief tutorial will help you get your Eclipse environment configured to run both the HIPI unit tests and the Eclipse debugger. This tutorial assumes that you have completed the initial setup and installation procedures described on the <a href="gettingstarted.html">Getting Started</a> page. It is also assumed that you have at least a working understanding of <a class="external_link" href="https://eclipse.org/users/">Eclipse</a>. 
+
+      <h3>1. Import Hipi Into Eclipse Workspace </h3>
+      Before HIPI can be configured to work with Eclipse, it must be imported into your workspace. In order to import HIPI into your Eclipse workspace, navigate to <strong>File -> New -> Java Project</strong>. Uncheck "Use Default Location", and manually set the location to your HIPI directory.
+
+      <img class="centered_image"  height="500" src="images/eclipse/import-to-workspace.png"></img>
+
+      This will configure your HIPI project directory in your Eclipse workspace as an Eclipse project.
+
+      <h3>2. Configure Referenced Libraries</h3>
+      Now that HIPI has been imported into Eclipse, you are probably seeing many errors because of undefined imports. To fix this, you need to make sure that your Eclipse project is referencing the same .jar files which are specified in your root ant buildfile. In order to configure these references, open your project in the <strong>Package Explorer</strong> and right-click on the <strong>Referenced Libraries</strong> directory. Navigate to <strong>Build Path -> Configure Build Path... -> Add External JARs...</strong>, and select the required JARs as specified in your root build.xml file. Your build.xml file should also indicate where these jars reside on your system. The snapshot below provides an example of an Eclipse project with configured <strong>Referenced Libraries</strong> directory.
+
+      <img class="centered_image" height="500" src="images/eclipse/configure-referenced-libraries.png"</img>
+
+
+      <h3>3. Configure Runtime Environment Variables</h3>
+      The final step in your Eclipse configuration is ensuring that your runtime references the correct path. This is necessary to ensure that tests which make use of the <a class="external_link" href="http://www.imagemagick.org/">ImageMagick</a> library can find the location where ImageMagick is installed. To configure this component, first, make sure that ImageMagick is included on your local system's <strong>$PATH</strong> variable. Next, in Eclipse, left-click on the downward-facing arrow which is next to Eclipse's <strong>Run</strong> button (represented as a green circle with a right-facing arrow). In the subsequent menu, navigate to <strong>Run Configurations... -> Environment -> New... </strong>. Create a <strong>New Environment Variable</strong> called <strong>PATH</strong>, and copy/paste the contents of your system's <strong>$PATH</strong> variable as your new environment variable's  <strong>Value</strong>. Select <strong> OK -> Apply -> Run </strong>. Eclipse should now run your unit tests with no problem!
+
+<img class="centered_image" height="500" src="images/eclipse/environment-variable.png"></img>
+
+<h3>4. Important Notes</h3>
+Note that four HIPI unit tests will not pass - these unit tests require specific Hadoop Configurations which are not set unless an actual Hadoop job is being run. A solution to this problem is forthcoming.
+
+<h3>Next Steps</h4>
+Return to the <a href="gettingstarted.html">Getting Started</a> page to continue learning about HIPI.
+
+</div>
+    <!-- End Content -->
+  </body>
+</html>
+  
+ 
+
+
+

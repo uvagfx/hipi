@@ -31,6 +31,7 @@ test {
   dependsOn(':tools:hibDump:jar')
   dependsOn(':tools:hibDownload:jar')
   dependsOn(':tools:hibToJpeg:jar')
+  dependsOn(':tools:covar:jar')
 
   testLogging.showStandardStreams = true
 

@@ -1,10 +1,12 @@
-package org.hipi.examples.covar;
+package org.hipi.tools.covar;
 
+import org.hipi.mapreduce.BinaryOutputFormat;
 import org.hipi.imagebundle.mapreduce.HibInputFormat;
 import org.hipi.opencv.OpenCVMatWritable;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -15,7 +17,7 @@ import java.net.URISyntaxException;
 
 public class ComputeCovariance {
   
-  public static int run(String[] args, String inputHibPath, String outputDir, String meanCachePath) throws IllegalArgumentException, IOException, ClassNotFoundException, InterruptedException, URISyntaxException {
+  public static int run(String[] args, String inputHibPath, String outputDir, String inputMeanPath) throws IllegalArgumentException, IOException, ClassNotFoundException, InterruptedException, URISyntaxException {
     
     System.out.println("Running compute covariance.");
    
@@ -25,7 +27,10 @@ public class ComputeCovariance {
 
     job.setInputFormatClass(HibInputFormat.class);
     
-    job.setOutputKeyClass(IntWritable.class);
+    job.setMapOutputKeyClass(IntWritable.class);
+    job.setMapOutputValueClass(OpenCVMatWritable.class);
+    
+    job.setOutputKeyClass(NullWritable.class);
     job.setOutputValueClass(OpenCVMatWritable.class);
 
     job.setMapperClass(CovarianceMapper.class);
@@ -37,8 +42,7 @@ public class ComputeCovariance {
     FileInputFormat.setInputPaths(job, new Path(inputHibPath));
     FileOutputFormat.setOutputPath(job, new Path(outputDir));
     
-
-    job.addCacheFile(new URI(job.getConfiguration().get("fs.defaultFS") + meanCachePath));
+    job.getConfiguration().setStrings("mean.path", inputMeanPath);
 
     return job.waitForCompletion(true) ? 0 : 1;
   }

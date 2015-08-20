@@ -1,4 +1,4 @@
-package org.hipi.examples.covar;
+package org.hipi.tools.covar;
 
 import org.hipi.image.FloatImage;
 import org.hipi.image.HipiImageHeader;
@@ -21,8 +21,8 @@ import java.nio.FloatBuffer;
 public class CovarianceMapper extends
     Mapper<HipiImageHeader, FloatImage, IntWritable, OpenCVMatWritable> {
 
-  Mat mean; //stores result of computeMean job which has been stored in the job's cache.
-  Mat gaussian; //stores gaussian matrix computed in mapper setup
+  Mat mean; // Stores result of computeMean job which has been stored in the job's cache.
+  Mat gaussian; // Stores gaussian matrix computed in setup
 
   @Override
   public void setup(Context job) {
@@ -30,48 +30,73 @@ public class CovarianceMapper extends
     int N = Covariance.patchSize;
     float sigma = Covariance.sigma;
     
-    //access mean from cache
+    /////
+    // Create mean mat using data from mean computation
+    /////
+    
     try {
-      // Access the job cache
-      URI[] files = new URI[1];
-      if (job.getCacheFiles() != null) {
-        files = job.getCacheFiles();
-      } else {
-        System.err.println("Job cache files is null!");
+      
+      // Access mean data on HDFS
+      String meanPathString = job.getConfiguration().get("mean.path");
+      if(meanPathString == null) {
+        System.err.println("Mean path not set in configuration - cannot continue. Exiting.");
+        System.exit(1);
       }
-
-      // Read mean from previously run mean job
-      Path cacheFilePath = new Path(files[0].toString());
-      FSDataInputStream dis = FileSystem.get(job.getConfiguration()).open(cacheFilePath);
-      dis.skip(4);
+      Path meanPath = new Path(meanPathString);
+      FSDataInputStream dis = FileSystem.get(job.getConfiguration()).open(meanPath);
+      
+      // Populate mat with mean data
       OpenCVMatWritable meanWritable = new OpenCVMatWritable();
       meanWritable.readFields(dis);
       mean = meanWritable.getMat();
+      
     } catch (IOException ioe) {
-      System.err.println(ioe);
+      ioe.printStackTrace();
+      System.exit(1);
     }
-
-    // Create a normalized gaussian array with standard deviation of 10 pixels for patch masking
+    
+    /////
+    // Create a normalized gaussian array for patch masking
+    /////
+    
     gaussian = new Mat(N, N, opencv_core.CV_32FC1, new Scalar(0.0));
     FloatBuffer gaussianBuffer = gaussian.createBuffer();
-    float gaussianSum = 0;
+    float gaussianSum = 0; // Used for normalization
+    
+    // 'center' and 'denominator' precomputed for gaussian generation
+    int center = N / 2;
+    double denominator =  2 * Math.pow(sigma, 2);
+    
     for (int i = 0; i < N; i++) {
-      for (int j = 0; j < N; j++) {
-        float gaussianValue =
-            (float) Math.exp(-((i - N / 2) * (i - N / 2) / (sigma * sigma) + (j - N / 2)
-                * (j - N / 2) / (sigma * sigma)));
+      for (int j = 0; j < N; j++) {      
+        float gaussianValue = generate2DGaussianValue(i, j, center, denominator);
         gaussianBuffer.put(i * N + j, gaussianValue);
         gaussianSum += gaussianValue;
       }
     }
 
-    gaussian = opencv_core.multiply(gaussian, ((N * N) / gaussianSum)).asMat();
+    // Normalize gaussian array
+    float averageGaussianValue = (float) gaussianSum / (float) (N * N); //sum divided by area of gaussian array (N x N)
+    gaussian = opencv_core.divide(gaussian, averageGaussianValue).asMat();
+  }
+  
+  // 2D Gaussian: f(i, j) = A * exp(-( (i - i0)^2 / (2 * iSigma^2) + (j - j0)^2 / (2 * jSigma^2) ))
+  // i0 == j0 == "center"
+  // iSigma == jSigma (sigma)
+  // A == 1
+  // i0 == j0 == "center"
+  // (2 * sigma^2) == "denominator"
+  private float generate2DGaussianValue(int i, int j, int center, double denominator) {    
+    
+    double termOne = Math.pow(i - center, 2) / denominator;
+    double termTwo = Math.pow(j - center, 2) / denominator;
+    
+    return ((float)Math.exp(-(termOne + termTwo)));
   }
 
   @Override
   public void map(HipiImageHeader header, FloatImage image, Context context) throws IOException,
       InterruptedException {
-    
     
     /////
     // Perform conversion to OpenCV
@@ -83,7 +108,7 @@ public class CovarianceMapper extends
     if(!Covariance.convertFloatImageToGrayscaleMat(image, cvImage)) {
       return;
     }
-    
+     
     /////
     // Create patches for covariance computation
     /////
@@ -92,13 +117,14 @@ public class CovarianceMapper extends
     int iMax = 10;
     int jMax = 10;
     
-    // Stores FloatBuffers for each patch (prevents redundant FloatBuffer creation)
-    // FloatBuffers refer to original memory segments contained by Mats, so mats don't need to be stored
+    // Stores FloatBuffers for each patch
+    // FloatBuffers refer to Mat data, so Mats don't need to be stored
     FloatBuffer[] patchBuffers = new FloatBuffer[iMax * jMax];
     
     //patch dimensions (N x N)
     int N = Covariance.patchSize;
 
+    // Create mean-subtracted and gaussian-masked patches
     for (int i = 0; i < iMax; i++) {
       int x = (cvImage.cols() - N) * i / iMax;
       for (int j = 0; j < jMax; j++) {
@@ -129,7 +155,6 @@ public class CovarianceMapper extends
         covarianceBuffer.put(i * N * N + j, accumulatedValue);
       }
     }
-    
     context.write(new IntWritable(0), new OpenCVMatWritable(covarianceMat));
   }
 }

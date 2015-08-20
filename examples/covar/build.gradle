@@ -1,6 +1,0 @@
-
-jar {
-  manifest {
-    attributes("Main-Class": "org.hipi.examples.covar.Covariance")
-  }
-}

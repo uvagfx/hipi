@@ -1,4 +1,4 @@
-package org.hipi.examples.covar;
+package org.hipi.tools.covar;
 
 import static org.bytedeco.javacpp.opencv_imgproc.CV_RGB2GRAY;
 
@@ -19,7 +19,7 @@ import java.io.IOException;
 
 public class Covariance extends Configured implements Tool {
   
-  public static final int patchSize = 48; // Patch dimensions: patchSize x patchSize
+  public static final int patchSize = 64; // Patch dimensions: patchSize x patchSize
   public static final float sigma = 10; // Standard deviation of Gaussian weighting function
   
   
@@ -79,11 +79,11 @@ public class Covariance extends Configured implements Tool {
     
   }
   
-  private static void validateMeanCachePath(String cachePathString, Configuration conf) throws IOException {
-    Path cachePath = new Path(cachePathString);
+  private static void validateMeanPath(String inputMeanPathString, Configuration conf) throws IOException {
+    Path meanPath = new Path(inputMeanPathString);
     FileSystem fileSystem = FileSystem.get(conf);
-    if (!fileSystem.exists(cachePath)) {
-      System.out.println("Mean patch does not exist: " + cachePath);
+    if (!fileSystem.exists(meanPath)) {
+      System.out.println("Mean patch does not exist: " + meanPath);
       System.exit(1);
     }
   }
@@ -102,7 +102,7 @@ public class Covariance extends Configured implements Tool {
     String outputBaseDir = args[1];
     String outputMeanDir = outputBaseDir + "/mean-output/";
     String outputCovarianceDir = outputBaseDir + "/covariance-output/";
-    String meanCachePath = outputMeanDir + "part-r-00000"; //used by ComputeCovariance to access ComputeMean result
+    String inputMeanPath = outputMeanDir + "part-r-00000"; //used by ComputeCovariance to access ComputeMean result
     
     // Set up directory structure
     mkdir(outputBaseDir, conf);
@@ -114,10 +114,10 @@ public class Covariance extends Configured implements Tool {
       return 1;
     }
     
-    validateMeanCachePath(meanCachePath, conf);
+    validateMeanPath(inputMeanPath, conf);
     
     // Run compute covariance
-    if (ComputeCovariance.run(args, inputHibPath, outputCovarianceDir, meanCachePath) == 1) {
+    if (ComputeCovariance.run(args, inputHibPath, outputCovarianceDir, inputMeanPath) == 1) {
       return 1;
     }
 

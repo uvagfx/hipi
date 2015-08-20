@@ -1,8 +1,9 @@
-package org.hipi.examples.covar;
+package org.hipi.tools.covar;
 
 import org.hipi.opencv.OpenCVMatWritable;
 
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
@@ -10,7 +11,7 @@ import org.bytedeco.javacpp.opencv_core.Scalar;
 
 import java.io.IOException;
 
-public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, IntWritable, OpenCVMatWritable> {
+public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, NullWritable, OpenCVMatWritable> {
   
   @Override
   public void reduce(IntWritable key, Iterable<OpenCVMatWritable> meanPatches, Context context)
@@ -33,7 +34,7 @@ public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, IntWrit
     }
     
     //write out consolidated patch
-    context.write(key, new OpenCVMatWritable(mean));
+    context.write(NullWritable.get(), new OpenCVMatWritable(mean));
   }
 
 

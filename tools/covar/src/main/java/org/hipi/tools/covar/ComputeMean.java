@@ -1,10 +1,12 @@
-package org.hipi.examples.covar;
+package org.hipi.tools.covar;
 
+import org.hipi.mapreduce.BinaryOutputFormat;
 import org.hipi.imagebundle.mapreduce.HibInputFormat;
 import org.hipi.opencv.OpenCVMatWritable;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -23,7 +25,10 @@ public class ComputeMean {
 
     job.setInputFormatClass(HibInputFormat.class);
 
-    job.setOutputKeyClass(IntWritable.class);
+    job.setMapOutputKeyClass(IntWritable.class);
+    job.setMapOutputValueClass(OpenCVMatWritable.class);
+    
+    job.setOutputKeyClass(NullWritable.class);
     job.setOutputValueClass(OpenCVMatWritable.class);
 
     job.setMapperClass(MeanMapper.class);

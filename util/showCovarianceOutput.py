@@ -15,21 +15,20 @@ fname = args.input
 print "Input file:", fname
 
 # Set patch size
-psize = 48
+psize = 64
 
 f = open(fname,"rb")
 
 try:
-    header = np.fromfile(f, dtype=np.dtype('>i4'), count=4)
+    header = np.fromfile(f, dtype=np.dtype('>i4'), count=3)
     print header
-    type = header[1]
-    rows = header[2]
-    cols = header[3]
+    type = header[0]
+    rows = header[1]
+    cols = header[2]
     mat = np.fromfile(f, dtype=np.dtype('>f'))
     
     print "opencv type: ", type
     print "rows: ", rows, " cols: ", cols
-    print mat
     
     if (cols==psize):
         print "Displaying Mean Image." # just display

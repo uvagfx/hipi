@@ -1,4 +1,4 @@
-package org.hipi.examples.covar;
+package org.hipi.tools.covar;
 
 import org.hipi.image.FloatImage;
 import org.hipi.image.HipiImageHeader;

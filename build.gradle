@@ -16,6 +16,7 @@ subprojects {
     compile 'com.twelvemonkeys.imageio:imageio-jpeg:3.1.1'
     compile 'com.twelvemonkeys.imageio:imageio-pnm:3.1.1'
     compile 'com.twelvemonkeys.imageio:imageio-tiff:3.1.1'
+	compile 'org.jocl:jocl:0.2.0-RC00'
     testCompile "junit:junit:4+"
   }
 

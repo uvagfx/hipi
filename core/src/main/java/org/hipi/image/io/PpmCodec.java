@@ -185,9 +185,9 @@ public class PpmCodec extends ImageCodec {
     int h = image.getHeight();
 
     PrintWriter writer = new PrintWriter(outputStream);
-    writer.println("P6");
-    writer.println(w + " " + h);
-    writer.println("255");
+    writer.print("P6\r");
+    writer.print(w + " " + h + "\r");
+    writer.print("255\r");
     writer.flush();
 
     PixelArray pa = ((RasterImage)image).getPixelArray();

@@ -3,6 +3,7 @@ package org.hipi.tools.test;
 import static org.junit.Assert.*;
 
 import org.hipi.opencv.OpenCVMatWritable;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -32,6 +33,7 @@ public class TestUtils {
     if (fs.exists(new Path("skipsetup"))) {
       return;
     }
+    
     TestUtils.runCommand("hadoop fs -rm -r -f testout");
     assertEquals("Failed to create testout directory on HDFS. Check setup.", 0, TestUtils.runCommand("hadoop fs -mkdir -p testout"));
 //    assertEquals("Failed to create testout/jpeg-rgb on HDFS. Check setup.", 0, TestUtils.runCommand("hadoop fs -mkdir -p testout/jpeg-rgb"));
@@ -86,7 +88,7 @@ public class TestUtils {
     return (psnr >= thresh);
   } 
   
-  public static boolean convertOpenCVMatWritableToJpg(String inputPath, String outputPath) throws IOException {
+  public static boolean convertFloatOpenCVMatWritableToJpg(String inputPath, String outputPath) throws IOException {
     
     DataInputStream dis = new DataInputStream(new FileInputStream(inputPath));  
     OpenCVMatWritable openCVMatWritable = new OpenCVMatWritable();

@@ -30,8 +30,6 @@ public class OpenCVUtilsTestCase {
   
   private ArrayList<FloatImage> createTestFloatImages() throws IllegalArgumentException, IOException {
     
-    
-    
     ArrayList<FloatImage> floatImages = new ArrayList<FloatImage>();
     
     ImageDecoder ppmDecoder = PpmCodec.getInstance();
@@ -152,7 +150,7 @@ public class OpenCVUtilsTestCase {
   public void testConvertRasterImageToMatInvalidSize() throws IllegalArgumentException, IOException {
     FloatImage image = createTestFloatImage();
     image.setHeader(new HipiImageHeader(HipiImageFormat.JPEG, HipiColorSpace.RGB, 0, 0, 0, null, null));
-    OpenCVUtils.convertRasterImageToMat(new FloatImage());
+    OpenCVUtils.convertRasterImageToMat(image);
   }
   
   @Test
@@ -162,27 +160,11 @@ public class OpenCVUtilsTestCase {
       
       Mat mat = OpenCVUtils.convertRasterImageToMat(image);
       
-      assertEquals("width of converted mat is incorrect", image.getWidth(), mat.cols());
-      assertEquals("height of converted mat is incorrect", image.getHeight(), mat.rows());
+      assertEquals("Width of converted mat is incorrect.", image.getWidth(), mat.cols());
+      assertEquals("Height of converted mat is incorrect.", image.getHeight(), mat.rows());
       
-      int openCVType = -1;
-      switch(image.getNumBands()) {
-        case 1:
-          openCVType = opencv_core.CV_32FC1;
-          break;
-        case 2:
-          openCVType = opencv_core.CV_32FC2;
-          break;
-        case 3:
-          openCVType = opencv_core.CV_32FC3;
-          break;
-        case 4:
-          openCVType = opencv_core.CV_32FC4;
-          break;
-        default:
-          fail("unsupported number of bands");  
-      }
-      assertEquals("opencv type of converted mat is incorrect", openCVType, mat.type());
+      assertEquals("opencv type of converted mat is incorrect", OpenCVUtils.generateOpenCVType(image.getPixelArray().getDataType(), image.getNumBands()), mat.type());
+      
       float[] benchmark = image.getData();
       float[] convertedData = new float[benchmark.length];
       ((FloatBuffer)mat.createBuffer()).get(convertedData);      
@@ -201,24 +183,8 @@ public class OpenCVUtilsTestCase {
       assertEquals("width of converted mat is incorrect", image.getWidth(), mat.cols());
       assertEquals("height of converted mat is incorrect", image.getHeight(), mat.rows());
       
-      int openCVType = -1;
-      switch(image.getNumBands()) {
-        case 1:
-          openCVType = opencv_core.CV_8UC1;
-          break;
-        case 2:
-          openCVType = opencv_core.CV_8UC2;
-          break;
-        case 3:
-          openCVType = opencv_core.CV_8UC3;
-          break;
-        case 4:
-          openCVType = opencv_core.CV_8UC4;
-          break;
-        default:
-          fail("unsupported number of bands");  
-      }
-      assertEquals("opencv type of converted mat is incorrect", openCVType, mat.type());
+      assertEquals("opencv type of converted mat is incorrect", OpenCVUtils.generateOpenCVType(image.getPixelArray().getDataType(), image.getNumBands()), mat.type());
+      
       byte[] benchmark = image.getData();
       byte[] convertedData = new byte[benchmark.length];
       ((ByteBuffer)mat.createBuffer()).get(convertedData);      

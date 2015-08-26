@@ -19,7 +19,7 @@ public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, NullWri
     
     int N = Covariance.patchSize;
     
-    //consolidate each mean patch computed in map step
+    //consolidate mean patches from mapper
     Mat mean = new Mat(N, N, opencv_core.CV_32FC1, new Scalar(0.0));
     
     int total = 0;

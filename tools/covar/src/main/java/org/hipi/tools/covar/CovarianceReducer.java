@@ -21,11 +21,12 @@ public class CovarianceReducer extends
     int N = Covariance.patchSize;
     
     Mat cov = new Mat(N * N, N * N, opencv_core.CV_32FC1, new Scalar(0.0));
+    
+    // Consolidate covariance matrices
     for(OpenCVMatWritable value : values) {
       opencv_core.add(value.getMat(), cov, cov);
     }
       
-    
     context.write(NullWritable.get(), new OpenCVMatWritable(cov));
   }
 }

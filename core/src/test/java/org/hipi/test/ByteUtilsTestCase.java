@@ -1,16 +1,14 @@
 package org.hipi.test;
 
-import static org.junit.Assert.*;
-
-import java.nio.ByteBuffer;
-import java.util.Arrays;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import org.hipi.util.ByteUtils;
 import org.junit.Test;
 
-public class ByteUtilsTestCase {
+import java.nio.ByteBuffer;
 
-  private static final byte[] byteArray = new byte[] {1, 2, 3, 4, 5};
+public class ByteUtilsTestCase {
 
   private static final short[] shortArray = new short[] {6, 7, 8, 9, 10};
   private static byte[] convertedShortArray;
@@ -19,10 +17,10 @@ public class ByteUtilsTestCase {
   private static byte[] convertedIntArray;
 
 
-  private static final float[] floatArray = new float[] {16, 17, 18, 19, 20};
+  private static final float[] floatArray = new float[] {16.0f, 17.0f, 18.0f, 19.0f, 20.0f};
   private static byte[] convertedFloatArray;
 
-  private static final double[] doubleArray = new double[] {21, 22, 23, 24, 25};
+  private static final double[] doubleArray = new double[] {21.0, 22.0, 23.0, 24.0, 25.0};
   private static byte[] convertedDoubleArray;
 
   private static final double delta = 0.01;

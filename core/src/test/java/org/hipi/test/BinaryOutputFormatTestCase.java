@@ -2,6 +2,7 @@ package org.hipi.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.fail;
 
 import org.hipi.mapreduce.BinaryOutputFormat;
 import org.hipi.opencv.OpenCVMatWritable;
@@ -111,10 +112,13 @@ public class BinaryOutputFormatTestCase {
   
     writer.write(intKey, intValue);
     writer.close(context);
-    
-    FSDataInputStream dis = fileSystem.open(tempOutputPath);
-    assertEquals("Keys are not equivalent.", intKey.get(), readIntWritable(dis).get());
-    assertEquals("Values are not equivalent.", intValue.get(), readIntWritable(dis).get());
+    if(fileSystem.exists(tempOutputPath)) {
+      FSDataInputStream dis = fileSystem.open(tempOutputPath);
+      assertEquals("Keys are not equivalent.", intKey.get(), readIntWritable(dis).get());
+      assertEquals("Values are not equivalent.", intValue.get(), readIntWritable(dis).get());
+    } else {
+      fail("Output of record writer not located at: " + tempOutputPath + " as expected. Hadoop configuration may have changed.");
+    }
   }
   
   @Test
@@ -126,9 +130,13 @@ public class BinaryOutputFormatTestCase {
     writer.write(nullKey, intValue);
     writer.close(context);
     
-    FSDataInputStream dis = fileSystem.open(tempOutputPath);
-    assertEquals("Values are not equivalent.", intValue.get(), readIntWritable(dis).get());
-    assertEquals("Null values were written.", 0, dis.available());
+    if(fileSystem.exists(tempOutputPath)) {
+      FSDataInputStream dis = fileSystem.open(tempOutputPath);
+      assertEquals("Values are not equivalent.", intValue.get(), readIntWritable(dis).get());
+      assertEquals("Null values were written.", 0, dis.available());
+    } else {
+      fail("Output of record writer not located at: " + tempOutputPath + " as expected. Hadoop configuration may have changed.");
+    }
   }
   
   @Test
@@ -140,9 +148,13 @@ public class BinaryOutputFormatTestCase {
     writer.write(intKey, nullValue);
     writer.close(context);
     
-    FSDataInputStream dis = fileSystem.open(tempOutputPath);
-    assertEquals("Keys are not equivalent.", intKey.get(), readIntWritable(dis).get());
-    assertEquals("Null values were written.", 0, dis.available());
+    if(fileSystem.exists(tempOutputPath)) {
+      FSDataInputStream dis = fileSystem.open(tempOutputPath);
+      assertEquals("Keys are not equivalent.", intKey.get(), readIntWritable(dis).get());
+      assertEquals("Null values were written.", 0, dis.available());
+    } else {
+      fail("Output of record writer not located at: " + tempOutputPath + " as expected. Hadoop configuration may have changed.");
+    }
   }
   
   @Test
@@ -153,9 +165,12 @@ public class BinaryOutputFormatTestCase {
   
     writer.write(nullKey, nullValue);
     writer.close(context);
-    
-    FSDataInputStream dis = fileSystem.open(tempOutputPath);
-    assertEquals("Null values were written.", 0, dis.available());
+    if(fileSystem.exists(tempOutputPath)) {
+      FSDataInputStream dis = fileSystem.open(tempOutputPath);
+      assertEquals("Null values were written.", 0, dis.available());
+    } else {
+      fail("Output of record writer not located at: " + tempOutputPath + " as expected. Hadoop configuration may have changed.");
+    }
   }
   
   
@@ -168,9 +183,13 @@ public class BinaryOutputFormatTestCase {
     writer.write(null, intValue);
     writer.close(context);
     
-    FSDataInputStream dis = fileSystem.open(tempOutputPath);
-    assertEquals("Values are not equivalent.", intValue.get(), readIntWritable(dis).get());
-    assertEquals("Null values were written.", 0, dis.available());
+    if(fileSystem.exists(tempOutputPath)) {
+      FSDataInputStream dis = fileSystem.open(tempOutputPath);
+      assertEquals("Values are not equivalent.", intValue.get(), readIntWritable(dis).get());
+      assertEquals("Null values were written.", 0, dis.available());
+    } else {
+      fail("Output of record writer not located at: " + tempOutputPath + " as expected. Hadoop configuration may have changed.");
+    }
   }
   
   @Test
@@ -182,9 +201,14 @@ public class BinaryOutputFormatTestCase {
     writer.write(intKey, null);
     writer.close(context);
     
-    FSDataInputStream dis = fileSystem.open(tempOutputPath);
-    assertEquals("Keys are not equivalent.", intKey.get(), readIntWritable(dis).get());
-    assertEquals("Null values were written.", 0, dis.available());
+    if(fileSystem.exists(tempOutputPath)) {
+      FSDataInputStream dis = fileSystem.open(tempOutputPath);
+      assertEquals("Keys are not equivalent.", intKey.get(), readIntWritable(dis).get());
+      assertEquals("Null values were written.", 0, dis.available());
+    } else {
+      fail("Output of record writer not located at: " + tempOutputPath + " as expected. Hadoop configuration may have changed.");
+    }
+    
   }
   
   @Test
@@ -196,8 +220,12 @@ public class BinaryOutputFormatTestCase {
     writer.write(null, null);
     writer.close(context);
     
-    FSDataInputStream dis = fileSystem.open(tempOutputPath);
-    assertEquals("Null values were written.", 0, dis.available());
+    if(fileSystem.exists(tempOutputPath)) {
+      FSDataInputStream dis = fileSystem.open(tempOutputPath);
+      assertEquals("Null values were written.", 0, dis.available());
+    } else {
+      fail("Output of record writer not located at: " + tempOutputPath + " as expected. Hadoop configuration may have changed.");
+    }
   }
   
   @Test
@@ -209,9 +237,13 @@ public class BinaryOutputFormatTestCase {
     writer.write(nullKey, cvValue);
     writer.close(context);
     
-    FSDataInputStream dis = fileSystem.open(tempOutputPath);
-    assertArrayEquals("Mats are not equivalent.", cvValueData, readMatDataToArray(dis), 0.05f);
-    assertEquals("Null values were written.", 0, dis.available());
+    if(fileSystem.exists(tempOutputPath)) {
+      FSDataInputStream dis = fileSystem.open(tempOutputPath);
+      assertArrayEquals("Mats are not equivalent.", cvValueData, readMatDataToArray(dis), 0.05f);
+      assertEquals("Null values were written.", 0, dis.available());
+    } else {
+      fail("Output of record writer not located at: " + tempOutputPath + " as expected. Hadoop configuration may have changed.");
+    }
   }
   
   @Test
@@ -223,11 +255,14 @@ public class BinaryOutputFormatTestCase {
     writer.write(intKey, cvValue);
     writer.close(context);
     
-    FSDataInputStream dis = fileSystem.open(tempOutputPath);
-    
-    assertEquals("Keys are not equivalent.", intKey.get(), readIntWritable(dis).get());
-    assertArrayEquals("Mats are not equivalent.", cvValueData, readMatDataToArray(dis), 0.05f);
-    assertEquals("Not all data was read.", 0, dis.available());
+    if(fileSystem.exists(tempOutputPath)) {
+      FSDataInputStream dis = fileSystem.open(tempOutputPath);
+      assertEquals("Keys are not equivalent.", intKey.get(), readIntWritable(dis).get());
+      assertArrayEquals("Mats are not equivalent.", cvValueData, readMatDataToArray(dis), 0.05f);
+      assertEquals("Not all data was read.", 0, dis.available());
+    } else {
+      fail("Output of record writer not located at: " + tempOutputPath + " as expected. Hadoop configuration may have changed.");
+    }
   }
   
   private IntWritable readIntWritable(FSDataInputStream dis) throws IOException {
@@ -242,6 +277,7 @@ public class BinaryOutputFormatTestCase {
     return openCVMatWritable;
   }
   
+  // Tests assume use of mats containing floats
   private float[] readMatDataToArray(FSDataInputStream dis) throws IOException {
     Mat newMat = readOpenCVMatWritable(dis).getMat();
     float[] newData = new float[cvValueData.length];

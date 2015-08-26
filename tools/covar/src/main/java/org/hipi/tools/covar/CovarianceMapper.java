@@ -21,7 +21,7 @@ import java.nio.FloatBuffer;
 public class CovarianceMapper extends
     Mapper<HipiImageHeader, FloatImage, IntWritable, OpenCVMatWritable> {
 
-  Mat mean; // Stores result of computeMean job which has been stored in the job's cache.
+  Mat mean; // Stores pre-computed mean
   Mat gaussian; // Stores gaussian matrix computed in setup
 
   @Override
@@ -37,7 +37,7 @@ public class CovarianceMapper extends
     try {
       
       // Access mean data on HDFS
-      String meanPathString = job.getConfiguration().get("mean.path");
+      String meanPathString = job.getConfiguration().get("hipi.covar.mean.path");
       if(meanPathString == null) {
         System.err.println("Mean path not set in configuration - cannot continue. Exiting.");
         System.exit(1);
@@ -65,19 +65,30 @@ public class CovarianceMapper extends
     
     // 'center' and 'denominator' precomputed for gaussian generation
     int center = N / 2;
-    double denominator =  2 * Math.pow(sigma, 2);
+    double denominator =  2 * sigma * sigma;
     
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {      
-        float gaussianValue = generate2DGaussianValue(i, j, center, denominator);
-        gaussianBuffer.put(i * N + j, gaussianValue);
-        gaussianSum += gaussianValue;
+        gaussianBuffer.put(i * N + j, generate2DGaussianValue(i, j, center, denominator));
       }
     }
+    
+    // compute euclidean distance of gaussian vector
+    double sumOfSquares = 0.0;
+    for(int i = 0; i < N * N; i++) {
+      sumOfSquares += gaussianBuffer.get(i) * gaussianBuffer.get(i);
+    }
+    
+    double euclideanDistance = Math.sqrt(sumOfSquares);
+    
+    if(euclideanDistance == 0) {
+      System.out.println("Invalid euclidean distance of gaussian vector [0]. Cannot continue.");
+      System.exit(1);
+    }
+    
+    // normalize gaussian weighting matrix
+    gaussian = opencv_core.divide(gaussian, euclideanDistance).asMat();
 
-    // Normalize gaussian array
-    float averageGaussianValue = (float) gaussianSum / (float) (N * N); //sum divided by area of gaussian array (N x N)
-    gaussian = opencv_core.divide(gaussian, averageGaussianValue).asMat();
   }
   
   // 2D Gaussian: f(i, j) = A * exp(-( (i - i0)^2 / (2 * iSigma^2) + (j - j0)^2 / (2 * jSigma^2) ))
@@ -88,8 +99,8 @@ public class CovarianceMapper extends
   // (2 * sigma^2) == "denominator"
   private float generate2DGaussianValue(int i, int j, int center, double denominator) {    
     
-    double termOne = Math.pow(i - center, 2) / denominator;
-    double termTwo = Math.pow(j - center, 2) / denominator;
+    double termOne = ((double)((i - center) * (i - center))) / denominator;
+    double termTwo = ((double)((j - center) * (j - center))) / denominator;
     
     return ((float)Math.exp(-(termOne + termTwo)));
   }
@@ -117,11 +128,8 @@ public class CovarianceMapper extends
     int iMax = 10;
     int jMax = 10;
     
-    // Stores FloatBuffers for each patch
-    // FloatBuffers refer to Mat data, so Mats don't need to be stored
-    FloatBuffer[] patchBuffers = new FloatBuffer[iMax * jMax];
+    Mat[] patches = new Mat[iMax * jMax];
     
-    //patch dimensions (N x N)
     int N = Covariance.patchSize;
 
     // Create mean-subtracted and gaussian-masked patches
@@ -135,7 +143,7 @@ public class CovarianceMapper extends
         opencv_core.subtract(patch, mean, patch);
         opencv_core.multiply(patch, gaussian, patch);
         
-        patchBuffers[(iMax * i) + j] = patch.createBuffer();
+        patches[(iMax * i) + j] = patch;
       }
     }
     
@@ -143,18 +151,20 @@ public class CovarianceMapper extends
     // Run covariance computation
     /////
 
-    // Stores the (N^2 x N^2) covariance matrix AAt
+    // Stores the (N^2 x N^2) covariance matrix patchMat*transpose(patchMat)
     Mat covarianceMat = new Mat(N * N, N * N, opencv_core.CV_32FC1, new Scalar(0.0));
-    FloatBuffer covarianceBuffer = covarianceMat.createBuffer();
-    for (int i = 0; i < N * N; i++) {
-      for (int j = 0; j < N * N; j++) {
-        float accumulatedValue = 0.0f;
-        for (int k = 0; k < patchBuffers.length; k++) {
-          accumulatedValue += patchBuffers[k].get(i) * patchBuffers[k].get(j); 
-        }
-        covarianceBuffer.put(i * N * N + j, accumulatedValue);
-      }
+    
+    // Stores patches as column vectors
+    Mat patchMat = new Mat(N * N, patches.length, opencv_core.CV_32FC1, new Scalar(0.0));
+   
+    // Create patchMat
+    for(int i = 0; i < patches.length; i++) {
+      patches[i].reshape(0, N * N).copyTo(patchMat.col(i));
     }
+    
+    // Compute patchMat*transpose(patchMat)
+    covarianceMat = opencv_core.multiply(patchMat, patchMat.t().asMat()).asMat();
+    
     context.write(new IntWritable(0), new OpenCVMatWritable(covarianceMat));
   }
 }

@@ -37,8 +37,8 @@ public class BinaryOutputFormat<K, V> extends FileOutputFormat<K, V> {
     @Override
     public void write(K key, V value) throws IOException, InterruptedException {
       
-      boolean nullKey = key == null || key instanceof NullWritable;
-      boolean nullValue = value == null || value instanceof NullWritable;
+      boolean nullKey = (key == null) || (key instanceof NullWritable);
+      boolean nullValue = (value == null) || (value instanceof NullWritable);
       
       boolean writableKey = key instanceof Writable;
       boolean writableValue = value instanceof Writable;

@@ -42,7 +42,7 @@ public class ComputeCovariance {
     FileInputFormat.setInputPaths(job, new Path(inputHibPath));
     FileOutputFormat.setOutputPath(job, new Path(outputDir));
     
-    job.getConfiguration().setStrings("mean.path", inputMeanPath);
+    job.getConfiguration().setStrings("hipi.covar.mean.path", inputMeanPath);
 
     return job.waitForCompletion(true) ? 0 : 1;
   }

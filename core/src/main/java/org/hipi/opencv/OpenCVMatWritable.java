@@ -23,8 +23,7 @@ public class OpenCVMatWritable implements Writable {
     mat = new Mat();
     assert mat != null;
     mat.dims(2);
-    int dims = mat.dims();
-    assert (dims == 1 || dims == 2); // handle only 1- or 2-D arrays
+    assert (mat.dims() == 2); // handle only 1- or 2-D arrays (sanity check)
   }
 
   public OpenCVMatWritable(Mat mat) {

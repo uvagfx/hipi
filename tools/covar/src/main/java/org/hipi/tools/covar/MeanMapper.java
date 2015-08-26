@@ -54,8 +54,7 @@ public class MeanMapper extends Mapper<HipiImageHeader, FloatImage, IntWritable,
     }
     
     //scale mean patch mat based on total number of patches
-    int numPatches = iMax * jMax;
-    mean = opencv_core.divide(mean, (double) numPatches).asMat();
+    mean = opencv_core.divide(mean, ((double) (iMax * jMax))).asMat();
     
     context.write(new IntWritable(0), new OpenCVMatWritable(mean));
   }

@@ -41,27 +41,25 @@ public class CovarTests {
     assertEquals("Failed to run covariance job. Check setup.", 0, TestUtils.runCommand("../covar.sh testout/covar/input/white-black.hib testout/covar/output"));
     TestUtils.runCommand("rm /tmp/mean-output-opencvmatwritable");
     assertEquals("Failed to copy mean output to local filesystem. Check setup.", 0, TestUtils.runCommand("hadoop fs -copyToLocal testout/covar/output/mean-output/part-r-00000 /tmp/mean-output-opencvmatwritable"));
-    assertEquals("Failed to covert openCVMatWritable object to jpg.", true, TestUtils.convertOpenCVMatWritableToJpg("/tmp/mean-output-opencvmatwritable", "/tmp/mean-output.jpg"));
+    assertEquals("Failed to covert openCVMatWritable object to jpg.", true, TestUtils.convertFloatOpenCVMatWritableToJpg("/tmp/mean-output-opencvmatwritable", "/tmp/mean-output.jpg"));
     assertTrue("Psnr does not reach desired threshold.", TestUtils.checkPsnr("/tmp/mean-output.jpg", "../../testdata/covar/images/mean-benchmark.jpg", 30.0f));
   }
  
-  //psnr on this test should indicate that new covariance image is identical to covariance benchmark because input hibs are identical.
   @Test
   public void testComputeCovarianceWithSmallTestHib() throws IOException {
     assertEquals("Failed to run covariance job. Check setup.", 0, TestUtils.runCommand("../covar.sh testout/covar/input/smalltesthib.hib testout/covar/output"));
     TestUtils.runCommand("rm /tmp/covariance-output-opencvmatwritable");
     assertEquals("Failed to copy covariance output to local filesystem. Check setup.", 0, TestUtils.runCommand("hadoop fs -copyToLocal testout/covar/output/covariance-output/part-r-00000 /tmp/covariance-output-opencvmatwritable"));
-    assertEquals("Failed to covert openCVMatWritable object to jpg.", true, TestUtils.convertOpenCVMatWritableToJpg("/tmp/covariance-output-opencvmatwritable", "/tmp/covariance-output.jpg"));
+    assertEquals("Failed to covert openCVMatWritable object to jpg.", true, TestUtils.convertFloatOpenCVMatWritableToJpg("/tmp/covariance-output-opencvmatwritable", "/tmp/covariance-output.jpg"));
     assertTrue("Psnr does not reach desired threshold.", TestUtils.checkPsnr("/tmp/covariance-output.jpg", "../../testdata/covar/images/covariance-benchmark.jpg", 30.0f));
   }
-    
-  //psnr on this test should indicate that new covariance image is appoximate to covariance benchmark, but will not be identical because input hibs are different.
+   
   @Test
-  public void testComputeCovariancWithMediumTestHib() throws IOException {
+  public void testComputeCovarianceWithMediumTestHib() throws IOException {
     assertEquals("Failed to run covariance job. Check setup.", 0, TestUtils.runCommand("../covar.sh testout/covar/input/mediumtesthib.hib testout/covar/output"));
     TestUtils.runCommand("rm /tmp/covariance-output-opencvmatwritable");
     assertEquals("Failed to copy covariance output to local filesystem. Check setup.", 0, TestUtils.runCommand("hadoop fs -copyToLocal testout/covar/output/covariance-output/part-r-00000 /tmp/covariance-output-opencvmatwritable"));
-    assertEquals("Failed to covert openCVMatWritable object to jpg.", true, TestUtils.convertOpenCVMatWritableToJpg("/tmp/covariance-output-opencvmatwritable", "/tmp/covariance-output.jpg"));
-    assertTrue("Psnr does not reach desired threshold.", TestUtils.checkPsnr("/tmp/covariance-output.jpg", "../../testdata/covar/images/covariance-benchmark.jpg", 10.0f));
+    assertEquals("Failed to covert openCVMatWritable object to jpg.", true, TestUtils.convertFloatOpenCVMatWritableToJpg("/tmp/covariance-output-opencvmatwritable", "/tmp/covariance-output.jpg"));
+    assertTrue("Psnr does not reach desired threshold.", TestUtils.checkPsnr("/tmp/covariance-output.jpg", "../../testdata/covar/images/covariance-benchmark.jpg", 30.0f));
   }
 }

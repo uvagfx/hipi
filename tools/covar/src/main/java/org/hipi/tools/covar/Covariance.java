@@ -23,10 +23,10 @@ public class Covariance extends Configured implements Tool {
   public static final float sigma = 10; // Standard deviation of Gaussian weighting function
   
   
-  // Used to convert input FloatImages into grayscale openCV Mats in MeanMapper and CovarianceMapper
+  // Used to convert input FloatImages into grayscale OpenCV Mats in MeanMapper and CovarianceMapper
   public static boolean convertFloatImageToGrayscaleMat(FloatImage image, Mat cvImage) {
     
-    // Convert FloatImage to Mat, and convert Mat to grayscale  (if necessary).
+    // Convert FloatImage to Mat, and convert Mat to grayscale (if necessary)
     switch(image.getColorSpace()) {
       
       //if RGB, convert to grayscale
@@ -73,7 +73,7 @@ public class Covariance extends Configured implements Tool {
     Path inputPath = new Path(args[0]);
     FileSystem fileSystem = FileSystem.get(conf);
     if (!fileSystem.exists(inputPath)) {
-      System.out.println("Input HIB does not exist: " + inputPath);
+      System.out.println("Input HIB does not exist at location: " + inputPath);
       System.exit(1);
     }
     
@@ -83,7 +83,7 @@ public class Covariance extends Configured implements Tool {
     Path meanPath = new Path(inputMeanPathString);
     FileSystem fileSystem = FileSystem.get(conf);
     if (!fileSystem.exists(meanPath)) {
-      System.out.println("Mean patch does not exist: " + meanPath);
+      System.out.println("Mean patch does not exist at location: " + meanPath);
       System.exit(1);
     }
   }
@@ -125,7 +125,7 @@ public class Covariance extends Configured implements Tool {
     return 0;
   }
 
-  //main driver for full covariance computation
+  // Main driver for full covariance computation
   public static void main(String[] args) throws Exception {
     int res = ToolRunner.run(new Covariance(), args);
     System.exit(res);

@@ -184,6 +184,7 @@ public class PpmCodec extends ImageCodec {
     int w = image.getWidth();
     int h = image.getHeight();
 
+    // http://netpbm.sourceforge.net/doc/ppm.html
     PrintWriter writer = new PrintWriter(outputStream);
     writer.print("P6\r");
     writer.print(w + " " + h + "\r");

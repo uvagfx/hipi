@@ -15,6 +15,9 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
+/**
+ * Implementation of Hadoop {@link Writable} interface which encapsulates {@link Mat} objects.
+ */
 public class OpenCVMatWritable implements Writable {
 
   private Mat mat = null;
@@ -36,7 +39,8 @@ public class OpenCVMatWritable implements Writable {
     }
     int dims = mat.dims();
     if (!(dims == 1 || dims == 2)) {
-      throw new IllegalArgumentException("Currently supports only 1D or 2D arrays. Input mat dims: " + dims);
+      throw new IllegalArgumentException("Currently supports only 1D or 2D arrays. "
+          + "Input mat dims: " + dims);
     }
     
     Mat matCopy = new Mat(mat.rows(), mat.cols(), mat.type());

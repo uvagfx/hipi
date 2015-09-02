@@ -7,7 +7,7 @@ import scipy.sparse.linalg as LA
 
 # Parse command line
 parser = argparse.ArgumentParser(description='Display the result of the covariance example.')
-parser.add_argument('input', help="path to covariance result (whether mean image or covariance image)")
+parser.add_argument('input', help="path to covariance result (mean image or covariance image)")
 args = parser.parse_args()
 
 # Get input file
@@ -21,16 +21,15 @@ f = open(fname,"rb")
 
 try:
     header = np.fromfile(f, dtype=np.dtype('>i4'), count=3)
-    print header
+    
     type = header[0]
     rows = header[1]
     cols = header[2]
-
-    mat = np.fromfile(f, dtype=np.dtype('>f'))
     
     print "opencv type: ", type
     print "rows: ", rows, " cols: ", cols
-    print mat
+
+    mat = np.fromfile(f, dtype=np.dtype('>f'))
     
     if (cols==psize):
         print "Displaying Mean Image." # just display

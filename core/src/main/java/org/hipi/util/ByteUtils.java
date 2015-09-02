@@ -73,7 +73,8 @@ public class ByteUtils {
    * TODO: Test that this will work for leading-zero bytes
    */
   public static final int byteArrayToInt(byte[] byteArray, int offset) {
-    return byteArray[0 + offset] << 24 | (byteArray[1 + offset] & 0xff) << 16 | (byteArray[2 + offset] & 0xff) << 8 | (byteArray[3 + offset] & 0xff);
+    return byteArray[0 + offset] << 24 | (byteArray[1 + offset] & 0xff) << 16 | 
+        (byteArray[2 + offset] & 0xff) << 8 | (byteArray[3 + offset] & 0xff);
   }
 
   /**
@@ -131,7 +132,8 @@ public class ByteUtils {
   public static short[] byteArrayToShortArray(byte[] byteArray) {
     
     if(byteArray.length % 2 != 0) {
-      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 2, which is the number of bytes in one short.");
+      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 2, "
+          + "which is the number of bytes in one short.");
     }
     short shortArray[] = new short[byteArray.length / 2];
     ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);
@@ -160,7 +162,8 @@ public class ByteUtils {
    */
   public static int[] byteArrayToIntArray(byte[] byteArray) {
     if(byteArray.length % 4 != 0) {
-      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 4, which is the number of bytes in one int.");
+      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 4, "
+          + "which is the number of bytes in one int.");
     }
     int intArray[] = new int[byteArray.length / 4];
     ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);
@@ -188,7 +191,8 @@ public class ByteUtils {
    */
   public static float[] byteArrayToFloatArray(byte byteArray[]) throws IllegalArgumentException {
     if (byteArray.length % 4 != 0) {
-      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 4, which is the number of bytes in one float.");
+      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 4, "
+          + "which is the number of bytes in one float.");
     }
     float floatArray[] = new float[byteArray.length / 4];
     ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);
@@ -216,7 +220,8 @@ public class ByteUtils {
    */
   public static double[] byteArrayToDoubleArray(byte[] byteArray) {
     if (byteArray.length % 8 != 0) {
-      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 8, which is the number of bytes in one double.");
+      throw new IllegalArgumentException("Length of byteArray is not evenly divisible by 8, "
+          + "which is the number of bytes in one double.");
     }
     double doubleArray[] = new double[byteArray.length / 8];
     ByteBuffer byteBuf = ByteBuffer.wrap(byteArray);

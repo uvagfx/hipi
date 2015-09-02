@@ -3,7 +3,7 @@ package org.hipi.opencv;
 import org.hipi.image.PixelArray;
 import org.hipi.image.RasterImage;
 import org.hipi.util.ByteUtils;
-
+import org.apache.hadoop.mapreduce.RecordReader;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 
@@ -13,15 +13,26 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
+/**
+ * Various static helper methods which facilitate conversion between HIPI and OpenCV image 
+ * representations.
+ */
 public class OpenCVUtils {
 
-  private static int[][] openCVTypeLUT = new int[][] {{opencv_core.CV_8UC1, opencv_core.CV_8UC2, opencv_core.CV_8UC3, opencv_core.CV_8UC4},
-                                                              {opencv_core.CV_16UC1, opencv_core.CV_16UC2, opencv_core.CV_16UC3, opencv_core.CV_16UC4},
-                                                              {opencv_core.CV_16SC1, opencv_core.CV_16SC2, opencv_core.CV_16SC3, opencv_core.CV_16SC4},
-                                                              {opencv_core.CV_32SC1, opencv_core.CV_32SC2, opencv_core.CV_32SC3, opencv_core.CV_32SC4},
-                                                              {opencv_core.CV_32FC1, opencv_core.CV_32FC2, opencv_core.CV_32FC3, opencv_core.CV_32FC4},
-                                                              {opencv_core.CV_64FC1, opencv_core.CV_64FC2, opencv_core.CV_64FC3, opencv_core.CV_64FC4}};
+  private static int[][] openCVTypeLUT = new int[][] 
+      {{opencv_core.CV_8UC1, opencv_core.CV_8UC2, opencv_core.CV_8UC3, opencv_core.CV_8UC4},     
+       {opencv_core.CV_16UC1, opencv_core.CV_16UC2, opencv_core.CV_16UC3, opencv_core.CV_16UC4},
+       {opencv_core.CV_16SC1, opencv_core.CV_16SC2, opencv_core.CV_16SC3, opencv_core.CV_16SC4},
+       {opencv_core.CV_32SC1, opencv_core.CV_32SC2, opencv_core.CV_32SC3, opencv_core.CV_32SC4},
+       {opencv_core.CV_32FC1, opencv_core.CV_32FC2, opencv_core.CV_32FC3, opencv_core.CV_32FC4},
+       {opencv_core.CV_64FC1, opencv_core.CV_64FC2, opencv_core.CV_64FC3, opencv_core.CV_64FC4}};
   
+  /**
+   * Returns the OpenCV data type which is associated with a particular {@link PixelArray} data type 
+   * and number of bands.
+   * 
+   * @return integer representation of OpenCV data type
+   */
   public static int generateOpenCVType(int pixelArrayDataType, int numBands) {
     
     int depthIndex = -1;
@@ -60,6 +71,12 @@ public class OpenCVUtils {
     return openCVTypeLUT[depthIndex][channelIndex];
   }
   
+  /**
+   * Converts an input {@link RasterImage} into an {@link Mat}. 
+   * 
+   * @return {@link Mat} of same data type and dimensions as input image
+   * @throws IllegalArgumentException
+   */
   public static Mat convertRasterImageToMat(RasterImage image) throws IllegalArgumentException {
     
     // Check for invalid input
@@ -67,10 +84,12 @@ public class OpenCVUtils {
       throw new IllegalArgumentException("Input RasterImage is null.");
     }
     if(image.getWidth() <= 0 || image.getHeight() <= 0) {
-      throw new IllegalArgumentException("Input RasterImage has invalid dimensions [" + image.getWidth() + "," + image.getHeight() + "]");
+      throw new IllegalArgumentException("Input RasterImage has invalid dimensions: "
+          + "[" + image.getWidth() + "," + image.getHeight() + "]");
     }
     if(image.getNumBands() <= 0 || image.getNumBands() > 4) {
-      throw new IllegalArgumentException("Input RasterImage has invalid number of bands [" + image.getNumBands() + "]");
+      throw new IllegalArgumentException("Input RasterImage has invalid number of bandsY: "
+          + "[" + image.getNumBands() + "]");
     }
     
     // Generate opencv data type based on input pixel array data type / number of bands
@@ -78,7 +97,8 @@ public class OpenCVUtils {
     int numBands = image.getNumBands();
     int openCVType = generateOpenCVType(pixelArrayDataType, numBands);
     if(openCVType == -1) {
-      throw new IllegalArgumentException("Invalid PixelArray data type [" + pixelArrayDataType + "] and / or RasterImage numBands [" + numBands + "]");
+      throw new IllegalArgumentException("Invalid PixelArray data type: "
+          + "[" + pixelArrayDataType + "] and / or RasterImage numBands: [" + numBands + "]");
     }
     
     // Create output mat

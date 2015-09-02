@@ -3,6 +3,7 @@ package org.hipi.tools.covar;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_RGB2GRAY;
 
 import org.hipi.image.FloatImage;
+import org.hipi.image.HipiImageHeader.HipiColorSpace;
 import org.hipi.opencv.OpenCVUtils;
 
 import org.apache.hadoop.conf.Configuration;
@@ -27,7 +28,8 @@ public class Covariance extends Configured implements Tool {
   public static boolean convertFloatImageToGrayscaleMat(FloatImage image, Mat cvImage) {
     
     // Convert FloatImage to Mat, and convert Mat to grayscale (if necessary)
-    switch(image.getColorSpace()) {
+    HipiColorSpace colorSpace = image.getColorSpace();
+    switch(colorSpace) {
       
       //if RGB, convert to grayscale
       case RGB:
@@ -42,7 +44,7 @@ public class Covariance extends Configured implements Tool {
         
       //otherwise, color space is not supported for this example. Skip input image.
       default:
-        System.out.println("HipiColorSpace [" + image.getColorSpace() + "] not supported in covar example. Skipping image.");
+        System.out.println("HipiColorSpace [" + colorSpace + "] not supported in covar example. ");
         return false;
     }
   }
@@ -79,7 +81,8 @@ public class Covariance extends Configured implements Tool {
     
   }
   
-  private static void validateMeanPath(String inputMeanPathString, Configuration conf) throws IOException {
+  private static void validateMeanPath(String inputMeanPathString, Configuration conf) 
+      throws IOException {
     Path meanPath = new Path(inputMeanPathString);
     FileSystem fileSystem = FileSystem.get(conf);
     if (!fileSystem.exists(meanPath)) {
@@ -102,7 +105,7 @@ public class Covariance extends Configured implements Tool {
     String outputBaseDir = args[1];
     String outputMeanDir = outputBaseDir + "/mean-output/";
     String outputCovarianceDir = outputBaseDir + "/covariance-output/";
-    String inputMeanPath = outputMeanDir + "part-r-00000"; //used by ComputeCovariance to access ComputeMean result
+    String inputMeanPath = outputMeanDir + "part-r-00000"; //used to access ComputeMean result
     
     // Set up directory structure
     mkdir(outputBaseDir, conf);
@@ -111,6 +114,7 @@ public class Covariance extends Configured implements Tool {
 
     // Run compute mean
     if (ComputeMean.run(args, inputHibPath, outputMeanDir) == 1) {
+      System.out.println("Compute mean job failed to complete.");
       return 1;
     }
     
@@ -118,6 +122,7 @@ public class Covariance extends Configured implements Tool {
     
     // Run compute covariance
     if (ComputeCovariance.run(args, inputHibPath, outputCovarianceDir, inputMeanPath) == 1) {
+      System.out.println("Compute covariance job failed to complete.");
       return 1;
     }
 

@@ -42,7 +42,7 @@ public class CovarTests {
     TestUtils.runCommand("rm /tmp/mean-output-opencvmatwritable");
     assertEquals("Failed to copy mean output to local filesystem. Check setup.", 0, TestUtils.runCommand("hadoop fs -copyToLocal testout/covar/output/mean-output/part-r-00000 /tmp/mean-output-opencvmatwritable"));
     assertEquals("Failed to covert openCVMatWritable object to jpg.", true, TestUtils.convertFloatOpenCVMatWritableToJpg("/tmp/mean-output-opencvmatwritable", "/tmp/mean-output.jpg"));
-    assertTrue("Psnr does not reach desired threshold.", TestUtils.checkPsnr("/tmp/mean-output.jpg", "../../testdata/covar/images/mean-benchmark.jpg", 30.0f));
+    assertTrue("Psnr does not reach desired threshold.", TestUtils.checkPsnr("/tmp/mean-output.jpg", "../../testdata/covar/mean-benchmark.jpg", 30.0f));
   }
  
   @Test
@@ -51,7 +51,7 @@ public class CovarTests {
     TestUtils.runCommand("rm /tmp/covariance-output-opencvmatwritable");
     assertEquals("Failed to copy covariance output to local filesystem. Check setup.", 0, TestUtils.runCommand("hadoop fs -copyToLocal testout/covar/output/covariance-output/part-r-00000 /tmp/covariance-output-opencvmatwritable"));
     assertEquals("Failed to covert openCVMatWritable object to jpg.", true, TestUtils.convertFloatOpenCVMatWritableToJpg("/tmp/covariance-output-opencvmatwritable", "/tmp/covariance-output.jpg"));
-    assertTrue("Psnr does not reach desired threshold.", TestUtils.checkPsnr("/tmp/covariance-output.jpg", "../../testdata/covar/images/covariance-benchmark.jpg", 30.0f));
+    assertTrue("Psnr does not reach desired threshold.", TestUtils.checkPsnr("/tmp/covariance-output.jpg", "../../testdata/covar/covariance-benchmark.jpg", 30.0f));
   }
    
   @Test
@@ -60,6 +60,6 @@ public class CovarTests {
     TestUtils.runCommand("rm /tmp/covariance-output-opencvmatwritable");
     assertEquals("Failed to copy covariance output to local filesystem. Check setup.", 0, TestUtils.runCommand("hadoop fs -copyToLocal testout/covar/output/covariance-output/part-r-00000 /tmp/covariance-output-opencvmatwritable"));
     assertEquals("Failed to covert openCVMatWritable object to jpg.", true, TestUtils.convertFloatOpenCVMatWritableToJpg("/tmp/covariance-output-opencvmatwritable", "/tmp/covariance-output.jpg"));
-    assertTrue("Psnr does not reach desired threshold.", TestUtils.checkPsnr("/tmp/covariance-output.jpg", "../../testdata/covar/images/covariance-benchmark.jpg", 30.0f));
+    assertTrue("Psnr does not reach desired threshold.", TestUtils.checkPsnr("/tmp/covariance-output.jpg", "../../testdata/covar/covariance-benchmark.jpg", 30.0f));
   }
 }

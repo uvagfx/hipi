@@ -23,6 +23,8 @@ subprojects {
     compile group: 'org.bytedeco', name: 'javacv', version: '1.0'
     compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.0'
     compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.0', classifier: 'macosx-x86_64'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.0', classifier: 'linux-x86_64'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.0', classifier: 'windows-x86_64'
     testCompile "junit:junit:4+"
   }
 
@@ -46,7 +48,7 @@ task install {
   dependsOn(':tools:hibToJpeg:jar')
   dependsOn(':tools:hibDump:jar')
 
-  dependsOn(':examples:covar:jar')
+  dependsOn(':tools:covar:jar')
 
   doLast {
     println '\nFinished building the HIPI library along with all tools and examples.'

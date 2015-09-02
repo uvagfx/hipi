@@ -15,7 +15,8 @@ import java.io.IOException;
 
 public class ComputeMean {
 
-  public static int run(String[] args, String inputHibPath, String outputDir) throws IllegalArgumentException, IOException, ClassNotFoundException, InterruptedException {
+  public static int run(String[] args, String inputHibPath, String outputDir) 
+      throws ClassNotFoundException, IllegalStateException, InterruptedException, IOException {
 
     System.out.println("Running compute mean.");
 

@@ -12,12 +12,11 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class ComputeCovariance {
   
-  public static int run(String[] args, String inputHibPath, String outputDir, String inputMeanPath) throws IllegalArgumentException, IOException, ClassNotFoundException, InterruptedException, URISyntaxException {
+  public static int run(String[] args, String inputHibPath, String outputDir, String inputMeanPath) 
+      throws ClassNotFoundException, IllegalStateException, InterruptedException, IOException {
     
     System.out.println("Running compute covariance.");
    

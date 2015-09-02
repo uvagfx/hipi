@@ -11,7 +11,8 @@ import org.bytedeco.javacpp.opencv_core.Scalar;
 
 import java.io.IOException;
 
-public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, NullWritable, OpenCVMatWritable> {
+public class MeanReducer extends 
+  Reducer<IntWritable, OpenCVMatWritable, NullWritable, OpenCVMatWritable> {
   
   @Override
   public void reduce(IntWritable key, Iterable<OpenCVMatWritable> meanPatches, Context context)
@@ -22,15 +23,15 @@ public class MeanReducer extends Reducer<IntWritable, OpenCVMatWritable, NullWri
     //consolidate mean patches from mapper
     Mat mean = new Mat(N, N, opencv_core.CV_32FC1, new Scalar(0.0));
     
-    int total = 0;
+    int count = 0;
     for (OpenCVMatWritable patch : meanPatches) {
       opencv_core.add(patch.getMat(), mean, mean);
-      total++;
+      count++;
     }
     
     //normalize consolidated mean patch
-    if (total > 1) {
-      mean = opencv_core.divide(mean, (double) total).asMat();
+    if (count > 1) {
+      mean = opencv_core.divide(mean, (double) count).asMat();
     }
     
     //write out consolidated patch

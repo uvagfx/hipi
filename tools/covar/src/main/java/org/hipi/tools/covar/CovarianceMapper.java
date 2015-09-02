@@ -3,7 +3,6 @@ package org.hipi.tools.covar;
 import org.hipi.image.FloatImage;
 import org.hipi.image.HipiImageHeader;
 import org.hipi.opencv.OpenCVMatWritable;
-
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -61,7 +60,6 @@ public class CovarianceMapper extends
     
     gaussian = new Mat(N, N, opencv_core.CV_32FC1, new Scalar(0.0));
     FloatBuffer gaussianBuffer = gaussian.createBuffer();
-    float gaussianSum = 0; // Used for normalization
     
     // 'center' and 'denominator' precomputed for gaussian generation
     int center = N / 2;
@@ -117,6 +115,7 @@ public class CovarianceMapper extends
     
     // if unable to convert input FloatImage to grayscale Mat, skip image and move on
     if(!Covariance.convertFloatImageToGrayscaleMat(image, cvImage)) {
+      System.out.println("CovarianceMapper is skipping image with invalid color space.");
       return;
     }
      

@@ -3,7 +3,6 @@ package org.hipi.tools.test;
 import static org.junit.Assert.*;
 
 import org.hipi.opencv.OpenCVMatWritable;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -11,6 +10,7 @@ import org.apache.hadoop.util.RunJar;
 import org.apache.hadoop.util.ToolRunner;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.junit.Test;
 
@@ -54,18 +54,9 @@ public class TestUtils {
     TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/yfcc100m_dataset-100-temp-0.bz2 testout/flickr_bz2_src/yfcc100m_dataset-100-temp-0.bz2");
     TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/yfcc100m_dataset-100-temp-1.bz2 testout/flickr_bz2_src/yfcc100m_dataset-100-temp-1.bz2");
     
-    //used to test mean computation (contains one black image, and one white image)
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/white-black.hib testout/covar/input/white-black.hib");
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/white-black.hib.dat testout/covar/input/white-black.hib.dat");
-    
-    //used to test covariance computation (contains 7 images)
-    //used to create hipi/testdata/covar/images/covariance-benchmark.jpg
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/smalltesthib.hib testout/covar/input/smalltesthib.hib");
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/smalltesthib.hib.dat testout/covar/input/smalltesthib.hib.dat");
-    
-    //used to test covariance computation (contains 25 images)
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/mediumtesthib.hib testout/covar/input/mediumtesthib.hib");
-    TestUtils.runCommand("hadoop fs -copyFromLocal ../../testdata/covar/hibs/mediumtesthib.hib.dat testout/covar/input/mediumtesthib.hib.dat");
+    TestUtils.runCommand("../hibImport.sh -f ../../testdata/jpeg-exif-test testout/covar/input/mediumtesthib.hib");
+    TestUtils.runCommand("../hibImport.sh -f ../../testdata/covar/small-test testout/covar/input/smalltesthib.hib");
+    TestUtils.runCommand("../hibImport.sh -f ../../testdata/covar/white-black testout/covar/input/white-black.hib");
     
     setupOnce = true;
   }
@@ -165,5 +156,4 @@ public class TestUtils {
     argList.add(outputHib);
     runJar(argList);
   }
-  
 }

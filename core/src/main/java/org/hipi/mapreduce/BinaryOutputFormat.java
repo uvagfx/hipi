@@ -62,7 +62,8 @@ public class BinaryOutputFormat<K, V> extends FileOutputFormat<K, V> {
     CompressionCodec codec = null;
     String extension = "";
     if (isCompressed) {
-      Class<? extends CompressionCodec> codecClass = getOutputCompressorClass(context, GzipCodec.class);
+      Class<? extends CompressionCodec> codecClass = 
+          getOutputCompressorClass(context, GzipCodec.class);
       codec = ReflectionUtils.newInstance(codecClass, context.getConfiguration());
       extension = codec.getDefaultExtension();
     }

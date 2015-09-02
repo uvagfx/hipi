@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="../include/main.css" />
     <link rel="stylesheet" type="text/css" href="../include/javasyntax.css" />
-    <title>HIPI - Hadoop Image Processing Interface :: examples/covar</title>
+    <title>HIPI - Hadoop Image Processing Interface :: tools/covar</title>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -46,7 +46,7 @@
     <!-- Begin Content -->
     <div class="content">
 
-      <h2 class="title">examples/covar</h2>
+      <h2 class="title">tools/covar</h2>
 
       <div class="section">
 
@@ -61,11 +61,11 @@
 	<h3>Introduction</h3>
 -->
 
-	This program reproduces the key result in the seminal 1992 computer vision paper <a class="external_link" href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">The Principal Components of Natural Images</a> by Hancock et al. We perform the same experiment described in that paper using HIPI, which enables analyzing a much larger collection of images than the 15 used in the original paper. To understand this program, we need to first review a bit of linear algebra.<br /><br />
+	This program reproduces the key result in the seminal 1992 computer vision paper <a class="external_link" href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">The Principal Components of Natural Images</a> by Hancock et al. We perform the same experiment described in that paper using both HIPI and <a class="external_link" href="http://opencv.org/">OpenCV</a>, a powerful open-source computer vision library which can easily be integrated into HIPI jobs. We are able to analyze a much larger collection of images than the 15 used in the original paper. To understand this program, we need to first review a bit of linear algebra.<br /><br />
 
 	Our goal is to reveal statistical properties of the pixel values in small patches of typical images (e.g., snapshots, selfies, landscape photos, etc.). Why would this be useful? Well, this would tell us something about the structure of <i>natural images</i> and would provide a basis for certain image processing and compression algorithms. Specifically, we are interested in computing the second-order statistics, also called the <i>covariance</i>, which gives the expected value of the squared deviation across <i>all pairs of pixels</i> in a patch. It turns out that the eigenvectors of the covariance matrix reveal the <i>dominant modes of variance</i> across the set of input patches. Because these are so useful for many data analysis and compression tasks they are given the name <i>principal components</i> and this process is often called <i>Principal Component Analysis</i>. <br /><br />
 
-	Following Hancock et al. we will be using image patches that are <i>48 x 48</i> in size. Let's assume that we have collected <b>n</b> such patches by randmoly sampling them from a set of images downloaded from the Internet. If we denote a single image patch by the vector <b>x</b> then the <i>sample covariance</i> computed from these <b>n</b> patches is given by the following formula:
+	Following Hancock et al. we will be using image patches that are <i>64 x 64</i> in size. Let's assume that we have collected <b>n</b> such patches by randomly sampling them from a set of images downloaded from the Internet. If we denote a single image patch by the vector <b>x</b> then the <i>sample covariance</i> computed from these <b>n</b> patches is given by the following formula:
 
       <img class="centered_image" src="../images/pca/cov_formula.png" alt="" /><br />
 
@@ -73,9 +73,9 @@
 
       <img class="centered_image" src="../images/pca/cov_parallel.png" alt="" /><br />
 
-      Writing the expression in this way makes it a bit easier to see how to compute the covariance matrix C using MapReduce. Our approach is to have each map task compute the product of a different submatrix (e.g., one map task will compute <span class="math">AA<sup>T</sup></span>, another will compute <span class="math">BB<sup>T</sup></span>, and so on) and the reduce task will perform the final aggregation to obtain C. Note, however, that the mean must be known ahead of time. Although there is a way to rewrite this computation that allows computing the mean and covariance with just one pass through the data, we chose this formulation for simplicity and because it illustates the use of the very handy MapReduce job cache file. Specifically, our program consists of two MapReduce jobs, the first computes the mean and the second uses this mean to compute the covariance. Our program makes use of the <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">Job::addCacheFile()</a> and <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">Job::getCacheFiles()</a> methods to distribute the mean patch to all of the covariance map tasks.<br /><br />
+      Writing the expression in this way makes it a bit easier to see how to compute the covariance matrix C using MapReduce. Our approach is to have each map task compute the product of a different submatrix (e.g., one map task will compute <span class="math">AA<sup>T</sup></span>, another will compute <span class="math">BB<sup>T</sup></span>, and so on) and the reduce task will perform the final aggregation to obtain C. Note, however, that the mean must be known ahead of time. Although there is a way to rewrite this computation that allows computing the mean and covariance with just one pass through the data, we chose this formulation for simplicity and because it illustrates how the <a href="http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html">Hadoop Distributed Filesystem</a> (HDFS) can be used to pass data between Hadoop jobs. Our program consists of two MapReduce jobs; the first computes the mean and stores it on the HDFS, while the second uses the mean to compute the covariance.<br /><br />
 
-      After the covariance matrix is computed, you can use a variety of tools like MATLAB or Python to compute its eigenvectors and obtain the principal components. The HIPI distribution includes MATLAB and Python scripts for doing this in <tt>util/readFloatImage.m</tt> and <tt>util/showCovarianceOutput.py</tt>, respectively.<br /><br />
+      After the covariance matrix is computed, you can use a variety of tools like MATLAB or Python to compute its eigenvectors and obtain the principal components. The HIPI distribution includes MATLAB and Python scripts for doing this (<tt>util/readFloatOpenCVMatWritable.m</tt>, <tt>util/displayPrincipalComponents.m</tt>, and <tt>util/showCovarianceOutput.py</tt>, respectively).<br /><br />
 
       Below are the first 15 principal components reproduced from Hancock et al., which were computed using 20,000 patches, compared to the first 15 principal components obtained with our HIPI program for different values of <b>n</b> up to 10,000,000 patches (we used a random mix of images downloaded from <a class="external_link" href="https://www.flickr.com/services/developer/api/">Flickr</a>): 
       <table class="centered_table">
@@ -108,245 +108,283 @@
       Compile <b>covar</b> by executing the following Gradle command in the HIPI examples directory (see our <a href="../gettingstarted.html">general notes</a> on setting up HIPI on your system):
   
       <pre class="console">
-$> cd examples
+$> cd tools
 $> gradle covar:jar
       </pre>
 
       <h3>Usage</h3>
 
-      Run <b>covar</b> by executing the <tt>covar.sh</tt> script located in the examples directory. Run without any arguments to see usage:
+      Run <b>covar</b> by executing the <tt>covar.sh</tt> script located in the tools directory. Run without any arguments to see usage:
 
       <pre class="console">
 $> ./covar.sh
       </pre>
 	
-      <b>covar</b> takes two arguments. The first argument is the path to a HIB on the HDFS. This HIB will provide the source of image patches used to compute the mean and covariance. The second argument is the HDFS path to the output directory that will be created once the program has finished. The resulting mean patch and covariance matrix will be stored in this directory in a raw binary format readable by the scripts in the <tt>util</tt> directory.
+      <b>covar</b> takes two arguments. The first argument is the path to a <a href="../javadoc/org/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB) on the HDFS. This HIB will provide the image patches used to compute the mean and covariance. The second argument is the <a href="http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html">HDFS</a> path to the output directory that will be created once the program has finished. Both the resulting mean patch and covariance matrix will be stored in this directory in a raw binary format readable by the scripts in the <tt>util</tt> directory.
 
-      <h2 class="title">How covar works</h2>
-
+      <h2 class="title">How Covar Works</h2>
+    
       <b>covar</b> consists of two steps:
       <ol>
        <li>Compute the average (mean) of 100 randomly sampled patches taken from each image in the input HIB.</li>
        <li>Compute the covariance matrix using the same set of 100 patches <b>per image</b> along with the mean computed in the previous step.</li>
      </ol>
 
-     The output of the first phase is transfered to the second phase using the <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">Job::addCacheFile()</a> and <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/JobContext.html#getCacheFiles()">Job::getCacheFiles()</a> MapReduce methods.
+     The output of the first phase is transfered to the second phase using the <a href="http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html">HDFS</a>.<br/><br/>
+    
+     Note that the source files for covar are stored in the <tt>tools/covar/src/main/java/org/hipi/tools/covar</tt> directory.
+     
+      <h3>The Covar Driver</h3>
 
+      Every MapReduce job must specify a driver class that configures and executes the job (e.g., specifies the various key/value object types, etc.). The overarching driver class for the covariariance computation is <tt>Covariance.java</tt>, where <tt>main()</tt> is the primary entry point which calls the <tt>run()</tt> method. <tt>run()</tt> performs the two MapReduce jobs described above only if the first one succeeds. For more information about setting up and configuring a standard HIPI job, please look at the <a href="hibDump.html">hibDump</a> tool.<br/><br />
+  
+      <tt>Covariance.java</tt> also contains the utility function <tt>convertFloatImageToGrayscaleMat()</tt>, which uses HIPI's OpenCV <a href="../javadoc/org/hipi/opencv/OpenCVUtils.html">utilities</a> to convert <a href="../javadoc/org/hipi/image/FloatImage.html">FloatImages</a> with supported <a href="../javadoc/org/hipi/image/HipiImageHeader.HipiColorSpace.html">HipiColorSpaces</a> into grayscale <a href="http://bytedeco.org/javacpp-presets/opencv/apidocs/org/bytedeco/javacpp/opencv_core.Mat.html">Mats</a>. If the input FloatImage uses an unsupported HipiColorSpace (currently, if it isn't RGB or LUM), the mapper is informed that this particular input image should be skipped. This method is used by both <tt>MeanMapper.java</tt> and <tt>CovarianceMapper.java</tt>.<br/>
+     
       <h3>The Two MapReduce Driver Classes</h3>
-
-      Every MapReduce job must specify a driver class that configures and executes the job (e.g., specifies the various key/value object types, etc.). The driver classes for <b>covariance</b> are defined in <tt>examples/hipi/examples/covariance/Covariance.java</tt>. First, take a look at the <tt>main()</tt> and <tt>run()</tt> methods defined in the Covariance class:
-
+  
+      The driver classes for <b>covar</b> are defined in <tt>ComputeMean.java</tt> and <tt>ComputeCovariance.java</tt>. Because the two drivers are quite similar, only <tt>ComputeCovariance.java</tt> has been included below:
+      
       <pre class="prettyprint">
-  public static void main(String[] args) throws Exception {
-    int res = ToolRunner.run(new Covariance(), args);
-    System.exit(res);
+public class ComputeCovariance {
+  
+  public static int run(String[] args, String inputHibPath, String outputDir, String inputMeanPath) 
+      throws ClassNotFoundException, IllegalStateException, InterruptedException, IOException {
+    
+    System.out.println("Running compute covariance.");
+   
+    Job job = Job.getInstance();
+    
+    job.setJarByClass(Covariance.class);
+
+    job.setInputFormatClass(HibInputFormat.class);
+    
+    job.setMapOutputKeyClass(IntWritable.class);
+    job.setMapOutputValueClass(OpenCVMatWritable.class);
+    
+    job.setOutputKeyClass(NullWritable.class);
+    job.setOutputValueClass(OpenCVMatWritable.class);
+
+    job.setMapperClass(CovarianceMapper.class);
+    job.setReducerClass(CovarianceReducer.class);
+    job.setNumReduceTasks(1);
+    
+    job.setOutputFormatClass(BinaryOutputFormat.class);
+
+    FileInputFormat.setInputPaths(job, new Path(inputHibPath));
+    FileOutputFormat.setOutputPath(job, new Path(outputDir));
+    
+    job.getConfiguration().setStrings("hipi.covar.mean.path", inputMeanPath);
+
+    return job.waitForCompletion(true) ? 0 : 1;
   }
-
-  public int run(String[] args) throws Exception {
-    if (args.length !=2) {
-      System.out.println("Usage: covariance &#60;input HIB&#62; &#60;output directory&#62;");
-      System.exit(0);
-    }
-    if (!runComputeMean(args)) {
-      return 1;
-    }
-    if (!runCovariance(args)) {
-      return 1;
-    }
-    // Indicate success
-    return 0;
-  }
+}      
       </pre>
-
-      <tt>main()</tt> is the entry point of the program and it simply calls the <tt>run()</tt> method which performs the two MapReduce jobs described above only if the first one succeeds. Because the operation of the <tt>runComputeMean()</tt> method is pretty standard so we will forego a detailed explanation here. Please see the <a href="dumphib.html">DumpHIB</a> example program to learn how to setup a standard HIPI job.<br /><br />
-
-      The <tt>runCovariance()</tt> method is slightly more complicated and interesting. Note how it calls <a class="external_link" href="https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/Job.html#addCacheFile(java.net.URI)">Job::addCacheFile()</a> to distribute the previously computed mean patch to the covariance map tasks:
-
-      <pre class="prettyprint">
-  public boolean runCovariance(String[] args) throws Exception {
-    ...
-    job.addCacheFile(new URI("hdfs://" + args[1] + "/mean-output/part-r-00000"));
-    ...
-      </pre>
+      
+      Both of the driver classes contain a static <tt>run()</tt> method which is called in <tt>Covariance.java</tt>. Important to note here is that the path to the result of ComputeMean is stored as a configuration parameter (<tt>hipi.covar.mean.path</tt>). This allows ComputeCovariance to read the result of ComputeMean from the HDFS. Also note that this tool outputs <a href="../javadoc/org/hipi/opencv/OpenCVMatWritable.html">OpenCVMatWritables</a>, which enable Hadoop to write and read <a href="http://bytedeco.org/javacpp-presets/opencv/apidocs/org/bytedeco/javacpp/opencv_core.Mat.html">Mat</a> objects from the HDFS.<br /><br />
+      
+      
+      Again, for a more detailed description regarding how to configure a HIPI job, please refer to the <a href="hibDump.html">hibDump</a> tool.
 
       <h3>The Mean Mapper</h3>
 
-      Here is the <tt>map()</tt> method in the MeanMapper class along with the helper method <tt>generateMeanImage()</tt>:
+      Here is the <tt>map()</tt> method in the MeanMapper:
 
       <pre class="prettyprint">
-    public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException {
-      if (value != null && value.getWidth() &#62; N && value.getHeight() &#62; N) {
-        context.write(new IntWritable(0), generateMeanImage(value, 100, 100));
-      }
+  public void map(HipiImageHeader header, FloatImage image, Context context) throws IOException,
+      InterruptedException {
+    
+    /////
+    // Perform conversion to OpenCV
+    /////
+    
+    Mat cvImage = new Mat(image.getHeight(), image.getWidth(), opencv_core.CV_32FC1);
+    
+    // if unable to convert input FloatImage to grayscale Mat, skip image and move on
+    if(!Covariance.convertFloatImageToGrayscaleMat(image, cvImage)) {
+      System.out.println("MeanMapper is skipping image with invalid color space.");
+      return;
     }
+    
+    /////
+    // Compute mean using OpenCV
+    /////
+    
+    //patch dimensions (N X N)
+    int N = Covariance.patchSize;
+ 
+    Mat mean = new Mat(N, N, opencv_core.CV_32FC1, new Scalar(0.0));
+    
+    //specify number of patches to use in mean patch computation (iMax * jMax patches)
+    int iMax = 10;
+    int jMax = 10;
 
-    // Compute the mean of (xPatchCount * yPatchCount) patches within the input image
-    private FloatImage generateMeanImage(FloatImage input, int xPatchCount, int yPatchCount) {
-      FloatImage mean = new FloatImage(N, N, 1);
-      for (int i = 0; i &#60; xPatchCount; i++) {
-        int x = (input.getWidth() - N) * i / xPatchCount;
-        for (int j = 0; j &#60; yPatchCount; j++) {
-          int y = (input.getHeight() - N) * j / yPatchCount;
-          FloatImage patch = input.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
-          mean.add(patch);
-        }
+    //collect patches and add their values to mean patch mat
+    for (int i = 0; i < iMax; i++) {
+      int x = ((cvImage.cols() - N) * i) / iMax;
+      for (int j = 0; j < jMax; j++) {
+        int y = ((cvImage.rows() - N) * j) / jMax;
+        Mat patch = cvImage.apply(new Rect(x, y, N, N));
+        opencv_core.add(patch, mean, mean);
       }
-      mean.scale((float) (1.0 / (xPatchCount * yPatchCount)));
-      return mean;
     }
+    
+    //scale mean patch mat based on total number of patches
+    mean = opencv_core.divide(mean, ((double) (iMax * jMax))).asMat();
+    
+    context.write(new IntWritable(0), new OpenCVMatWritable(mean));
   }
       </pre>
-
-      This code makes use of several methods in the <a href="../doc/api/hipi/image/FloatImage.html">FloatImage</a> class such as <tt>crop()</tt> and <tt>convert()</tt>. The program uses a fixed patch size of <tt>N=48</tt> and a fixed 100 x 100 subsampling procedure. Also, note that the output key is always <tt>0</tt>, ensuring that all of the partial means will be sent to the same reduce task.
-
+      
+      This code makes use of the <tt>convertFloatImageToGrayscaleMat()</tt> method described above in order convert the provided <a href="../javadoc/org/hipi/image/FloatImage.html">FloatImages</a> into OpenCV <a href="http://bytedeco.org/javacpp-presets/opencv/apidocs/org/bytedeco/javacpp/opencv_core.Mat.html">Mats</a>. This allows us to leverage the mature OpenCV library for image processing, where many basic matrix operations are already implemented (add, divide, etc). <br/><br/>
+      
+      
       <h3>The Mean Reducer</h3>
 
       Here is the <tt>reduce()</tt> method in the MeanReducer class:
 
       <pre class="prettyprint">
-    public void reduce(IntWritable key, Iterable&#60;FloatImage&#62; values, Context context) 
-        throws IOException, InterruptedException {
-      FloatImage mean = new FloatImage(N, N, 1);
-      int total = 0;
-      for (FloatImage val : values) {
-        mean.add(val);
-        total++;
-      }
-      if (total &#62; 0) {
-        mean.scale(1.0f / total);
-        context.write(key, mean);
-      }
+  public void reduce(IntWritable key, Iterable<OpenCVMatWritable> meanPatches, Context context)
+      throws IOException, InterruptedException {
+    
+    int N = Covariance.patchSize;
+    
+    //consolidate mean patches from mapper
+    Mat mean = new Mat(N, N, opencv_core.CV_32FC1, new Scalar(0.0));
+    
+    int count = 0;
+    for (OpenCVMatWritable patch : meanPatches) {
+      opencv_core.add(patch.getMat(), mean, mean);
+      count++;
     }
+    
+    //normalize consolidated mean patch
+    if (count > 1) {
+      mean = opencv_core.divide(mean, (double) count).asMat();
+    }
+    
+    //write out consolidated patch
+    context.write(NullWritable.get(), new OpenCVMatWritable(mean));
   }
       </pre>
 
-    Since each of the partial means output by the map tasks were computed using the same number of patches, there is no need to weight these partial means differently in the final sum.
+    Since each of the partial means output by the map tasks were computed using the same number of patches, there is no need to weight these partial means differently in the final sum. Again, the OpenCVMatWritable class allows us to read OpenCV Mat objects directly from the HDFS. 
 
       <h3>The Covariance Mapper</h3>
 
-      Recall that the covariance calculation requires the average image patch. This object is accessed inside the <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a> method defined in CovarianceMapper with the following lines:
+      Recall that the covariance calculation requires the average image patch. This object is accessed inside the <a class="external_link" href="https://hadoop.apache.org/docs/r2.5.1/api/org/apache/hadoop/mapreduce/Mapper.html#setup(org.apache.hadoop.mapreduce.Mapper.Context)">Mapper:setup()</a> method defined in CovarianceMapper:
 
       <pre class="prettyprint">
-	// Access the job cache
-        URI[] files = new URI[1];
-        if (job.getCacheFiles() != null) {
-          files = job.getCacheFiles();
-        } else {
-          System.err.println("Job cache files is null!");
-        }
-
-        // Read mean from previously run mean job
-        Path cacheFilePath = new Path(files[0].toString());
-        FSDataInputStream dis = FileSystem.get(job.getConfiguration()).open(cacheFilePath);
-        dis.skip(4);
-        FloatImage image = new FloatImage();
-        image.readFields(dis);
-        mean = image.getData();
-      </pre>
-
-      The <tt>dis.skip(4)</tt> function call is needed to discard the key (4 bytes long) that was written to the output of the MeanReducer.<br /><br />
-
-      The <tt>map()</tt> method defined in the CovarianceMapper class uses this <tt>mean</tt> member variable to compute the sample covariance over 100 patches from within one image. In the code below, you may notice that these patches are first converted to grayscale and then Gaussian weighted during the covariance calculation:
-
-      <pre class="prettyprint">
-    public void map(ImageHeader key, FloatImage value, Context context) throws IOException, InterruptedException {
-      if (value != null && value.getWidth() &#62; N && value.getHeight() &#62; N) {
-        // Holds 100 patches as they are collected from the image
-        float[][] patchArray = new float[100][N * N];
-        // Generate mean-subtracted (whitened) and Gaussian weighted patches and stores them in patchArray
-        for (int i = 0; i &#60; 10; i++) {
-          int x = (value.getWidth() - N) * i / 10;
-          for (int j = 0; j &#60; 10; j++) {
-            int y = (value.getHeight() - N) * j / 10;
-            FloatImage patch = value.crop(x, y, N, N).convert(FloatImage.RGB2GRAY);
-            float[] pels = patch.getData();
-            for (int k = 0; k &#60; N * N; k++) {
-              // Subtract mean and weight using Gaussian mask
-              patchArray[i * 10 + j][k] = (pels[k] - mean[k]) * gaussianArray[k];
-            }
-          }
-        }
-        ...
+      // Access mean data on HDFS
+      String meanPathString = job.getConfiguration().get("hipi.covar.mean.path");
+      if(meanPathString == null) {
+        System.err.println("Mean path not set in configuration - cannot continue. Exiting.");
+        System.exit(1);
       }
+      Path meanPath = new Path(meanPathString);
+      FSDataInputStream dis = FileSystem.get(job.getConfiguration()).open(meanPath);
+      
+      // Populate mat with mean data
+      OpenCVMatWritable meanWritable = new OpenCVMatWritable();
+      meanWritable.readFields(dis);
+      mean = meanWritable.getMat();
+      
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+      System.exit(1);
     }
       </pre>
+      
+      Because the MeanReducer used a <a href="https://hadoop.apache.org/docs/current/api/org/apache/hadoop/io/NullWritable.html">NullWritable</a> as the key to its output, the image can be read direcly from the HDFS without needing to skip any key-related components in the data stream. This behavior is defined in <a href="../javadoc/org/hipi/mapreduce/BinaryOutputFormat.html">BinaryOutputFormat</a>. <br/><br/>
 
-      The Gaussian weighting effectively gives higher weight to the center pixels in a patch (see <a class="external_link" href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">Hancock et al.</a> for details). Finally, the covariance is computed from the <tt>patchArray</tt>:
+      The <tt>map()</tt> method defined in the CovarianceMapper class uses this average image patch to compute the sample covariance over 100 patches from within one image. Following the steps of the original paper, these patches are first converted to grayscale (as in the MeanMapper) and then Gaussian-masked before the covariance calculation. The Gaussian masking effectively gives higher weight to the center pixels in a patch (see <a class="external_link" href="http://www.ib.cnea.gov.ar/~redneu/2013/BOOKS/Hancock_Baddeley_Smith_1992.pdf">Hancock et al.</a> for details).
 
       <pre class="prettyprint">
-        ...
-        // Stores the (N^2 x N^2) covariance matrix AAt
-        float[] covarianceArray = new float[N * N * N * N];
-        for (int i = 0; i &#60; N * N; i++) {
-          for (int j = 0; j &#60; N * N; j++) {
-            covarianceArray[i * N * N + j] = 0;
-            for (int k = 0; k &#60; 10; k++) {
-              covarianceArray[i * N * N + j] += patchArray[k][i] * patchArray[k][j];
-            }
-          }
-        }
-        context.write(new IntWritable(0), new FloatImage(N * N, N * N, 1, covarianceArray));
+  public void map(HipiImageHeader header, FloatImage image, Context context) throws IOException,
+      InterruptedException {
+    
+    /////
+    // Perform conversion to OpenCV
+    /////
+    
+    Mat cvImage = new Mat(image.getHeight(), image.getWidth(), opencv_core.CV_32FC1);
+    
+    // if unable to convert input FloatImage to grayscale Mat, skip image and move on
+    if(!Covariance.convertFloatImageToGrayscaleMat(image, cvImage)) {
+      System.out.println("CovarianceMapper is skipping image with invalid color space.");
+      return;
+    }
+     
+    /////
+    // Create patches for covariance computation
+    /////
+    
+    // Specify number of patches to use in covariance computation (iMax * jMax patches)
+    int iMax = 10;
+    int jMax = 10;
+    
+    Mat[] patches = new Mat[iMax * jMax];
+    
+    int N = Covariance.patchSize;
+
+    // Create mean-subtracted and gaussian-masked patches
+    for (int i = 0; i < iMax; i++) {
+      int x = (cvImage.cols() - N) * i / iMax;
+      for (int j = 0; j < jMax; j++) {
+        int y = (cvImage.rows() - N) * j / jMax;
+        
+        Mat patch = cvImage.apply(new Rect(x, y, N, N)).clone();
+        
+        opencv_core.subtract(patch, mean, patch);
+        opencv_core.multiply(patch, gaussian, patch);
+        
+        patches[(iMax * i) + j] = patch;
       }
     }
-      </pre>
+    
+    /////
+    // Run covariance computation
+    /////
 
-      The resulting covariance matrix is represented as a <a href="../doc/api/hipi/image/FloatImage.html">FloatImage</a> and emitted to the reduce task with a call to <tt>context.write()</tt>.
+    // Stores the (N^2 x N^2) covariance matrix patchMat*transpose(patchMat)
+    Mat covarianceMat = new Mat(N * N, N * N, opencv_core.CV_32FC1, new Scalar(0.0));
+    
+    // Stores patches as column vectors
+    Mat patchMat = new Mat(N * N, patches.length, opencv_core.CV_32FC1, new Scalar(0.0));
+   
+    // Create patchMat
+    for(int i = 0; i < patches.length; i++) {
+      patches[i].reshape(0, N * N).copyTo(patchMat.col(i));
+    }
+    
+    // Compute patchMat*transpose(patchMat)
+    covarianceMat = opencv_core.multiply(patchMat, patchMat.t().asMat()).asMat();
+    
+    context.write(new IntWritable(0), new OpenCVMatWritable(covarianceMat));
+  }
+      </pre>
 
       <h3>The Covariance Reducer</h3>
 
-      The <tt>reduce()</tt> method in the CovarianceReducer class combines the partial covariances emitted by the map tasks into the final covariance. As with the reducer method for the mean program, each map task processes the same number of patches so there is no need to weight the partial covariances differently. The output of <tt>reduce</tt> is simply the sum of these input covariances, again represented as a FloatImage:
+      The <tt>reduce()</tt> method in the CovarianceReducer class combines the partial covariances emitted by the map tasks into the final covariance. As with the reducer method for the mean program, each map task processes the same number of patches so there is no need to weight the partial covariances differently. The output of <tt>reduce()</tt> is simply the sum of these input covariances, again encapsulated in an OpenCVMatWritable object:
 
       <pre class="prettyprint">
-    public void reduce(IntWritable key, Iterable&#60;FloatImage&#62; values, Context context) throws IOException, InterruptedException {
-      // Aggregate sub-matrices in full covariance calculation
-      FloatImage cov = new FloatImage(N * N, N * N, 1);
-      for (FloatImage val : values) {
-        cov.add(val);
-      }
-      context.write(key, cov);
+  public void reduce(IntWritable key, Iterable<OpenCVMatWritable> values, Context context)
+      throws IOException, InterruptedException {
+    
+    int N = Covariance.patchSize;
+    
+    Mat cov = new Mat(N * N, N * N, opencv_core.CV_32FC1, new Scalar(0.0));
+    
+    // Consolidate covariance matrices
+    for(OpenCVMatWritable value : values) {
+      opencv_core.add(value.getMat(), cov, cov);
     }
+      
+    context.write(NullWritable.get(), new OpenCVMatWritable(cov));
   }
       </pre>
     
-    The output of <b>covariance</b> consists of two files named <tt>&#60;output directory&#62;/mean-output/part-r-00000</tt> and <tt>&#60;output directory&#62;/covariance-output/part-r-00000</tt>. These binary files can be viewed using a simple MATLAB or Python program. The HIPI distribution includes sample programs in each of these languages. Here is the MATLAB function that reads a FloatImage into a MATLAB matrix:
-
-      <pre class="prettyprint">
-  function [ y ] = readFloatImage( file )
-    fid = fopen(file);
-    if fid ~= 0
-      fread(fid, 1, 'int32', 0, 'b');
-      width = fread(fid, 1, 'int32', 0, 'b');
-      height = fread(fid, 1, 'int32', 0, 'b');
-      band = fread(fid, 1, 'int32', 0, 'b');
-      y = reshape(fread(fid, width * height * band, 'float32', 0, 'b'), width, height, band);
-    else
-      y = [];
-    end
-  end
-      </pre>
-
-      An extended version of this function was used to generate the result images displayed above:
-
-      <pre class="prettyprint">
-  function [ y ] = readCovarianceOutputAndGenerateImages( file )
-    fid = fopen(file);
-    if fid ~= 0
-      fread(fid, 1, 'int32', 0, 'b');
-      width = fread(fid, 1, 'int32', 0, 'b');
-      height = fread(fid, 1, 'int32', 0, 'b');
-      band = fread(fid, 1, 'int32', 0, 'b');
-      y = reshape(fread(fid, width * height * band, 'float32', 0, 'b'), width, height, band);
-      [V,d] = princomp(y);
-      for n = 1:15
-        column_data = V(:,n);
-        I = mat2gray(vec2mat(column_data, 48));
-        figure, imshow(I)
-      end
-    else
-      y = [];
-    end
-  end
-   </pre>     
+    The output of <b>covar</b> consists of two files named <tt>&#60;output directory&#62;/mean-output/part-r-00000</tt> and <tt>&#60;output directory&#62;/covariance-output/part-r-00000</tt>. These binary files can be viewed using a simple MATLAB or Python program. The HIPI distribution includes sample programs in each of these languages.<br/><br/>
 
       If you'd like to learn more about Principal Component Analysis, Singular Value Decomposition, and related topics from linear algebra, we recommend the excellent book <a href="http://www.amazon.com/Computations-Hopkins-Studies-Mathematical-Sciences/dp/0801854148">Matrix Computations</a> by Gene Golub.
 

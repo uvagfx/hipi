@@ -1,5 +1,9 @@
 defaultTasks 'install'
 
+allprojects {  
+  apply plugin: 'eclipse'
+}
+
 subprojects {
 
   apply plugin: 'java'
@@ -16,31 +20,25 @@ subprojects {
     compile 'com.twelvemonkeys.imageio:imageio-jpeg:3.1.1'
     compile 'com.twelvemonkeys.imageio:imageio-pnm:3.1.1'
     compile 'com.twelvemonkeys.imageio:imageio-tiff:3.1.1'
-	compile 'org.jocl:jocl:0.2.0-RC00'
+    compile group: 'org.bytedeco', name: 'javacpp', version: '1.0'
+    compile group: 'org.bytedeco', name: 'javacv', version: '1.0'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.0'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.0', classifier: 'macosx-x86_64'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.0', classifier: 'linux-x86_64'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.0', classifier: 'windows-x86_64'
     testCompile "junit:junit:4+"
   }
 
 }
 
-task checkJavaVersion << {
-  if (!JavaVersion.current().isJava8()) {
-    String message = "ERROR: Java 1.8 required but " + JavaVersion.current() + " found. Change your JAVA_HOME environment variable.";
-    throw new IllegalStateException(message);
-    } else {
-      println 'Found Java 1.8.'
-    }
-}
-
 task install {
-  dependsOn(checkJavaVersion)
-
   dependsOn(':tools:hibImport:jar')
   dependsOn(':tools:hibDownload:jar')
   dependsOn(':tools:hibInfo:jar')
   dependsOn(':tools:hibToJpeg:jar')
   dependsOn(':tools:hibDump:jar')
 
-  //  dependsOn(':examples:covar:jar')
+  dependsOn(':tools:covar:jar')
 
   doLast {
     println '\nFinished building the HIPI library along with all tools and examples.'

@@ -10,5 +10,4 @@ subprojects {
       attributes("Class-Path" : configurations.runtime.collect { it.toURI() }.join(' '));
     }
   }
-
 }

@@ -3,6 +3,7 @@ sourceSets {
     java {
       srcDir 'src/main'
     }
+    compileClasspath += sourceSets.main.runtimeClasspath
   }
 }
 
@@ -30,6 +31,7 @@ test {
   dependsOn(':tools:hibDump:jar')
   dependsOn(':tools:hibDownload:jar')
   dependsOn(':tools:hibToJpeg:jar')
+  dependsOn(':tools:covar:jar')
 
   testLogging.showStandardStreams = true
 

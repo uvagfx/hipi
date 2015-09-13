@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
 
 /**
  * A MapReduce program that takes a list of image URL's, downloads
- * them, and creates a {@link hipi.imagebundle.HipiImageBundle} from
+ * them, and creates a {@link org.hipi.imagebundle.HipiImageBundle} from
  * them. Also supports downloading the Yahoo/Flickr 100M CC dataset.
  * 
  * When running this program, the user must specify 3 parameters. The
@@ -57,8 +57,11 @@ import java.util.regex.Pattern;
  * the third is the number of nodes that should be used during the
  * program's execution. This final parameter should be chosen with
  * respect to the total bandwidth your particular cluster is able to
- * handle. An example usage would be: <br /> <br /> downloader.jar
- * /path/to/urls.txt /path/to/output.hib 10 <br /> <br /> This program
+ * handle. An example usage would be: 
+ * <p>
+ * downloader.jar /path/to/urls.txt /path/to/output.hib 10 
+ * <p>
+ * This program
  * will automatically force 10 nodes to download the set of URL's
  * contained in the input list, thus if your list contains 100,000
  * images, each node in this example will be responsible for

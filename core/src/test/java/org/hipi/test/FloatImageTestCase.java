@@ -68,35 +68,6 @@ public class FloatImageTestCase {
       }
     }
     
-  }
-  
-  @Test
-  public void testImageConvolution() throws IllegalArgumentException, IOException {
-    String[] filenames = {"fall", "stonehendge", "panda", "jpg", "giraffe"};
-    String directory = "../testdata/convolution/";
-    ImageDecoder jpgCodec = JpegCodec.getInstance();
-    ImageDecoder ppmCodec = PpmCodec.getInstance();
-    HipiImageFactory imagegFactory = HipiImageFactory.getFloatImageFactory();
-    FloatImage filter = FloatImage.gaussianFilter(2);
-    
-    for (int i = 0; i < filenames.length; i++) {
-      // Read in a test image
-      String inputPath = directory + filenames[i] + ".jpg";
-      FileInputStream inputStream = new FileInputStream(inputPath);
-      FloatImage inputImg = (FloatImage) jpgCodec.decodeHeaderAndImage(inputStream, imagegFactory, false);
-      
-      // Convolve (CPU)
-      FloatImage cpuImg = new FloatImage(inputImg.getWidth(), inputImg.getHeight(), inputImg.getNumBands(), HipiImageFormat.PPM, HipiColorSpace.RGB);
-      inputImg.convolution(filter, cpuImg);
-      
-      // Read in the truth image
-      String truthPath = directory + filenames[i] + ".ppm";
-      inputStream = new FileInputStream(truthPath);
-      FloatImage truthImg = (FloatImage) ppmCodec.decodeHeaderAndImage(inputStream, imagegFactory, false);
-      
-      assertTrue("Failed image: " + filenames[i], cpuImg.equalsWithTolerance(truthImg, 5.0f/255.0f));
-    }
-    
-  }
+  }  
 
 }

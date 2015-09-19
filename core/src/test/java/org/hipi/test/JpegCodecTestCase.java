@@ -21,6 +21,7 @@ import org.hipi.util.ByteUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.Ignore;
 
@@ -35,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.System;
 import java.util.Scanner;
 import java.util.Iterator;
 
@@ -44,6 +46,33 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 public class JpegCodecTestCase {
+
+  private static String getTmpPath(String file) {
+    String userTmpPath = System.getProperty("user.home") + "/tmp";
+    if (file != null && file.length() > 0) {
+      userTmpPath += "/" + file;
+    }
+    return userTmpPath; 
+  }
+
+  // setup tmp directory used by tests
+  @BeforeClass
+  public static void setup() throws IOException {
+    File userTmpDir = new File(getTmpPath(null));
+    try {
+      if (!userTmpDir.exists()) {
+        if (!userTmpDir.mkdir()) {
+          System.err.println("Failed to create temp directory: " + userTmpDir.getPath());
+          System.exit(1);
+        } else {
+          System.err.println("Created temp directory: " + userTmpDir.getPath());
+        }
+      } 
+    } catch(SecurityException se) {
+      System.err.println("Failed to create temporary directory.");
+      System.err.println(se.getMessage());
+    }
+  }
 
   private void printExifData(HipiImage image) {
     // display EXIF data
@@ -61,8 +90,8 @@ public class JpegCodecTestCase {
       ImageReader imageReader = readers.next();
       //      System.out.println("ImageReader: " + imageReader);
       if (imageReader.toString().startsWith("com.twelvemonkeys.imageio.plugins.jpeg")) {
-	foundTwelveMonkeys = true;
-      }
+       foundTwelveMonkeys = true;
+     }
     }
     assertTrue("FATAL ERROR: failed to locate TwelveMonkeys ImageIO plugins", foundTwelveMonkeys);
   }
@@ -90,7 +119,8 @@ public class JpegCodecTestCase {
       FileInputStream fis = new FileInputStream(fname);
       HipiImageHeader header = decoder.decodeHeader(fis, true);
       assertNotNull("failed to decode header: " + fname, header);
-      assertEquals("exif model not correct: " + fname, model[i].trim(), header.getExifData("Model").trim());
+      assertEquals("exif model not correct: " + fname, model[i].trim(), 
+        header.getExifData("Model").trim());
       assertEquals("width not correct: " + fname, width[i], header.getWidth());
       assertEquals("height not correct: " + fname, height[i], header.getHeight());
     }
@@ -109,46 +139,47 @@ public class JpegCodecTestCase {
       String ext = FilenameUtils.getExtension(file.getName());
       if (file.isFile() && ext.equalsIgnoreCase("jpg")) {
 
-	String jpgPath = file.getPath();
-	String ppmPath = FilenameUtils.removeExtension(file.getPath()) + "_hipi.ppm";
+        String jpgPath = file.getPath();
+        String ppmPath = FilenameUtils.removeExtension(file.getPath()) + "_hipi.ppm";
 
-	System.out.println("Testing linear RGB color conversion for: " + jpgPath);
+        System.out.println("Testing linear RGB color conversion for: " + jpgPath);
 
-	// Using FloatImage forces conversion from non-linear sRGB to linear RGB by default
-	FloatImage jpegImage = (FloatImage)jpegDecoder.decodeHeaderAndImage(new FileInputStream(jpgPath), HipiImageFactory.getFloatImageFactory(), true);
-	assertNotNull(jpegImage);
+        // Using FloatImage forces conversion from non-linear sRGB to linear RGB by default
+        FloatImage jpegImage = (FloatImage)jpegDecoder.decodeHeaderAndImage(
+          new FileInputStream(jpgPath), HipiImageFactory.getFloatImageFactory(), true);
+        assertNotNull(jpegImage);
 
-	BufferedImage javaImage = ImageIO.read(new FileInputStream(jpgPath));
-	assertNotNull(javaImage);
+        BufferedImage javaImage = ImageIO.read(new FileInputStream(jpgPath));
+        assertNotNull(javaImage);
 
-	ColorSpace ics = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
-	ColorConvertOp cco = new ColorConvertOp(ics, null);
-	BufferedImage rgbImage = cco.filter(javaImage, null);
-	assertNotNull(rgbImage);
-	
-	Raster raster = rgbImage.getData();
-	DataBuffer dataBuffer = raster.getDataBuffer();
-	int w = raster.getWidth();
-	int h = raster.getHeight();
-	
-	assertEquals(w,jpegImage.getWidth());
-	assertEquals(h,jpegImage.getHeight());
-	assertEquals(3,raster.getNumBands());
+        ColorSpace ics = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
+        ColorConvertOp cco = new ColorConvertOp(ics, null);
+        BufferedImage rgbImage = cco.filter(javaImage, null);
+        assertNotNull(rgbImage);
 
-	ppmEncoder.encodeImage(jpegImage, new FileOutputStream(ppmPath));
-	System.out.println("wrote: " + ppmPath);
+        Raster raster = rgbImage.getData();
+        DataBuffer dataBuffer = raster.getDataBuffer();
+        int w = raster.getWidth();
+        int h = raster.getHeight();
 
-	String truthPath = FilenameUtils.removeExtension(file.getPath()) + "_photoshop.ppm";
+        assertEquals(w,jpegImage.getWidth());
+        assertEquals(h,jpegImage.getHeight());
+        assertEquals(3,raster.getNumBands());
 
-	Runtime rt = Runtime.getRuntime();
-	String cmd = "compare -metric PSNR " + ppmPath + " " + truthPath + " /tmp/psnr.png";
-	System.out.println(cmd);
-	Process pr = rt.exec(cmd);
-	Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));
-	float psnr = scanner.hasNextFloat() ? scanner.nextFloat() : 0;
-	System.out.println("PSNR with respect to Photoshop ground truth: " + psnr);
-	assertTrue("PSNR is too low : " + psnr, psnr > 30);
+        ppmEncoder.encodeImage(jpegImage, new FileOutputStream(ppmPath));
+        System.out.println("wrote: " + ppmPath);
 
+        String truthPath = FilenameUtils.removeExtension(file.getPath()) + "_photoshop.ppm";
+
+        Runtime rt = Runtime.getRuntime();
+        String cmd = "compare -metric PSNR " + ppmPath + " " + truthPath + " " + 
+          getTmpPath("psnr.png");
+        System.out.println(cmd);
+        Process pr = rt.exec(cmd);
+        Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));
+        float psnr = scanner.hasNextFloat() ? scanner.nextFloat() : 0;
+        System.out.println("PSNR with respect to Photoshop ground truth: " + psnr);
+        assertTrue("PSNR is too low : " + psnr, psnr > 30);
       }
     }    
   }
@@ -164,63 +195,63 @@ public class JpegCodecTestCase {
     File[] files = (File[])ArrayUtils.addAll(cmykFiles,rgbFiles);
 
     for (int iter=0; iter<=1; iter++) {
-
       for (File file : files) {
-	String ext = FilenameUtils.getExtension(file.getName());
-	if (file.isFile() && ext.equalsIgnoreCase("jpg")) {
 
-	  String jpgPath = file.getPath();
-	  String ppmPath = FilenameUtils.removeExtension(file.getPath()) + "_photoshop.ppm";
+        String ext = FilenameUtils.getExtension(file.getName());
+        if (file.isFile() && ext.equalsIgnoreCase("jpg")) {
 
-	  System.out.println("Testing JPEG decoder (" + (iter == 0 ? "ByteImage" : "FloatImage") + ") for: " + jpgPath);
+          String jpgPath = file.getPath();
+          String ppmPath = FilenameUtils.removeExtension(file.getPath()) + "_photoshop.ppm";
+
+          System.out.println("Testing JPEG decoder (" + (iter == 0 ? "ByteImage" : "FloatImage") + ") for: " + jpgPath);
 	  
-	  FileInputStream fis = new FileInputStream(ppmPath);
-	  RasterImage ppmImage = (RasterImage)ppmDecoder.decodeHeaderAndImage(fis, (iter == 0 ? HipiImageFactory.getByteImageFactory() : HipiImageFactory.getFloatImageFactory()), false);
-	  assumeNotNull(ppmImage);
+          FileInputStream fis = new FileInputStream(ppmPath);
+          RasterImage ppmImage = (RasterImage)ppmDecoder.decodeHeaderAndImage(fis, (iter == 0 ? HipiImageFactory.getByteImageFactory() : HipiImageFactory.getFloatImageFactory()), false);
+          assumeNotNull(ppmImage);
 	  
-	  fis = new FileInputStream(jpgPath);
-	  RasterImage jpegImage = (RasterImage)jpegDecoder.decodeHeaderAndImage(fis, (iter == 0 ? HipiImageFactory.getByteImageFactory() : HipiImageFactory.getFloatImageFactory()), true);
-	  assumeNotNull(jpegImage);
+          fis = new FileInputStream(jpgPath);
+          RasterImage jpegImage = (RasterImage)jpegDecoder.decodeHeaderAndImage(fis, (iter == 0 ? HipiImageFactory.getByteImageFactory() : HipiImageFactory.getFloatImageFactory()), true);
+          assumeNotNull(jpegImage);
 	  
-	  float maxDiff = (iter == 0 ? 45.0f : 45.0f/255.0f);
-	  if (!ppmImage.equalsWithTolerance((RasterImage)jpegImage, maxDiff)) { // allow 3 8-bit values difference to account for color space conversion
-	    System.out.println(ppmImage);
-	    System.out.println(jpegImage);
+          float maxDiff = (iter == 0 ? 45.0f : 45.0f/255.0f);
+	        if (!ppmImage.equalsWithTolerance((RasterImage)jpegImage, maxDiff)) { // allow 3 8-bit values difference to account for color space conversion
+            System.out.println(ppmImage);
+            System.out.println(jpegImage);
 	    
-	    // Get pointers to pixel arrays
-	    PixelArray ppmPA = ppmImage.getPixelArray();
-	    PixelArray jpegPA = jpegImage.getPixelArray();
+	          // Get pointers to pixel arrays
+            PixelArray ppmPA = ppmImage.getPixelArray();
+            PixelArray jpegPA = jpegImage.getPixelArray();
 	    
-	    int w = ppmImage.getWidth();
-	    int h = ppmImage.getHeight();
-	    assertEquals(ppmImage.getNumBands(),3);
-	    assertEquals(jpegImage.getNumBands(),3);
+            int w = ppmImage.getWidth();
+            int h = ppmImage.getHeight();
+            assertEquals(ppmImage.getNumBands(),3);
+            assertEquals(jpegImage.getNumBands(),3);
 	    
-	    // Check that pixel data is equal.
-	    for (int i = 0; i < w*h*3; i++) {
-	      float diff = (iter == 0 ? Math.abs(ppmPA.getElem(i) - jpegPA.getElem(i)) : Math.abs(ppmPA.getElemFloat(i) - jpegPA.getElemFloat(i)));
-	      if (diff > maxDiff) {
-		int j = (int)(i/3);
-		int x = j%w;
-		int y = (int)(j/w);
-		if (iter == 0) {
-		  System.out.println(String.format("(%d,%d)  PPM: %d %d %d | JPG: %d %d %d", x, y,
-						   ppmPA.getElem(j*3+0), ppmPA.getElem(j*3+1), ppmPA.getElem(j*3+2),
-						   jpegPA.getElem(j*3+0), jpegPA.getElem(j*3+1), jpegPA.getElem(j*3+2)));
-		} else {
-		  System.out.println(String.format("(%d,%d)  PPM: %.2f %.2f %.2f | JPG: %.2f %.2f %.2f", x, y,
-						   ppmPA.getElemFloat(j*3+0), ppmPA.getElemFloat(j*3+1), ppmPA.getElemFloat(j*3+2),
-						   jpegPA.getElemFloat(j*3+0), jpegPA.getElemFloat(j*3+1), jpegPA.getElemFloat(j*3+2)));
-		}
-		System.out.println(String.format("diff = %f [maxDiff = %f]", diff, maxDiff));
-		break;
-	      }
-	    }
+	          // Check that pixel data is equal.
+            for (int i = 0; i < w*h*3; i++) {
+              float diff = (iter == 0 ? Math.abs(ppmPA.getElem(i) - jpegPA.getElem(i)) : Math.abs(ppmPA.getElemFloat(i) - jpegPA.getElemFloat(i)));
+              if (diff > maxDiff) {
+                int j = (int)(i/3);
+                int x = j%w;
+                int y = (int)(j/w);
+                if (iter == 0) {
+                  System.out.println(String.format("(%d,%d)  PPM: %d %d %d | JPG: %d %d %d", x, y,
+                   ppmPA.getElem(j*3+0), ppmPA.getElem(j*3+1), ppmPA.getElem(j*3+2),
+                   jpegPA.getElem(j*3+0), jpegPA.getElem(j*3+1), jpegPA.getElem(j*3+2)));
+                } else {
+                  System.out.println(String.format("(%d,%d)  PPM: %.2f %.2f %.2f | JPG: %.2f %.2f %.2f", x, y,
+                   ppmPA.getElemFloat(j*3+0), ppmPA.getElemFloat(j*3+1), ppmPA.getElemFloat(j*3+2),
+                   jpegPA.getElemFloat(j*3+0), jpegPA.getElemFloat(j*3+1), jpegPA.getElemFloat(j*3+2)));
+                }
+                System.out.println(String.format("diff = %f [maxDiff = %f]", diff, maxDiff));
+                break;
+              }
+            }
+
+            fail("Found differences between decoded image and ground truth.");
 	    
-	    fail("Found differences between decoded image and ground truth.");
-	    
-	  }
-	}
+          }
+        }
       }
     }
   }
@@ -236,45 +267,47 @@ public class JpegCodecTestCase {
     for (File file : files) {
       if (file.isFile() && file.getName().endsWith("_photoshop.ppm")) {
 
-	String ppmPath = file.getPath();
-	String jpgPath = "/tmp/hipi_enc.jpg";
+        String ppmPath = file.getPath();
+        String jpgPath = getTmpPath("hipi_enc.jpg");
 
-	System.out.println("Testing JPEG encoder (ByteImage) for: " + ppmPath);
+        System.out.println("Testing JPEG encoder (ByteImage) for: " + ppmPath);
 
-	ByteImage image = (ByteImage)ppmDecoder.decodeHeaderAndImage(new FileInputStream(ppmPath), HipiImageFactory.getByteImageFactory(), false);
-	jpegEncoder.encodeImage(image, new FileOutputStream(jpgPath));
+        ByteImage image = (ByteImage)ppmDecoder.decodeHeaderAndImage(new FileInputStream(ppmPath), 
+          HipiImageFactory.getByteImageFactory(), false);
+        jpegEncoder.encodeImage(image, new FileOutputStream(jpgPath));
 
-	Runtime rt = Runtime.getRuntime();
-	String cmd = "compare -metric PSNR " + ppmPath + " " + jpgPath + " /tmp/psnr.png";
-	System.out.println("cmd: " + cmd);
-	Process pr = rt.exec(cmd);
-	Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));
-	float psnr = scanner.hasNextFloat() ? scanner.nextFloat() : 0;
-	System.out.println("PSNR: " + psnr);
-	assertTrue(ppmPath + " PSNR is too low : " + psnr, psnr > 30);
+        Runtime rt = Runtime.getRuntime();
+        String cmd = "compare -metric PSNR " + ppmPath + " " + jpgPath + " /tmp/psnr.png";
+        System.out.println("cmd: " + cmd);
+        Process pr = rt.exec(cmd);
+        Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));
+        float psnr = scanner.hasNextFloat() ? scanner.nextFloat() : 0;
+        System.out.println("PSNR: " + psnr);
+        assertTrue(ppmPath + " PSNR is too low : " + psnr, psnr > 30);
       }
     }
 
     // Tests PPM decode and JPEG encode routines using FloatImage
     for (File file : files) {
       if (file.isFile() && file.getName().endsWith("_photoshop.ppm")) {
+        String ppmPath = file.getPath();
+        String jpgPath = getTmpPath("hipi_enc.jpg");
 
-	String ppmPath = file.getPath();
-	String jpgPath = "/tmp/hipi_enc.jpg";
+        System.out.println("Testing JPEG encoder (FloatImage) for: " + ppmPath);
 
-	System.out.println("Testing JPEG encoder (FloatImage) for: " + ppmPath);
+        FloatImage image = (FloatImage)ppmDecoder.decodeHeaderAndImage(new FileInputStream(ppmPath), 
+          HipiImageFactory.getFloatImageFactory(), false);
+        jpegEncoder.encodeImage(image, new FileOutputStream(jpgPath));
 
-	FloatImage image = (FloatImage)ppmDecoder.decodeHeaderAndImage(new FileInputStream(ppmPath), HipiImageFactory.getFloatImageFactory(), false);
-	jpegEncoder.encodeImage(image, new FileOutputStream(jpgPath));
-
-	Runtime rt = Runtime.getRuntime();
-	String cmd = "compare -metric PSNR " + ppmPath + " " + jpgPath + " /tmp/psnr.png";
-	System.out.println("cmd: " + cmd);
-	Process pr = rt.exec(cmd);
-	Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));
-	float psnr = scanner.hasNextFloat() ? scanner.nextFloat() : 0;
-	System.out.println("PSNR: " + psnr);
-	assertTrue(ppmPath + " PSNR is too low : " + psnr, psnr > 30);
+        Runtime rt = Runtime.getRuntime();
+        String cmd = "compare -metric PSNR " + ppmPath + " " + jpgPath + " " + 
+          getTmpPath("psnr.png");
+        System.out.println("cmd: " + cmd);
+        Process pr = rt.exec(cmd);
+        Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));
+        float psnr = scanner.hasNextFloat() ? scanner.nextFloat() : 0;
+        System.out.println("PSNR: " + psnr);
+        assertTrue(ppmPath + " PSNR is too low : " + psnr, psnr > 30);
       }
     }
   }

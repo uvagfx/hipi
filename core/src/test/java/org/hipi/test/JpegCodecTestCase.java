@@ -47,31 +47,9 @@ import javax.imageio.stream.ImageInputStream;
 
 public class JpegCodecTestCase {
 
-  private static String getTmpPath(String file) {
-    String userTmpPath = System.getProperty("user.home") + "/tmp";
-    if (file != null && file.length() > 0) {
-      userTmpPath += "/" + file;
-    }
-    return userTmpPath; 
-  }
-
-  // setup tmp directory used by tests
   @BeforeClass
   public static void setup() throws IOException {
-    File userTmpDir = new File(getTmpPath(null));
-    try {
-      if (!userTmpDir.exists()) {
-        if (!userTmpDir.mkdir()) {
-          System.err.println("Failed to create temp directory: " + userTmpDir.getPath());
-          System.exit(1);
-        } else {
-          System.err.println("Created temp directory: " + userTmpDir.getPath());
-        }
-      } 
-    } catch(SecurityException se) {
-      System.err.println("Failed to create temporary directory.");
-      System.err.println(se.getMessage());
-    }
+    TestUtils.setupTmpDirectory();
   }
 
   private void printExifData(HipiImage image) {
@@ -173,7 +151,7 @@ public class JpegCodecTestCase {
 
         Runtime rt = Runtime.getRuntime();
         String cmd = "compare -metric PSNR " + ppmPath + " " + truthPath + " " + 
-          getTmpPath("psnr.png");
+          TestUtils.getTmpPath("psnr.png");
         System.out.println(cmd);
         Process pr = rt.exec(cmd);
         Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));
@@ -268,7 +246,7 @@ public class JpegCodecTestCase {
       if (file.isFile() && file.getName().endsWith("_photoshop.ppm")) {
 
         String ppmPath = file.getPath();
-        String jpgPath = getTmpPath("hipi_enc.jpg");
+        String jpgPath = TestUtils.getTmpPath("hipi_enc.jpg");
 
         System.out.println("Testing JPEG encoder (ByteImage) for: " + ppmPath);
 
@@ -291,7 +269,7 @@ public class JpegCodecTestCase {
     for (File file : files) {
       if (file.isFile() && file.getName().endsWith("_photoshop.ppm")) {
         String ppmPath = file.getPath();
-        String jpgPath = getTmpPath("hipi_enc.jpg");
+        String jpgPath = TestUtils.getTmpPath("hipi_enc.jpg");
 
         System.out.println("Testing JPEG encoder (FloatImage) for: " + ppmPath);
 
@@ -301,7 +279,7 @@ public class JpegCodecTestCase {
 
         Runtime rt = Runtime.getRuntime();
         String cmd = "compare -metric PSNR " + ppmPath + " " + jpgPath + " " + 
-          getTmpPath("psnr.png");
+          TestUtils.getTmpPath("psnr.png");
         System.out.println("cmd: " + cmd);
         Process pr = rt.exec(cmd);
         Scanner scanner = new Scanner(new InputStreamReader(pr.getErrorStream()));

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="Description" content="HIPI - Hadoop Image Processing Interface getting started page tells you what you need to know to start using HIPI on Hadoop MapReduce." />
+    <meta charset="UTF-8">
+    
+    <link rel="stylesheet" type="text/css" href="include/main.css" />
+    <link rel="stylesheet" type="text/css" href="include/javasyntax.css" />
+    <title>HIPI - Hadoop Image Processing Interface :: Getting Started</title>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-23539446-1']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+      </script>
+
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+    <style> pre.prettyprint {padding:20px 20px 0px 20px;} </style>
+
+  </head>
+  
+  <body>
+    <div class="header">
+      <h1>HIPI - Hadoop Image Processing Framework</h1>
+    </div>
+    <div class="navigation_menu">
+      <ul>
+	<li><a href="index.html">Overview</a></li>
+	<li><a href="gettingstarted.html">Getting Started</a></li>
+	<li><a href="documentation.html">Documentation</a></li>
+	<li><a href="examples.html">Tools and Examples</a></li>
+	<li><a href="downloads.html">Downloads</a></li>
+	<li><a href="contribute.html">Contribute</a></li>
+	<li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+    
+    <!-- Begin Content -->
+    <div class="content">
+
+      <div class="section">
+
+	<h2 class="title">Contribute</h2>
+
+	HIPI is an open-source project maintained by a group of dedicated researchers and developers. Please help us make HIPI better by <a class="external_link" href="https://github.com/uvagfx/hipi">forking the official HIPI repository</a>, fixing bugs, adding new features, creating more example programs, etc., creating unit tests to verify the accuracy of your new code, and issuing a <a class="external_link" href="https://help.github.com/articles/using-pull-requests/">pull request</a>.
+
+	<h3>Bugs and Feature Requests</h3>
+
+	We use GitHub's <a class="external_link" href="https://github.com/uvagfx/hipi/issues">issue tracker</a> to keep up with bugs and feature requests. If you're unsure whether or not you've found a new bug please first post a question to the <a class="external_link" href="https://groups.google.com/forum/#!forum/hipi-users">HIPI Users Group</a>.
+
+	<h3>Code Style</h3>
+
+	Any code contributed to the HIPI distribution must follow <a class="external_link" href="https://google-styleguide.googlecode.com/svn/trunk/javaguide.html">Google's Java Style Guide</a>. Any pull requests that don't adhere to this guide will be rejected.
+
+	<h3>Unit Tests</h3>
+
+  The HIPI distribution includes extensive unit tests both for the core library along with the accompanying tools and example programs. Any new feature or bug fix must be accompanied by a comprehensive set of unit tests. You can run HIPI's suite of unit tests by executing the following Gradle command in the HIPI root directory:
+
+	<pre class="console">
+$> gradle core:test
+	</pre>	
+	
+  And you can run the unit tests for the tools with the command:
+
+  <pre class="console">
+$> gradle tools:testSuite:test
+  </pre>  
+
+    </div>
+    <!-- End Content -->
+  </body>
+</html>
+  

@@ -1,0 +1,9 @@
+apply plugin: 'application'
+
+mainClassName = "org.hipi.tools.HibToJpeg"
+
+jar {
+  manifest {
+    attributes("Main-Class": "org.hipi.tools.HibToJpeg")
+  }
+}

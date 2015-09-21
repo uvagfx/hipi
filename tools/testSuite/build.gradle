@@ -1,0 +1,44 @@
+sourceSets {
+  hibDump {
+    java {
+      srcDir 'src/main'
+    }
+    compileClasspath += sourceSets.main.runtimeClasspath
+  }
+}
+
+dependencies {
+  hibDumpCompile project(":core")
+}
+
+task hibDumpJar(type: Jar) {
+  from sourceSets.hibDump.output
+  description 'Creates hibDump.jar required for testing (uses culling functionality).'
+  archiveName='hibDump.jar'
+  manifest {
+//    attributes("Class-Path" : configurations.runtime.collect { it.getAbsolutePath() }.join(' '),
+//               "Main-Class": "org.hipi.tools.test.HibDump");
+      attributes("Class-Path" : configurations.runtime.collect { it.toURI() }.join(' '),
+                 "Main-Class": "org.hipi.tools.test.HibDump");
+  }
+}
+
+test {
+  dependsOn(hibDumpJar)
+
+  dependsOn(':tools:hibImport:jar')
+  dependsOn(':tools:hibInfo:jar')
+  dependsOn(':tools:hibDump:jar')
+  dependsOn(':tools:hibDownload:jar')
+  dependsOn(':tools:hibToJpeg:jar')
+  dependsOn(':tools:covar:jar')
+
+  testLogging.showStandardStreams = true
+
+  doLast {
+    println "\nFinished running HIPI tools test suite."
+  }
+
+}
+
+test.mustRunAfter(hibDumpJar)

@@ -1,0 +1,25 @@
+apply plugin: 'java-library-distribution'
+
+jar {
+	baseName = 'hipi'
+	version = '2.1.0'
+}
+
+distributions {
+    main{
+        baseName = 'hipi'
+        version = '2.1.0'
+    }
+}
+
+javadoc {
+  title = "HIPI - Hadoop Image Processing Interface"
+  options.links("http://docs.oracle.com/javase/8/docs/api/",
+                "http://hadoop.apache.org/docs/stable/api/",
+                "http://javadoc.metadata-extractor.googlecode.com/git/2.7.0/",
+                "http://bytedeco.org/javacpp-presets/opencv/apidocs/")
+}
+
+test {
+    testLogging.showStandardStreams = true
+}

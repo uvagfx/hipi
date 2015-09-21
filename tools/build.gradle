@@ -1,0 +1,13 @@
+subprojects {
+
+  dependencies {
+    compile project(':core')
+  }
+
+  jar {
+    manifest {
+  //      attributes("Class-Path" : configurations.runtime.collect { it.getAbsolutePath() }.join(' '));
+      attributes("Class-Path" : configurations.runtime.collect { it.toURI() }.join(' '));
+    }
+  }
+}

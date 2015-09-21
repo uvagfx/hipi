@@ -1,0 +1,5 @@
+jar {
+	manifest {
+		attributes("Main-Class": "org.hipi.tools.HibDump")
+	}
+}

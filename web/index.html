@@ -1,0 +1,85 @@
+<!DOCTYPE html">
+<html>
+  <head>
+    <meta name="Description" content="HIPI - Hadoop Image Processing Interface is a Hadoop MapReduce library for performing image processing tasks in the Hadoop distributed computation framework." />
+    <meta charset="UTF-8">
+    
+    <link rel="stylesheet" type="text/css" href="include/main.css" />
+    <link rel="stylesheet" type="text/css" href="include/javasyntax.css" />
+    <title>HIPI - Hadoop Image Processing Interface :: Introduction</title>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-23539446-1']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+  </head>
+  
+  <body>
+
+    <div class="header">
+      <h1>HIPI - Hadoop Image Processing Framework</h1>
+    </div>
+    <div class="navigation_menu">
+      <ul>
+	<li><a href="index.html">Overview</a></li>
+	<li><a href="gettingstarted.html">Getting Started</a></li>
+  <li><a href="documentation.html">Documentation</a></li>
+	<li><a href="examples.html">Tools and Examples</a></li>
+	<li><a href="downloads.html">Downloads</a></li>
+	<li><a href="contribute.html">Contribute</a></li>
+	<li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+    
+    <!-- Begin Content -->
+    <div class="content">
+
+      <h2 class="title">Overview</h2>
+
+      <div class="section">
+
+        HIPI is an image processing library designed to be used with the <a class="external_link" href="http://hadoop.apache.org/">Apache Hadoop MapReduce</a> parallel programming framework. HIPI facilitates efficient and high-throughput image processing with MapReduce style parallel programs typically executed on a cluster. It provides a solution for how to store a large collection of images on the Hadoop Distributed File System (HDFS) and make them available for efficient distributed processing. HIPI is developed and maintained by a growing number of developers from around the world.<br /><br />The latest release of HIPI has been tested with Hadoop 2.7.1.<br/><br/>
+
+	<a href="https://github.com/uvagfx/hipi"><img src="./images/viewongithub.png" width="220" alt="View HIPI Repository on GitHub"/></a>
+ 
+	<br/>
+
+	<h3>System Design</h3>
+
+      This diagram shows the organization of a typical MapReduce/HIPI program:<br />
+	
+	<img class="centered_image" src="images/hipi_pipeline.png" width="700" alt=""/><br />
+	
+	The primary input object to a HIPI program is a <a href="javadoc/org/hipi/imagebundle/HipiImageBundle.html">HipiImageBundle</a> (HIB). A HIB is a collection of images represented as a single file on the HDFS. The HIPI distribution includes <a href="examples.html">several useful tools</a> for creating HIBs, including a MapReduce program that builds a HIB from a list of images downloaded from the Internet. <br /><br />
+
+	The first processing stage of a HIPI program is a culling step that allows filtering the images in a HIB based on a variety of user-defined conditions like spatial resolution or criteria related to the image metadata. This functionality is achieved through the <a href="javadoc/org/hipi/mapreduce/Culler.html">Culler</a> class. Images that are culled are never fully decoded, saving processing time.<br /><br />
+
+	The images that survive the culling stage are assigned to individual map tasks in a way that attempts to maximize data locality, a cornerstone of the Hadoop MapReduce programming model. This functionality is achieved through the <a href="javadoc/org/hipi/imagebundle/mapreduce/HibInputFormat.html">HibInputFormat</a> class. Finally, individual images are presented to the Mapper as objects derived from the <a href="javadoc/org/hipi/image/HipiImage.html">HipiImage</a> abstract base class along with an associated <a href="javadoc/org/hipi/image/HipiImageHeader.html">HipiImageHeader</a> object. For example, the <a href="javadoc/org/hipi/image/ByteImage.html">ByteImage</a> and <a href="javadoc/org/hipi/image/FloatImage.html">FloatImage</a> classes extend the HipiImage base class and provide access to the underlying raster grid of image pixel values as arrays of Java bytes and floats, respectively. These classes provide a number of useful functions like cropping, color space conversion, and scaling.<br /><br />
+
+	The records emitted by the Mapper are collected and transmitted to the Reducer according to the built-in MapReduce shuffle algorithm that attemps to minimize network traffic. Finally, the user-defined reduce tasks are executed in parallel and their output is aggregated and written to the HDFS.<br /><br />
+
+<!--
+	The goal of HIPI is to provide a simple and clean interface for high-throughput distributed image processing on the MapReduce platform. To this end, we performed a series of <a href="experiments.html">experiments</a> that show HIPI favorably compares to several common alternatives for representing and processing large collections of binary data in MapReduce.
+-->
+
+<!--
+	<h3>Citing HIPI</h3>
+	
+	If you end up using HIPI your research please cite the following publication:
+
+<pre><code>
+</code></pre>	
+-->
+
+      </div>
+    </div>
+    <!-- End Content -->
+  </body>
+</html>

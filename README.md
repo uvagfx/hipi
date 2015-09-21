@@ -1,4 +1,4 @@
-HIPI (Hadoop Image Processing Interface) is a library designed to provide efficient and high-throughput image processing in the Apache Hadoop MapReduce parallel programming framework.
+HIPI (Hadoop Image Processing Interface) is a library designed to provide efficient and high-throughput image processing in the Apache Hadoop MapReduce parallel programming framework. It also provides support for [OpenCV](http://opencv.org).
 
 For more detail about what HIPI is, see the [Main HIPI Webpage](http://hipi.cs.virginia.edu).
 

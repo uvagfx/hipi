@@ -104,7 +104,7 @@ $> hadoop fs -cat tigers/part-r-00000
 public void map(HipiImageHeader header, ByteImage image, Context context) throws IOException, InterruptedException
 	    </pre>
 
-      Note that the key/value pair received by this method consists of a <a href="../javadoc/org/hipi/image/ImageHeader.html">HipiImageHeader</a> and a <a href="../javadoc/org/hipi/image/ByteImage.html">ByteImage</a>, respectively. Mapper classes that use HIPI (technically, MapReduce programs that use the <a href="../javadoc/org/hipi/imagebundle/mapreduce/HibInputFormat.html">HibInputFormat</a>) must define a <tt>map()</tt> method whose first two arguments are a HipiImageHeader followed by an object derived from the abstract base class <a href="../javadoc/org/hipi/imagebundle/mapreduce/HibInputFormat.html">HipiImage</a>. Specifying a ByteImage as the second argument, as is done here, causes HIPI to decode the image pixel data into a flat array of Java bytes. HIPI takes care of all the low-level (but very important) details of how to efficiently read and decode the image data stored in the HIB and deliver it to the <tt>map()</tt> method in the form of this requested high-level Java object, freeing the developer to focus on the high-level image processing algorithms.<br/><br/>
+      Note that the key/value pair received by this method consists of a <a href="../javadoc/org/hipi/image/ImageHeader.html">HipiImageHeader</a> and a <a href="../javadoc/org/hipi/image/ByteImage.html">ByteImage</a>, respectively. Mapper classes that use HIPI (technically, MapReduce programs that use the <a href="../javadoc/org/hipi/imagebundle/mapreduce/HibInputFormat.html">HibInputFormat</a>) must define a <tt>map()</tt> method whose first two arguments are a HipiImageHeader followed by an object derived from the abstract base class <a href="../javadoc/org/hipi/image/HipiImage.html">HipiImage</a>. Specifying a ByteImage as the second argument, as is done here, causes HIPI to decode the image pixel data into a flat array of Java bytes. HIPI takes care of all the low-level (but very important) details of how to efficiently read and decode the image data stored in the HIB and deliver it to the <tt>map()</tt> method in the form of this requested high-level Java object, freeing the developer to focus on the high-level image processing algorithms.<br/><br/>
 
       Finally, the HibDumpReducer class is the <i>reducer</i> class and it is responsible for defining the operation of the reduce tasks which receive their input from the map tasks and often (though not always) consolidate and further process this data before writing their output to the HDFS.<br /><br />
 
@@ -241,7 +241,7 @@ public static class HibDumpReducer extends Reducer&#60;IntWritable, Text, IntWri
 
 	<h3>Next</h3>
 
-	Read about <a href="../examples/hibDownload.html"><b>tools/hibDownload</b>, a useful program for downloading a set of images from the Internet and storing them in a HIB.
+	Read about <a href="../examples/hibDownload.html"><b>tools/hibDownload</b></a>, a useful program for downloading a set of images from the Internet and storing them in a HIB.
 
       </div>
 

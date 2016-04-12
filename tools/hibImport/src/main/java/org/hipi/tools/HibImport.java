@@ -130,6 +130,7 @@ public class HibImport {
         HashMap<String, String> metaData = new HashMap<String,String>();
         metaData.put("source", localPath);
         String fileName = file.getName().toLowerCase();
+        metaData.put("filename", fileName);
         String suffix = fileName.substring(fileName.lastIndexOf('.'));
         if (suffix.compareTo(".jpg") == 0 || suffix.compareTo(".jpeg") == 0) {
          hib.addImage(fis, HipiImageFormat.JPEG, metaData);

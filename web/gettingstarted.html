@@ -366,9 +366,24 @@ jar {
         We also need to update the <tt>settings.gradle</tt> file in the root directory to tell Gradle about this new build target:
 
         <pre class="prettyprint">
-include ':core', ':tools:hibImport', ... ':examples:covar', ':examples:helloWorld'
+include ':core', ':tools:hibImport', ... ':examples:helloWorld'
         </pre>
-		  
+
+        Next, prepare Gradle configuration for all subprojects under <tt>examples</tt> directory by creating the file <tt>examples/build.gradle</tt>:
+
+        <pre class="prettyprint">
+subprojects {
+  dependencies {
+    compile project(':core')
+  }
+  jar {
+    manifest {
+      attributes("Class-Path" : configurations.runtime.collect { it.toURI() }.join(' '));
+    }
+  }
+}
+        </pre>
+
         Next, create a new Java source file at <tt>examples/helloWorld/src/main/java/org/hipi/examples/HelloWorld.java</tt> that contains the following code:
 
         <pre class="prettyprint">

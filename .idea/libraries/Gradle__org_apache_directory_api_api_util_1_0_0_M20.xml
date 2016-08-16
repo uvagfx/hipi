@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.directory.api:api-util:1.0.0-M20">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.directory.api/api-util/1.0.0-M20/a871abf060b3cf83fc6dc4d7e3d151fce50ac3cb/api-util-1.0.0-M20.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.directory.api/api-util/1.0.0-M20/91330a00cfcd1d89dea957ba25909574cb078502/api-util-1.0.0-M20-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

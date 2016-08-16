@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/covar/covar.iml" filepath="$PROJECT_DIR$/tools/covar/covar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/hibDownload/hibDownload.iml" filepath="$PROJECT_DIR$/tools/hibDownload/hibDownload.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/hibDump/hibDump.iml" filepath="$PROJECT_DIR$/tools/hibDump/hibDump.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/hibImport/hibImport.iml" filepath="$PROJECT_DIR$/tools/hibImport/hibImport.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/hibInfo/hibInfo.iml" filepath="$PROJECT_DIR$/tools/hibInfo/hibInfo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/hibToJpeg/hibToJpeg.iml" filepath="$PROJECT_DIR$/tools/hibToJpeg/hibToJpeg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hipi.iml" filepath="$PROJECT_DIR$/hipi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/testSuite/testSuite.iml" filepath="$PROJECT_DIR$/tools/testSuite/testSuite.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/tools.iml" filepath="$PROJECT_DIR$/tools/tools.iml" />
+    </modules>
+  </component>
+</project>

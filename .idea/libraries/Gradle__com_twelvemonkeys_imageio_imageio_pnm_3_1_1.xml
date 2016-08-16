@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.twelvemonkeys.imageio:imageio-pnm:3.1.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-pnm/3.1.1/e5c92724af98ce1fbb3992058dc759cae17e78de/imageio-pnm-3.1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-pnm/3.1.1/24289fad70efd2727e976e5ded065df0de980a4b/imageio-pnm-3.1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

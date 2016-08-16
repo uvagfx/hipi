@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="LOCAL" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="/usr/local/Cellar/gradle/2.13/libexec" />
+        <option name="gradleJvm" value="1.7" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/tools" />
+            <option value="$PROJECT_DIR$/tools/covar" />
+            <option value="$PROJECT_DIR$/tools/hibDownload" />
+            <option value="$PROJECT_DIR$/tools/hibDump" />
+            <option value="$PROJECT_DIR$/tools/hibImport" />
+            <option value="$PROJECT_DIR$/tools/hibInfo" />
+            <option value="$PROJECT_DIR$/tools/hibToJpeg" />
+            <option value="$PROJECT_DIR$/tools/testSuite" />
+          </set>
+        </option>
+        <option name="myModules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/tools" />
+            <option value="$PROJECT_DIR$/tools/covar" />
+            <option value="$PROJECT_DIR$/tools/hibDownload" />
+            <option value="$PROJECT_DIR$/tools/hibDump" />
+            <option value="$PROJECT_DIR$/tools/hibImport" />
+            <option value="$PROJECT_DIR$/tools/hibInfo" />
+            <option value="$PROJECT_DIR$/tools/hibToJpeg" />
+            <option value="$PROJECT_DIR$/tools/testSuite" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

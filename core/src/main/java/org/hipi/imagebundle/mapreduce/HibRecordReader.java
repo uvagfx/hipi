@@ -41,7 +41,7 @@ public class HibRecordReader extends RecordReader<HipiImageHeader, HipiImage> {
       if(imtype == null){
         imageFactory = new HipiImageFactory(context.getMapperClass());
       } else {
-        System.out.println("imtype:"+imtype);
+        System.out.println("imtype: "+imtype);
         if(imtype.equals("FloatImage")){
           imageFactory = new HipiImageFactory(HipiImage.HipiImageType.FLOAT);
         } else if(imtype.equals("ByteImage")){
